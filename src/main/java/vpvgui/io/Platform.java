@@ -19,9 +19,9 @@ public class Platform {
     public static File getVPVDir() {
         CurrentPlatform platform = figureOutPlatform();
 
-        File linuxPath = new File(System.getProperty("user.home") + File.separator + ".vpv");
-        File windowsPath = new File(System.getProperty("user.home") + File.separator + "VPVconfig");
-        File osxPath = new File(System.getProperty("user.home") + File.separator + ".vpv");
+        File linuxPath = new File(System.getProperty("user.home") + File.separator + ".vpvgui");
+        File windowsPath = new File(System.getProperty("user.home") + File.separator + "vpvgui");
+        File osxPath = new File(System.getProperty("user.home") + File.separator + ".vpvgui");
 
         switch (platform) {
             case LINUX: return linuxPath;
