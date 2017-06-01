@@ -17,11 +17,15 @@ import vpvgui.gui.ErrorWindow;
 import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
+import vpvgui.model.Settings;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static vpvgui.io.Platform.getVPVDir;
 
 public class Controller implements Initializable {
     /**
@@ -97,7 +101,6 @@ public class Controller implements Initializable {
     void showButtonClicked(ActionEvent event) {
         System.out.println("Content: " + textTextField.getText());
     }
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -184,7 +187,6 @@ public class Controller implements Initializable {
         ErrorWindow.display("TO DO","Implement command to create transcript definition file with Jannovar here");
     }
 
-
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
@@ -203,16 +205,64 @@ public class Controller implements Initializable {
         }
     }
 
-
     public void createCaptureProbes() {
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
         selectionModel.select(analysistab);
     }
 
-
     public void closeWindow() {
         boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
         if (answer)
             System.exit(0);
+    }
+    /**
+     * Parse settings file from standard location and return as {@link Settings} bean.
+     * @return Settings for specified project
+     */
+    private Settings loadSettings(String projectName) {
+//        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
+//                + File.separator + projectName + "-settings.txt");
+        File projectSettingsPath = new File(getVPVDir(),
+                model.getSettings().getProjectName() + "-settings.txt");
+        if (!projectSettingsPath.exists()) {
+            System.err.println("Cannot find project settings file. Exiting.");
+            System.exit(1);
+        }
+        return Settings.factory(projectSettingsPath.getAbsolutePath());
+    }
+
+    /**
+     * This method gets called when user chooses to close Gui. Content of
+     * {@link Settings} bean is written to platform-dependent default location.
+     */
+    private void saveSettings() {
+        File settingsDir = getVPVDir();
+
+        // getVPVDir returns null if user's platform is unrecognized.
+        if (settingsDir == null) {
+            System.err.println("Directory for settings files is null. Exiting.");
+            System.exit(1);
+        }
+
+        // Check whether directory already exists; if not, create it.
+        if (!(settingsDir.exists() || settingsDir.mkdir())) {
+                System.err.println("Cannot create directory for settings files. Exiting.");
+                System.exit(1);
+        }
+
+        File projectSettingsPath = new File(settingsDir,
+                model.getSettings().getProjectName() + "-settings.txt");
+        try {
+            // Create new file if one does not already exist.
+            projectSettingsPath.createNewFile();
+        } catch (IOException e) {
+            System.err.println("Cannot create settings file. Exiting.");
+            System.exit(1);
+        }
+
+        // If .vpvgui directory previously contained a settings file for this project,
+        // it gets overwritten by the new file.
+        // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
+        Settings.saveToFile(model.getSettings(), projectSettingsPath);
     }
 }
