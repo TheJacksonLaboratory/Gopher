@@ -12,12 +12,15 @@ import java.util.stream.Stream;
 
 /**
  * Created by peter on 05.05.17.
+ * Modified by blauh on 05.31.17 to add Settings instance variable
  */
 public class Model {
 
     private DataSource datasource=null;
 
     private List<RestrictionEnzyme> enzymelist;
+
+    private Settings settings;
 
     /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10 */
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
@@ -28,6 +31,8 @@ public class Model {
     /** This is coupled to genomeTranscriptomeList in the Controller
      *  ("UCSC-hg19","UCSC-hg38", "UCSC-mm10");
      *  Consider better design
+     *
+     *  TODO: eliminate redundant code after Settings class is integrated into gui HB
      */
 
     public String genomeURL=null;
@@ -44,7 +49,13 @@ public class Model {
 
     public String repeatsURL=null;
 
+    public Settings getSettings() {
+        return settings;
+    }
 
+    public void setSettings(Settings s) {
+        settings = s;
+    }
 
     public Model() {
         initializeEnzymesFromFile();
