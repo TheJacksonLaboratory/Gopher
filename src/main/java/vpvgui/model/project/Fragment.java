@@ -25,7 +25,7 @@ public class Fragment {
     private String currentChromosome="";
 
     /**
-     * The consructor is passed the location of a directory that
+     * The constructor is passed the location of a directory that
      * contains exactly one FASTA file (ending: *.fa or *.fasta) that
      * represents the human genome together with the correcponding
      * fasta index file (fai).
