@@ -3,16 +3,22 @@ package vpvgui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.CopyPasteGenesWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.entrezgenetable.PopupController;
 import vpvgui.io.Downloader;
 import vpvgui.io.JannovarTranscriptFileBuilder;
 import vpvgui.io.Operation;
@@ -24,6 +30,7 @@ import vpvgui.model.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,6 +42,10 @@ public class Controller implements Initializable {
      * The Model for the entire analysis.
      */
     private Model model = null;
+
+    private Stage primaryStage;
+    public void initStage( Stage stage){ primaryStage = stage;}
+
 
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
@@ -147,11 +158,10 @@ public class Controller implements Initializable {
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
             setGenomeBuild(newValue);
+
         }));
-        //System.out.print("initialize " + genomeChoiceBox.getItems().size());
 
-
-        // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
+               // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
         // textLabel.textProperty().bind(textTextField.textProperty());
     }
 
@@ -232,6 +242,8 @@ public class Controller implements Initializable {
 
 
     public void enterGeneList() {
+        showPopupWindow();
+        return; /*
         String[] targetgenes = CopyPasteGenesWindow.display();
         if (targetgenes == null) {
             System.err.println("[TODO] implement me, targetgenes==null");
@@ -240,7 +252,7 @@ public class Controller implements Initializable {
             for (String tg : targetgenes) {
                 System.err.println("\t" + tg);
             }
-        }
+        }*/
     }
 
     public void createCaptureProbes() {
@@ -335,4 +347,39 @@ public class Controller implements Initializable {
         // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
         Settings.saveToFile(model.getSettings(), projectSettingsPath);
     }
+
+    private HashMap<String, Object> showPopupWindow() {
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+
+        FXMLLoader loader = new FXMLLoader();
+        System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
+
+        loader.setLocation(getClass().getResource("/fxml/popup.fxml"));
+        // initializing the controller
+        PopupController popupController = new PopupController();
+        loader.setController(popupController);
+        Parent layout;
+        try {
+            layout = loader.load();
+            Scene scene = new Scene(layout);
+            // this is the popup stage
+            Stage popupStage = new Stage();
+            // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
+            popupController.setStage(popupStage);
+            if(this.rootNode.getScene().getWindow()!=null) {
+                popupStage.initOwner(this.rootNode.getScene().getWindow());
+            }
+            popupStage.initModality(Modality.WINDOW_MODAL);
+            popupStage.setScene(scene);
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return popupController.getResult();
+
+    }
 }
+
+
+
+

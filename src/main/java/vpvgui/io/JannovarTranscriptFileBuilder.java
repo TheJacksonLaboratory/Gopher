@@ -45,6 +45,7 @@ public class JannovarTranscriptFileBuilder {
     }
 
     private void runJannovar() {
+        /* todo check absolute path is not null */
         String argv[] = {"download","-d","hg19/ucsc","--download-dir",downloaddir.getAbsolutePath()};
         Jannovar.main(argv);
 

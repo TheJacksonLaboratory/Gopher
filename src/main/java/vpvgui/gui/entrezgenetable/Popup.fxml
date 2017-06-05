@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.entrezgenetable.PopupController">
+    <children>
+        <HBox alignment="CENTER" style="-fx-background-color: #e1c1c1;">
+            <children>
+                <Label text="POPUP WINDOW EXAMPLE" textFill="#752b2b">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER">
+            <children>
+                <Label prefWidth="70.0" text="Username" />
+                <TextField fx:id="usernameTF" promptText="John Doe" />
+            </children>
+        </HBox>
+        <HBox alignment="CENTER">
+            <children>
+                <Label prefWidth="70.0" text="Password" />
+                <PasswordField fx:id="passwordPF" promptText="*********" />
+            </children>
+        </HBox>
+        <HBox alignment="CENTER">
+            <children>
+                <Button fx:id="connectBtn" mnemonicParsing="false" text="Connect" />
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+</VBox>
