@@ -3,18 +3,20 @@ package vpvgui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.control.ProgressIndicator;
-import javafx.stage.DirectoryChooser;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.CopyPasteGenesWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
-import vpvgui.io.*;
+import vpvgui.io.Downloader;
+import vpvgui.io.JannovarTranscriptFileBuilder;
+import vpvgui.io.Operation;
+import vpvgui.io.UCSChg37Operation;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
@@ -22,6 +24,7 @@ import vpvgui.model.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -31,38 +34,64 @@ public class Controller implements Initializable {
     /**
      * The Model for the entire analysis.
      */
-    private Model model=null;
+    private Model model = null;
 
-    /** This is the root node of the GUI and refers to the BorderPane. It can be used to
+    /**
+     * This is the root node of the GUI and refers to the BorderPane. It can be used to
      * obtain a reference to the primary scene, which is needed by FileChooser, etc.
      */
-    @FXML private Node rootNode;
-
-    /** List of genome+gene files for download. Used by genomeChoiceBox */
     @FXML
-    private ObservableList<String> genomeTranscriptomeList= FXCollections.observableArrayList("UCSC-hg19","UCSC-hg38", "UCSC-mm10");
+    private Node rootNode;
+
+    /**
+     * List of genome+gene files for download. Used by genomeChoiceBox
+     */
+    @FXML
+    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("UCSC-hg19", "UCSC-hg38", "UCSC-mm10");
 
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
 
-    @FXML private ChoiceBox<String> geneDefinitionsChoiceBox;
-    /** Clicking this button downloads the genome build and unpacks it. */
-    @FXML private Button downloadGenome;
-    /** Label for the genome build we want to download. */
-    @FXML private Label genomeBuildLabel;
-    /** Label for the transcripts we want to download. */
-    @FXML private Label transcriptsLabel;
+    @FXML
+    private ChoiceBox<String> geneDefinitionsChoiceBox;
+    /**
+     * Clicking this button downloads the genome build and unpacks it.
+     */
+    @FXML
+    private Button downloadGenome;
+    /**
+     * Label for the genome build we want to download.
+     */
+    @FXML
+    private Label genomeBuildLabel;
+    /**
+     * Label for the transcripts we want to download.
+     */
+    @FXML
+    private Label transcriptsLabel;
 
-    /** Clicking this button will download some combination of genome and (compatible) gene definition files.
+    /**
+     * Clicking this button will download some combination of genome and (compatible) gene definition files.
      * A file chooser will appear and the user can decide where to download everything. The paths will be stored
-     * in the project settings file. */
-    @FXML private Button downloadGenomeButton;
-    /** Show progress in downloading the Genome and corresponding transcript definition file.*/
-    @FXML private ProgressIndicator genomeDownloadPI;
-    /** Button to download RefSeq.tar.gz (transcript/gene definition file */
-    @FXML private Button downloadTranscriptsButton;
-    /** Progress indicator for downloading the transcript file */
-    @FXML private ProgressIndicator transcriptDownloadPI;
+     * in the project settings file.
+     */
+    @FXML
+    private Button downloadGenomeButton;
+    /**
+     * Show progress in downloading the Genome and corresponding transcript definition file.
+     */
+    @FXML
+    private ProgressIndicator genomeDownloadPI;
+    /**
+     * Button to download RefSeq.tar.gz (transcript/gene definition file
+     */
+    @FXML
+    private Button downloadTranscriptsButton;
+    /**
+     * Progress indicator for downloading the transcript file
+     */
+    @FXML
+    private ProgressIndicator transcriptDownloadPI;
 
 
     @FXML
@@ -74,21 +103,29 @@ public class Controller implements Initializable {
     @FXML
     private Button exitButton;
 
-    @FXML private Button enterGeneListButton;
+    @FXML
+    private Button enterGeneListButton;
 
-    @FXML Button createCaptureProbesButton;
+    @FXML
+    Button createCaptureProbesButton;
 
     @FXML
     private Label textLabel;
 
-    @FXML private TabPane tabpane;
+    @FXML
+    private TabPane tabpane;
 
-    @FXML private Tab setuptab;
+    @FXML
+    private Tab setuptab;
 
-    @FXML private Tab analysistab;
+    @FXML
+    private Tab analysistab;
 
-    /** Click this to choose the restriction enzymes with which to do the captuyre Hi-C cutting */
-    @FXML private Button chooseEnzymeButton;
+    /**
+     * Click this to choose the restriction enzymes with which to do the captuyre Hi-C cutting
+     */
+    @FXML
+    private Button chooseEnzymeButton;
 
     @FXML
     void exitButtonClicked(ActionEvent e) {
@@ -115,10 +152,11 @@ public class Controller implements Initializable {
 
 
         // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
-       // textLabel.textProperty().bind(textTextField.textProperty());
+        // textLabel.textProperty().bind(textTextField.textProperty());
     }
 
-    /** Initialize the bindings to Java bean properties in the model with
+    /**
+     * Initialize the bindings to Java bean properties in the model with
      * the GUI elements.
      */
     private void initializeBindings() {
@@ -128,8 +166,8 @@ public class Controller implements Initializable {
     }
 
     private void setGenomeBuild(String newValue) {
-        System.out.println("I am getting newValue="+newValue);
-        System.out.println("The model should have been set to this by binding, "+ model.getGenomeBuild());
+        System.out.println("I am getting newValue=" + newValue);
+        System.out.println("The model should have been set to this by binding, " + model.getGenomeBuild());
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
@@ -145,7 +183,7 @@ public class Controller implements Initializable {
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
-            ErrorWindow.display("Error",e.getMessage());
+            ErrorWindow.display("Error", e.getMessage());
             return;
         }
         /** The Model should now be set to hg19,hg38 or mm10 etc.*/
@@ -154,7 +192,7 @@ public class Controller implements Initializable {
         dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         Operation op = new UCSChg37Operation(file.getPath());
-        Downloader downloadTask = new Downloader(file,model.getGenomeURL(),model.getGenomeBasename(),genomeDownloadPI);
+        Downloader downloadTask = new Downloader(file, model.getGenomeURL(), model.getGenomeBasename(), genomeDownloadPI);
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);
             th.setDaemon(true);
@@ -168,13 +206,13 @@ public class Controller implements Initializable {
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
-            ErrorWindow.display("Error",e.getMessage());
+            ErrorWindow.display("Error", e.getMessage());
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for transcripts file for " + genome + " (will be created by Jannovar if not found).");
         File destinationdirectory = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome,destinationdirectory);
+        JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
 
 
         /*Operation op = new RefSeqOperation(dir.getPath());
@@ -184,7 +222,7 @@ public class Controller implements Initializable {
             th.setDaemon(true);
             th.start();
         }*/
-        ErrorWindow.display("TO DO","Implement command to create transcript definition file with Jannovar here");
+        ErrorWindow.display("TO DO", "Implement command to create transcript definition file with Jannovar here");
     }
 
     public void chooseEnzymes() {
@@ -194,13 +232,13 @@ public class Controller implements Initializable {
 
 
     public void enterGeneList() {
-        String [] targetgenes = CopyPasteGenesWindow.display();
+        String[] targetgenes = CopyPasteGenesWindow.display();
         if (targetgenes == null) {
             System.err.println("[TODO] implement me, targetgenes==null");
         } else {
             System.err.println("[TODO] implement me, targetgenes are:");
             for (String tg : targetgenes) {
-                System.err.println("\t"+tg);
+                System.err.println("\t" + tg);
             }
         }
     }
@@ -215,15 +253,47 @@ public class Controller implements Initializable {
         if (answer)
             System.exit(0);
     }
+
+    /**
+     * Look for project settings files in default VPV directory, populate list of project names to be offered
+     * so user can re-open existing project.
+     *
+     * @return list of project names (empty if no settings files found, or VPV directory is null)
+     */
+    private List<String> findExistingProjects() {
+        File settingsDir = getVPVDir();
+        String[] filesInDir;
+        List<String> projectNames = new ArrayList<>();
+        int suffixStart;
+
+        if (!(settingsDir == null || (filesInDir = settingsDir.list()) == null)) {
+            for (String s : filesInDir) {
+                suffixStart = s.indexOf(Model.PROJECT_FILENAME_SUFFIX);
+                if (suffixStart > 0) {
+                    projectNames.add(s.substring(0, suffixStart));
+                }
+            }
+        }
+        return projectNames;
+    }
+
+    /**
+     * Update model with new settings object that will be gradually filled in by user via gui.
+     */
+    private void startNewProject() {
+        model.setSettings(Settings.factory());
+    }
+
     /**
      * Parse settings file from standard location and return as {@link Settings} bean.
+     *
      * @return Settings for specified project
      */
     private Settings loadSettings(String projectName) {
 //        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
-//                + File.separator + projectName + "-settings.txt");
+//                + File.separator + projectName + Model.PROJECT_FILENAME_SUFFIX);
         File projectSettingsPath = new File(getVPVDir(),
-                model.getSettings().getProjectName() + "-settings.txt");
+                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
         if (!projectSettingsPath.exists()) {
             System.err.println("Cannot find project settings file. Exiting.");
             System.exit(1);
@@ -246,12 +316,12 @@ public class Controller implements Initializable {
 
         // Check whether directory already exists; if not, create it.
         if (!(settingsDir.exists() || settingsDir.mkdir())) {
-                System.err.println("Cannot create directory for settings files. Exiting.");
-                System.exit(1);
+            System.err.println("Cannot create directory for settings files. Exiting.");
+            System.exit(1);
         }
 
         File projectSettingsPath = new File(settingsDir,
-                model.getSettings().getProjectName() + "-settings.txt");
+                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
         try {
             // Create new file if one does not already exist.
             projectSettingsPath.createNewFile();

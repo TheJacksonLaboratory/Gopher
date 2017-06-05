@@ -6,7 +6,6 @@ package vpvgui.model;
 }
 */
 
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -126,7 +125,6 @@ public class Settings {
         return repeatsFileTo;
     }
 
-
     public Settings() {
     }
 
@@ -157,6 +155,18 @@ public class Settings {
         return pair;
     }
 
+    /**
+     * Creates new Settings object to be populated from gui
+     * @return empty Settings object
+     */
+    public static Settings factory() {
+        return new Settings();
+    }
+
+    /**
+     * Creates new Settings object by reading from specified settings file
+     * @return Settings object populated from file
+     */
     public static Settings factory(String path) {
         Settings settings = new Settings();
 
@@ -189,7 +199,6 @@ public class Settings {
             System.err.println(e.getMessage());
         }
         return settings;
-
     }
 
     public static boolean saveToFile(Settings settings, File settingsFile) {

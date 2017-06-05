@@ -22,6 +22,12 @@ public class Model {
 
     private Settings settings;
 
+    /**
+     * This suffix is appended to the project name to get the name of the file for storing the
+     * project settings.
+     */
+    public static final String PROJECT_FILENAME_SUFFIX = "-settings.txt";
+
     /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10 */
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
     public String getGenomeBuild() {return genomeBuild.get();}
@@ -102,7 +108,6 @@ public class Model {
         }
     }
 
-
     /**
      * This method uses {@link DataSource} as a source for collections
      * of paths and names that represent the sets of data we will need
@@ -118,6 +123,4 @@ public class Model {
         this.genomeURL = datasource.getGenomeURL();
         this.transcriptsURL = datasource.getTranscriptsURL();
     }
-
-
 }
