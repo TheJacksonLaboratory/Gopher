@@ -1,17 +1,32 @@
 package vpvgui.model;
 
-/* public class VPVSettings {
-    private List<String> restrictionEnzymes;
-    private List<String> targetGenes;
-}
-*/
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.*;
 
+/**
+ * This class bundles together the project settings specified by the user, including
+ *    project name
+ *    path from which to download genome file
+ *    path from which to download transcripts file
+ *    path from which to download repeats file
+ *    path where genome file should be stored
+ *    path where transcripts file should be stored
+ *    path where repeats file should be stored
+ *    list of restriction enzymes
+ *    list of target genes
+ *
+ * @author Hannah Blau (blauh)
+ * @version last modified 6/5/17
+ */
 public class Settings {
+
+/*  public class VPVSettings {
+    private List<String> restrictionEnzymes;
+    private List<String> targetGenes;
+}
+*/
 
     /* Project name
      */

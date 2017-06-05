@@ -3,26 +3,22 @@ package vpvgui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
-import vpvgui.gui.CopyPasteGenesWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.entrezgenetable.PopupController;
-import vpvgui.io.Downloader;
-import vpvgui.io.JannovarTranscriptFileBuilder;
-import vpvgui.io.Operation;
-import vpvgui.io.UCSChg37Operation;
+import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
@@ -31,11 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import static vpvgui.io.Platform.getVPVDir;
 
 public class Controller implements Initializable {
     /**
@@ -267,29 +260,6 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Look for project settings files in default VPV directory, populate list of project names to be offered
-     * so user can re-open existing project.
-     *
-     * @return list of project names (empty if no settings files found, or VPV directory is null)
-     */
-    private List<String> findExistingProjects() {
-        File settingsDir = getVPVDir();
-        String[] filesInDir;
-        List<String> projectNames = new ArrayList<>();
-        int suffixStart;
-
-        if (!(settingsDir == null || (filesInDir = settingsDir.list()) == null)) {
-            for (String s : filesInDir) {
-                suffixStart = s.indexOf(Model.PROJECT_FILENAME_SUFFIX);
-                if (suffixStart > 0) {
-                    projectNames.add(s.substring(0, suffixStart));
-                }
-            }
-        }
-        return projectNames;
-    }
-
-    /**
      * Update model with new settings object that will be gradually filled in by user via gui.
      */
     private void startNewProject() {
@@ -302,15 +272,7 @@ public class Controller implements Initializable {
      * @return Settings for specified project
      */
     private Settings loadSettings(String projectName) {
-//        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
-//                + File.separator + projectName + Model.PROJECT_FILENAME_SUFFIX);
-        File projectSettingsPath = new File(getVPVDir(),
-                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
-        if (!projectSettingsPath.exists()) {
-            System.err.println("Cannot find project settings file. Exiting.");
-            System.exit(1);
-        }
-        return Settings.factory(projectSettingsPath.getAbsolutePath());
+        return SettingsIO.loadSettings(projectName, model);
     }
 
     /**
@@ -318,34 +280,7 @@ public class Controller implements Initializable {
      * {@link Settings} bean is written to platform-dependent default location.
      */
     private void saveSettings() {
-        File settingsDir = getVPVDir();
-
-        // getVPVDir returns null if user's platform is unrecognized.
-        if (settingsDir == null) {
-            System.err.println("Directory for settings files is null. Exiting.");
-            System.exit(1);
-        }
-
-        // Check whether directory already exists; if not, create it.
-        if (!(settingsDir.exists() || settingsDir.mkdir())) {
-            System.err.println("Cannot create directory for settings files. Exiting.");
-            System.exit(1);
-        }
-
-        File projectSettingsPath = new File(settingsDir,
-                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
-        try {
-            // Create new file if one does not already exist.
-            projectSettingsPath.createNewFile();
-        } catch (IOException e) {
-            System.err.println("Cannot create settings file. Exiting.");
-            System.exit(1);
-        }
-
-        // If .vpvgui directory previously contained a settings file for this project,
-        // it gets overwritten by the new file.
-        // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
-        Settings.saveToFile(model.getSettings(), projectSettingsPath);
+        SettingsIO.saveSettings(model);
     }
 
     private HashMap<String, Object> showPopupWindow() {
