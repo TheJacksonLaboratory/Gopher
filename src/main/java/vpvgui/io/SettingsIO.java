@@ -39,6 +39,8 @@ public class SettingsIO {
                 }
             }
         }
+        // want names in alphabetical order, not unpredictable order returned by File.list() method
+        projectNames.sort(null);
         return projectNames;
     }
 
@@ -65,6 +67,12 @@ public class SettingsIO {
      */
     public static void saveSettings(Model model) {
         File settingsDir = getVPVDir();
+        String projName = model.getSettings().getProjectName();
+
+        if (projName == null || projName.isEmpty()) {
+            System.err.println("Cannot save settings without project name. Exiting.");
+            System.exit(1);
+        }
 
         // getVPVDir returns null if user's platform is unrecognized.
         if (settingsDir == null) {
@@ -79,7 +87,7 @@ public class SettingsIO {
         }
 
         File projectSettingsPath = new File(settingsDir,
-                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
+                projName + Model.PROJECT_FILENAME_SUFFIX);
         try {
             // Create new file if one does not already exist.
             projectSettingsPath.createNewFile();
