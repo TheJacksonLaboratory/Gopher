@@ -85,7 +85,7 @@ public class Settings {
     private StringProperty repeatsFileFrom = new SimpleStringProperty(this, "repeatsFileFrom");
 
     public final String getRepeatsFileFrom() {
-        return transcriptsFileFrom.getValue();
+        return repeatsFileFrom.getValue();
     }
 
     public final void setRepeatsFileFrom(String rff) {
@@ -133,7 +133,7 @@ public class Settings {
     private StringProperty repeatsFileTo = new SimpleStringProperty(this, "repeatsFileTo");
 
     public final String getRepeatsFileTo() {
-        return transcriptsFileTo.getValue();
+        return repeatsFileTo.getValue();
     }
 
     public final void setRepeatsFileTo(String rft) {
@@ -171,14 +171,30 @@ public class Settings {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         //sb.append("Current settings:");
-        sb.append(String.format("\nProject name: %s", getProjectName()));
-        sb.append(String.format("\nGenome file source: %s", getGenomeFileFrom()));
-        sb.append(String.format("\nTranscripts file source: %s", getTranscriptsFileFrom()));
-        sb.append(String.format("\nRepeats file source: %s", getRepeatsFileFrom()));
-        sb.append(String.format("\nGenome file destination: %s", getGenomeFileTo()));
-        sb.append(String.format("\nTranscripts file destination: %s", getTranscriptsFileTo()));
-        sb.append(String.format("\nRepeats file destination: %s", getRepeatsFileTo()));
-        sb.append("\n");
+        sb.append(String.format("\nProject name: %s", makeHumanReadable(getProjectName())));
+        sb.append(String.format("\nGenome file source: %s", makeHumanReadable(getGenomeFileFrom())));
+        sb.append(String.format("\nTranscripts file source: %s", makeHumanReadable(getTranscriptsFileFrom())));
+        sb.append(String.format("\nRepeats file source: %s", makeHumanReadable(getRepeatsFileFrom())));
+        sb.append(String.format("\nGenome file destination: %s", makeHumanReadable(getGenomeFileTo())));
+        sb.append(String.format("\nTranscripts file destination: %s", makeHumanReadable(getTranscriptsFileTo())));
+        sb.append(String.format("\nRepeats file destination: %s\n", makeHumanReadable(getRepeatsFileTo())));
+        sb.append(toStringHelper("Restriction Enzymes", getRestrictionEnzymesList()));
+        sb.append(toStringHelper("Target Genes", getTargetGenesList()));
+        return sb.toString();
+    }
+
+    /*
+     * Formats the list properties in human-readable format, checking for an empty list.
+     */
+    private String toStringHelper(String listName, ObservableList<String> lst) {
+        if (lst.isEmpty()) {
+            return (listName + ": unspecified\n");
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s:\n", listName));
+        for (String s : lst) {
+            sb.append(String.format("\t%s\n", s));
+        }
         return sb.toString();
     }
 
@@ -267,21 +283,20 @@ public class Settings {
      public static boolean saveToFile(Settings settings, File settingsFile) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(settingsFile));
-            // projectName will not be empty (see saveSettings method in SettingsIO),
-            // so no need to makeHumanReadable
-            bw.write(String.format("Project name: %s\n", settings.getProjectName()));
-            bw.write(String.format("Genome file source: %s\n",
-                    makeHumanReadable(settings.getGenomeFileFrom())));
-            bw.write(String.format("Transcripts file source: %s\n",
-                    makeHumanReadable(settings.getTranscriptsFileFrom())));
-            bw.write(String.format("Repeats file source: %s\n",
-                    makeHumanReadable(settings.getRepeatsFileFrom())));
-            bw.write(String.format("Genome file destination: %s\n",
-                    makeHumanReadable(settings.getGenomeFileTo())));
-            bw.write(String.format("Transcripts file destination: %s\n",
-                    makeHumanReadable(settings.getTranscriptsFileTo())));
-            bw.write(String.format("Repeats file destination: %s\n",
-                    makeHumanReadable(settings.getRepeatsFileTo())));
+//            bw.write(String.format("Project name: %s\n", settings.getProjectName()));
+//            bw.write(String.format("Genome file source: %s\n",
+//                    makeHumanReadable(settings.getGenomeFileFrom())));
+//            bw.write(String.format("Transcripts file source: %s\n",
+//                    makeHumanReadable(settings.getTranscriptsFileFrom())));
+//            bw.write(String.format("Repeats file source: %s\n",
+//                    makeHumanReadable(settings.getRepeatsFileFrom())));
+//            bw.write(String.format("Genome file destination: %s\n",
+//                    makeHumanReadable(settings.getGenomeFileTo())));
+//            bw.write(String.format("Transcripts file destination: %s\n",
+//                    makeHumanReadable(settings.getTranscriptsFileTo())));
+//            bw.write(String.format("Repeats file destination: %s\n",
+//                    makeHumanReadable(settings.getRepeatsFileTo())));
+            bw.write(settings.toString());
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
