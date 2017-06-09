@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
+            <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
@@ -72,7 +72,7 @@
 
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
+      <!--  <sourceDirectory>src</sourceDirectory> -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -86,16 +86,25 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <!-- set useUniqueVersions=false in order that the classpath has the
-                                 SNAPSHOT instead of the build number prefixed to the dependency -->
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+
+             <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+            <archive>
+                <index>true</index>
+                <manifest>
+                    <addClasspath>true</addClasspath>
+                    <classpathPrefix>lib/</classpathPrefix>
+
                             <useUniqueVersions>false</useUniqueVersions>
                             <mainClass>vpvgui.Main</mainClass>
                         </manifest>
@@ -157,17 +166,8 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20</version>

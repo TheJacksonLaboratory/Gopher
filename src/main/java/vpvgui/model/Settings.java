@@ -1,18 +1,36 @@
 package vpvgui.model;
 
-/* public class VPVSettings {
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.io.*;
+
+/**
+ * This class bundles together the project settings specified by the user, including
+ *    project name
+ *    path from which to download genome file
+ *    path from which to download transcripts file
+ *    path from which to download repeats file
+ *    path where genome file should be stored
+ *    path where transcripts file should be stored
+ *    path where repeats file should be stored
+ *    list of restriction enzymes
+ *    list of target genes
+ *
+ * @author Hannah Blau (blauh)
+ * @version last modified 6/5/17
+ */
+public class Settings {
+
+/*  public class VPVSettings {
     private List<String> restrictionEnzymes;
     private List<String> targetGenes;
 }
 */
-
-
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.*;
-
-public class Settings {
 
     /* Project name
      */
@@ -67,7 +85,7 @@ public class Settings {
     private StringProperty repeatsFileFrom = new SimpleStringProperty(this, "repeatsFileFrom");
 
     public final String getRepeatsFileFrom() {
-        return transcriptsFileFrom.getValue();
+        return repeatsFileFrom.getValue();
     }
 
     public final void setRepeatsFileFrom(String rff) {
@@ -86,8 +104,8 @@ public class Settings {
         return genomeFileTo.getValue();
     }
 
-    public final void setGenomeFileTo(String gff) {
-        genomeFileTo.setValue(gff);
+    public final void setGenomeFileTo(String gft) {
+        genomeFileTo.setValue(gft);
     }
 
     public final StringProperty genomeFileToProperty() {
@@ -102,8 +120,8 @@ public class Settings {
         return transcriptsFileTo.getValue();
     }
 
-    public final void setTranscriptsFileTo(String tff) {
-        transcriptsFileTo.setValue(tff);
+    public final void setTranscriptsFileTo(String tft) {
+        transcriptsFileTo.setValue(tft);
     }
 
     public final StringProperty transcriptsFileToProperty() {
@@ -115,17 +133,36 @@ public class Settings {
     private StringProperty repeatsFileTo = new SimpleStringProperty(this, "repeatsFileTo");
 
     public final String getRepeatsFileTo() {
-        return transcriptsFileTo.getValue();
+        return repeatsFileTo.getValue();
     }
 
-    public final void setRepeatsFileTo(String rff) {
-        repeatsFileTo.setValue(rff);
+    public final void setRepeatsFileTo(String rft) {
+        repeatsFileTo.setValue(rft);
     }
 
     public final StringProperty repeatsFileToProperty() {
         return repeatsFileTo;
     }
 
+    private ListProperty<String> restrictionEnzymesList =
+            new SimpleListProperty<>(this, "restrictionEnzymesList");
+
+    public final ObservableList<String> getRestrictionEnzymesList() { return restrictionEnzymesList.getValue(); }
+
+    public final void setRestrictionEnzymesList(ObservableList<String> rel) {
+        restrictionEnzymesList.setValue(rel);
+    }
+
+    public final ListProperty restrictionEnzymesListProperty() { return restrictionEnzymesList; }
+
+    private ListProperty<String> targetGenesList =
+            new SimpleListProperty<>(this, "targetGenesList");
+
+    public final ObservableList<String> getTargetGenesList() { return targetGenesList.getValue(); }
+
+    public final void setTargetGenesList(ObservableList<String> tgl) { targetGenesList.setValue(tgl); }
+
+    public final ListProperty targetGenesListProperty() { return targetGenesList; }
 
     public Settings() {
     }
@@ -134,14 +171,30 @@ public class Settings {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         //sb.append("Current settings:");
-        sb.append(String.format("\nProject name: %s", getProjectName()));
-        sb.append(String.format("\nGenome file source: %s", getGenomeFileFrom()));
-        sb.append(String.format("\nTranscripts file source: %s", getTranscriptsFileFrom()));
-        sb.append(String.format("\nRepeats file source: %s", getRepeatsFileFrom()));
-        sb.append(String.format("\nGenome file destination: %s", getGenomeFileTo()));
-        sb.append(String.format("\nTranscripts file destination: %s", getTranscriptsFileTo()));
-        sb.append(String.format("\nRepeats file destination: %s", getRepeatsFileTo()));
-        sb.append("\n");
+        sb.append(String.format("\nProject name: %s", makeHumanReadable(getProjectName())));
+        sb.append(String.format("\nGenome file source: %s", makeHumanReadable(getGenomeFileFrom())));
+        sb.append(String.format("\nTranscripts file source: %s", makeHumanReadable(getTranscriptsFileFrom())));
+        sb.append(String.format("\nRepeats file source: %s", makeHumanReadable(getRepeatsFileFrom())));
+        sb.append(String.format("\nGenome file destination: %s", makeHumanReadable(getGenomeFileTo())));
+        sb.append(String.format("\nTranscripts file destination: %s", makeHumanReadable(getTranscriptsFileTo())));
+        sb.append(String.format("\nRepeats file destination: %s\n", makeHumanReadable(getRepeatsFileTo())));
+        sb.append(toStringHelper("Restriction Enzymes", getRestrictionEnzymesList()));
+        sb.append(toStringHelper("Target Genes", getTargetGenesList()));
+        return sb.toString();
+    }
+
+    /*
+     * Formats the list properties in human-readable format, checking for an empty list.
+     */
+    private String toStringHelper(String listName, ObservableList<String> lst) {
+        if (lst.isEmpty()) {
+            return (listName + ": unspecified\n");
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s:\n", listName));
+        for (String s : lst) {
+            sb.append(String.format("\t%s\n", s));
+        }
         return sb.toString();
     }
 
@@ -157,6 +210,33 @@ public class Settings {
         return pair;
     }
 
+    /**
+     * Creates new Settings object to be populated from gui
+     * @return empty Settings object
+     */
+    public static Settings factory() {
+        Settings settings = new Settings();
+
+        settings.setProjectName("");
+        settings.setGenomeFileFrom("");
+        settings.setTranscriptsFileFrom("");
+        settings.setRepeatsFileFrom("");
+        settings.setGenomeFileTo("");
+        settings.setTranscriptsFileTo("");
+        settings.setRepeatsFileTo("");
+        settings.setRestrictionEnzymesList(FXCollections.observableArrayList());
+        settings.setTargetGenesList(FXCollections.observableArrayList());
+        return settings;
+    }
+
+    /**
+     * Creates new Settings object by reading from specified settings file
+     *
+     * @param path file from which elements of the Settings object are read
+     * @return Settings object populated from file
+     *
+     * TODO: add restriction enzyme list and target gene list
+     */
     public static Settings factory(String path) {
         Settings settings = new Settings();
 
@@ -170,17 +250,17 @@ public class Settings {
                 if (pair[0].toLowerCase().contains("Project name")) {
                     settings.setProjectName(pair[1]);
                 } else if (pair[0].toLowerCase().contains("genome file source")) {
-                    settings.setGenomeFileFrom(pair[1]);
+                    settings.setGenomeFileFrom(makeComputerReadable(pair[1]));
                 } else if (pair[0].toLowerCase().contains("transcripts file source")) {
-                    settings.setTranscriptsFileFrom(pair[1]);
+                    settings.setTranscriptsFileFrom(makeComputerReadable(pair[1]));
                 } else if (pair[0].toLowerCase().contains("repeats file source")) {
-                    settings.setRepeatsFileFrom(pair[1]);
+                    settings.setRepeatsFileFrom(makeComputerReadable(pair[1]));
                 } else if (pair[0].toLowerCase().contains("genome file destination")) {
-                    settings.setGenomeFileTo(pair[1]);
+                    settings.setGenomeFileTo(makeComputerReadable(pair[1]));
                 } else if (pair[0].toLowerCase().contains("transcripts file destination")) {
-                    settings.setTranscriptsFileTo(pair[1]);
+                    settings.setTranscriptsFileTo(makeComputerReadable(pair[1]));
                 } else if (pair[0].toLowerCase().contains("repeats file destination")) {
-                    settings.setRepeatsFileTo(pair[1]);
+                    settings.setRepeatsFileTo(makeComputerReadable(pair[1]));
                 } else {
                     System.err.println("Did not recognize setting: " + line);
                 }
@@ -189,24 +269,47 @@ public class Settings {
             System.err.println(e.getMessage());
         }
         return settings;
-
     }
 
-    public static boolean saveToFile(Settings settings, File settingsFile) {
+    /**
+     * Saves settings to specified file.
+     *
+     * @param settings Settings object to be saved
+     * @param settingsFile File to which settings should be saved
+     * @return true if settings were successfully saved, false otherwise
+     *
+     * TODO: add restriction enzyme list and target gene list
+     */
+     public static boolean saveToFile(Settings settings, File settingsFile) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(settingsFile));
-            bw.write(String.format("Project name: %s\n", settings.getProjectName()));
-            bw.write(String.format("Genome file source: %s\n", settings.getGenomeFileFrom()));
-            bw.write(String.format("Transcripts file source: %s", settings.getTranscriptsFileFrom()));
-            bw.write(String.format("Repeats file source: %s", settings.getRepeatsFileFrom()));
-            bw.write(String.format("Genome file destination: %s\n", settings.getGenomeFileTo()));
-            bw.write(String.format("Transcripts file destination: %s", settings.getTranscriptsFileTo()));
-            bw.write(String.format("Repeats file destination: %s", settings.getRepeatsFileTo()));
+//            bw.write(String.format("Project name: %s\n", settings.getProjectName()));
+//            bw.write(String.format("Genome file source: %s\n",
+//                    makeHumanReadable(settings.getGenomeFileFrom())));
+//            bw.write(String.format("Transcripts file source: %s\n",
+//                    makeHumanReadable(settings.getTranscriptsFileFrom())));
+//            bw.write(String.format("Repeats file source: %s\n",
+//                    makeHumanReadable(settings.getRepeatsFileFrom())));
+//            bw.write(String.format("Genome file destination: %s\n",
+//                    makeHumanReadable(settings.getGenomeFileTo())));
+//            bw.write(String.format("Transcripts file destination: %s\n",
+//                    makeHumanReadable(settings.getTranscriptsFileTo())));
+//            bw.write(String.format("Repeats file destination: %s\n",
+//                    makeHumanReadable(settings.getRepeatsFileTo())));
+            bw.write(settings.toString());
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    private static String makeComputerReadable(String s) {
+        return s.equals("unspecified") ? "" : s;
+    }
+
+    private static String makeHumanReadable(String s) {
+        return s.isEmpty() ? "unspecified" : s;
     }
 }
