@@ -8,6 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class bundles together the project settings specified by the user, including
@@ -22,15 +24,9 @@ import java.io.*;
  *    list of target genes
  *
  * @author Hannah Blau (blauh)
- * @version last modified 6/5/17
+ * @version last modified 6/9/17
  */
 public class Settings {
-
-/*  public class VPVSettings {
-    private List<String> restrictionEnzymes;
-    private List<String> targetGenes;
-}
-*/
 
     /* Project name
      */
@@ -164,6 +160,8 @@ public class Settings {
 
     public final ListProperty targetGenesListProperty() { return targetGenesList; }
 
+    private static final String UNSPEC = "unspecified";
+
     public Settings() {
     }
 
@@ -188,30 +186,26 @@ public class Settings {
      */
     private String toStringHelper(String listName, ObservableList<String> lst) {
         if (lst.isEmpty()) {
-            return (listName + ": unspecified\n");
+            return (String.format("%s: %s\n", listName, UNSPEC));
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s:\n", listName));
+        sb.append(String.format("%s: (%d)\n", listName, lst.size()));
         for (String s : lst) {
             sb.append(String.format("\t%s\n", s));
         }
         return sb.toString();
     }
 
-    private static String[] readPair(String line) {
-        int i = line.indexOf(':');
-        if (i < 0) {
-            System.out.println("[WARN] Could not read settings line: " + line);
-            return null;
-        }
-        String pair[] = new String[2];
-        pair[0] = line.substring(0, i).trim();
-        pair[1] = line.substring(i + 1).trim();
-        return pair;
+    private static String makeComputerReadable(String s) {
+        return s.equals(UNSPEC) ? "" : s;
+    }
+
+    private static String makeHumanReadable(String s) {
+        return s.isEmpty() ? UNSPEC : s;
     }
 
     /**
-     * Creates new Settings object to be populated from gui
+     * Creates new Settings object to be populated from gui or from settings saved in file
      * @return empty Settings object
      */
     public static Settings factory() {
@@ -234,41 +228,92 @@ public class Settings {
      *
      * @param path file from which elements of the Settings object are read
      * @return Settings object populated from file
-     *
-     * TODO: add restriction enzyme list and target gene list
      */
     public static Settings factory(String path) {
-        Settings settings = new Settings();
+        Settings settings = factory();
+        String line;
+        int colonIndex;
+
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
-            String line;
             while ((line = br.readLine()) != null) {
-                String pair[] = readPair(line);
-                if (pair == null)
-                    continue;
-                if (pair[0].toLowerCase().contains("Project name")) {
-                    settings.setProjectName(pair[1]);
-                } else if (pair[0].toLowerCase().contains("genome file source")) {
-                    settings.setGenomeFileFrom(makeComputerReadable(pair[1]));
-                } else if (pair[0].toLowerCase().contains("transcripts file source")) {
-                    settings.setTranscriptsFileFrom(makeComputerReadable(pair[1]));
-                } else if (pair[0].toLowerCase().contains("repeats file source")) {
-                    settings.setRepeatsFileFrom(makeComputerReadable(pair[1]));
-                } else if (pair[0].toLowerCase().contains("genome file destination")) {
-                    settings.setGenomeFileTo(makeComputerReadable(pair[1]));
-                } else if (pair[0].toLowerCase().contains("transcripts file destination")) {
-                    settings.setTranscriptsFileTo(makeComputerReadable(pair[1]));
-                } else if (pair[0].toLowerCase().contains("repeats file destination")) {
-                    settings.setRepeatsFileTo(makeComputerReadable(pair[1]));
-                } else {
-                    System.err.println("Did not recognize setting: " + line);
+                colonIndex = line.indexOf(':');
+                if (colonIndex < 1) {
+                    System.out.println("[Settings.factory] Could not read settings line: " + line);
+                    return null;
                 }
-            }
+                switch (line.substring(0, colonIndex)) {
+                    case "Project name" :
+                        settings.setProjectName(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Genome file source" :
+                        settings.setGenomeFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Transcripts file source" :
+                        settings.setTranscriptsFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Repeats file source" :
+                        settings.setRepeatsFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Genome file destination" :
+                        settings.setGenomeFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Transcripts file destination" :
+                        settings.setTranscriptsFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Repeats file destination" :
+                        settings.setRepeatsFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        break;
+                    case "Restriction Enzymes" :
+                        readLst(line, br, settings.getRestrictionEnzymesList());
+                        break;
+                    case "Target Genes" :
+                        readLst(line, br, settings.getTargetGenesList());
+                        break;
+                    default :
+                        System.out.println("[Settings.factory] Did not recognize setting: " + line);
+                        return null;
+                } // end switch
+            } // end while
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("[Settings.factory] I/O Error reading settings file: " + e.getMessage());
         }
         return settings;
+    }
+
+    /*
+     * Reads list of restriction enzymes or target genes (one entry per line, each line starts with a
+     * tab character.
+     *
+     * line is the line with the name of the list and its length
+     * br is the BufferedReader from which to read the list
+     * lst is the list to which we add each new item read
+     */
+    private static void readLst(String line, BufferedReader br, ObservableList<String> lst) {
+        int lstLength;
+        Pattern p = Pattern.compile("\\d+");
+        Matcher m = p.matcher(line);
+        String nextLine;
+
+        // if the lst is unspecified, there is nothing to do
+        if (!line.endsWith(UNSPEC)) {
+            if (m.find()) {
+                lstLength = Integer.valueOf(m.group());
+
+                try {
+                    for (int i = 0; i < lstLength; i++) {
+                        nextLine = br.readLine();
+                        lst.add(nextLine.trim());
+                    }
+                } catch (IOException e) {
+                    System.err.println("[Settings.readLst] I/O Error reading settings file: " + e.getMessage());
+                }
+            }
+            else {
+                System.err.println("[Settings.readLst] Cannot find list length: " + line);
+            }
+        }
     }
 
     /**
@@ -277,39 +322,19 @@ public class Settings {
      * @param settings Settings object to be saved
      * @param settingsFile File to which settings should be saved
      * @return true if settings were successfully saved, false otherwise
-     *
-     * TODO: add restriction enzyme list and target gene list
      */
-     public static boolean saveToFile(Settings settings, File settingsFile) {
+    public static boolean saveToFile(Settings settings, File settingsFile) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(settingsFile));
-//            bw.write(String.format("Project name: %s\n", settings.getProjectName()));
-//            bw.write(String.format("Genome file source: %s\n",
-//                    makeHumanReadable(settings.getGenomeFileFrom())));
-//            bw.write(String.format("Transcripts file source: %s\n",
-//                    makeHumanReadable(settings.getTranscriptsFileFrom())));
-//            bw.write(String.format("Repeats file source: %s\n",
-//                    makeHumanReadable(settings.getRepeatsFileFrom())));
-//            bw.write(String.format("Genome file destination: %s\n",
-//                    makeHumanReadable(settings.getGenomeFileTo())));
-//            bw.write(String.format("Transcripts file destination: %s\n",
-//                    makeHumanReadable(settings.getTranscriptsFileTo())));
-//            bw.write(String.format("Repeats file destination: %s\n",
-//                    makeHumanReadable(settings.getRepeatsFileTo())));
-            bw.write(settings.toString());
+            // strip off the leading newline (and the ending one)
+            bw.write(settings.toString().trim());
+            // restore the ending newline
+            bw.newLine();
             bw.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("[Settings.saveToFile] I/O Error writing settings file: " + e.getMessage());
             return false;
         }
         return true;
-    }
-
-    private static String makeComputerReadable(String s) {
-        return s.equals("unspecified") ? "" : s;
-    }
-
-    private static String makeHumanReadable(String s) {
-        return s.isEmpty() ? "unspecified" : s;
     }
 }
