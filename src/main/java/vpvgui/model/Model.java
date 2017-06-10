@@ -117,10 +117,12 @@ public class Model {
         String gb = getGenomeBuild();
         if (gb.equals("UCSC-hg19")){
             this.datasource = DataSource.createUCSChg19();
-        } else {
+        } else if (gb.equals("UCSC-hg38")){
+             this.datasource = DataSource.createUCSChg38();
+         } else {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.",gb));
         }
         this.genomeURL = datasource.getGenomeURL();
-        this.transcriptsURL = datasource.getTranscriptsURL();
+        //this.transcriptsURL = datasource.getTranscriptsURL();
     }
 }

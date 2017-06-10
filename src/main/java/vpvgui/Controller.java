@@ -203,8 +203,8 @@ public class Controller implements Initializable {
         }
     }
 
+    /** Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions. */
     public void downloadTranscripts() {
-        // todo -- hook up with Jannovar
         String genome = this.genomeChoiceBox.getValue();
         try {
             this.model.adjustGenomeDownloadPaths();
@@ -215,6 +215,9 @@ public class Controller implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for transcripts file for " + genome + " (will be created by Jannovar if not found).");
         File destinationdirectory = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (destinationdirectory==null) {
+            return; // assume the user clicked the cancel button, we do not need to show an error message
+        }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
 
 
@@ -225,7 +228,7 @@ public class Controller implements Initializable {
             th.setDaemon(true);
             th.start();
         }*/
-        ErrorWindow.display("TO DO", "Implement command to create transcript definition file with Jannovar here");
+
     }
 
     public void chooseEnzymes() {

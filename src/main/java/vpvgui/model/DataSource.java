@@ -34,7 +34,7 @@ public class DataSource {
         this.genomeBasename = genomeBasename;
     }
 
-    public String getTranscriptsName() {
+   /* public String getTranscriptsName() {
         return transcriptsName;
     }
 
@@ -44,39 +44,38 @@ public class DataSource {
 
     public String getTranscriptsURL() {
         return transcriptsURL;
-    }
+    }*/
 
-    public void setTranscriptsURL(String transcriptsURL) {
-        this.transcriptsURL = transcriptsURL;
-    }
+   // public void setTranscriptsURL(String transcriptsURL) {       this.transcriptsURL = transcriptsURL;   }
 
     private String genomeBasename;
 
-    private String transcriptsName;
+   // private String transcriptsName;
 
     public static String getUCSChg19basename() {
         return UCSChg19basename;
     }
 
-    private String transcriptsURL;
+   // private String transcriptsURL;
 
-    public String getTranscriptsBasename() {
-        return transcriptsBasename;
-    }
+   // public String getTranscriptsBasename() {   return transcriptsBasename;  }
 
-    public void setTranscriptsBasename(String transcriptsBasename) {
-        this.transcriptsBasename = transcriptsBasename;
-    }
+   // public void setTranscriptsBasename(String transcriptsBasename) {this.transcriptsBasename = transcriptsBasename; }
 
-    private String transcriptsBasename;
+   // private String transcriptsBasename;
 
 
     private static final String UCSChg19url = "http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz";
     /** Basename of the file that we will store to disk */
     private static final String UCSChg19basename = "chromFa.tar.gz";
 
-    private static final String UCSCrefGeneHg19url="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";
-    private static final String UCSCrefGeneBasename="refGene.txt.gz";
+    private static final String UCSChg38url = "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/chromFa.tar.gz";
+    /** Basename of the file that we will store to disk */
+    private static final String UCSChg38basename = "chromFa.tar.gz";
+
+
+    //private static final String UCSCrefGeneHg19url="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";
+   // private static final String UCSCrefGeneBasename="refGene.txt.gz";
 
     private DataSource(){
     }
@@ -87,10 +86,22 @@ public class DataSource {
         ds.setGenomeName("UCSC-hg19");
         ds.setGenomeBasename(UCSChg19basename);
         ds.setGenomeURL(UCSChg19url);
-        ds.setTranscriptsName("RefGene");
-        ds.setTranscriptsURL(UCSCrefGeneHg19url);
-        ds.setTranscriptsBasename(UCSCrefGeneBasename);
+        //ds.setTranscriptsName("RefGene");
+        //ds.setTranscriptsURL(UCSCrefGeneHg19url);
+        //ds.setTranscriptsBasename(UCSCrefGeneBasename);
         return ds;
     }
+
+    public static DataSource createUCSChg38() {
+        DataSource ds = new DataSource();
+        ds.setGenomeName("UCSC-hg38");
+        ds.setGenomeBasename(UCSChg38basename);
+        ds.setGenomeURL(UCSChg38url);
+        //ds.setTranscriptsName("RefGene");
+        //ds.setTranscriptsURL(UCSCrefGeneHg19url);
+        //ds.setTranscriptsBasename(UCSCrefGeneBasename);
+        return ds;
+    }
+
 
 }
