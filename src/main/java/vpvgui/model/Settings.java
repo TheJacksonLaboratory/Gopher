@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  *    list of target genes
  *
  * @author Hannah Blau (blauh)
- * @version last modified 6/9/17
+ * @version last modified 6/12/17
  */
 public class Settings {
 
@@ -166,6 +166,38 @@ public class Settings {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Settings settings = (Settings) o;
+
+        if (!getProjectName().equals(settings.getProjectName())) return false;
+        if (!getGenomeFileFrom().equals(settings.getGenomeFileFrom())) return false;
+        if (!getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom())) return false;
+        if (!getRepeatsFileFrom().equals(settings.getRepeatsFileFrom())) return false;
+        if (!getGenomeFileTo().equals(settings.getGenomeFileTo())) return false;
+        if (!getTranscriptsFileTo().equals(settings.getTranscriptsFileTo())) return false;
+        if (!getRepeatsFileTo().equals(settings.getRepeatsFileTo())) return false;
+        if (!getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList())) return false;
+        return getTargetGenesList().equals(settings.getTargetGenesList());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getProjectName().hashCode();
+        result = 31 * result + getGenomeFileFrom().hashCode();
+        result = 31 * result + getTranscriptsFileFrom().hashCode();
+        result = 31 * result + getRepeatsFileFrom().hashCode();
+        result = 31 * result + getGenomeFileTo().hashCode();
+        result = 31 * result + getTranscriptsFileTo().hashCode();
+        result = 31 * result + getRepeatsFileTo().hashCode();
+        result = 31 * result + getRestrictionEnzymesList().hashCode();
+        result = 31 * result + getTargetGenesList().hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         //sb.append("Current settings:");
@@ -233,7 +265,6 @@ public class Settings {
         Settings settings = factory();
         String line;
         int colonIndex;
-
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));

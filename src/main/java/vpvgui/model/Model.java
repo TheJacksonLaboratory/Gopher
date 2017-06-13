@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 /**
  * Created by peter on 05.05.17.
- * Modified by blauh on 05.31.17 to add Settings instance variable
+ * Modified by blauh on 06.12.17 to add Settings instance variable to Model constructor.
  */
 public class Model {
 
@@ -65,6 +65,7 @@ public class Model {
 
     public Model() {
         initializeEnzymesFromFile();
+        settings = Settings.factory();    // creates empty Settings object
     }
 
     /** @return List of enzymes for the user to choose from. */

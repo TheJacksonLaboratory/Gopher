@@ -25,7 +25,7 @@ public class SettingsIO {
      *
      * @return list of project names (empty if no settings files found, or VPV directory is null)
      */
-    private List<String> findExistingProjects() {
+    public static List<String> findExistingProjects() {
         File settingsDir = getVPVDir();
         String[] filesInDir;
         List<String> projectNames = new ArrayList<>();
@@ -40,7 +40,7 @@ public class SettingsIO {
             }
         }
         // want names in alphabetical order, not unpredictable order returned by File.list() method
-        projectNames.sort(null);
+        projectNames.sort(String::compareToIgnoreCase);
         return projectNames;
     }
 
@@ -49,13 +49,14 @@ public class SettingsIO {
      *
      * @return Settings for specified project
      */
-    public static Settings loadSettings(String projectName, Model model) {
+    public static Settings loadSettings(String projectName) {
 //        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
 //                + File.separator + projectName + Model.PROJECT_FILENAME_SUFFIX);
         File projectSettingsPath = new File(getVPVDir(),
-                model.getSettings().getProjectName() + Model.PROJECT_FILENAME_SUFFIX);
+                projectName + Model.PROJECT_FILENAME_SUFFIX);
         if (!projectSettingsPath.exists()) {
-            System.err.println("Cannot find project settings file. Exiting.");
+            System.err.println("[SettingsIO.loadSettings] Cannot find settings file for project " +
+                    projectName + " ; exiting.");
             System.exit(1);
         }
         return Settings.factory(projectSettingsPath.getAbsolutePath());
@@ -70,19 +71,20 @@ public class SettingsIO {
         String projName = model.getSettings().getProjectName();
 
         if (projName == null || projName.isEmpty()) {
-            System.err.println("Cannot save settings without project name. Exiting.");
+            System.err.println("[SettingsIO.saveSettings] Cannot save settings without project name. Exiting.");
             System.exit(1);
         }
 
         // getVPVDir returns null if user's platform is unrecognized.
         if (settingsDir == null) {
-            System.err.println("Directory for settings files is null. Exiting.");
+            System.err.println("[SettingsIO.saveSettings] Directory for settings files is null. Exiting.");
             System.exit(1);
         }
 
         // Check whether directory already exists; if not, create it.
         if (!(settingsDir.exists() || settingsDir.mkdir())) {
-            System.err.println("Cannot create directory for settings files. Exiting.");
+            System.err.println("[SettingsIO.saveSettings] Cannot create directory for settings files: " +
+                    settingsDir.getPath() + " ; exiting.");
             System.exit(1);
         }
 
@@ -92,7 +94,8 @@ public class SettingsIO {
             // Create new file if one does not already exist.
             projectSettingsPath.createNewFile();
         } catch (IOException e) {
-            System.err.println("Cannot create settings file. Exiting.");
+            System.err.println("[SettingsIO.saveSettings] Cannot create settings file: " +
+                    projectSettingsPath.getPath() + " ; exiting.");
             System.exit(1);
         }
 

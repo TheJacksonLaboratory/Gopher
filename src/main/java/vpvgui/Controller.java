@@ -275,7 +275,7 @@ public class Controller implements Initializable {
      * @return Settings for specified project
      */
     private Settings loadSettings(String projectName) {
-        return SettingsIO.loadSettings(projectName, model);
+        return SettingsIO.loadSettings(projectName);
     }
 
     /**
