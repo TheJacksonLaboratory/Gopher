@@ -49,15 +49,14 @@ public class SettingsIO {
      *
      * @return Settings for specified project
      */
-    public static Settings loadSettings(String projectName) {
+    public static Settings loadSettings(String projectName) throws IOException {
 //        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
 //                + File.separator + projectName + Model.PROJECT_FILENAME_SUFFIX);
         File projectSettingsPath = new File(getVPVDir(),
                 projectName + Model.PROJECT_FILENAME_SUFFIX);
         if (!projectSettingsPath.exists()) {
-            System.err.println("[SettingsIO.loadSettings] Cannot find settings file for project " +
+            throw new IOException("[SettingsIO.loadSettings] Cannot find settings file for project " +
                     projectName + " ; exiting.");
-            System.exit(1);
         }
         return Settings.factory(projectSettingsPath.getAbsolutePath());
     }
