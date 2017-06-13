@@ -172,6 +172,16 @@ public class Settings {
 
         Settings settings = (Settings) o;
 
+        return getProjectName().equals(settings.getProjectName()) &&
+                getGenomeFileFrom().equals(settings.getGenomeFileFrom()) &&
+                getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom()) &&
+                getRepeatsFileFrom().equals(settings.getRepeatsFileFrom()) &&
+                getGenomeFileTo().equals(settings.getGenomeFileTo()) &&
+                getTranscriptsFileTo().equals(settings.getTranscriptsFileTo()) &&
+                getRepeatsFileTo().equals(settings.getRepeatsFileTo()) &&
+                getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList()) &&
+                getTargetGenesList().equals(settings.getTargetGenesList());
+/*
         if (!getProjectName().equals(settings.getProjectName())) return false;
         if (!getGenomeFileFrom().equals(settings.getGenomeFileFrom())) return false;
         if (!getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom())) return false;
@@ -181,6 +191,7 @@ public class Settings {
         if (!getRepeatsFileTo().equals(settings.getRepeatsFileTo())) return false;
         if (!getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList())) return false;
         return getTargetGenesList().equals(settings.getTargetGenesList());
+*/
     }
 
     @Override
@@ -311,6 +322,19 @@ public class Settings {
             System.err.println("[Settings.factory] I/O Error reading settings file: " + e.getMessage());
         }
         return settings;
+    }
+
+    /**
+     * Predicate indicating whether the current Settings object is complete (has no empty properties).
+     *
+     * @return true if object has no empty properties, false otherwise
+     */
+    public boolean isComplete() {
+        return !(getProjectName().isEmpty() || getGenomeFileFrom().isEmpty() ||
+                getTranscriptsFileFrom().isEmpty() || getRepeatsFileFrom().isEmpty() ||
+                getGenomeFileTo().isEmpty() || getTranscriptsFileTo().isEmpty() ||
+                getRepeatsFileTo().isEmpty() || getRestrictionEnzymesList().isEmpty() ||
+                getTargetGenesList().isEmpty());
     }
 
     /*
