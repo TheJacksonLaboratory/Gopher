@@ -19,10 +19,15 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import vpvgui.gui.ErrorWindow;
@@ -31,18 +36,17 @@ import vpvgui.gui.MessageConsole;
 /**
  * This class uses Jannovar to download and build a serialized transcript definition file
  * that contains the coordinates and gene symbols etc for all transcripts/genes.
- * Created by peter on 08.05.17.
+ * @author  Peter Robinson
+ * @version 0.0.2 (2017-06-10)
  */
 public class JannovarTranscriptFileBuilder {
-
-    //private DownloadOptions options;
-   // private JannovarDownloadOptions options;
-
     private File downloaddir=null;
     /** should be one of hg19,hg38,mm10 */
     private String genomebuild;
     /** should be UCSC, may allow others in the future */
     private String genomedatabase=null;
+    /** SHould be set to the name of the serialized file, e.g., {@code hg19_ucsc.ser}. */
+    private String jannovarFileName=null;
 
     private boolean reportProgress=false;
 
@@ -54,7 +58,20 @@ public class JannovarTranscriptFileBuilder {
     public JannovarTranscriptFileBuilder( String genome, File dirpath){
         downloaddir=dirpath;
         setGenome(genome);
+        setJannovarFileName();
         runJannovar();
+    }
+
+    private void setJannovarFileName() {
+        if (genomedatabase.equals("ucsc")) {
+            if (genomebuild.equals("hg19")) {
+                this.jannovarFileName = this.downloaddir.getAbsolutePath() + File.separator + "hg19_ucsc.ser";
+            } else if (genomebuild.equals("hg38")) {
+                this.jannovarFileName =  this.downloaddir.getAbsolutePath() + File.separator + "hg38_ucsc.ser";
+            } else if (genomebuild.equals("mm10")) {
+                this.jannovarFileName =  this.downloaddir.getAbsolutePath() + File.separator + "mm10_ucsc.ser";
+            }
+        }
     }
 
     private void setGenome(String genome) {
@@ -67,46 +84,31 @@ public class JannovarTranscriptFileBuilder {
         genomebuild=fields[1].toLowerCase();
     }
 
-
+    /** Start a task to let the Jannovar download run.*/
     private void runJannovar() {
-        final double wndwWidth = 300.0d;
-        //Label updateLabel = new Label("Running tasks...");
+          Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
+        Scene scene = new Scene(new Group());
+        taskUpdateStage.setTitle("Jannovar download");
+        taskUpdateStage.setWidth(400);
+        taskUpdateStage.setHeight(180);
+        HBox hbox = new HBox();
+        Label label = new Label("Downloading Jannovar-based transcript/gene models.\nThis will take a few minutes.\nThis dialog will close when the download is completed");
+        hbox.getChildren().add(label);
+        ((Group)scene.getRoot()).getChildren().add(hbox);
 
-        Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
+        taskUpdateStage.setScene(scene);
 
+        final String jannovarpath=this.jannovarFileName;
 
         Task longTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                VBox messageConsol = MessageConsole.getMessageConsole();
-
-                VBox updatePane = new VBox();
-                updatePane.setPadding(new Insets(10));
-                updatePane.setSpacing(5.0d);
-                updatePane.getChildren().addAll(messageConsol);
-
-                taskUpdateStage.setScene(new Scene(messageConsol));
-                taskUpdateStage.show();
-                System.out.println("IN STARTED TO START TASK");
-                //progress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+                File f = new File(jannovarpath);
+                if (f.exists())
+                    return null; /* Don't download if File already exists!! */
                 String dbase=String.format("%s/%s",genomebuild,genomedatabase);
                 String argv[] = {"download","-d",dbase,"--download-dir",downloaddir.getAbsolutePath()};
-                updateMessage("Downloading and building Jannovar transcript file (may take several minutes)");
-
-
-                System.out.println("About  TO START Jannovar");
-
                 Jannovar.main(argv);
-                System.out.println("DONE Jannovar");
-                /*for (int i = 1; i <= max; i++) {
-                    if (isCancelled()) {
-                        break;
-                    }
-                    //updateProgress(i, max);
-                    //updateMessage("Task part " + String.valueOf(i) + " complete");
-
-                    Thread.sleep(100);
-                }*/
                 return null;
             }
         };
@@ -117,18 +119,12 @@ public class JannovarTranscriptFileBuilder {
                 taskUpdateStage.hide();
             }
         });
-        //progress.progressProperty().bind(longTask.progressProperty());
-       // updateLabel.textProperty().bind(longTask.messageProperty());
-
         taskUpdateStage.show();
-        System.out.println("ABOUT TO START TASK");
         new Thread(longTask).start();
-        /* todo check absolute path is not null
-        String dbase=String.format("%s/%s",genomebuild,genomedatabase);
-        String argv[] = {"download","-d",dbase,"--download-dir",downloaddir.getAbsolutePath()};
-        Jannovar.main(argv);
-*/
+    }
 
+    public String getSerializedFilePath() {
+        return this.jannovarFileName;
     }
 
 

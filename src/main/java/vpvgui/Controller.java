@@ -123,6 +123,11 @@ public class Controller implements Initializable {
     private Tab setuptab;
 
     @FXML
+    MenuItem showSettingsCurrentProject;
+
+
+
+    @FXML
     private Tab analysistab;
 
     /**
@@ -147,6 +152,16 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.model = new Model();
         initializeBindings();
+        // initialize settings. First check if already exists
+        String defaultProjectName="vpvsettings";
+        Settings set=null;
+        try {
+            set=loadSettings(defaultProjectName);
+        } catch (IOException i) {
+            set = new Settings();
+        }
+        model.setSettings(set);
+
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
@@ -219,15 +234,9 @@ public class Controller implements Initializable {
             return; // assume the user clicked the cancel button, we do not need to show an error message
         }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
-
-
-        /*Operation op = new RefSeqOperation(dir.getPath());
-        Downloader downloadTask = new Downloader(dir,model.getTranscriptsURL(),model.getTranscriptsBasename(),transcriptDownloadPI);
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-        }*/
+        String jannovarSerializedFilePath = builder.getSerializedFilePath();
+        System.out.println("PATH="+jannovarSerializedFilePath);
+        this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
 
     }
 
@@ -274,8 +283,19 @@ public class Controller implements Initializable {
      *
      * @return Settings for specified project
      */
-    private Settings loadSettings(String projectName) {
+    private Settings loadSettings(String projectName) throws  IOException {
         return SettingsIO.loadSettings(projectName);
+    }
+
+
+
+    public void showSettingsOfCurrentProject() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Settings");
+        alert.setHeaderText("Look, an Information Dialog");
+        alert.setContentText(this.model.getSettings().toString());
+
+        alert.showAndWait();
     }
 
     /**
@@ -290,12 +310,12 @@ public class Controller implements Initializable {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
         FXMLLoader loader = new FXMLLoader();
-        System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
+        //System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
 
         loader.setLocation(getClass().getResource("/fxml/popup.fxml"));
         // initializing the controller
         PopupController popupController = new PopupController();
-        loader.setController(popupController);
+        //loader.setController(popupController);
         Parent layout;
         try {
             layout = loader.load();
@@ -314,7 +334,6 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
         return popupController.getResult();
-
     }
 }
 

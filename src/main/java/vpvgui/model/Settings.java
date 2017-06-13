@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import vpvgui.io.Platform;
 
 import java.io.*;
 import java.util.regex.Matcher;
@@ -26,7 +27,9 @@ import java.util.regex.Pattern;
  * @author Hannah Blau (blauh)
  * @version last modified 6/12/17
  */
-public class Settings {
+public class Settings implements Serializable {
+
+    public static final long versionID = 1;
 
     /* Project name
      */
@@ -367,5 +370,11 @@ public class Settings {
             return false;
         }
         return true;
+    }
+
+    /** Ugly hack todo -- in future, allow user to choose project file */
+    public String getDefaultPath() {
+        File dir = Platform.getVPVDir();
+        return String.format("%s%s.vpvsettings%s",dir.getAbsoluteFile(),File.separator,Model.PROJECT_FILENAME_SUFFIX);
     }
 }
