@@ -156,6 +156,8 @@ public class Controller implements Initializable {
         this.model = new Model();
         initializeBindings();
         // initialize settings. First check if already exists
+        //TODO For now we are using just one default project name. Later extend this so the
+        //user can store multiple project settings file under names chosen by them.
         String defaultProjectName="vpvsettings";
         Settings set=null;
         try {
@@ -163,6 +165,7 @@ public class Controller implements Initializable {
         } catch (IOException i) {
             set = new Settings();
         }
+        set.setProjectName(defaultProjectName);
         model.setSettings(set);
 
         genomeChoiceBox.setItems(genomeTranscriptomeList);
@@ -240,6 +243,8 @@ public class Controller implements Initializable {
         String jannovarSerializedFilePath = builder.getSerializedFilePath();
         System.out.println("PATH="+jannovarSerializedFilePath);
         this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
+        saveSettings();
+
 
     }
 
