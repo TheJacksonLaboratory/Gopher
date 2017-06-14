@@ -1,13 +1,15 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /*
  * A region, usually at the transcription start site of a gene,
@@ -38,39 +40,57 @@ public class ViewPoint {
 
     /* A hash map with restriction cutting sites as key and arrays of integers as values.
      * The integer values are positions relative to the TSS. */
-    private static HashMap<String,int[]> cuttingPositionMap = new HashMap<String,int[]>();
+    private static HashMap<String,ArrayList<Integer>> cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
+
 
     /* Constructor */
-    public ViewPoint(String referenceSequenceID, int tssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
+    public ViewPoint(String rID, int tssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
 
-        //setReferenceSequenceID(referenceSequenceID);
-        System.out.println("Constructor!");
-    }
+        int initialRadius=100;
 
-    public static void main(String [ ] args) {
+        /* Set referenceSequenceID */
+        setReferenceID(rID);
+        System.out.println(getReferenceID());
 
-        /* create a hash of integer arrays */
+        /* Init hash of int arrays */
 
-        cuttingPositionMap.put("ACGT", new int[]{-4, 99});
-        int[] arr1 = cuttingPositionMap.get("ACGT");
-        System.out.println("ACGT" + '\t' + arr1[0]);
-        System.out.println("ACGT" + '\t' + arr1[1]);
+        for(int i=0;i<cuttingPatterns.length;i++) {
+            String tssRegionString = fastaReader.getSubsequenceAt(rID,tssPos-initialRadius,tssPos+initialRadius).getBaseString(); // get sequence around TSS
+            Pattern pattern = Pattern.compile(cuttingPatterns[i]);
+            Matcher matcher = pattern.matcher(tssRegionString);
+            ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>(); //int[] cuttingPositions;
+            int count = 0;
+            while(matcher.find()) {
+                count++;
+                cuttingPositionList.add(matcher.start()-initialRadius); // push occurence positions relative to the TSS to list.
+            }
+            cuttingPositionMap.put(cuttingPatterns[i],cuttingPositionList); // push array list to map
+        }
 
-        cuttingPositionMap.put("GAATA", new int[]{5, -100});
-        int[] arr2 = cuttingPositionMap.get("GAATA");
-        System.out.println("GAATA" + '\t' + arr2[0]);
-        System.out.println("GAATA" + '\t' + arr2[1]);
     }
 
 
     /* getter and setter functions */
 
-    public StringProperty getReferenceSequenceID() {
+    public final String getReferenceID() {
+        if (referenceSequenceID != null)
+            return referenceSequenceID.get();
+        return "x";
+    }
+
+    public final void setReferenceID(String rID) {
+        this.referenceSequenceIDProperty().set(rID);
+    }
+
+    public final StringProperty referenceSequenceIDProperty() {
+        if (referenceSequenceID == null) {
+            referenceSequenceID = new SimpleStringProperty("");
+        }
         return referenceSequenceID;
     }
 
-    public void setReferenceSequenceID(String referenceSequenceID) {
-        this.referenceSequenceID.set(referenceSequenceID);
+    public final HashMap<String,ArrayList<Integer>> getCuttingPositionMap() {
+        return cuttingPositionMap;
     }
 
     public IntegerProperty getStartPos() {
