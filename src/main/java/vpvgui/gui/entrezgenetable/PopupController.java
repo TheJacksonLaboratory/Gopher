@@ -10,16 +10,14 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import vpvgui.model.Model;
+import vpvgui.model.project.JannovarGeneGenerator;
 
 public class PopupController  implements Initializable {
 
-    @FXML private TextField geneSymbolTF;
+    @FXML private TextArea geneSymbolArea;
     @FXML private Button geneButton;
 
     @FXML private Label instructions;
@@ -48,8 +46,7 @@ public class PopupController  implements Initializable {
         instructions.setWrapText(true);
         instructions.setStyle("-fx-font-family: \"Comic Sans MS\"; -fx-font-size: 20; -fx-text-fill: darkred;");
         instructions.setText(WORDS);
-        System.err.println("INITIALIZE IN PopupController");
-
+        geneSymbolArea.setWrapText(true);
     }
 
     public HashMap<String, Object> getResult() {
@@ -76,14 +73,28 @@ public class PopupController  implements Initializable {
         }
     }
 
-
+    /** Transfer the genes to the model.
+     *
+     * @param e
+     */
     public void fetchGeneSymbols(ActionEvent e) {
-        this.geneListString = this.geneSymbolTF.getText();
+        this.geneListString = this.geneSymbolArea.getText();
         String[] symbols = parseGeneSymbols(this.geneListString);
         if (this.model!=null)
             this.model.setGeneSymbols(symbols);
         e.consume();
+        geneSymbolArea.clear();
+        parseGeneSymbolsWithJannovar(symbols);
     }
+
+
+    private void parseGeneSymbolsWithJannovar(String[] symb) {
+        JannovarGeneGenerator jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
+        jgg.checkGenes(symb);
+    }
+
+
+
 
     private String[] parseGeneSymbols(String str) {
         String fields[] = str.split("[,;\\s]");

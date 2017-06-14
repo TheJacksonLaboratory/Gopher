@@ -131,10 +131,14 @@ public class Model {
     }
 
     public void setGeneSymbols(String[] symbols) {
-        geneList = Arrays.asList(symbols);
+        geneList = new ArrayList<>();
         System.err.println("Genes");
+        for (String g : symbols) {
+            if (g!=null && !g.isEmpty())
+                geneList.add(g.trim());
+        }
         for (String g : geneList) {
-            System.err.println("\t"+g);
+            System.err.println("\t\""+g+"\"");
         }
     }
 

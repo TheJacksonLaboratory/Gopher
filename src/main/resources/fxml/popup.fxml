@@ -25,18 +25,20 @@
                 </Label>
             </children>
         </HBox>
-        <HBox alignment="CENTER">
-            <children>
-                <TextField fx:id="geneSymbolTF" alignment="TOP_LEFT" prefHeight="358.0" prefWidth="309.0" promptText="Paste or write gene symbols/IDs here">
-               <font>
-                  <Font name="System Italic" size="13.0" />
-               </font></TextField>
-            </children>
-        </HBox>
+      <ScrollPane prefHeight="200.0" prefWidth="200.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="297.0">
+               <children>
+                  <TextArea fx:id="geneSymbolArea" prefHeight="200.0" prefWidth="300.0" />
+               </children>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
+        <HBox alignment="CENTER" />
         <HBox alignment="CENTER" />
         <HBox alignment="CENTER">
             <children>
-                <Button mnemonicParsing="false" onAction="#fetchGeneSymbols" text="Add genes" />
+                <Button mnemonicParsing="false" onAction="#fetchGeneSymbols" text="Validate genes" />
             </children>
         </HBox>
     </children>

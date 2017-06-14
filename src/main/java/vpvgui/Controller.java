@@ -24,6 +24,7 @@ import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
+import vpvgui.model.project.JannovarGeneGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -247,13 +248,17 @@ public class Controller implements Initializable {
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
     }
 
-
+    /**
+     * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
+     * See {@link PopupController} for logic.
+     * @param e
+     */
     public void enterGeneList(ActionEvent e) {
-        //showPopupWindow();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup.fxml"));
         try {
             Parent root1 = loader.load();
             PopupController controller = (PopupController) loader.getController();
+            controller.setModel(this.model);
             Stage stage = new Stage();
             stage.setTitle("Enter target genes");
             stage.setScene(new Scene(root1));
@@ -261,6 +266,13 @@ public class Controller implements Initializable {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+        /* When we get here, we have added the contents of the TextArea in the window to the model
+        and the model stores them in a List called GeneList. These are not yet guaranteed to be
+        valid gene symbols. The next method will use the Jannovar serialized file in order to
+        check whether they are valid smybols and also to create Gene objects from them. A gene
+        object has a list of Transcription Start sites and positions that we will use to
+        generate a list of viewpoints.
+         */
 
 
         e.consume();
@@ -312,43 +324,7 @@ public class Controller implements Initializable {
         SettingsIO.saveSettings(model);
     }
 
-    private HashMap<String, Object> showPopupWindow() {
-        HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-
-        //System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
-        //root = loader.load(getClass().getResource("showTable.fxml").openStream());
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource(
-                        "/fxml/popup.fxml"
-                )
-        );
-
-        try {
-
-            // initializing the controller
-            PopupController popupController = new PopupController();
-            loader.setController(popupController);
-           // popupController.initialize();
-
-
-            // this is the popup stage
-            Stage popupStage = new Stage();
-           // Scene scene = new Scene(popupStage);
-            // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
-            popupController.setStage(popupStage);
-            if(this.rootNode.getScene().getWindow()!=null) {
-                popupStage.initOwner(this.rootNode.getScene().getWindow());
-            }
-            popupStage.initModality(Modality.WINDOW_MODAL);
-            //popupStage.setScene(scene);
-            popupStage.showAndWait();
-            return popupController.getResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-       return null;
-    }
 }
 
 
