@@ -231,7 +231,7 @@ public class Settings implements Serializable {
      * Formats the list properties in human-readable format, checking for an empty list.
      */
     private String toStringHelper(String listName, ObservableList<String> lst) {
-        if (lst.isEmpty()) {
+        if (lst==null || lst.isEmpty()) {
             return (String.format("%s: %s\n", listName, UNSPEC));
         }
         StringBuilder sb = new StringBuilder();
@@ -247,7 +247,8 @@ public class Settings implements Serializable {
     }
 
     private static String makeHumanReadable(String s) {
-        return s.isEmpty() ? UNSPEC : s;
+        if (s==null || s.isEmpty()) return UNSPEC;
+        else return s;
     }
 
     /**

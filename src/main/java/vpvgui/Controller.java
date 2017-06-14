@@ -1,5 +1,6 @@
 package vpvgui;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -246,18 +248,22 @@ public class Controller implements Initializable {
     }
 
 
-    public void enterGeneList() {
-        showPopupWindow();
-        return; /*
-        String[] targetgenes = CopyPasteGenesWindow.display();
-        if (targetgenes == null) {
-            System.err.println("[TODO] implement me, targetgenes==null");
-        } else {
-            System.err.println("[TODO] implement me, targetgenes are:");
-            for (String tg : targetgenes) {
-                System.err.println("\t" + tg);
-            }
-        }*/
+    public void enterGeneList(ActionEvent e) {
+        //showPopupWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup.fxml"));
+        try {
+            Parent root1 = loader.load();
+            PopupController controller = (PopupController) loader.getController();
+            Stage stage = new Stage();
+            stage.setTitle("Enter target genes");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+
+        e.consume();
     }
 
     public void createCaptureProbes() {
@@ -309,31 +315,39 @@ public class Controller implements Initializable {
     private HashMap<String, Object> showPopupWindow() {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-        FXMLLoader loader = new FXMLLoader();
-        //System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
 
-        loader.setLocation(getClass().getResource("/fxml/popup.fxml"));
-        // initializing the controller
-        PopupController popupController = new PopupController();
-        //loader.setController(popupController);
-        Parent layout;
+        //System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
+        //root = loader.load(getClass().getResource("showTable.fxml").openStream());
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource(
+                        "/fxml/popup.fxml"
+                )
+        );
+
         try {
-            layout = loader.load();
-            Scene scene = new Scene(layout);
+
+            // initializing the controller
+            PopupController popupController = new PopupController();
+            loader.setController(popupController);
+           // popupController.initialize();
+
+
             // this is the popup stage
             Stage popupStage = new Stage();
+           // Scene scene = new Scene(popupStage);
             // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
             popupController.setStage(popupStage);
             if(this.rootNode.getScene().getWindow()!=null) {
                 popupStage.initOwner(this.rootNode.getScene().getWindow());
             }
             popupStage.initModality(Modality.WINDOW_MODAL);
-            popupStage.setScene(scene);
+            //popupStage.setScene(scene);
             popupStage.showAndWait();
-        } catch (IOException e) {
+            return popupController.getResult();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return popupController.getResult();
+       return null;
     }
 }
 

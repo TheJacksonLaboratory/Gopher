@@ -6,6 +6,7 @@ import vpvgui.exception.DownloadFileNotFoundException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -19,6 +20,8 @@ public class Model {
     private DataSource datasource=null;
 
     private List<RestrictionEnzyme> enzymelist;
+
+    private List<String> geneList;
 
     private Settings settings;
 
@@ -126,4 +129,13 @@ public class Model {
         this.genomeURL = datasource.getGenomeURL();
         //this.transcriptsURL = datasource.getTranscriptsURL();
     }
+
+    public void setGeneSymbols(String[] symbols) {
+        geneList = Arrays.asList(symbols);
+        System.err.println("Genes");
+        for (String g : geneList) {
+            System.err.println("\t"+g);
+        }
+    }
+
 }
