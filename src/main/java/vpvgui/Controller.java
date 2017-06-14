@@ -1,5 +1,6 @@
 package vpvgui;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -22,6 +24,7 @@ import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
+import vpvgui.model.project.JannovarGeneGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +126,11 @@ public class Controller implements Initializable {
     private Tab setuptab;
 
     @FXML
+    MenuItem showSettingsCurrentProject;
+
+
+
+    @FXML
     private Tab analysistab;
 
     /**
@@ -147,6 +155,19 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.model = new Model();
         initializeBindings();
+        // initialize settings. First check if already exists
+        //TODO For now we are using just one default project name. Later extend this so the
+        //user can store multiple project settings file under names chosen by them.
+        String defaultProjectName="vpvsettings";
+        Settings set=null;
+        try {
+            set=loadSettings(defaultProjectName);
+        } catch (IOException i) {
+            set = new Settings();
+        }
+        set.setProjectName(defaultProjectName);
+        model.setSettings(set);
+
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
@@ -176,6 +197,10 @@ public class Controller implements Initializable {
         } catch (DownloadFileNotFoundException e) {
 
         }
+        /* The model will directly update the settings object to reflect
+        the genome build etc, and the following command will save the settings to disk.
+         */
+        saveSettings();
     }
 
     public void downloadGenome() {
@@ -219,36 +244,48 @@ public class Controller implements Initializable {
             return; // assume the user clicked the cancel button, we do not need to show an error message
         }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
+        String jannovarSerializedFilePath = builder.getSerializedFilePath();
+        System.out.println("PATH="+jannovarSerializedFilePath);
+        this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
+        saveSettings();
 
-
-        /*Operation op = new RefSeqOperation(dir.getPath());
-        Downloader downloadTask = new Downloader(dir,model.getTranscriptsURL(),model.getTranscriptsBasename(),transcriptDownloadPI);
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-        }*/
 
     }
 
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
+
     }
 
+    /**
+     * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
+     * See {@link PopupController} for logic.
+     * @param e
+     */
+    public void enterGeneList(ActionEvent e) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup.fxml"));
+        try {
+            Parent root1 = loader.load();
+            PopupController controller = (PopupController) loader.getController();
+            controller.setModel(this.model);
+            Stage stage = new Stage();
+            stage.setTitle("Enter target genes");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        /* When we get here, we have added the contents of the TextArea in the window to the model
+        and the model stores them in a List called GeneList. These are not yet guaranteed to be
+        valid gene symbols. The next method will use the Jannovar serialized file in order to
+        check whether they are valid smybols and also to create Gene objects from them. A gene
+        object has a list of Transcription Start sites and positions that we will use to
+        generate a list of viewpoints.
+         */
 
-    public void enterGeneList() {
-        showPopupWindow();
-        return; /*
-        String[] targetgenes = CopyPasteGenesWindow.display();
-        if (targetgenes == null) {
-            System.err.println("[TODO] implement me, targetgenes==null");
-        } else {
-            System.err.println("[TODO] implement me, targetgenes are:");
-            for (String tg : targetgenes) {
-                System.err.println("\t" + tg);
-            }
-        }*/
+
+        e.consume();
     }
 
     public void createCaptureProbes() {
@@ -274,8 +311,19 @@ public class Controller implements Initializable {
      *
      * @return Settings for specified project
      */
-    private Settings loadSettings(String projectName) {
+    private Settings loadSettings(String projectName) throws  IOException {
         return SettingsIO.loadSettings(projectName);
+    }
+
+
+
+    public void showSettingsOfCurrentProject() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Settings");
+        alert.setHeaderText("Look, an Information Dialog");
+        alert.setContentText(this.model.getSettings().toString());
+
+        alert.showAndWait();
     }
 
     /**
@@ -286,36 +334,7 @@ public class Controller implements Initializable {
         SettingsIO.saveSettings(model);
     }
 
-    private HashMap<String, Object> showPopupWindow() {
-        HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-        FXMLLoader loader = new FXMLLoader();
-        System.out.println("GET CLASS="+getClass().getResource("/fxml/popup.fxml"));
-
-        loader.setLocation(getClass().getResource("/fxml/popup.fxml"));
-        // initializing the controller
-        PopupController popupController = new PopupController();
-        loader.setController(popupController);
-        Parent layout;
-        try {
-            layout = loader.load();
-            Scene scene = new Scene(layout);
-            // this is the popup stage
-            Stage popupStage = new Stage();
-            // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
-            popupController.setStage(popupStage);
-            if(this.rootNode.getScene().getWindow()!=null) {
-                popupStage.initOwner(this.rootNode.getScene().getWindow());
-            }
-            popupStage.initModality(Modality.WINDOW_MODAL);
-            popupStage.setScene(scene);
-            popupStage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return popupController.getResult();
-
-    }
 }
 
 

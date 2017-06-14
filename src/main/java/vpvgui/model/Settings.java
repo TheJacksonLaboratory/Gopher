@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import vpvgui.io.Platform;
 
 import java.io.*;
 import java.util.regex.Matcher;
@@ -26,7 +27,9 @@ import java.util.regex.Pattern;
  * @author Hannah Blau (blauh)
  * @version last modified 6/12/17
  */
-public class Settings {
+public class Settings implements Serializable {
+
+    public static final long versionID = 1;
 
     /* Project name
      */
@@ -172,6 +175,16 @@ public class Settings {
 
         Settings settings = (Settings) o;
 
+        return getProjectName().equals(settings.getProjectName()) &&
+                getGenomeFileFrom().equals(settings.getGenomeFileFrom()) &&
+                getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom()) &&
+                getRepeatsFileFrom().equals(settings.getRepeatsFileFrom()) &&
+                getGenomeFileTo().equals(settings.getGenomeFileTo()) &&
+                getTranscriptsFileTo().equals(settings.getTranscriptsFileTo()) &&
+                getRepeatsFileTo().equals(settings.getRepeatsFileTo()) &&
+                getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList()) &&
+                getTargetGenesList().equals(settings.getTargetGenesList());
+/*
         if (!getProjectName().equals(settings.getProjectName())) return false;
         if (!getGenomeFileFrom().equals(settings.getGenomeFileFrom())) return false;
         if (!getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom())) return false;
@@ -181,6 +194,7 @@ public class Settings {
         if (!getRepeatsFileTo().equals(settings.getRepeatsFileTo())) return false;
         if (!getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList())) return false;
         return getTargetGenesList().equals(settings.getTargetGenesList());
+*/
     }
 
     @Override
@@ -217,7 +231,7 @@ public class Settings {
      * Formats the list properties in human-readable format, checking for an empty list.
      */
     private String toStringHelper(String listName, ObservableList<String> lst) {
-        if (lst.isEmpty()) {
+        if (lst==null || lst.isEmpty()) {
             return (String.format("%s: %s\n", listName, UNSPEC));
         }
         StringBuilder sb = new StringBuilder();
@@ -233,7 +247,8 @@ public class Settings {
     }
 
     private static String makeHumanReadable(String s) {
-        return s.isEmpty() ? UNSPEC : s;
+        if (s==null || s.isEmpty()) return UNSPEC;
+        else return s;
     }
 
     /**
@@ -313,6 +328,19 @@ public class Settings {
         return settings;
     }
 
+    /**
+     * Predicate indicating whether the current Settings object is complete (has no empty properties).
+     *
+     * @return true if object has no empty properties, false otherwise
+     */
+    public boolean isComplete() {
+        return !(getProjectName().isEmpty() || getGenomeFileFrom().isEmpty() ||
+                getTranscriptsFileFrom().isEmpty() || getRepeatsFileFrom().isEmpty() ||
+                getGenomeFileTo().isEmpty() || getTranscriptsFileTo().isEmpty() ||
+                getRepeatsFileTo().isEmpty() || getRestrictionEnzymesList().isEmpty() ||
+                getTargetGenesList().isEmpty());
+    }
+
     /*
      * Reads list of restriction enzymes or target genes (one entry per line, each line starts with a
      * tab character.
@@ -367,5 +395,11 @@ public class Settings {
             return false;
         }
         return true;
+    }
+
+    /** Ugly hack todo -- in future, allow user to choose project file */
+    public String getDefaultPath() {
+        File dir = Platform.getVPVDir();
+        return String.format("%s%s.vpvsettings%s",dir.getAbsoluteFile(),File.separator,Model.PROJECT_FILENAME_SUFFIX);
     }
 }

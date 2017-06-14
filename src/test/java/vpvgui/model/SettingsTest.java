@@ -43,14 +43,16 @@ public class SettingsTest {
 
         System.out.print(t);
         System.out.print(s);
+        assertTrue(s.isComplete());
     }
 
     @Test
     public void test1SaveToFile() throws Exception {
         File f = new File("/Users/blauh/vpv/settingsTestFile.txt");
 
-        Settings.saveToFile(s, f);
-        System.out.println("\nSettings saved to file");
+        if (Settings.saveToFile(s, f)) {
+            System.out.println("\nSettings saved to file");
+        }
     }
 
     @Test
@@ -62,8 +64,8 @@ public class SettingsTest {
 
     @Test
     public void test3writeRead() throws Exception {
-        Settings t = Settings.factory();
         File f = new File("/Users/blauh/vpv/test3File.txt");
+        Settings t = Settings.factory();
 
         t.setProjectName("ANewFancyProject");
         t.setGenomeFileFrom("/Users/blauh/vpv/genomeFile");
@@ -76,11 +78,14 @@ public class SettingsTest {
         for (int i = 0; i < 8; i++) {
             tgl.add("NewTargetGene" + i);
         }
+        assertFalse(t.isComplete());
 
         System.out.print(t);
-        Settings.saveToFile(t, f);
-        System.out.println("\nSettings saved to file");
+        if (Settings.saveToFile(t, f)) {
+            System.out.println("\nSettings saved to file");
+        }
         Settings u = Settings.factory("/Users/blauh/vpv/test3File.txt");
-        System.out.print("\nSettings restored from file\n" + u);
+        assert(t.equals(u));
+        System.out.print("\nSettings restored from file\n");
     }
 }

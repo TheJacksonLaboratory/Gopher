@@ -3,35 +3,50 @@ package vpvgui.gui.entrezgenetable;
 /**
  * Created by peter on 03.06.17.
  */
+import javafx.event.ActionEvent;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import vpvgui.model.Model;
+import vpvgui.model.project.JannovarGeneGenerator;
 
 public class PopupController  implements Initializable {
 
-    @FXML private TextField usernameTF;
-    @FXML private PasswordField passwordPF;
-    @FXML private Button connectBtn;
+    @FXML private TextArea geneSymbolArea;
+    @FXML private Button geneButton;
+
+    @FXML private Label instructions;
+
+    /** A reference to the Model. We will use it to add genes information to
+     * the model.
+     */
+    private Model model=null;
+
+
+    /** This will hold the string with the list of genes entered by the user. */
+    private String geneListString=null;
+
+
     private Stage stage = null;
     private HashMap<String, Object> result = new HashMap<String, Object>();
 
+    private static final String WORDS =
+            "Paste a gene list into the window or use the File Chooser to select a file "+
+                    " with the genes. Use valid HGNC gene symbols. Valid gene symbols will be shown" +
+                    "in bold text.";
+
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        connectBtn.setOnAction((event)->{
-            result.clear();
-            result.put("username", usernameTF.getText());
-            result.put("password", passwordPF.getText());
-            closeStage();
-        });
-
+        instructions.setWrapText(true);
+        instructions.setStyle("-fx-font-family: \"Comic Sans MS\"; -fx-font-size: 20; -fx-text-fill: darkred;");
+        instructions.setText(WORDS);
+        geneSymbolArea.setWrapText(true);
     }
 
     public HashMap<String, Object> getResult() {
@@ -46,6 +61,9 @@ public class PopupController  implements Initializable {
         this.stage = stage;
     }
 
+
+    public void setModel(Model mod){this.model=mod;}
+
     /**
      * Closes the stage of this view
      */
@@ -53,6 +71,37 @@ public class PopupController  implements Initializable {
         if(stage!=null) {
             stage.close();
         }
+    }
+
+    /** Transfer the genes to the model.
+     *
+     * @param e
+     */
+    public void fetchGeneSymbols(ActionEvent e) {
+        this.geneListString = this.geneSymbolArea.getText();
+        String[] symbols = parseGeneSymbols(this.geneListString);
+        if (this.model!=null)
+            this.model.setGeneSymbols(symbols);
+        e.consume();
+        geneSymbolArea.clear();
+        parseGeneSymbolsWithJannovar(symbols);
+    }
+
+
+    private void parseGeneSymbolsWithJannovar(String[] symb) {
+        JannovarGeneGenerator jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
+        jgg.checkGenes(symb);
+    }
+
+
+
+
+    private String[] parseGeneSymbols(String str) {
+        String fields[] = str.split("[,;\\s]");
+        for (int i=0;i<fields.length;++i) {
+            fields[i]=fields[i].trim().toUpperCase();
+        }
+        return fields;
     }
 
 }
