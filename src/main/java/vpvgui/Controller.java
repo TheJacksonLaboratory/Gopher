@@ -197,6 +197,10 @@ public class Controller implements Initializable {
         } catch (DownloadFileNotFoundException e) {
 
         }
+        /* The model will directly update the settings object to reflect
+        the genome build etc, and the following command will save the settings to disk.
+         */
+        saveSettings();
     }
 
     public void downloadGenome() {
@@ -251,6 +255,7 @@ public class Controller implements Initializable {
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
+
     }
 
     /**

@@ -127,6 +127,8 @@ public class Model {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.",gb));
         }
         this.genomeURL = datasource.getGenomeURL();
+        this.settings.setGenomeFileFrom(this.genomeURL);
+        this.settings.setGenomeFileTo(this.genomeBasename);
         //this.transcriptsURL = datasource.getTranscriptsURL();
     }
 
