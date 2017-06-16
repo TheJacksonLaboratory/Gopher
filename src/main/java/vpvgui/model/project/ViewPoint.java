@@ -30,7 +30,7 @@ public class ViewPoint {
 
     /* The viewpoint cannot be outside the interval [maxUpstreamTssPos,maxDownPos]. */
     private Integer maxUpstreamTssPos;
-    private Integer maxDownstreamPos;
+    private Integer maxDownstreamTssPos;
 
     /* Start and end position of the viewpoint */
     private Integer startPos, endPos;
@@ -90,12 +90,12 @@ public class ViewPoint {
     public final Integer getMaxUpstreamTssPos() { return maxUpstreamTssPos; }
 
 
-    public final void setMaxDownstreamPos(Integer maxDownstreamPos) {
-        this.maxDownstreamPos=maxDownstreamPos;
+    public final void setMaxDownstreamTssPos(Integer maxDownstreamTssPos) {
+        this.maxDownstreamTssPos=maxDownstreamTssPos;
     }
 
-    public final Integer getMaxDownstreamPos() {
-        return maxDownstreamPos;
+    public final Integer getMaxDownstreamTssPos() {
+        return maxDownstreamTssPos;
     }
 
 

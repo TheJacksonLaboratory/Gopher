@@ -59,8 +59,8 @@ public class ViewPointTest {
 
     @Test
     public void testSetAndGetMaxDownstreamPos() throws Exception {
-        testViewpoint.setMaxDownstreamPos(testMaxDownstreamPos);
-        assertEquals(testMaxDownstreamPos,testViewpoint.getMaxDownstreamPos());
+        testViewpoint.setMaxDownstreamTssPos(testMaxDownstreamPos);
+        assertEquals(testMaxDownstreamPos,testViewpoint.getMaxDownstreamTssPos());
     }
     @Test
     public void testSetAndGetStartAndEndPos() throws Exception {
