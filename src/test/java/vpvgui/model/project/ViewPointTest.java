@@ -25,14 +25,14 @@ public class ViewPointTest {
     private String testGeneSymbol = "SOX9";
     private String testDerivationApproach = "INITIAL";
 
-    private String[] testCuttingPatterns = new String[]{"TGG","CA","AAA"};
+    private String[] testCuttingPatterns = new String[]{"TCCG","CA","AAA"};
 
     private String testFastaFile="src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
 
     private final File fasta = new File(testFastaFile);
     IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
 
-    ViewPoint testViewpoint = new ViewPoint(testReferenceSequenceID, testTssPos, testInitialRadius, testCuttingPatterns, testFastaReader, testGeneSymbol);
+    ViewPoint testViewpoint = new ViewPoint(testReferenceSequenceID, testTssPos, testInitialRadius, testMaxUpstreamTssPos, testMaxDownstreamPos, testCuttingPatterns, testFastaReader, testGeneSymbol);
 
     public ViewPointTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
 

@@ -48,20 +48,20 @@ public class ViewPoint {
 
     /* Constructor fuction */
 
-    public ViewPoint(String referenceSequenceID, Integer tssPos, Integer initialRadius, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader, String geneSymbol) {
+    public ViewPoint(String referenceSequenceID, Integer tssPos, Integer initialRadius, Integer maxUpstreamTssPos, Integer maxDownstreamTssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader, String geneSymbol) {
 
         /* Set fields */
 
         setReferenceID(referenceSequenceID);
         setTssPos(tssPos);
-        setStartPos(tssPos - initialRadius);
-        setEndPos(tssPos + initialRadius);
+        setStartPos(tssPos - maxUpstreamTssPos);
+        setEndPos(tssPos + maxDownstreamTssPos);
         setGeneSymbol(geneSymbol);
         setDerivationApproach("INITIAL");
 
         /* Create hash of int arrays */
 
-        cuttingPositionMap=createCuttingPositionMap(referenceSequenceID, tssPos, initialRadius, cuttingPatterns, fastaReader);
+        cuttingPositionMap=createCuttingPositionMap(referenceSequenceID, tssPos, initialRadius, maxUpstreamTssPos, maxDownstreamTssPos, cuttingPatterns, fastaReader);
     }
 
 
@@ -143,20 +143,22 @@ public class ViewPoint {
 
     /* wrapper/helper functions */
 
-    private HashMap<String,ArrayList<Integer>> createCuttingPositionMap(String referenceSequenceID, Integer tssPos, Integer initialRadius, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
+    private HashMap<String,ArrayList<Integer>> createCuttingPositionMap(String referenceSequenceID, Integer tssPos, Integer initialRadius, Integer maxUpstreamTssPos, Integer maxDownstreamTssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
 
         HashMap<String,ArrayList<Integer>> cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
 
         for(int i=0;i<cuttingPatterns.length;i++) {
 
-            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,tssPos-initialRadius,tssPos+initialRadius).getBaseString().toUpperCase(); // get sequence around TSS
+            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,tssPos-maxUpstreamTssPos,tssPos+maxDownstreamTssPos).getBaseString().toUpperCase(); // get sequence around TSS
 
             Pattern pattern = Pattern.compile(cuttingPatterns[i]);
             Matcher matcher = pattern.matcher(tssRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
 
             while(matcher.find()) {
-                cuttingPositionList.add(matcher.start()-initialRadius); // push occurence positions relative to the TSS to list.
+                // TODO: Use maxUpstreamTssPos and maxDownstreamTssPos instead of initialRadius (Upstream TSS: 'match'-'UpMax'; Downstream: 'DownMax'-'match').
+                cuttingPositionList.add(matcher.start()-initialRadius); // push occurrence positions relative to the TSS to list.
+                //System.out.println(matcher.start());
             }
 
             cuttingPositionMap.put(cuttingPatterns[i],cuttingPositionList); // push array list to map
