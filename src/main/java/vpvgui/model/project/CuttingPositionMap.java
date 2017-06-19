@@ -67,9 +67,6 @@ public class CuttingPositionMap {
 
         cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
 
-        // TODO: So far, the starting position of the map is taken as cutting position,
-        // TODO: But it would be more correct to use an offset parameter and take the real cutting within the motif,
-        // TODO: which can be indivcated by a '^' character, e.g. for A^GATCT, would be 1.
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<Integer>();
         for(int i=0;i<cuttingPatterns.length;i++) {
 
