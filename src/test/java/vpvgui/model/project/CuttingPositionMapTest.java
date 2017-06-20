@@ -21,12 +21,13 @@ public class CuttingPositionMapTest {
     String testReferenceSequenceID="chr4_ctg9_hap1";;
     Integer testGenomicPos=20000;;
     Integer testMaxDistToTssUp=150;
-    Integer testMaxDistToTssDown=50;
+    Integer testMaxDistToTssDown=60;
 
 
     /* create CuttingPositionMap object for testing */
 
-    private String[] testCuttingPatterns = new String[]{"ACTTT^TA","AAAC^CACTTAC","G^AG"};
+    private String[] testCuttingPatterns = new String[]{"ACT^TTTA","AAAC^CACTTAC","G^AG"};
+    private String[] testCuttingPatternsCopy = testCuttingPatterns.clone();
 
     private String testFastaFile="src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
 
@@ -51,6 +52,20 @@ public class CuttingPositionMapTest {
     @Test
     public void testHashMap() throws Exception {
 
+        // print cutting motifs with '^' characters
+        System.out.println();
+        System.out.println("Cutting motifs:");
+        for(int i = 0; i<testCuttingPatterns.length;i++) {
+            System.out.println(testCuttingPatternsCopy[i]);
+        }
+
+        // print offsets
+        System.out.println();
+        System.out.println("Offsets of cutting motifs:");
+        for(int i = 0; i<testCuttingPositionMap.getCuttingPositionMapOffsets().size();i++) {
+            System.out.println(testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]));
+        }
+
         // print the initial sequence
         System.out.println();
         System.out.println("Sequence around 'genomicPos':");
@@ -72,16 +87,19 @@ public class CuttingPositionMapTest {
         System.out.println(s);
 
         // print cutting motif occurrences only for individual motifs
+        System.out.println();
+        System.out.println("Individual cutting motif occurrences:");
         for (int i = 0; i < testCuttingPatterns.length; i++) {
             ArrayList<Integer> relPosIntArray = testCuttingPositionMap.getCuttingPositionMap().get(testCuttingPatterns[i]);
             for (int j = 0; j < relPosIntArray.size(); j++) {
                 s = "";
-                for (int k = 0; k < relPosIntArray.get(j)+testMaxDistToTssUp; k++) {
+                Integer offset=testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
+                for (int k = 0; k < relPosIntArray.get(j)+testMaxDistToTssUp -offset; k++) { // subtract offset
                     s += " ";
                 }
-                s += testFastaReader.getSubsequenceAt(testReferenceSequenceID, testGenomicPos + relPosIntArray.get(j), testGenomicPos + relPosIntArray.get(j) + testCuttingPatterns[i].length() - 1).getBaseString();
-                s += " ";
-                s += relPosIntArray.get(j);
+                Integer sta = testGenomicPos + relPosIntArray.get(j) - testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
+                Integer end = sta + testCuttingPatterns[i].length() - 1;
+                s += testFastaReader.getSubsequenceAt(testReferenceSequenceID, sta, end).getBaseString();
                 System.out.println(s);
             }
         }
@@ -100,6 +118,18 @@ public class CuttingPositionMapTest {
     }
 
 
+
+    /* utility functions */
+
+    @Test
+    public void testgetNextCutPos() throws Exception {
+        Integer pos = -15;
+        String direction="down";
+        System.out.println("pos:  " + pos);
+        System.out.println("direction:  " + direction);
+        Integer nextCutPos = testCuttingPositionMap.getNextCutPos(pos,direction);
+        System.out.println("nextCutPos:  " + nextCutPos);
+    }
 
 
     /* setter and getter functions */
@@ -128,12 +158,6 @@ public class CuttingPositionMapTest {
         assertEquals(testMaxDistToTssDown,testCuttingPositionMap.getMaxDistToTssDown());
     }
 
-    @Test
-    public void testGetNextCutUp() throws Exception {
-    }
 
-    @Test
-    public void testGetNextCutDown() throws Exception {
-    }
 
 }

@@ -24,6 +24,8 @@ package vpvgui.model.project;
  */
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import vpvgui.exception.IntegerOutOfRangeException;
+import vpvgui.exception.NoCuttingSiteUpStreamException;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -56,22 +58,23 @@ public class CuttingPositionMap {
 
         /* create maps */
 
+        cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
+
         // determine offsets
         cuttingPositionMapOffsets = new HashMap<String,Integer>();
         for(int i=0;i<cuttingPatterns.length;i++) {
             Integer offSet=cuttingPatterns[i].indexOf('^');
             cuttingPatterns[i] = cuttingPatterns[i].replace("^",""); // remove '^' characters
             cuttingPositionMapOffsets.put(cuttingPatterns[i],offSet);
-            System.out.println(cuttingPositionMapOffsets.get(cuttingPatterns[i]));
         }
 
-        cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
+
 
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<Integer>();
         for(int i=0;i<cuttingPatterns.length;i++) {
 
             // get sequence around genomic position and convert everything to uppercase
-            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos-maxDistToTssUp,genomicPos+maxDistToTssDown).getBaseString().toUpperCase();
+            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToTssUp,genomicPos+maxDistToTssDown).getBaseString().toUpperCase();
 
             Pattern pattern = Pattern.compile(cuttingPatterns[i]);
             Matcher matcher = pattern.matcher(tssRegionString);
@@ -80,11 +83,11 @@ public class CuttingPositionMap {
             while(matcher.find()) {
 
                 if (matcher.start()<=genomicPos) {
-                    cuttingPositionList.add(matcher.start() - maxDistToTssUp);
+                    cuttingPositionList.add(matcher.start() - maxDistToTssUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                     cuttingPositionListUnion.add(matcher.start()-maxDistToTssUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                 }
                 else if (genomicPos<matcher.start()) {
-                    cuttingPositionList.add(matcher.start() - genomicPos);
+                    cuttingPositionList.add(matcher.start() - genomicPos + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                     cuttingPositionListUnion.add(matcher.start() - genomicPos + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                 }
 
@@ -99,19 +102,6 @@ public class CuttingPositionMap {
         cuttingPositionListUnion.addAll(uniqueSet);
         Collections.sort(cuttingPositionListUnion); // sort
         cuttingPositionMap.put("ALL",cuttingPositionListUnion); // push array list to map
-
-
-        Iterator it = cuttingPositionMap.entrySet().iterator();
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
-/*
-System.out.println(cuttingPositionMap.size());
-        for(int i=0;i<cuttingPatterns.length;i++) {
-            System.out.println(cuttingPatterns[i]);
-            System.out.println(cuttingPositionMap.get(cuttingPatterns[i]));
-        }
-*/
 
     }
 
@@ -152,16 +142,56 @@ System.out.println(cuttingPositionMap.size());
         return cuttingPositionMap;
     }
 
-
+    public final HashMap<String,Integer> getCuttingPositionMapOffsets() {
+        return cuttingPositionMapOffsets;
+    }
 
     /* utilities */
 
-    public Integer getNextCutUp(){
-        return 0;
-    }
 
-    public Integer getNextCutDown(){
-        return 0;
-    }
+    public Integer getNextCutPos(Integer pos, String direction) {
 
+         /*
+         * Given a position relative to 'genomicPos' that is within the interval [maxDistToTssUp,maxDistToTssDown],
+         * return the next cutting position upstream.
+         *
+         * The given and returned positions are relative to the TSS.
+         *
+         * TODO: Handle exceptions using try catch contruct.
+         * TODO: Test fucnction.
+         *
+         */
+
+        if(pos<-maxDistToTssUp || pos>maxDistToTssDown) {
+            System.out.println("The specified position is out of range. Will change nothing.");
+            return pos;
+        }
+
+        ArrayList<Integer> cutPosArray = new ArrayList<Integer>();
+        cutPosArray = cuttingPositionMap.get("ALL");
+        Integer returnCutPos=cutPosArray.get(cutPosArray.size()-1);
+
+        if( direction=="up")
+        {
+            Collections.reverse(cutPosArray);
+            returnCutPos=cutPosArray.get(cutPosArray.size()-1);
+        }
+
+        Iterator<Integer> cutPosArrayIt = cutPosArray.iterator();
+        while(cutPosArrayIt.hasNext()) {
+            Integer nextCutPos=cutPosArrayIt.next();
+            if(direction=="down" && (pos<=nextCutPos)) {
+                returnCutPos=nextCutPos;break;
+            }
+            if(direction=="up" && (pos>=nextCutPos)) {
+                System.out.println(returnCutPos);
+                returnCutPos=nextCutPos;break;
+            }
+        }
+        if(!cutPosArrayIt.hasNext()) {
+            System.out.println("No cutting site " + direction + "stream of position " + pos + ". Will return the " +
+                    "outermost cutting site in " + direction + "stream direction.");
+        }
+        return returnCutPos;
+    }
 }
