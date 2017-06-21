@@ -25,12 +25,16 @@ package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import vpvgui.exception.IntegerOutOfRangeException;
-import vpvgui.exception.NoCuttingSiteUpStreamException;
+import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This a utility class for the class 'ViewPoint'.
+ * @author Peter Hansen
+ */
 public class CuttingPositionMap {
 
     /* fields */
@@ -146,25 +150,34 @@ public class CuttingPositionMap {
         return cuttingPositionMapOffsets;
     }
 
-    /* utilities */
+    /* utility functions */
 
-
-    public Integer getNextCutPos(Integer pos, String direction) {
+    /**
+     * Given a position within the interval [-maxDistToTssUp,maxDistToTssDown],
+     * this function returns the next cutting position in up or downstream direction.
+     * @param pos Position relative to 'genomicPos'.
+     * @param direction Direction in which the next cutting site will be searched.
+     * @return Position of the next cutting position relative to 'genomicPos'.
+     * @exception IllegalArgumentException if a value different than 'up' or 'down' is passed as 'direction' parameter.
+     */
+    public Integer getNextCutPos(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
 
          /*
-         * Given a position relative to 'genomicPos' that is within the interval [maxDistToTssUp,maxDistToTssDown],
-         * return the next cutting position upstream.
          *
-         * The given and returned positions are relative to the TSS.
          *
-         * TODO: Handle exceptions using try catch contruct.
          * TODO: Test fucnction.
+         *
          *
          */
 
+         if(!(Objects.equals(direction, "up")||Objects.equals(direction, "down"))) {
+             // TODO: Handle exception
+             throw new IllegalArgumentException("Please pass either 'up' or 'down' for 'direction'.");
+         }
+
         if(pos<-maxDistToTssUp || pos>maxDistToTssDown) {
-            System.out.println("The specified position is out of range. Will change nothing.");
-            return pos;
+             // TODO: Handle exception
+             throw new IntegerOutOfRangeException("Please pass a value within the interval [-maxDistToTssUp="+ -maxDistToTssUp +",maxDistToTssDown="+ maxDistToTssDown + "].");
         }
 
         ArrayList<Integer> cutPosArray = new ArrayList<Integer>();
@@ -188,8 +201,10 @@ public class CuttingPositionMap {
                 returnCutPos=nextCutPos;break;
             }
         }
+
         if(!cutPosArrayIt.hasNext()) {
-            System.out.println("No cutting site " + direction + "stream of position " + pos + ". Will return the " +
+            // TODO: Handle exception
+            throw new NoCuttingSiteFoundUpOrDownstreamException("No cutting site " + direction + "stream of position " + pos + ". Will return the " +
                     "outermost cutting site in " + direction + "stream direction.");
         }
         return returnCutPos;

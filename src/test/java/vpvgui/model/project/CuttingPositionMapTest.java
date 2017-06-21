@@ -123,8 +123,8 @@ public class CuttingPositionMapTest {
 
     @Test
     public void testgetNextCutPos() throws Exception {
-        Integer pos = -15;
-        String direction="down";
+        Integer pos = -75;
+        String direction="up";
         System.out.println("pos:  " + pos);
         System.out.println("direction:  " + direction);
         Integer nextCutPos = testCuttingPositionMap.getNextCutPos(pos,direction);
