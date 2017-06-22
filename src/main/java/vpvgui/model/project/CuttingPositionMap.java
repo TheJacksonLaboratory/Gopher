@@ -155,58 +155,66 @@ public class CuttingPositionMap {
     /**
      * Given a position within the interval [-maxDistToTssUp,maxDistToTssDown],
      * this function returns the next cutting position in up or downstream direction.
-     * @param pos Position relative to 'genomicPos'.
+     *
+     * @param pos       Position relative to 'genomicPos'.
      * @param direction Direction in which the next cutting site will be searched.
      * @return Position of the next cutting position relative to 'genomicPos'.
-     * @exception IllegalArgumentException if a value different than 'up' or 'down' is passed as 'direction' parameter.
+     * @throws IllegalArgumentException if a value different than 'up' or 'down' is passed as 'direction' parameter.
      */
     public Integer getNextCutPos(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
 
-         /*
-         *
-         *
-         * TODO: Test fucnction.
-         *
-         *
-         */
-
-         if(!(Objects.equals(direction, "up")||Objects.equals(direction, "down"))) {
-             // TODO: Handle exception
-             throw new IllegalArgumentException("Please pass either 'up' or 'down' for 'direction'.");
-         }
-
-        if(pos<-maxDistToTssUp || pos>maxDistToTssDown) {
-             // TODO: Handle exception
-             throw new IntegerOutOfRangeException("Please pass a value within the interval [-maxDistToTssUp="+ -maxDistToTssUp +",maxDistToTssDown="+ maxDistToTssDown + "].");
+        // throw exception
+        if (!(Objects.equals(direction, "up") || Objects.equals(direction, "down"))) {
+            throw new IllegalArgumentException("Please pass either 'up' or 'down' for 'direction'.");
         }
 
+        // throw exception
+
+        if (pos < -maxDistToTssUp || pos > maxDistToTssDown) {
+            throw new IntegerOutOfRangeException("Please pass a value within the interval [-maxDistToTssUp=" + -maxDistToTssUp + ",maxDistToTssDown=" + maxDistToTssDown + "].");
+        }
+
+        // get array with cutting positions
         ArrayList<Integer> cutPosArray = new ArrayList<Integer>();
         cutPosArray = cuttingPositionMap.get("ALL");
-        Integer returnCutPos=cutPosArray.get(cutPosArray.size()-1);
+        Integer returnCutPos = cutPosArray.get(cutPosArray.size() - 1);
 
-        if( direction=="up")
-        {
+        // reverse array, if the functions is called with 'up'
+        if (direction == "up") {
             Collections.reverse(cutPosArray);
-            returnCutPos=cutPosArray.get(cutPosArray.size()-1);
         }
 
-        Iterator<Integer> cutPosArrayIt = cutPosArray.iterator();
-        while(cutPosArrayIt.hasNext()) {
-            Integer nextCutPos=cutPosArrayIt.next();
-            if(direction=="down" && (pos<=nextCutPos)) {
-                returnCutPos=nextCutPos;break;
+        // find the next cutting site in up or downstream direction
+        try {
+            Iterator<Integer> cutPosArrayIt = cutPosArray.iterator();
+            boolean found = false;
+            while (cutPosArrayIt.hasNext()) {
+                Integer nextCutPos = cutPosArrayIt.next();
+                if (direction == "down" && (pos <= nextCutPos)) {
+                    found = true;
+                    returnCutPos = nextCutPos;
+                    break;
+                }
+                if (direction == "up" && (pos >= nextCutPos)) {
+                    found = true;
+                    returnCutPos = nextCutPos;
+                    break;
+                }
+
             }
-            if(direction=="up" && (pos>=nextCutPos)) {
-                System.out.println(returnCutPos);
-                returnCutPos=nextCutPos;break;
+            if (!found) {
+                throw new NoCuttingSiteFoundUpOrDownstreamException("EXCEPTION in function 'getNextCutPos': No cutting site " + direction + "stream of position " + pos + ". Will return the " +
+                        "outermost cutting site in " + direction + "stream direction.");
             }
+        } catch (NoCuttingSiteFoundUpOrDownstreamException e) {
+            System.out.println(e.getMessage());
         }
 
-        if(!cutPosArrayIt.hasNext()) {
-            // TODO: Handle exception
-            throw new NoCuttingSiteFoundUpOrDownstreamException("No cutting site " + direction + "stream of position " + pos + ". Will return the " +
-                    "outermost cutting site in " + direction + "stream direction.");
+        // reverse the array for future calls
+        if (direction == "up") {
+            Collections.reverse(cutPosArray);
         }
+
         return returnCutPos;
     }
 }

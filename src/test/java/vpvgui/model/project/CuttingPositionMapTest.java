@@ -1,12 +1,17 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import vpvgui.exception.IntegerOutOfRangeException;
+import org.junit.rules.ExpectedException;
+import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
+
 
 import static org.junit.Assert.assertEquals;
 
@@ -119,16 +124,88 @@ public class CuttingPositionMapTest {
 
 
 
-    /* utility functions */
+    /* test utility functions */
 
     @Test
     public void testgetNextCutPos() throws Exception {
-        Integer pos = -75;
-        String direction="up";
-        System.out.println("pos:  " + pos);
-        System.out.println("direction:  " + direction);
-        Integer nextCutPos = testCuttingPositionMap.getNextCutPos(pos,direction);
-        System.out.println("nextCutPos:  " + nextCutPos);
+
+        System.out.println("===============================================================");
+        System.out.println("Test function 'testgetNextCutPos' prints to the screen ");
+        System.out.println("===============================================================");
+
+        /* test usual function calls for positions between two cutting sites */
+
+        if(1<testCuttingPositionMap.getCuttingPositionMap().get("ALL").size()) {
+
+            Integer posA = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(0);
+            Integer posB = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(1);
+            Integer testPos=posA+((posB-posA)/2);
+
+            System.out.println("---------------------------------------------------------------");
+            System.out.println("Testing position " + testPos + " for downstream direction...");
+            Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
+            System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
+
+            System.out.println("---------------------------------------------------------------");
+            System.out.println("Testing position " + testPos + " for upstream direction...");
+            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
+            System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
+
+            System.out.println("---------------------------------------------------------------");
+            System.out.println("Testing position " + testPos + " for downstream direction...");
+            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
+            System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
+
+            System.out.println("---------------------------------------------------------------");
+            System.out.println("Testing position " + testPos + " for upstream direction...");
+            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
+            System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
+
+        } else {
+            System.out.println("There need to be at least two cutting sites to perform this test. Will skip this test.");
+        }
+
+        /* test handled NoCuttingSiteFoundUpOrDownstreamException */
+
+        // last cutting position, downstream
+        Integer testPos = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(testCuttingPositionMap.getCuttingPositionMap().get("ALL").size()-1) + 1;
+        System.out.println("---------------------------------------------------------------");
+        System.out.println("Testing position " + testPos + " for downstream direction...");
+        Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "down");
+        System.out.println("Returned value: " + nextCutPos);
+
+        // first cutting position, upstream
+        testPos = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(0) - 1;
+        System.out.println("---------------------------------------------------------------");
+        System.out.println("Testing position " + testPos + " for upstream direction...");
+        nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "up");
+        System.out.println("Returned value: " + nextCutPos);
+
+        System.out.println("===============================================================");
+        System.out.println("Test function 'testgetNextCutPos' END");
+        System.out.println("===============================================================");
+    }
+
+    /* test unhandled IntegerOutOfRangeException for function 'testgetNextCutPos' */
+
+    @Test(expected = IntegerOutOfRangeException.class)
+    public void testIntegerOutOfRangeExceptionDownstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
+        Integer testPos = testMaxDistToTssDown+1;
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
+    }
+
+    @Test(expected = IntegerOutOfRangeException.class)
+    public void testIntegerOutOfRangeExceptionUpstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
+        Integer testPos = testMaxDistToTssUp-1;
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
+    }
+
+    /* test unhandled IllegalArgumentException for function 'testgetNextCutPos' */
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalArgumentException() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
+        Integer testPos = testMaxDistToTssDown+1;
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "illegal argument");
     }
 
 

@@ -96,43 +96,4 @@ public class ViewPointTest {
             }
         }
     }
-
-    @Test
-    public void testCreateCuttingPositionMap() throws Exception {
-
-        /* This test is intended to test if the generation of the cuttingPositionMap works correct.
-         * Furthermore, the usage of the data structure is demonstrated here.
-         * Strucures used for testing including the viewpoint are created at the top of this class.
-         */
-
-        /* Print the initial sequence */
-
-        System.out.println();
-        String tssRegionString = testFastaReader.getSubsequenceAt("chr4_ctg9_hap1",10000-100,10000+100).getBaseString(); // get sequence around TSS
-        System.out.println(tssRegionString);
-        String tssRegionStringUpper=tssRegionString.toUpperCase();
-        System.out.println(tssRegionStringUpper);
-
-        /* Get the map from the Viewpoint object.
-        *  Use the cutting sites from the map and lengths of the test cutting patterns
-        *  to cut out the subsequences independently from the same region of the genome.
-        *  Print out the whole region as well as the subsequences with their positions
-        *  relative to the TSS for control.
-        */
-
-        for(int i=0;i<testCuttingPatterns.length;i++) {
-            ArrayList<Integer> relPosIntArray = testViewpoint.getCuttingPositionMap().get(testCuttingPatterns[i]);
-            for(int j=0;j<relPosIntArray.size();j++) {
-                String s = new String("");
-                for(int k=0;k<100+relPosIntArray.get(j);k++) {
-                    s += " ";
-                }
-                s += testFastaReader.getSubsequenceAt("chr4_ctg9_hap1",10000+relPosIntArray.get(j),10000+relPosIntArray.get(j)+testCuttingPatterns[i].length()-1).getBaseString();
-                s += " ";
-                s += relPosIntArray.get(j);
-                System.out.println(s);
-            }
-
-        }
-    }
 }

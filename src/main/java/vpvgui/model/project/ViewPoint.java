@@ -36,7 +36,7 @@ public class ViewPoint {
     private Integer startPos, endPos;
 
     /* Symbol of the corresponding gene, e.g. BCL2 */
-    private String geneSymbol;  // IN FACT, A VIEWPOINT SHOULD POINT TO A GENE OBJECT!
+    private String geneSymbol;  // IN FACT, A VIEWPOINT SHOULD POINT TO A GENE OBJECT! OR A VIEWPOINT SHOULD ALWAYS BE WITHIN A GENE OBJECT
 
     /* Derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
     private String derivationApproach;
