@@ -21,9 +21,9 @@ public class CuttingPositionMap {
 
     /* fields */
 
-    Integer genomicPos;
-    Integer maxDistToTssUp;
-    Integer maxDistToTssDown;
+    private Integer genomicPos;
+    private Integer maxDistToGenomicPosUp;
+    private Integer maxDistToGenomicPosDown;
     private static HashMap<String,ArrayList<Integer>> cuttingPositionMap;
     private static HashMap<String,Integer> cuttingPositionMapOffsets;
 
@@ -32,7 +32,7 @@ public class CuttingPositionMap {
 
     /**
      * The constructor will set all fields of this class and create the actual <i>HashMap</i> for cutting positions,
-     * which will be derived only for the interval [<i>genomicPos-maxDistToTssUp,genomicPos+maxDistToTssDown</i>].
+     * which will be derived only for the interval [<i>genomicPos-maxDistToGenomicPosUp,genomicPos+maxDistToGenomicPosDown</i>].
      * <p>
      * The keys for the <i>HashMap</i> will be the same as passed by the argument <i>cuttingPatterns</i>,
      * but with '^' characters removed.
@@ -40,18 +40,18 @@ public class CuttingPositionMap {
      * In addition to the passed motifs, there is one special key <i>ALL</i> which contains the cutting positions for the union of all motifs.
      * @param referenceSequenceID name of the genomic sequence, e.g. <i>chr1</i>.
      * @param genomicPos central position of the region for which the CuttingPositionMap is created.
-     * @param maxDistToTssUp maximal distance to 'genomicPos' in upstream direction.
-     * @param maxDistToTssDown maximal distance to 'genomicPos' in downstream direction.
+     * @param maxDistToGenomicPosUp maximal distance to 'genomicPos' in upstream direction.
+     * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
      * @param fastaReader indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
      * @param cuttingPatterns array of cutting motifs, e.g. <i>A^AGCTT</i> for the resrtiction enzyme <i>HindIII</i>. The '^' indicates the cutting position within the motif.
      */
-    public CuttingPositionMap(String referenceSequenceID, Integer genomicPos, IndexedFastaSequenceFile fastaReader, Integer maxDistToTssUp, Integer maxDistToTssDown, String[] cuttingPatterns) {
+    public CuttingPositionMap(String referenceSequenceID, Integer genomicPos, IndexedFastaSequenceFile fastaReader, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns) {
 
         /* set fields */
 
         setGenomicPos(genomicPos);
-        setMaxDistToTssUp(maxDistToTssUp);
-        setMaxDistToTssDown(maxDistToTssDown);
+        setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
+        setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
 
 
         /* create maps */
@@ -70,17 +70,17 @@ public class CuttingPositionMap {
         for(int i=0;i<cuttingPatterns.length;i++) {
 
             // get sequence around genomic position and convert everything to uppercase
-            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToTssUp,genomicPos+maxDistToTssDown).getBaseString().toUpperCase();
+            String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToGenomicPosUp,genomicPos+maxDistToGenomicPosDown).getBaseString().toUpperCase();
 
             Pattern pattern = Pattern.compile(cuttingPatterns[i]);
-            Matcher matcher = pattern.matcher(tssRegionString);
+            Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
 
             while(matcher.find()) {
 
                 if (matcher.start()<=genomicPos) {
-                    cuttingPositionList.add(matcher.start() - maxDistToTssUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
-                    cuttingPositionListUnion.add(matcher.start()-maxDistToTssUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionListUnion.add(matcher.start()-maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                 }
                 else if (genomicPos<matcher.start()) {
                     cuttingPositionList.add(matcher.start() - genomicPos + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
@@ -98,7 +98,6 @@ public class CuttingPositionMap {
         cuttingPositionListUnion.addAll(uniqueSet);
         Collections.sort(cuttingPositionListUnion); // sort
         cuttingPositionMap.put("ALL",cuttingPositionListUnion); // push array list to map
-
     }
 
 
@@ -111,17 +110,17 @@ public class CuttingPositionMap {
     }
 
 
-    public final void setMaxDistToTssUp(Integer maxDistToTssUp) { this.maxDistToTssUp=maxDistToTssUp; }
+    public final void setMaxDistToGenomicPosUp(Integer maxDistToGenomicPosUp) { this.maxDistToGenomicPosUp=maxDistToGenomicPosUp; }
 
-    public final Integer getMaxDistToTssUp() {
-        return maxDistToTssUp;
+    public final Integer getMaxDistToGenomicPosUp() {
+        return maxDistToGenomicPosUp;
     }
 
 
-    public final void setMaxDistToTssDown(Integer maxDistToTssDown) { this.maxDistToTssDown=maxDistToTssDown; }
+    public final void setMaxDistToGenomicPosDown(Integer maxDistToGenomicPosDown) { this.maxDistToGenomicPosDown=maxDistToGenomicPosDown; }
 
-    public final Integer getMaxDistToTssDown() {
-        return maxDistToTssDown;
+    public final Integer getMaxDistToGenomicPosDown() {
+        return maxDistToGenomicPosDown;
     }
 
 
@@ -145,14 +144,14 @@ public class CuttingPositionMap {
     /* utility functions */
 
     /**
-     * Given a position within the interval [-maxDistToTssUp,maxDistToTssDown],
+     * Given a position within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown],
      * this function returns the next cutting position in up or downstream direction.
      *
      * @param pos       Position relative to 'genomicPos'.
      * @param direction Direction in which the next cutting site will be searched.
      * @return Position of the next cutting position relative to 'genomicPos'.
      * @throws IllegalArgumentException if a value different than 'up' or 'down' is passed as 'direction' parameter.
-     * @throws IntegerOutOfRangeException if 'pos' is not within the interval [-maxDistToTssUp,maxDistToTssDown].
+     * @throws IntegerOutOfRangeException if 'pos' is not within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown].
      * @throws NoCuttingSiteFoundUpOrDownstreamException if there is no cutting position up or downstream of 'pos'. Exception is handled by returning the position of outermost cutting site up or downstream.
      */
     public Integer getNextCutPos(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
@@ -164,8 +163,8 @@ public class CuttingPositionMap {
 
         // throw exception
 
-        if (pos < -maxDistToTssUp || pos > maxDistToTssDown) {
-            throw new IntegerOutOfRangeException("Please pass a value within the interval [-maxDistToTssUp=" + -maxDistToTssUp + ",maxDistToTssDown=" + maxDistToTssDown + "].");
+        if (pos < -maxDistToGenomicPosUp || pos > maxDistToGenomicPosDown) {
+            throw new IntegerOutOfRangeException("Please pass a value within the interval [-maxDistToGenomicPosUp=" + -maxDistToGenomicPosUp + ",maxDistToGenomicPosDown=" + maxDistToGenomicPosDown + "].");
         }
 
         // get array with cutting positions

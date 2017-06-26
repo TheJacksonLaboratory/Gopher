@@ -23,8 +23,8 @@ public class CuttingPositionMapTest {
 
     String testReferenceSequenceID="chr4_ctg9_hap1";;
     Integer testGenomicPos=20000;;
-    Integer testMaxDistToTssUp=150;
-    Integer testMaxDistToTssDown=60;
+    Integer testMaxDistToGenomicPosUp=150;
+    Integer testMaxDistToGenomicPosDown=60;
 
 
     /* create CuttingPositionMap object for testing */
@@ -38,7 +38,7 @@ public class CuttingPositionMapTest {
 
     IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
 
-    CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToTssUp, testMaxDistToTssDown, testCuttingPatterns);
+    CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
 
     public CuttingPositionMapTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
 
@@ -47,8 +47,8 @@ public class CuttingPositionMapTest {
     @Test
     public void testFields() throws Exception {
         assertEquals(testGenomicPos,testCuttingPositionMap.getGenomicPos());
-        assertEquals(testMaxDistToTssUp,testCuttingPositionMap.getMaxDistToTssUp());
-        assertEquals(testMaxDistToTssDown,testCuttingPositionMap.getMaxDistToTssDown());
+        assertEquals(testMaxDistToGenomicPosUp,testCuttingPositionMap.getMaxDistToGenomicPosUp());
+        assertEquals(testMaxDistToGenomicPosDown,testCuttingPositionMap.getMaxDistToGenomicPosDown());
     }
 
     /**
@@ -88,20 +88,20 @@ public class CuttingPositionMapTest {
         // print the initial sequence
         System.out.println();
         System.out.println("Sequence around 'genomicPos':");
-        String tssRegionString = testFastaReader.getSubsequenceAt(testReferenceSequenceID, testGenomicPos - testMaxDistToTssUp, testGenomicPos + testMaxDistToTssDown).getBaseString(); // get sequence around genomic position
-        System.out.println(tssRegionString);
-        String tssRegionStringUpper = tssRegionString.toUpperCase();
+        String genomicPosRegionString = testFastaReader.getSubsequenceAt(testReferenceSequenceID, testGenomicPos - testMaxDistToGenomicPosUp, testGenomicPos + testMaxDistToGenomicPosDown).getBaseString(); // get sequence around genomic position
+        System.out.println(genomicPosRegionString);
+        String genomicPosRegionStringUpper = genomicPosRegionString.toUpperCase();
         System.out.println();
         System.out.println("Sequence around 'genomicPos' uppercas only:");
-        System.out.println(tssRegionStringUpper);
+        System.out.println(genomicPosRegionStringUpper);
 
         // print genomic position
         String s = new String("");
-        for (int k = 0; k < testMaxDistToTssUp; k++) { s += " "; }
+        for (int k = 0; k < testMaxDistToGenomicPosUp; k++) { s += " "; }
         s += "|";
         System.out.println(s);
         s = "";
-        for (int k = 0; k < testMaxDistToTssUp-4; k++) { s += " "; }
+        for (int k = 0; k < testMaxDistToGenomicPosUp-4; k++) { s += " "; }
         s += "genomicPos";
         System.out.println(s);
 
@@ -113,7 +113,7 @@ public class CuttingPositionMapTest {
             for (int j = 0; j < relPosIntArray.size(); j++) {
                 s = "";
                 Integer offset=testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
-                for (int k = 0; k < relPosIntArray.get(j)+testMaxDistToTssUp -offset; k++) { // subtract offset
+                for (int k = 0; k < relPosIntArray.get(j)+testMaxDistToGenomicPosUp -offset; k++) { // subtract offset
                     s += " ";
                 }
                 Integer sta = testGenomicPos + relPosIntArray.get(j) - testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
@@ -127,7 +127,7 @@ public class CuttingPositionMapTest {
         s = "";
         for (int i = 0; i < testCuttingPositionMap.getCuttingPositionMap().get("ALL").size(); i++) {
             s = "";
-            for (int j = 0; j < testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(i)+testMaxDistToTssUp; j++) {
+            for (int j = 0; j < testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(i)+testMaxDistToGenomicPosUp; j++) {
                 s += " ";
             }
             s += "|";
@@ -218,13 +218,13 @@ public class CuttingPositionMapTest {
 
     @Test(expected = IntegerOutOfRangeException.class)
     public void testIntegerOutOfRangeExceptionDownstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
-        Integer testPos = testMaxDistToTssDown+1;
+        Integer testPos = testMaxDistToGenomicPosDown+1;
         Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
     }
 
     @Test(expected = IntegerOutOfRangeException.class)
     public void testIntegerOutOfRangeExceptionUpstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
-        Integer testPos = testMaxDistToTssUp-1;
+        Integer testPos = testMaxDistToGenomicPosUp-1;
         Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
     }
 
@@ -232,7 +232,7 @@ public class CuttingPositionMapTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalArgumentException() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
-        Integer testPos = testMaxDistToTssDown+1;
+        Integer testPos = testMaxDistToGenomicPosDown+1;
         Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "illegal argument");
     }
 
@@ -246,15 +246,15 @@ public class CuttingPositionMapTest {
     }
 
     @Test
-    public void testSeAndGetMaxDistToTssUp() throws Exception {
-        testCuttingPositionMap.setMaxDistToTssUp(testMaxDistToTssUp);
-        assertEquals(testMaxDistToTssUp,testCuttingPositionMap.getMaxDistToTssUp());
+    public void testSetAndGetMaxDistToGenomicPosUp() throws Exception {
+        testCuttingPositionMap.setMaxDistToGenomicPosUp(testMaxDistToGenomicPosUp);
+        assertEquals(testMaxDistToGenomicPosUp,testCuttingPositionMap.getMaxDistToGenomicPosUp());
     }
 
     @Test
-    public void testSetAndGetMaxDistToTssDown() throws Exception {
-        testCuttingPositionMap.setMaxDistToTssDown(testMaxDistToTssDown);
-        assertEquals(testMaxDistToTssDown,testCuttingPositionMap.getMaxDistToTssDown());
+    public void testSetAndGetMaxDistToGenomicPosDown() throws Exception {
+        testCuttingPositionMap.setMaxDistToGenomicPosDown(testMaxDistToGenomicPosDown);
+        assertEquals(testMaxDistToGenomicPosDown,testCuttingPositionMap.getMaxDistToGenomicPosDown());
     }
 
 }
