@@ -1,32 +1,8 @@
 package vpvgui.model.project;
 
-/*
- * This a utility class for the class 'ViewPoint'.
- * The constructor is called with an 'IndexedFastaSequenceFile' (htsjdk), a reference sequence ID, a genomic position,
- * a list of cutting motifs, and maximum distances to the genomic position in up and downstream direction.
- *
- * The reference sequence ID and the genomic position need to exist in the must in the 'IndexedFastaSequenceFile',
- * otherwise an error will be thrown and no object will be created.
- *
- * The most central data structure in the class a 'HashMap' with 'Strings' as keys and 'ArrayLists' of 'Integers'
- * as values. The keys are cutting site motifs and the 'ArrayList' contains all positions of occurrences
- * relative to the transcription start site. There is one special key which contains the positions for the
- * union of all positions.
- *
- * In addition the usual getter and setter functions,
- * the class provides functions to navigate through the cutting sites of the viewpoints,
- * e.g. given a position within the interval [maxDistToTssUp,maxDistToTssDown] a function returns the
- * the postion of the next cuttig site up or downstream.
- *
- * Furthermore, there might be functions that return the lengths of all restriction fragments
- * within the interval [maxDistToTssUp,maxDistToTssDown].
- *
- */
-
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,9 +12,9 @@ import java.util.regex.Pattern;
  * The cutting positions are calculated when an object of the class is created.
  * <p>
  * The most central data structure in this class is a <i>HashMap</i> with 'Strings' as keys and <i>ArrayLists</i> of <i>Integers</i> as values.
- * The 'Strings' are cutting motifs and the related 'ArrayList' contains all positions of occurrences within a given range.
+ * The <i>Strings</i> are cutting motifs and the related <i>ArrayList</i> contains all positions of occurrences within a given range.
  * <p>
- * In addition to the usual getter and setter function, the class provides a functions that allow to query the 'HashMap'.
+ * In addition to the usual getter and setter function, the class provides a functions that allow to query the <i>HashMap</i>.
  * @author Peter Hansen
  */
 public class CuttingPositionMap {
@@ -56,10 +32,10 @@ public class CuttingPositionMap {
 
     /**
      * The constructor will set all fields of this class and create the actual <i>HashMap</i> for cutting positions,
-     * which will be derived only for the interval <i>[genomicPos-maxDistToTssUp,genomicPos+maxDistToTssDown]</i>.
+     * which will be derived only for the interval [<i>genomicPos-maxDistToTssUp,genomicPos+maxDistToTssDown</i>].
      * <p>
      * The keys for the <i>HashMap</i> will be the same as passed by the argument <i>cuttingPatterns</i>,
-     * but with 'characters' removed.
+     * but with '^' characters removed.
      * The information about the cutting position within in a particular motif will be recorded in  <i>cuttingPositionMapOffsets</i>, an additional  <i>HashMap</i>.
      * In addition to the passed motifs, there is one special key <i>ALL</i> which contains the cutting positions for the union of all motifs.
      * @param referenceSequenceID name of the genomic sequence, e.g. <i>chr1</i>.
@@ -149,10 +125,18 @@ public class CuttingPositionMap {
     }
 
 
+    /**
+     *
+     * @return Only the <i>HashMap</i> object for the cutting positions.
+     */
     public final HashMap<String,ArrayList<Integer>> getCuttingPositionMap() {
         return cuttingPositionMap;
     }
 
+    /**
+     *
+     * @return Only the <i>HashMap</i> object for the cutting offsets.
+     */
     public final HashMap<String,Integer> getCuttingPositionMapOffsets() {
         return cuttingPositionMapOffsets;
     }
@@ -213,11 +197,14 @@ public class CuttingPositionMap {
 
             }
             if (!found) {
+                returnCutPos = cutPosArray.get(cutPosArray.size() - 1);
                 throw new NoCuttingSiteFoundUpOrDownstreamException("EXCEPTION in function 'getNextCutPos': No cutting site " + direction + "stream of position " + pos + ". Will return the " +
                         "outermost cutting site in " + direction + "stream direction.");
             }
         } catch (NoCuttingSiteFoundUpOrDownstreamException e) {
             System.out.println(e.getMessage());
+        } finally {
+
         }
 
         // reverse the array for future calls

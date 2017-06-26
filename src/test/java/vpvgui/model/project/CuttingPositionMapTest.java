@@ -1,22 +1,20 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.junit.Rule;
 import org.junit.Test;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import vpvgui.exception.IntegerOutOfRangeException;
-import org.junit.rules.ExpectedException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
-
-
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by phansen on 6/19/17.
+ * This test class tests an instance of a <i>CuttingPositionMap</i>. The setting for the call of the constructor are specified at the head of this test class.
+ * <p>
+ * The two functions <i>testHashMap</i> and <i>testGetNextPos</i> print output to the screen for demonstration purposes (see method descriptions for more details).
+ * <p>
+ * @author Peter Hansen
  */
 public class CuttingPositionMapTest {
 
@@ -31,7 +29,7 @@ public class CuttingPositionMapTest {
 
     /* create CuttingPositionMap object for testing */
 
-    private String[] testCuttingPatterns = new String[]{"ACT^TTTA","AAAC^CACTTAC","G^AG"};
+    private String[] testCuttingPatterns = new String[]{"ACT^TTTA","AAAC^CACTTAC","^GAG"};
     private String[] testCuttingPatternsCopy = testCuttingPatterns.clone();
 
     private String testFastaFile="src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
@@ -40,7 +38,7 @@ public class CuttingPositionMapTest {
 
     IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
 
-    CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testFastaReader, testReferenceSequenceID, testGenomicPos, testCuttingPatterns, testMaxDistToTssUp, testMaxDistToTssDown);
+    CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToTssUp, testMaxDistToTssDown, testCuttingPatterns);
 
     public CuttingPositionMapTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
 
@@ -48,14 +46,30 @@ public class CuttingPositionMapTest {
 
     @Test
     public void testFields() throws Exception {
-        assertEquals(testReferenceSequenceID,testCuttingPositionMap.getReferenceID());
         assertEquals(testGenomicPos,testCuttingPositionMap.getGenomicPos());
         assertEquals(testMaxDistToTssUp,testCuttingPositionMap.getMaxDistToTssUp());
         assertEquals(testMaxDistToTssDown,testCuttingPositionMap.getMaxDistToTssDown());
     }
 
+    /**
+     * For demonstration purposes the contents of various data structures are printed to the screen:
+     * <ol>
+     * <li>Cutting motifs including the '^' character.</li>
+     * <li>The offsets for the cutting positions, which correspond to the position of the '^' character.</li>
+     * <li>The genomic sequence of the sequence of the viewpoint.</li>
+     * <li>The genomic sequence of the sequence of the viewpoint after uppercase conversion.</li>
+     * <li>The position of the central position <i>genomicPos</i> indicated by a '|' character.</li>
+     * <li>The individual occurrences of the cutting motifs placed within the viewpoint sequence.</li>
+     * <li>The more precise cutting positions within the motif occurrences indicated by a '|' character.</li>
+     * </ol>
+     * @throws Exception
+     */
     @Test
     public void testHashMap() throws Exception {
+
+        System.out.println("===============================================================");
+        System.out.println("Test function 'testHashMap' prints to the screen ");
+        System.out.println("===============================================================");
 
         // print cutting motifs with '^' characters
         System.out.println();
@@ -87,8 +101,8 @@ public class CuttingPositionMapTest {
         s += "|";
         System.out.println(s);
         s = "";
-        for (int k = 0; k < testMaxDistToTssUp-1; k++) { s += " "; }
-        s += "TSS";
+        for (int k = 0; k < testMaxDistToTssUp-4; k++) { s += " "; }
+        s += "genomicPos";
         System.out.println(s);
 
         // print cutting motif occurrences only for individual motifs
@@ -120,14 +134,28 @@ public class CuttingPositionMapTest {
             s += testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(i);
             System.out.println(s);
         }
+        System.out.println("===============================================================");
+        System.out.println("Test function 'testHashMap' END");
+        System.out.println("===============================================================");
     }
-
 
 
     /* test utility functions */
 
+    /**
+     * In this function some usage applications for the function <i>getNextCutPos</i> are given.
+     * Furthermore, the correctness of the function is tested.
+     * <p>
+     * At first a test position between two cutting sites is generated.
+     * This position is used to perform alternate calls of the function <i>getNextCutPos</i> for up and downstream direction.
+     * For checking purposes compare the output to the output of the test <i>testHashMap</i>.
+     * <p>
+     * In addition, the handled exception <i>NoCuttingSiteFoundUpOrDownstreamException</i> is tested for up and downstream direction.
+     * <p>
+     * @throws Exception
+     */
     @Test
-    public void testgetNextCutPos() throws Exception {
+    public void testGetNextCutPos() throws Exception {
 
         System.out.println("===============================================================");
         System.out.println("Test function 'testgetNextCutPos' prints to the screen ");
@@ -212,12 +240,6 @@ public class CuttingPositionMapTest {
     /* setter and getter functions */
 
     @Test
-    public void testSetAndGetReferenceID() throws Exception {
-        testCuttingPositionMap.setReferenceID(testReferenceSequenceID);
-        assertEquals(testReferenceSequenceID,testCuttingPositionMap.getReferenceID());
-    }
-
-    @Test
     public void testSetAndGetGenomicPos() throws Exception {
         testCuttingPositionMap.setGenomicPos(testGenomicPos);
         assertEquals(testGenomicPos,testCuttingPositionMap.getGenomicPos());
@@ -234,7 +256,5 @@ public class CuttingPositionMapTest {
         testCuttingPositionMap.setMaxDistToTssDown(testMaxDistToTssDown);
         assertEquals(testMaxDistToTssDown,testCuttingPositionMap.getMaxDistToTssDown());
     }
-
-
 
 }
