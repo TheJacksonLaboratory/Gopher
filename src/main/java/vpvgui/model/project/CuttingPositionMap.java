@@ -70,7 +70,7 @@ public class CuttingPositionMap {
         for(int i=0;i<cuttingPatterns.length;i++) {
 
             // get sequence around genomic position and convert everything to uppercase
-            String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToGenomicPosUp,genomicPos+maxDistToGenomicPosDown).getBaseString().toUpperCase();
+            String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToGenomicPosUp,genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
 
             Pattern pattern = Pattern.compile(cuttingPatterns[i]);
             Matcher matcher = pattern.matcher(genomicPosRegionString);
@@ -83,8 +83,8 @@ public class CuttingPositionMap {
                     cuttingPositionListUnion.add(matcher.start()-maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                 }
                 else if (genomicPos<matcher.start()) {
-                    cuttingPositionList.add(matcher.start() - genomicPos + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
-                    cuttingPositionListUnion.add(matcher.start() - genomicPos + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionListUnion.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
                 }
 
             }
@@ -126,10 +126,19 @@ public class CuttingPositionMap {
 
     /**
      *
-     * @return Only the <i>HashMap</i> object for the cutting positions.
+     * @return only the <i>HashMap</i> object for the cutting positions.
      */
-    public final HashMap<String,ArrayList<Integer>> getCuttingPositionMap() {
+    public final HashMap<String,ArrayList<Integer>> getHashMapOnly() {
         return cuttingPositionMap;
+    }
+
+    /**
+     *
+     * @return only the <i>ArrayList</i> of <i>Integers</i> for a given motif.
+     */
+    public final ArrayList<Integer> getArrayListForGivenMotif(String motif) {
+
+        return cuttingPositionMap.get(motif);
     }
 
     /**
