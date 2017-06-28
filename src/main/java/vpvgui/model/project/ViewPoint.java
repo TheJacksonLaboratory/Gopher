@@ -5,63 +5,83 @@ import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import vpvgui.exception.IntegerOutOfRangeException;
+import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
 import java.util.*;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-/*
- A region, usually at the transcription start site of a gene,
- that will be enriched in a capture C experiment.
- The start and end coordinates can be set manually or automatically.
- In the latter case one of two approaches can be used.
- Start and end coordinates can be altered after automatic generation.
- The last approach of derivation will be tracked.
+/**
+ * A region, usually at the transcription start site (TSS) of a gene, that will be enriched in a Capture-C experiment.
+ * However, the region does not necessarily need to be at can be at TSS, it can be everywhere in the genome.
+ * <p>
+ * Essentially, a viewpoint consists of a start and end coordinate, and a map for restriction enzyme cutting sites
+ * within the viewpoint, which play an important role for the design of viewpoints due to lab protocol of Capture-C.
+ * <p>
+ * This class provides a set of utility functions that can be used for primarily for editing of the coordinates,
+ * which can be either set manually or automatically using different (so far two) approaches.
+ * The last editing step will be tracked.
+ * <p>
+ * Furthermore, there will be utility functions calculating characteristics of the viewpoint,
+ * such as repetitive or GC content, or the number of restriction enzyme cutting sites.
+ * <p>
+ * @author Peter Nick Robinson
+ * @author Peter Hansen
  */
-
 public class ViewPoint {
 
-    /* Usually a chromosome */
+    /* usually a chromosome */
     private String referenceSequenceID;
 
-    /* Coordinate of the original TSS */
-    private Integer tssPos;
+    /* central genomic coordinate of the viewpoint, usually a trancription start site */
+    private Integer genomicPos;
 
-    /* The viewpoint cannot be outside the interval [maxUpstreamTssPos,maxDownPos]. */
-    private Integer maxUpstreamTssPos;
-    private Integer maxDownstreamTssPos;
+    /* viewpoint cannot be outside the interval [maxDistToGenomicPosUp,maxDistToGenomicPosDown]. */
+    private Integer maxDistToGenomicPosUp;
+    private Integer maxDistToGenomicPosDown;
 
-    /* Start and end position of the viewpoint */
+    /* start and end position of the viewpoint */
     private Integer startPos, endPos;
 
-    /* Symbol of the corresponding gene, e.g. BCL2 */
-    private String geneSymbol;  // IN FACT, A VIEWPOINT SHOULD POINT TO A GENE OBJECT! OR A VIEWPOINT SHOULD ALWAYS BE WITHIN A GENE OBJECT
-
-    /* Derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
+    /* derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
     private String derivationApproach;
 
-    /* A hash map with restriction cutting sites as key and arrays of integers as values.
-     * The integer values are positions relative to the TSS. */
-    private static HashMap<String,ArrayList<Integer>> cuttingPositionMap; // = new HashMap<String,ArrayList<Integer>>();
+    /* data structure for storing cutting site position relative to 'genomicPos' */
+    private CuttingPositionMap cuttingPositionMap;
 
 
-    /* Constructor fuction */
+    /* constructor function */
 
-    public ViewPoint(String referenceSequenceID, Integer tssPos, Integer initialRadius, Integer maxUpstreamTssPos, Integer maxDownstreamTssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader, String geneSymbol) {
+    /**
+     * This is the contructor of this class. It will set all fields create an <i>CuttingPositionMap</i> object.
+     * @param referenceSequenceID name of the genomic sequence, e.g. <i>chr1</i>.
+     * @param genomicPos central position of the region for which the CuttingPositionMap is created.
+     * @param maxDistToGenomicPosUp maximal distance to 'genomicPos' in upstream direction.
+     * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
+     * @param cuttingPatterns array of cutting motifs, e.g. <i>A^AGCTT</i> for the resrtiction enzyme <i>HindIII</i>. The '^' indicates the cutting position within the motif.
+     * @param fastaReader indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
+     */
+    public ViewPoint(String referenceSequenceID, Integer genomicPos, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
 
         /* Set fields */
 
         setReferenceID(referenceSequenceID);
-        setTssPos(tssPos);
-        setStartPos(tssPos - maxUpstreamTssPos);
-        setEndPos(tssPos + maxDownstreamTssPos);
-        setGeneSymbol(geneSymbol);
+        setGenomicPos(genomicPos);
+        setStartPos(genomicPos - maxDistToGenomicPosUp);
+        setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
 
-        /* Create hash of int arrays */
+        /* Create cuttingPositionMap */
 
-        cuttingPositionMap=createCuttingPositionMap(referenceSequenceID, tssPos, initialRadius, maxUpstreamTssPos, maxDownstreamTssPos, cuttingPatterns, fastaReader);
+        // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
+        // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.
+
+        // TODO: Exception: genomicPos.
+        // TODO: Handling: Discard viewpoint and throw warning.
+
+        cuttingPositionMap = new CuttingPositionMap(referenceSequenceID,genomicPos,fastaReader,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns);
     }
 
 
@@ -76,26 +96,26 @@ public class ViewPoint {
     }
 
 
-    public final void setTssPos(Integer tssPos) {
-        this.tssPos=tssPos;
+    public final void setGenomicPos(Integer genomicPos) {
+        this.genomicPos=genomicPos;
     }
 
-    public final Integer getTssPos() {
-        return tssPos;
+    public final Integer getGenomicPos() {
+        return genomicPos;
     }
 
 
-    public final void setMaxUpstreamTssPos(Integer maxUpstreamTssPos) { this.maxUpstreamTssPos=maxUpstreamTssPos; }
+    public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) { this.maxDistToGenomicPosUp=maxDistToGenomicPosUp; }
 
-    public final Integer getMaxUpstreamTssPos() { return maxUpstreamTssPos; }
+    public final Integer getMaxUpstreamGenomicPos() { return maxDistToGenomicPosUp; }
 
 
-    public final void setMaxDownstreamTssPos(Integer maxDownstreamTssPos) {
-        this.maxDownstreamTssPos=maxDownstreamTssPos;
+    public final void setMaxDownstreamGenomicPos(Integer maxDistToGenomicPosDown) {
+        this.maxDistToGenomicPosDown=maxDistToGenomicPosDown;
     }
 
-    public final Integer getMaxDownstreamTssPos() {
-        return maxDownstreamTssPos;
+    public final Integer getMaxDownstreamGenomicPos() {
+        return maxDistToGenomicPosDown;
     }
 
 
@@ -117,75 +137,46 @@ public class ViewPoint {
     }
 
 
-    public final String getGeneSymbol() { return geneSymbol;    }
+    public final String getDerivationApproach() { return derivationApproach; }
 
-    public final void setGeneSymbol(String geneSymbol) { this.geneSymbol=geneSymbol;    }
+    public final void setDerivationApproach(String derivationApproach) { this.derivationApproach=derivationApproach; }
 
 
-    public final String getDerivationApproach() { return derivationApproach;    }
-
-    public final void setDerivationApproach(String derivationApproach) { this.derivationApproach=derivationApproach;    }
-
-    public Integer getGenomicPosFromTssRelativePos(Integer tssPos,Integer tssRelPos) {
-        return this.tssPos+tssRelPos;
+    public Integer getGenomicPosOfGenomicRelativePos(Integer genomicPos,Integer genomicPosRelPos) {
+        return this.genomicPos+genomicPosRelPos;
     }
 
-
-    //----------------------------------------
-
-    public final HashMap<String,ArrayList<Integer>> getCuttingPositionMap() {
+    public final CuttingPositionMap getCuttingPositionMap() {
         return cuttingPositionMap;
     }
-
-
-
 
 
     /* wrapper/helper functions */
 
-    private HashMap<String,ArrayList<Integer>> createCuttingPositionMap(String referenceSequenceID, Integer tssPos, Integer initialRadius, Integer maxUpstreamTssPos, Integer maxDownstreamTssPos, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
-
-        HashMap<String,ArrayList<Integer>> cuttingPositionMap = new HashMap<String,ArrayList<Integer>>();
-
-        for(int i=0;i<cuttingPatterns.length;i++) {
-
-            String tssRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,tssPos-maxUpstreamTssPos,tssPos+maxDownstreamTssPos).getBaseString().toUpperCase(); // get sequence around TSS
-
-            Pattern pattern = Pattern.compile(cuttingPatterns[i]);
-            Matcher matcher = pattern.matcher(tssRegionString);
-            ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
-
-            while(matcher.find()) {
-                // TODO: Use maxUpstreamTssPos and maxDownstreamTssPos instead of initialRadius (Upstream TSS: 'match'-'UpMax'; Downstream: 'DownMax'-'match').
-                cuttingPositionList.add(matcher.start()-initialRadius); // push occurrence positions relative to the TSS to list.
-                //System.out.println(matcher.start());
-            }
-
-            cuttingPositionMap.put(cuttingPatterns[i],cuttingPositionList); // push array list to map
-        }
-
-        return cuttingPositionMap;
-    }
-
-    private void extendFragmentWise(Integer fromThisPos){
+    public void extendFragmentWise(Integer fromThisPos) throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
 
         /* The viewpoint will be extended up to the next cutting site. */
 
-            /* CASE 1: If 'fromThisPos' is upstream of the interval ['tssPos'-'initialRadius','tssPos'+'initialRadius'],
+            /* CASE 1: If 'fromThisPos' is upstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     the viewpoint extended to the outmost cutting site upstream within this interval. */
+            if(fromThisPos<startPos) {
+                System.out.println("fromThisPos is upstream of the viewpoint.");
+                System.out.println("Next cutting site in upstream direction is:");
+                startPos=cuttingPositionMap.getNextCutPos(fromThisPos,"up");
+                System.out.println(startPos);
+            }
 
-            /* CASE 2: If 'fromThisPos' is upstream of 'startPos' and within the ['tssPos'-'initialRadius','tssPos'+'initialRadius'],
+            /* CASE 2: If 'fromThisPos' is upstream of 'startPos' and within the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     'startPos' will be set to position of the next cutting site upstream of 'fromThisPos'. */
 
             /* CASE 3: If 'fromThisPos' within the interval [startPos,endPos],
                     nothing will happen. */
 
-            /* CASE 4: If 'fromThisPos' is downstream of 'endPos' and within the [tssPos-initialRadius,tssPos+initialRadius],
+            /* CASE 4: If 'fromThisPos' is downstream of 'endPos' and within the ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     'endPos' will be set to position of the next cutting site downstream of 'fromThisPos'. */
 
-            /* CASE 5: If 'fromThisPos' is downstream of the interval ['tssPos'-'initialRadius','tssPos'+'initialRadius'],
+            /* CASE 5: If 'fromThisPos' is downstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     the viewpoint extended in to the outmost cutting site downstream within this interval. */
-
 
     }
 

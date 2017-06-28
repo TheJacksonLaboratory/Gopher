@@ -10,7 +10,7 @@ import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * This test class tests an instance of a <i>CuttingPositionMap</i>. The setting for the call of the constructor are specified at the head of this test class.
+ * This test class tests an instance of the <i>CuttingPositionMap</i> class. The settings for the call of the constructor are specified at the head of this test class.
  * <p>
  * The two functions <i>testHashMap</i> and <i>testGetNextPos</i> print output to the screen for demonstration purposes (see method descriptions for more details).
  * <p>
@@ -24,7 +24,7 @@ public class CuttingPositionMapTest {
     String testReferenceSequenceID="chr4_ctg9_hap1";;
     Integer testGenomicPos=20000;;
     Integer testMaxDistToGenomicPosUp=150;
-    Integer testMaxDistToGenomicPosDown=60;
+    Integer testMaxDistToGenomicPosDown=50;
 
 
     /* create CuttingPositionMap object for testing */
@@ -92,7 +92,7 @@ public class CuttingPositionMapTest {
         System.out.println(genomicPosRegionString);
         String genomicPosRegionStringUpper = genomicPosRegionString.toUpperCase();
         System.out.println();
-        System.out.println("Sequence around 'genomicPos' uppercas only:");
+        System.out.println("Sequence around 'genomicPos' uppercase only:");
         System.out.println(genomicPosRegionStringUpper);
 
         // print genomic position
@@ -109,7 +109,7 @@ public class CuttingPositionMapTest {
         System.out.println();
         System.out.println("Individual cutting motif occurrences:");
         for (int i = 0; i < testCuttingPatterns.length; i++) {
-            ArrayList<Integer> relPosIntArray = testCuttingPositionMap.getCuttingPositionMap().get(testCuttingPatterns[i]);
+            ArrayList<Integer> relPosIntArray = testCuttingPositionMap.getHashMapOnly().get(testCuttingPatterns[i]);
             for (int j = 0; j < relPosIntArray.size(); j++) {
                 s = "";
                 Integer offset=testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
@@ -125,13 +125,13 @@ public class CuttingPositionMapTest {
 
         // print out all cutting sites
         s = "";
-        for (int i = 0; i < testCuttingPositionMap.getCuttingPositionMap().get("ALL").size(); i++) {
+        for (int i = 0; i < testCuttingPositionMap.getHashMapOnly().get("ALL").size(); i++) {
             s = "";
-            for (int j = 0; j < testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(i)+testMaxDistToGenomicPosUp; j++) {
+            for (int j = 0; j < testCuttingPositionMap.getHashMapOnly().get("ALL").get(i)+testMaxDistToGenomicPosUp; j++) {
                 s += " ";
             }
             s += "|";
-            s += testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(i);
+            s += testCuttingPositionMap.getHashMapOnly().get("ALL").get(i);
             System.out.println(s);
         }
         System.out.println("===============================================================");
@@ -163,10 +163,10 @@ public class CuttingPositionMapTest {
 
         /* test usual function calls for positions between two cutting sites */
 
-        if(1<testCuttingPositionMap.getCuttingPositionMap().get("ALL").size()) {
+        if(1<testCuttingPositionMap.getHashMapOnly().get("ALL").size()) {
 
-            Integer posA = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(0);
-            Integer posB = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(1);
+            Integer posA = testCuttingPositionMap.getHashMapOnly().get("ALL").get(0);
+            Integer posB = testCuttingPositionMap.getHashMapOnly().get("ALL").get(1);
             Integer testPos=posA+((posB-posA)/2);
 
             System.out.println("---------------------------------------------------------------");
@@ -196,14 +196,14 @@ public class CuttingPositionMapTest {
         /* test handled NoCuttingSiteFoundUpOrDownstreamException */
 
         // last cutting position, downstream
-        Integer testPos = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(testCuttingPositionMap.getCuttingPositionMap().get("ALL").size()-1) + 1;
+        Integer testPos = testCuttingPositionMap.getHashMapOnly().get("ALL").get(testCuttingPositionMap.getHashMapOnly().get("ALL").size()-1) + 1;
         System.out.println("---------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for downstream direction...");
         Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "down");
         System.out.println("Returned value: " + nextCutPos);
 
         // first cutting position, upstream
-        testPos = testCuttingPositionMap.getCuttingPositionMap().get("ALL").get(0) - 1;
+        testPos = testCuttingPositionMap.getHashMapOnly().get("ALL").get(0) - 1;
         System.out.println("---------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for upstream direction...");
         nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "up");
