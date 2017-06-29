@@ -160,7 +160,8 @@ public class ViewPoint {
             /* CASE 1: If 'fromThisPos' is upstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     the viewpoint extended to the outmost cutting site upstream within this interval. */
             if(fromThisPos<startPos) {
-                System.out.println("fromThisPos is upstream of the viewpoint.");
+                System.out.println("fromThisPos:");
+                System.out.println(fromThisPos);
                 System.out.println("Next cutting site in upstream direction is:");
                 startPos=cuttingPositionMap.getNextCutPos(fromThisPos,"up");
                 System.out.println(startPos);
@@ -180,6 +181,61 @@ public class ViewPoint {
 
     }
 
+
+    /**
+     * This function converts absolute coordinates of the genomic sequence to coordinates relative to <i>genomicPos</i>.
+     * @param absPos
+     * @return the coordinate relative to <i>genomicPos</i>.
+     */
+    public Integer absToRelPos(Integer absPos) {
+        return absPos - genomicPos;
+    }
+
+    /**
+     * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates in the genomic sequence.
+     * @param relPos
+     * @return
+     */
+    public Integer relToAbsPos(Integer relPos) {
+        return relPos + genomicPos;
+    }
+
+
+    /**
+     * This function converts absolute genomic coordinates to absolute coordinates within the viewpoint (<i>startPos</i> corresponds to 0).
+     * @param absPos
+     * @return
+     */
+    public Integer absToVpIdxPos(Integer absPos) {
+        return absPos - startPos;
+    }
+
+    /**
+     * This function converts absolute coordinates within the viewpoint to absolute genomic coordinates.
+     * @param vpIdx
+     * @return
+     */
+    public Integer vpIdxToAbsPos(Integer vpIdx) {
+        return vpIdx + startPos;
+    }
+
+    /**
+     * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates within the viewpoint.
+     * @param relPos
+     * @return
+     */
+    public Integer relToVpIdxPos(Integer relPos) {
+        return relPos - startPos + genomicPos;
+    }
+
+    /**
+     * This function converts absolute coordinates within the viewpoint to coordinates relative to <i>genomicPos</i>.
+     * @param vpIdx
+     * @return
+     */
+    public Integer vpIdxToRelPos(Integer vpIdx) {
+        return vpIdx - genomicPos + startPos;
+    }
 
 
 
