@@ -1,6 +1,7 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import org.apache.tools.ant.util.StringUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -111,70 +112,121 @@ public class ViewPointTest {
         ViewPoint testViewpointGATC = new ViewPoint("chr_t1_GATC", genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
 
 
-        /* print initial viewpoint sequence to screen */
+         /* print genomic position to screen */
 
-        String genomicPosRegionString = FastaReader.getSubsequenceAt("chr_t1_GATC", genomicPos-maxDistToGenomicPosUp, genomicPos+maxDistToGenomicPosDown).getBaseString();
-        System.out.println("\nViewpoint sequence:");
-        System.out.println(genomicPosRegionString);
+        String s_gPos = new String("");
+        s_gPos = "";
+        for (int k = 0; k < testViewpointGATC.getGenomicPos(); k++) { s_gPos += " ";}
+        s_gPos += "|";
+
+
+        /* print whole test sequence to screen */
+        String genomicPosRegionString = FastaReader.getSubsequenceAt("chr_t1_GATC", 0, FastaReader.getSequence("chr_t1_GATC").length()).getBaseString();
+        genomicPosRegionString.replaceAll("[\n\r]", "");
+
 
         /* print all cutting positions to screen */
 
-        String s = new String("");
-        s = "";
-        Integer pos_prev = testViewpointGATC.getCuttingPositionMap().getNextCutPos(-maxDistToGenomicPosUp,"down");
-        int i;
-        Integer pos=0;
-        for(i=-maxDistToGenomicPosUp;i<=maxDistToGenomicPosDown;i++) {
-            pos = testViewpointGATC.getCuttingPositionMap().getNextCutPos(i,"down");
-            if(pos==pos_prev) {
-                s += " ";
+        String s_cSites = new String("");
+        ArrayList<Integer> relPosArr = testViewpointGATC.getCuttingPositionMap().getHashMapOnly().get("GATC");
+
+        int l=0;
+        for(int k=0; k < genomicPosRegionString.length();k++) {
+            if(k != testViewpointGATC.relToAbsPos(relPosArr.get(l))) {
+                s_cSites += " ";
             } else {
-                s += "^";
-                pos_prev=pos;
+                s_cSites += "^";
+                l++;
             }
-            if(testViewpointGATC.getCuttingPositionMap().getHashMapOnly().get("GATC").get(testViewpointGATC.getCuttingPositionMap().getHashMapOnly().get("GATC").size()-1)==pos){
-                break;
-            }
+            if(l==relPosArr.size()) {break;}
         }
-        for (i=i;i<pos;i++) {
-            s += " ";
-        }
-        s += "^";
+
+        /* print start and end position of the viewpoint to screen */
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Complete genomic sequence with 'genomicPos' (|) and cutting sites (^) and initial start and end positions (> sta, < end) of the viewpoint");
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        String s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
+
+        /* move start and end positions to the center */
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+
+        System.out.println("Set new start and end positions near 'genomicPos'");
+
+        testViewpointGATC.setStartPos(testViewpointGATC.getGenomicPos()-4);
+        testViewpointGATC.setEndPos(testViewpointGATC.getGenomicPos()+4);
+
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
+
+        /* apply extendFragmentWise function */
+
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Apply function '' to position in upstream directio of the viewpoint");
+        Integer upstream_pos=-6;
+        System.out.println("Position upstream is: " + upstream_pos + " (X)");
+        testViewpointGATC.extendFragmentWise(upstream_pos);
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        String s = new String("");
+        for(int i=0;i<testViewpointGATC.relToAbsPos(upstream_pos);i++) { s += " "; } s += "X";
         System.out.println(s);
+        s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
 
-        /* print genomic position to screen */
-
-        s = "";
-        for (int k = 0; k < maxDistToGenomicPosUp; k++) { s += " ";}
-        s += "|";
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Apply function '' to position in upstream direction of the viewpoint");
+        upstream_pos=30;
+        System.out.println("Position upstream is: " + upstream_pos + " (X)");
+        testViewpointGATC.extendFragmentWise(upstream_pos);
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        s = new String("");
+        for(int i=0;i<testViewpointGATC.relToAbsPos(upstream_pos);i++) { s += " "; } s += "X";
         System.out.println(s);
+        s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
 
-        /* set and print start and end position of the viewpoint to screen */
-
-        System.out.println();
-        testViewpointGATC.setStartPos(maxDistToGenomicPosUp-18);
-        testViewpointGATC.setEndPos(maxDistToGenomicPosUp+18);
-
-        s = "";
-        for (int k = 0; k < testViewpointGATC.getStartPos(); k++) { s += " "; }
-        s += "> sta";
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Apply function '' to position in upstream direction of the viewpoint");
+        upstream_pos=-40;
+        System.out.println("Position upstream is: " + upstream_pos + " (X)");
+        testViewpointGATC.extendFragmentWise(upstream_pos);
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        s = new String("");
+        for(int i=0;i<testViewpointGATC.relToAbsPos(upstream_pos);i++) { s += " "; } s += "X";
         System.out.println(s);
-        s = "";
-        for (int k = 0; k < testViewpointGATC.getEndPos(); k++) { s += " "; }
-        s += "< end";
-        System.out.println(s);
+        s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
 
-        /* use function 'extendFragmentWise' */
-        testViewpointGATC.extendFragmentWise(maxDistToGenomicPosUp-20);
 
-        s = "";
-        for (int k = 0; k < testViewpointGATC.getStartPos(); k++) { s += " "; }
-        s += "> sta";
-        System.out.println(s);
-        s = "";
-        for (int k = 0; k < testViewpointGATC.getEndPos(); k++) { s += " "; }
-        s += "< end";
-        System.out.println(s);
+
+
     }
 
+    private String getStaEndString(Integer sta, Integer end) {
+        String s = new String("");
+        s = "";
+        for(int k=0; k <=end;k++) {
+            if(k==sta) {
+                s += "> sta";k=k+4;
+            }
+            else if(k==end) {
+                s += "< end";
+                break;
+            } else {
+                s += " ";
+            }
+        }
+        return s;
+    }
 }

@@ -157,24 +157,28 @@ public class ViewPoint {
 
         /* The viewpoint will be extended up to the next cutting site. */
 
-            /* CASE 1: If 'fromThisPos' is upstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
-                    the viewpoint extended to the outmost cutting site upstream within this interval. */
-            if(fromThisPos<startPos) {
-                System.out.println("fromThisPos:");
-                System.out.println(fromThisPos);
-                System.out.println("Next cutting site in upstream direction is:");
-                startPos=cuttingPositionMap.getNextCutPos(fromThisPos,"up");
-                System.out.println(startPos);
-            }
+        /* CASE 1: If 'fromThisPos' is upstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
+                   the viewpoint extended to the outmost cutting site upstream within this interval. */
 
-            /* CASE 2: If 'fromThisPos' is upstream of 'startPos' and within the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
+        if(fromThisPos+genomicPos<startPos) {
+            startPos=cuttingPositionMap.getNextCutPos(fromThisPos,"up")+genomicPos;
+        }
+
+         /* CASE 2: If 'fromThisPos' is downstream of 'endPos' and within the ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
+                   'endPos' will be set to position of the next cutting site downstream of 'fromThisPos'. */
+
+         if(endPos<fromThisPos+genomicPos) {
+            endPos=cuttingPositionMap.getNextCutPos(fromThisPos,"down")+genomicPos;
+         }
+
+
+            /* CASE 3: If 'fromThisPos' is upstream of 'startPos' and within the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     'startPos' will be set to position of the next cutting site upstream of 'fromThisPos'. */
 
-            /* CASE 3: If 'fromThisPos' within the interval [startPos,endPos],
+            /* CASE 4: If 'fromThisPos' within the interval [startPos,endPos],
                     nothing will happen. */
 
-            /* CASE 4: If 'fromThisPos' is downstream of 'endPos' and within the ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
-                    'endPos' will be set to position of the next cutting site downstream of 'fromThisPos'. */
+
 
             /* CASE 5: If 'fromThisPos' is downstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     the viewpoint extended in to the outmost cutting site downstream within this interval. */
