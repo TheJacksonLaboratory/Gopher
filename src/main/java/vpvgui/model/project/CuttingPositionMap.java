@@ -79,12 +79,12 @@ public class CuttingPositionMap {
             while(matcher.find()) {
 
                 if (matcher.start()<=genomicPos) {
-                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
-                    cuttingPositionListUnion.add(matcher.start()-maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
+                    cuttingPositionListUnion.add(matcher.start()-maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                 }
                 else if (genomicPos<matcher.start()) {
-                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
-                    cuttingPositionListUnion.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]));
+                    cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
+                    cuttingPositionListUnion.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                 }
 
             }

@@ -2,6 +2,7 @@ package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.tools.ant.util.StringUtils;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
+
+
 
 /**
  * This test class tests an instance of the <i>ViewPoint</i> class. The settings for the call of the constructor are specified at the head of this test class.
@@ -181,7 +184,7 @@ public class ViewPointTest {
         System.out.println(s_staEnd);
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Apply function '' to position in upstream direction of the viewpoint");
+        System.out.println("Apply function '' to position in downstream direction of the viewpoint");
         upstream_pos=30;
         System.out.println("Position upstream is: " + upstream_pos + " (X)");
         testViewpointGATC.extendFragmentWise(upstream_pos);
@@ -207,11 +210,106 @@ public class ViewPointTest {
         System.out.println(s);
         s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
         System.out.println(s_staEnd);
+    }
 
 
+    @Test
+    public void testFragmentListMap() throws Exception {
 
+        /* create viewpoint for testing */
+
+        Integer genomicPos=80;
+        Integer maxDistToGenomicPosUp=75;
+        Integer maxDistToGenomicPosDown=75;
+
+        String[] testCuttingPatterns = new String[]{"^GATC","A^AGCTT"};
+        String testFastaFile="src/test/resources/testgenome/test_genome.fa";
+        File fasta = new File(testFastaFile);
+        IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
+
+        ViewPoint testViewpointGATC = new ViewPoint("chr_t1_GATC", genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
+
+  /* print genomic position to screen */
+
+        String s_gPos = new String("");
+        s_gPos = "";
+        for (int k = 0; k < testViewpointGATC.getGenomicPos(); k++) { s_gPos += " ";}
+        s_gPos += "|";
+
+
+        /* print whole test sequence to screen */
+        String genomicPosRegionString = FastaReader.getSubsequenceAt("chr_t1_GATC", 0, FastaReader.getSequence("chr_t1_GATC").length()).getBaseString();
+        genomicPosRegionString.replaceAll("[\n\r]", "");
+
+
+        /* print all cutting positions to screen */
+
+        String s_cSites = new String("");
+        ArrayList<Integer> relPosArr = testViewpointGATC.getCuttingPositionMap().getHashMapOnly().get("GATC");
+
+        int l=0;
+        for(int k=0; k < genomicPosRegionString.length();k++) {
+            if(k < testViewpointGATC.relToAbsPos(relPosArr.get(l))) {
+                s_cSites += " ";
+            } else {
+                s_cSites += "^";
+                l++;
+            }
+            if(l==relPosArr.size()) {break;}
+        }
+
+        /* print start and end position of the viewpoint to screen as well as cutting sites and fragments */
+
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Complete genomic sequence with 'genomicPos' (|) and cutting sites (^) and initial start and end positions (> sta, < end) of the viewpoint");
+        System.out.println("and print all restriction fragments of the viewpoint. 'T' means selected and 'F' not selected.");
+        System.out.println(s_gPos);
+        System.out.println(genomicPosRegionString);
+        System.out.println(s_cSites);
+        String s_staEnd = getStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
+        System.out.println(s_staEnd);
+
+
+        /* print all fragments */
+
+        for (int i = 0; i< testViewpointGATC.getRestFragListMap().get("GATC").size();i++) {
+            Integer sta = testViewpointGATC.relToAbsPos(testViewpointGATC.getRestFragListMap().get("GATC").get(i).getStartPos());
+            Integer end = testViewpointGATC.relToAbsPos(testViewpointGATC.getRestFragListMap().get("GATC").get(i).getEndPos());
+            boolean selected = testViewpointGATC.getRestFragListMap().get("GATC").get(i).getSelected();
+
+            String s_frag = new String("");
+            for (int j = 0; j<end; j++) {
+                if(j<sta) {
+                    s_frag += " ";
+                }
+                else {
+                    if(selected) {
+                        s_frag += "T";
+                    } else {
+                        s_frag += "F";
+                    }
+
+
+                }
+            }
+            System.out.println(s_frag);
+        }
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("If the 'selectOrDeSelectFragment' is called with a position that is within a restriction fragment,");
+        System.out.println("the fragment will be swichted from 'selected' to 'deselected' or the other way around.");
+        System.out.println();
+        System.out.println();
+
+        testViewpointGATC.selectOrDeSelectFragment(-20);
+        printFragments(testViewpointGATC);
+        testViewpointGATC.selectOrDeSelectFragment(-20);
+        printFragments(testViewpointGATC);
+        testViewpointGATC.selectOrDeSelectFragment(18);
+        printFragments(testViewpointGATC);
 
     }
+
+
 
     private String getStaEndString(Integer sta, Integer end) {
         String s = new String("");
@@ -228,5 +326,30 @@ public class ViewPointTest {
             }
         }
         return s;
+    }
+
+    private void printFragments(ViewPoint vp) {
+        for (int i = 0; i< vp.getRestFragListMap().get("GATC").size();i++) {
+            Integer sta = vp.relToAbsPos(vp.getRestFragListMap().get("GATC").get(i).getStartPos());
+            Integer end = vp.relToAbsPos(vp.getRestFragListMap().get("GATC").get(i).getEndPos());
+            boolean selected = vp.getRestFragListMap().get("GATC").get(i).getSelected();
+
+            String s_frag = new String("");
+            for (int j = 0; j<end; j++) {
+                if(j<sta) {
+                    s_frag += " ";
+                }
+                else {
+                    if(selected) {
+                        s_frag += "T";
+                    } else {
+                        s_frag += "F";
+                    }
+
+
+                }
+            }
+            System.out.println(s_frag);
+        }
     }
 }

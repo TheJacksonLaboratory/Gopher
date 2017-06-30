@@ -32,12 +32,20 @@ public class Fragment {
      */
     private String directory;
 
+    private Integer startPos;
+    private Integer endPos;
+    private boolean selected;
+
     /**
      *
      * @param directoryPath path to the directory where the genome file is located.
      */
-    public Fragment(String directoryPath) {
+    public Fragment(String directoryPath, Integer startPos, Integer endPos, boolean selected) {
+
         this.directory=directoryPath;
+        setStartPos(startPos);
+        setEndPos(endPos);
+        setSelected(selected);
     }
 
     public  String getDirectoryPath() { return directory; }
@@ -60,6 +68,25 @@ public class Fragment {
 
     }
 
+    public void setStartPos(Integer startPos) {
+        this.startPos=startPos;
+    }
+    public void setEndPos(Integer endPos) {
+        this.endPos=endPos;
+    }
+    public void setSelected(boolean selected) {
+        this.selected=selected;
+    }
+
+    public Integer getStartPos() {
+        return startPos;
+    }
+    public Integer getEndPos() {
+        return endPos;
+    }
+    public boolean getSelected() {
+        return  selected;
+    }
 
 
     /**

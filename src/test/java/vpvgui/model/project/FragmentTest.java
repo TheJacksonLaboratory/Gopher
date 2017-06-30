@@ -19,9 +19,10 @@ public class FragmentTest {
     public static void setup() throws Exception {
         ClassLoader classLoader = FragmentTest.class.getClassLoader();
         String dirpath = classLoader.getResource("smallgenome").getFile();
-        fragment = new Fragment(dirpath);
+        fragment = new Fragment(dirpath, 1,2,false);
 
     }
+
     /* On my machine, fragment.getDirectoryPath() returns
     * /home/peter/IdeaProjects/VPV/target/test-classes/smallgenome
      */

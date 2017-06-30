@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
+import javax.swing.text.View;
 import java.util.*;
 
 import java.util.regex.Pattern;
@@ -51,6 +52,9 @@ public class ViewPoint {
     /* data structure for storing cutting site position relative to 'genomicPos' */
     private CuttingPositionMap cuttingPositionMap;
 
+    /* list of restriction 'Fragment' objects that are within the viewpoint */
+    private HashMap<String,ArrayList<Fragment>> restFragListMap;
+
 
     /* constructor function */
 
@@ -82,6 +86,22 @@ public class ViewPoint {
         // TODO: Handling: Discard viewpoint and throw warning.
 
         cuttingPositionMap = new CuttingPositionMap(referenceSequenceID,genomicPos,fastaReader,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns);
+
+
+        /* Retrieve all restriction fragments within the viewpoint */
+
+        restFragListMap = new HashMap<String,ArrayList<Fragment>>();
+        for (int i = 0; i < cuttingPatterns.length; i++) {
+            ArrayList arrList = new ArrayList<Fragment>();
+            restFragListMap.put(cuttingPatterns[i],arrList);
+        }
+
+        for (int i = 0; i < cuttingPatterns.length; i++) {
+            for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size()-1; j++) {
+                Fragment restFrag = new Fragment("dirpath", cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1), false);
+                restFragListMap.get(cuttingPatterns[i]).add(restFrag);
+            }
+        }
     }
 
 
@@ -149,6 +169,8 @@ public class ViewPoint {
     public final CuttingPositionMap getCuttingPositionMap() {
         return cuttingPositionMap;
     }
+
+    public final HashMap<String,ArrayList<Fragment>> getRestFragListMap() {return restFragListMap;};
 
 
     /* wrapper/helper functions */
@@ -243,4 +265,39 @@ public class ViewPoint {
 
 
 
-}
+    public void selectOrDeSelectFragment(Integer pos) {
+
+        /* find the fragments that contains 'pos' */
+
+        Object[] cuttingPatterns = restFragListMap.keySet().toArray();
+
+        boolean found = false;
+        for(int i=0; i<cuttingPatterns.length; i++) {
+            for (int j = 0; j < restFragListMap.get(cuttingPatterns[i]).size(); j++ ) {
+                Integer sta = restFragListMap.get(cuttingPatterns[i]).get(j).getStartPos();
+                Integer end = restFragListMap.get(cuttingPatterns[i]).get(j).getEndPos();
+                if( sta < pos && pos < end) {
+                    restFragListMap.get(cuttingPatterns[i]).get(j).setSelected(!restFragListMap.get(cuttingPatterns[i]).get(j).getSelected());
+                    found=true;
+                }
+            }
+        }
+        if(found) {
+            System.out.println("hooray!");
+        }
+
+
+/*
+        boolean found=false;
+        for (int i = 0; i< getRestFragListMap().get(motif).size(); i++ ) {
+
+        }
+*/
+        //vp.getRestFragListMap().get(motif).
+    }
+
+    }
+
+
+
+
