@@ -122,7 +122,7 @@ public class PopupController  implements Initializable {
             BufferedReader br =new BufferedReader(new FileReader(file));
             String line =null;
             while ((line=br.readLine())!=null) {
-                System.out.println(line);
+                //System.out.println(line);
                 sb.append(line);
             }
         } catch (IOException err) {

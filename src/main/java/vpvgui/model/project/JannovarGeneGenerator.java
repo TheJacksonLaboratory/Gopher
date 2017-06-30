@@ -9,10 +9,7 @@ import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.ReferenceDictionary;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by peter on 13.06.17.
@@ -59,7 +56,8 @@ public class JannovarGeneGenerator {
         }
         Set geneset = new HashSet<>();
         for (String s:genelst) {geneset.add(s);}
-        List<TranscriptModel> transcriptlist=new ArrayList<>();
+        /** key: gene symbol, value: lkist of corresponding transcripts. */
+        Map<String,List<TranscriptModel>> transcriptmap =new HashMap<>();
 
         try {
             deserializeTranscriptDefinitionFile(this.jannovarSerPath);
@@ -68,13 +66,20 @@ public class JannovarGeneGenerator {
             for (TranscriptModel tm : mp.values()) {
                 String symbol = tm.getGeneSymbol();
                 if ( geneset.contains(symbol) ){
-                    transcriptlist.add(tm);
+                    if (transcriptmap.containsKey(symbol)) {
+                        List<TranscriptModel> lst = transcriptmap.get(symbol);
+                        lst.add(tm);
+                    } else {
+                        List<TranscriptModel> lst = new ArrayList<>();
+                        lst.add(tm);
+                        transcriptmap.put(symbol,lst);
+                    }
                 }
             }
         } catch (JannovarException e) {
             e.printStackTrace();
         }
-        for (TranscriptModel tm:transcriptlist) {
+        for (String tm:transcriptmap.keySet()) {
             System.err.println(tm);
         }
     }
