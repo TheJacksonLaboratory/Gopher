@@ -3,6 +3,7 @@ package vpvgui.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import vpvgui.exception.DownloadFileNotFoundException;
+import vpvgui.model.project.VPVGene;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Model {
 
     private List<RestrictionEnzyme> enzymelist;
 
-    private List<String> geneList;
+    private List<VPVGene> geneList;
     /** Settings for the current project. */
     private Settings settings;
 
@@ -119,7 +120,7 @@ public class Model {
 
             while ((line = br.readLine()) != null) {
 
-                System.err.println(line);
+                //System.err.println(line);
                 if (line.startsWith("#"))
                     continue; /* skip header*/
                 String a[] = line.split("\\s");
@@ -154,16 +155,20 @@ public class Model {
         //this.transcriptsURL = datasource.getTranscriptsURL();
     }
 
-    public void setGeneSymbols(String[] symbols) {
-        geneList = new ArrayList<>();
-        System.err.println("Genes");
-        for (String g : symbols) {
-            if (g != null && !g.isEmpty())
-                geneList.add(g.trim());
-        }
-        for (String g : geneList) {
-            System.err.println("\t\"" + g + "\"");
-        }
+
+
+    public void setVPVGenes(List<VPVGene> vpvgenelist) {
+        this.geneList = vpvgenelist;
     }
 
+    public void debugPrintVPVGenes() {
+        if (this.geneList==null || this.geneList.size()==0) {
+            System.err.println("No VPV Genes in Model!");
+            return;
+        }
+        System.err.println("VPV Genes in Model:");
+        for (VPVGene vg : geneList) {
+            System.err.println(vg);
+        }
+    }
 }

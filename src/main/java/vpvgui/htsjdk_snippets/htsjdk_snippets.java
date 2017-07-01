@@ -1,4 +1,4 @@
-package main.java.vpvgui.htsjdk_snippets;
+package vpvgui.htsjdk_snippets;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 

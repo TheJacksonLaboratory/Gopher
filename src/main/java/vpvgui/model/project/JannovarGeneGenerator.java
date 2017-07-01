@@ -8,6 +8,7 @@ import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.ReferenceDictionary;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
+import vpvgui.gui.ErrorWindow;
 
 import java.util.*;
 
@@ -26,6 +27,25 @@ public class JannovarGeneGenerator {
 
     /** Map of Chromosomes, used in the annotation. */
     protected ImmutableMap<Integer, Chromosome> chromosomeMap = null;
+
+
+    private Set<String> invalidGeneSymbols=null;
+    private Set<String> validGeneSymbols=null;
+
+    public List<String> getInvalidGeneSymbols() {
+        List<String> lst = new ArrayList<>();
+        lst.addAll(invalidGeneSymbols);
+        Collections.sort(lst);
+        return lst;
+    }
+
+    public List<String> getValidGeneSymbols() {
+        List<String> lst = new ArrayList<>();
+        lst.addAll(validGeneSymbols);
+        Collections.sort(lst);
+        return lst;
+    }
+
 
     /**
      * Deserialize the transcript definition file
@@ -46,15 +66,22 @@ public class JannovarGeneGenerator {
 
     public JannovarGeneGenerator(String pathToSerializedFile) {
         this.jannovarSerPath=pathToSerializedFile;
-        System.out.println("Jan="+jannovarSerPath);
+       // System.out.println("Jan="+jannovarSerPath);
     }
 
-    public void checkGenes(String[] genelst) {
+    public Map<String,List<TranscriptModel>> checkGenes(List<String> genelst) {
         if (this.jannovarSerPath==null) {
             System.err.println("Path to serialized Jannovar file is not defined -- set it and retry!");
-            return;
+            return null;
         }
-        Set geneset = new HashSet<>();
+        if (genelst==null) {
+            ErrorWindow.display("Error", "Attempt to validate an empty gene list. "+
+                    "Please upload file with gene symbols prior to validation");
+            return null;
+        }
+        this.invalidGeneSymbols = new HashSet<>();
+        this.validGeneSymbols = new HashSet<>();
+        Set<String> geneset = new HashSet<>();
         for (String s:genelst) {geneset.add(s);}
         /** key: gene symbol, value: lkist of corresponding transcripts. */
         Map<String,List<TranscriptModel>> transcriptmap =new HashMap<>();
@@ -69,6 +96,7 @@ public class JannovarGeneGenerator {
                     if (transcriptmap.containsKey(symbol)) {
                         List<TranscriptModel> lst = transcriptmap.get(symbol);
                         lst.add(tm);
+                        validGeneSymbols.add(symbol);
                     } else {
                         List<TranscriptModel> lst = new ArrayList<>();
                         lst.add(tm);
@@ -76,12 +104,24 @@ public class JannovarGeneGenerator {
                     }
                 }
             }
+            /* When we get here, we have identified transcripts models for all of our
+            * valid gene symbols. There maybesymbols that are not valid that we can
+            * not parse with Jannovar. Put them into the invalid map so they can be displayed on the GUI
+             */
+            for (String gs:geneset) {
+                if (transcriptmap.containsKey(gs)) {
+                    // OK; do nothing
+                }  else {
+                    invalidGeneSymbols.add(gs);
+                }
+            }
         } catch (JannovarException e) {
             e.printStackTrace();
         }
-        for (String tm:transcriptmap.keySet()) {
+       /* for (String tm:transcriptmap.keySet()) {
             System.err.println(tm);
-        }
+        }*/
+        return transcriptmap;
     }
 
 

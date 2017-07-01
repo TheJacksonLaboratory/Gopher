@@ -4,11 +4,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -16,7 +13,7 @@ import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.entrezgenetable.PopupController;
+import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
@@ -31,7 +28,10 @@ import java.util.ResourceBundle;
 
 
 /**
- * Created by peter on 01.07.17.
+ * A Java app to help design probes for Capture Hi-C
+ * @author Peter Robinson
+ * @author Peter Hansen
+ * @version 0.0.2 (July 1, 2017)
  */
 public class VPVMainPresenter implements Initializable {
 
@@ -145,7 +145,6 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
-        System.out.println("clclcl");
         closeWindow();
     }
 
@@ -265,32 +264,16 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
-     * See {@link PopupController} for logic.
+     * See {@link EntrezGeneViewFactory} for logic.
      *
      * @param e
      */
     public void enterGeneList(ActionEvent e) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup.fxml"));
-        try {
-            Parent root1 = loader.load();
-            PopupController controller = (PopupController) loader.getController();
-            controller.setModel(this.model);
-            Stage stage = new Stage();
-            stage.setTitle("Enter target genes");
-            stage.setScene(new Scene(root1));
-            stage.show();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        /* When we get here, we have added the contents of the TextArea in the window to the model
-        and the model stores them in a List called GeneList. These are not yet guaranteed to be
-        valid gene symbols. The next method will use the Jannovar serialized file in order to
-        check whether they are valid smybols and also to create Gene objects from them. A gene
-        object has a list of Transcription Start sites and positions that we will use to
-        generate a list of viewpoints.
+        EntrezGeneViewFactory.display(this.model);
+        /** The following command is just for debugging. We now have all VPVGenes, but still need to
+         * add information about the restriction enzymes and the indexed FASTA file.
          */
-
-
+        this.model.debugPrintVPVGenes();
         e.consume();
     }
 

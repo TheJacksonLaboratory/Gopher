@@ -1,0 +1,63 @@
+package vpvgui.gui.entrezgenetable;
+
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import vpvgui.model.Model;
+
+/**
+ * Created by peter on 01.07.17.
+ */
+public class EntrezGeneViewFactory {
+
+
+    public static void display(Model model) {
+        Stage window;
+        String windowTitle = "Enter Gene List";
+        window = new Stage();
+        window.setOnCloseRequest( event -> {window.close();} );
+        window.setTitle(windowTitle);
+
+        EntrezGeneView view = new EntrezGeneView();
+        EntrezGenePresenter presenter = (EntrezGenePresenter) view.getPresenter();
+        presenter.setModel(model);
+        presenter.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+        String html=getHTML();
+        presenter.setData(html);
+
+        window.setScene(new Scene(view.getView()));
+        window.showAndWait();
+    }
+
+    private static String getHTML() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body><h3>Enter genes</h3>");
+        sb.append("<p>");
+        sb.append("Use the <b><TT>Upload</TT></b> button to load a file containing the target genes for a Capture Hi-C experiment. ");
+        sb.append("The file must have one gene on a line and use HGNC gene symbols");
+        sb.append("</p>");
+        sb.append("<p>");
+        sb.append("Following this, click on <b><TT>Validate</TT></b> to check whether your list contains valid HGNC gene symbols ");
+        sb.append("(This step may take 10-20 seconds to complete). ");
+        sb.append("If your gene list contains invalid gene symbols, revise your file before proceeding.");
+        sb.append("</p>");
+        sb.append("<p>");
+        sb.append("Finally, click on <b><TT>Accept</TT></b> to import the corresponding genes and transcripts into. ");
+        sb.append("the ViewPoint Viewer app.");
+        sb.append("</p>");
+        sb.append("</body></html>");
+        return sb.toString();
+
+    }
+
+
+}

@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
  * Furthermore, there will be utility functions calculating characteristics of the viewpoint,
  * such as repetitive or GC content, or the number of restriction enzyme cutting sites.
  * <p>
+ *
  * @author Peter Nick Robinson
  * @author Peter Hansen
  */
@@ -53,19 +54,20 @@ public class ViewPoint {
     private CuttingPositionMap cuttingPositionMap;
 
     /* list of restriction 'Fragment' objects that are within the viewpoint */
-    private HashMap<String,ArrayList<Fragment>> restFragListMap;
+    private HashMap<String, ArrayList<Fragment>> restFragListMap;
 
 
     /* constructor function */
 
     /**
      * This is the contructor of this class. It will set all fields create an <i>CuttingPositionMap</i> object.
-     * @param referenceSequenceID name of the genomic sequence, e.g. <i>chr1</i>.
-     * @param genomicPos central position of the region for which the CuttingPositionMap is created.
-     * @param maxDistToGenomicPosUp maximal distance to 'genomicPos' in upstream direction.
+     *
+     * @param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>.
+     * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
+     * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
      * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
-     * @param cuttingPatterns array of cutting motifs, e.g. <i>A^AGCTT</i> for the resrtiction enzyme <i>HindIII</i>. The '^' indicates the cutting position within the motif.
-     * @param fastaReader indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
+     * @param cuttingPatterns         array of cutting motifs, e.g. <i>A^AGCTT</i> for the resrtiction enzyme <i>HindIII</i>. The '^' indicates the cutting position within the motif.
+     * @param fastaReader             indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
      */
     public ViewPoint(String referenceSequenceID, Integer genomicPos, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns, IndexedFastaSequenceFile fastaReader) {
 
@@ -77,27 +79,71 @@ public class ViewPoint {
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
 
-        /* Create cuttingPositionMap */
+        /* Peter: ich habe denfolgenden Code in Funktionen ausgelagert, damit er von wonaders ausgerufen werden kann */
+        initCuttingPositionMap(referenceSequenceID, genomicPos, fastaReader, maxDistToGenomicPosUp, maxDistToGenomicPosDown, cuttingPatterns);
+        initRestrictionFragments(cuttingPatterns);
+
+    }
+
+
+    /**
+     * This is the contructor of this class that is called from the input genes window.
+     * It will set ONLY SOME of fields create an <i>CuttingPositionMap</i> object. We need
+     * to subsequently add the restirction enzyme and IndexedFastaSequence and do the actual cutting.
+     *
+     * @param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>.
+     * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
+     * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
+     * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
+     */
+    public ViewPoint(String referenceSequenceID, Integer genomicPos, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown) {
+
+        /* Set fields */
+
+        setReferenceID(referenceSequenceID);
+        setGenomicPos(genomicPos);
+        setStartPos(genomicPos - maxDistToGenomicPosUp);
+        setEndPos(genomicPos + maxDistToGenomicPosDown);
+        setDerivationApproach("INITIAL");
+
+
+    }
+
+    /**
+     * TODO -- need to execute this to finish initializing ViewPoint ojects made from GUI
+     */
+    public void initCuttingPositionMap(String referenceSequenceID, Integer genomicPos, IndexedFastaSequenceFile fastaReader, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns) {
+/* Create cuttingPositionMap */
 
         // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
         // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.
 
         // TODO: Exception: genomicPos.
         // TODO: Handling: Discard viewpoint and throw warning.
+        cuttingPositionMap = new CuttingPositionMap(referenceSequenceID, genomicPos, fastaReader, maxDistToGenomicPosUp, maxDistToGenomicPosDown, cuttingPatterns);
 
-        cuttingPositionMap = new CuttingPositionMap(referenceSequenceID,genomicPos,fastaReader,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns);
+    }
 
 
-        /* Retrieve all restriction fragments within the viewpoint */
+    /**
+     * Initializes {@link #restFragListMap} with the information in
+     * cuttingPatterns.
+     * <p>
+     * TODO -- need to execute this to finish initializing ViewPoint ojects made from GUI
+     *
+     * @param cuttingPatterns
+     */
+    private void initRestrictionFragments(String[] cuttingPatterns) {
+         /* Retrieve all restriction fragments within the viewpoint */
 
-        restFragListMap = new HashMap<String,ArrayList<Fragment>>();
+        this.restFragListMap = new HashMap<String, ArrayList<Fragment>>();
         for (int i = 0; i < cuttingPatterns.length; i++) {
             ArrayList arrList = new ArrayList<Fragment>();
-            restFragListMap.put(cuttingPatterns[i],arrList);
+            restFragListMap.put(cuttingPatterns[i], arrList);
         }
 
         for (int i = 0; i < cuttingPatterns.length; i++) {
-            for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size()-1; j++) {
+            for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size() - 1; j++) {
                 Fragment restFrag = new Fragment("dirpath", cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1), false);
                 restFragListMap.get(cuttingPatterns[i]).add(restFrag);
             }
@@ -105,19 +151,21 @@ public class ViewPoint {
     }
 
 
+
+
     /* getter and setter functions */
 
     public final String getReferenceID() {
-            return referenceSequenceID;
+        return referenceSequenceID;
     }
 
     public final void setReferenceID(String setReferenceID) {
-        this.referenceSequenceID=setReferenceID;
+        this.referenceSequenceID = setReferenceID;
     }
 
 
     public final void setGenomicPos(Integer genomicPos) {
-        this.genomicPos=genomicPos;
+        this.genomicPos = genomicPos;
     }
 
     public final Integer getGenomicPos() {
@@ -125,13 +173,17 @@ public class ViewPoint {
     }
 
 
-    public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) { this.maxDistToGenomicPosUp=maxDistToGenomicPosUp; }
+    public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) {
+        this.maxDistToGenomicPosUp = maxDistToGenomicPosUp;
+    }
 
-    public final Integer getMaxUpstreamGenomicPos() { return maxDistToGenomicPosUp; }
+    public final Integer getMaxUpstreamGenomicPos() {
+        return maxDistToGenomicPosUp;
+    }
 
 
     public final void setMaxDownstreamGenomicPos(Integer maxDistToGenomicPosDown) {
-        this.maxDistToGenomicPosDown=maxDistToGenomicPosDown;
+        this.maxDistToGenomicPosDown = maxDistToGenomicPosDown;
     }
 
     public final Integer getMaxDownstreamGenomicPos() {
@@ -140,7 +192,7 @@ public class ViewPoint {
 
 
     public final void setStartPos(Integer startPos) {
-        this.startPos=startPos;
+        this.startPos = startPos;
     }
 
     public final Integer getStartPos() {
@@ -153,24 +205,32 @@ public class ViewPoint {
     }
 
     public final void setEndPos(Integer endPos) {
-        this.endPos=endPos;
+        this.endPos = endPos;
     }
 
 
-    public final String getDerivationApproach() { return derivationApproach; }
+    public final String getDerivationApproach() {
+        return derivationApproach;
+    }
 
-    public final void setDerivationApproach(String derivationApproach) { this.derivationApproach=derivationApproach; }
+    public final void setDerivationApproach(String derivationApproach) {
+        this.derivationApproach = derivationApproach;
+    }
 
 
-    public Integer getGenomicPosOfGenomicRelativePos(Integer genomicPos,Integer genomicPosRelPos) {
-        return this.genomicPos+genomicPosRelPos;
+    public Integer getGenomicPosOfGenomicRelativePos(Integer genomicPos, Integer genomicPosRelPos) {
+        return this.genomicPos + genomicPosRelPos;
     }
 
     public final CuttingPositionMap getCuttingPositionMap() {
         return cuttingPositionMap;
     }
 
-    public final HashMap<String,ArrayList<Fragment>> getRestFragListMap() {return restFragListMap;};
+    public final HashMap<String, ArrayList<Fragment>> getRestFragListMap() {
+        return restFragListMap;
+    }
+
+    ;
 
 
     /* wrapper/helper functions */
@@ -182,16 +242,16 @@ public class ViewPoint {
         /* CASE 1: If 'fromThisPos' is upstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                    the viewpoint extended to the outmost cutting site upstream within this interval. */
 
-        if(fromThisPos+genomicPos<startPos) {
-            startPos=cuttingPositionMap.getNextCutPos(fromThisPos,"up")+genomicPos;
+        if (fromThisPos + genomicPos < startPos) {
+            startPos = cuttingPositionMap.getNextCutPos(fromThisPos, "up") + genomicPos;
         }
 
          /* CASE 2: If 'fromThisPos' is downstream of 'endPos' and within the ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                    'endPos' will be set to position of the next cutting site downstream of 'fromThisPos'. */
 
-         if(endPos<fromThisPos+genomicPos) {
-            endPos=cuttingPositionMap.getNextCutPos(fromThisPos,"down")+genomicPos;
-         }
+        if (endPos < fromThisPos + genomicPos) {
+            endPos = cuttingPositionMap.getNextCutPos(fromThisPos, "down") + genomicPos;
+        }
 
 
             /* CASE 3: If 'fromThisPos' is upstream of 'startPos' and within the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
@@ -210,6 +270,7 @@ public class ViewPoint {
 
     /**
      * This function converts absolute coordinates of the genomic sequence to coordinates relative to <i>genomicPos</i>.
+     *
      * @param absPos
      * @return the coordinate relative to <i>genomicPos</i>.
      */
@@ -219,6 +280,7 @@ public class ViewPoint {
 
     /**
      * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates in the genomic sequence.
+     *
      * @param relPos
      * @return
      */
@@ -229,6 +291,7 @@ public class ViewPoint {
 
     /**
      * This function converts absolute genomic coordinates to absolute coordinates within the viewpoint (<i>startPos</i> corresponds to 0).
+     *
      * @param absPos
      * @return
      */
@@ -238,6 +301,7 @@ public class ViewPoint {
 
     /**
      * This function converts absolute coordinates within the viewpoint to absolute genomic coordinates.
+     *
      * @param vpIdx
      * @return
      */
@@ -247,6 +311,7 @@ public class ViewPoint {
 
     /**
      * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates within the viewpoint.
+     *
      * @param relPos
      * @return
      */
@@ -256,13 +321,13 @@ public class ViewPoint {
 
     /**
      * This function converts absolute coordinates within the viewpoint to coordinates relative to <i>genomicPos</i>.
+     *
      * @param vpIdx
      * @return
      */
     public Integer vpIdxToRelPos(Integer vpIdx) {
         return vpIdx - genomicPos + startPos;
     }
-
 
 
     public void selectOrDeSelectFragment(Integer pos) {
@@ -272,17 +337,17 @@ public class ViewPoint {
         Object[] cuttingPatterns = restFragListMap.keySet().toArray();
 
         boolean found = false;
-        for(int i=0; i<cuttingPatterns.length; i++) {
-            for (int j = 0; j < restFragListMap.get(cuttingPatterns[i]).size(); j++ ) {
+        for (int i = 0; i < cuttingPatterns.length; i++) {
+            for (int j = 0; j < restFragListMap.get(cuttingPatterns[i]).size(); j++) {
                 Integer sta = restFragListMap.get(cuttingPatterns[i]).get(j).getStartPos();
                 Integer end = restFragListMap.get(cuttingPatterns[i]).get(j).getEndPos();
-                if( sta < pos && pos < end) {
+                if (sta < pos && pos < end) {
                     restFragListMap.get(cuttingPatterns[i]).get(j).setSelected(!restFragListMap.get(cuttingPatterns[i]).get(j).getSelected());
-                    found=true;
+                    found = true;
                 }
             }
         }
-        if(found) {
+        if (found) {
             System.out.println("hooray!");
         }
 
@@ -296,7 +361,12 @@ public class ViewPoint {
         //vp.getRestFragListMap().get(motif).
     }
 
+
+    public String toString() {
+        return String.format("%s: [%d-%d]",getReferenceID(),getStartPos(),getEndPos());
     }
+
+}
 
 
 
