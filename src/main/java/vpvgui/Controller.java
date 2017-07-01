@@ -20,6 +20,7 @@ import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.entrezgenetable.PopupController;
+import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
@@ -318,12 +319,15 @@ public class Controller implements Initializable {
 
 
     public void showSettingsOfCurrentProject() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        SettingsViewFactory.showSettings(model.getSettings());
+
+       /* Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Settings");
         alert.setHeaderText("Look, an Information Dialog");
         alert.setContentText(this.model.getSettings().toString());
 
-        alert.showAndWait();
+        alert.showAndWait();*/
     }
 
     /**
