@@ -77,6 +77,12 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 
@@ -90,6 +96,29 @@
             </resource>
             <resource>
                 <directory>src/main/resources/data</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                    <include>**/*.css</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                    <include>**/*.css</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.jpg</include>
+                </includes>
             </resource>
         </resources>
         <finalName>VpvGui-${project.version}</finalName>
@@ -116,7 +145,7 @@
                     <classpathPrefix>lib/</classpathPrefix>
 
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>vpvgui.Main</mainClass>
+                            <mainClass>vpvgui.ViewPointViewer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

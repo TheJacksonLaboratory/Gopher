@@ -1,14 +1,10 @@
 package vpvgui.gui;
 
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextAreaBuilder;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+
 
 import java.io.IOException;
 import java.io.OutputStream;

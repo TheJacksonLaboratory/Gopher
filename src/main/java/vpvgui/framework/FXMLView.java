@@ -33,6 +33,9 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 /*
  * #%L
  * afterburner.fx
+ * NOTE THAT YOU NEED TO ADD include statements for fxml and css
+ * to the resources section of the POM file for this to work! The
+ * fxml and css files are found automatically then.
  * %%
  * Copyright (C) 2015 Adam Bien
  * %%

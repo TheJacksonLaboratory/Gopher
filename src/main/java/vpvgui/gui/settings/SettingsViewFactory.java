@@ -1,5 +1,6 @@
 package vpvgui.gui.settings;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import vpvgui.model.Settings;
@@ -38,13 +39,35 @@ public class SettingsViewFactory {
         window.showAndWait();
     }
 
-
+    /*
+        * Formats the list properties in human-readable format, checking for an empty list.
+        */
+    private static String toStringHelper(String listName, ObservableList<String> lst) {
+        if (lst==null || lst.isEmpty()) {
+            return (String.format(""));
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s: (%d)\n", listName, lst.size()));
+        for (String s : lst) {
+            sb.append(String.format("\t%s\n", s));
+        }
+        return sb.toString();
+    }
 
     private static String getHTML(Settings settings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body><h3>VPV Settings</h3>");
         sb.append("<p><ul>");
         sb.append(String.format("<li>Project name: %s</li>",settings.getProjectName()));
+
+        sb.append(String.format("<li>Genome file source: %s</li>", settings.getGenomeFileFrom()));
+        sb.append(String.format("<li>Transcripts file source: %s</li>", settings.getTranscriptsFileFrom()));
+        sb.append(String.format("<li>Repeats file source: %s</li>", settings.getRepeatsFileFrom()));
+        sb.append(String.format("<li>Genome file destination: %s</li>", settings.getGenomeFileTo()));
+        sb.append(String.format("<li>Transcripts file destination: %s</li>", settings.getTranscriptsFileTo()));
+        sb.append(String.format("<li>Repeats file destination: %s</li>", settings.getRepeatsFileTo()));
+        sb.append("<li>"+toStringHelper("Restriction Enzymes", settings.getRestrictionEnzymesList())+"</li>");
+        sb.append("<li>"+toStringHelper("Target Genes", settings.getTargetGenesList())+"</li>");
 
         sb.append("</ul></p>");
         sb.append("</body></html>");

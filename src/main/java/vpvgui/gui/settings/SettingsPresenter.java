@@ -18,10 +18,8 @@ import java.util.function.Consumer;
  */
 public class SettingsPresenter  implements Initializable {
 
-    private static final String RED = "-fx-fill: red; -fx-font-weight: bold";
-    private static final String BLACK = "-fx-fill: black";
     /**
-     * WebView will show the annotated text with HPO terms in color
+     * WebView will show the settings text
      */
     @FXML
     private WebView wview;
@@ -41,10 +39,6 @@ public class SettingsPresenter  implements Initializable {
     }
 
     public void setData(String html) {
-        if (wview==null) {
-            System.err.println("wview is null");
-            System.exit(1);
-        }
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
     }

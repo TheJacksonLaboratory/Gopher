@@ -1,6 +1,5 @@
-package vpvgui;
+package vpvgui.vpvmain;
 
-import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,9 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
@@ -25,23 +22,29 @@ import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
-import vpvgui.model.project.JannovarGeneGenerator;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+
+/**
+ * Created by peter on 01.07.17.
+ */
+public class VPVMainPresenter implements Initializable {
+
     /**
      * The Model for the entire analysis.
      */
     private Model model = null;
 
     private Stage primaryStage;
-    public void initStage( Stage stage){ primaryStage = stage;}
+
+    public void initStage(Stage stage) {
+        primaryStage = stage;
+    }
 
 
     /**
@@ -130,7 +133,6 @@ public class Controller implements Initializable {
     MenuItem showSettingsCurrentProject;
 
 
-
     @FXML
     private Tab analysistab;
 
@@ -159,10 +161,10 @@ public class Controller implements Initializable {
         // initialize settings. First check if already exists
         //TODO For now we are using just one default project name. Later extend this so the
         //user can store multiple project settings file under names chosen by them.
-        String defaultProjectName="vpvsettings";
-        Settings set=null;
+        String defaultProjectName = "vpvsettings";
+        Settings set = null;
         try {
-            set=loadSettings(defaultProjectName);
+            set = loadSettings(defaultProjectName);
         } catch (IOException i) {
             set = new Settings();
         }
@@ -176,7 +178,7 @@ public class Controller implements Initializable {
 
         }));
 
-               // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
+        // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
         // textLabel.textProperty().bind(textTextField.textProperty());
     }
 
@@ -229,7 +231,9 @@ public class Controller implements Initializable {
         }
     }
 
-    /** Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions. */
+    /**
+     * Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions.
+     */
     public void downloadTranscripts() {
         String genome = this.genomeChoiceBox.getValue();
         try {
@@ -241,12 +245,12 @@ public class Controller implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for transcripts file for " + genome + " (will be created by Jannovar if not found).");
         File destinationdirectory = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (destinationdirectory==null) {
+        if (destinationdirectory == null) {
             return; // assume the user clicked the cancel button, we do not need to show an error message
         }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
         String jannovarSerializedFilePath = builder.getSerializedFilePath();
-        System.out.println("PATH="+jannovarSerializedFilePath);
+        System.out.println("PATH=" + jannovarSerializedFilePath);
         this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
         saveSettings();
 
@@ -262,6 +266,7 @@ public class Controller implements Initializable {
     /**
      * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
      * See {@link PopupController} for logic.
+     *
      * @param e
      */
     public void enterGeneList(ActionEvent e) {
@@ -312,10 +317,9 @@ public class Controller implements Initializable {
      *
      * @return Settings for specified project
      */
-    private Settings loadSettings(String projectName) throws  IOException {
+    private Settings loadSettings(String projectName) throws IOException {
         return SettingsIO.loadSettings(projectName);
     }
-
 
 
     public void showSettingsOfCurrentProject() {
@@ -340,6 +344,7 @@ public class Controller implements Initializable {
 
 
 }
+
 
 
 

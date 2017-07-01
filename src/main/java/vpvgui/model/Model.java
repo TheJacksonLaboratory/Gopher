@@ -17,12 +17,12 @@ import java.util.stream.Stream;
  */
 public class Model {
 
-    private DataSource datasource=null;
+    private DataSource datasource = null;
 
     private List<RestrictionEnzyme> enzymelist;
 
     private List<String> geneList;
-
+    /** Settings for the current project. */
     private Settings settings;
 
     /**
@@ -31,32 +31,56 @@ public class Model {
      */
     public static final String PROJECT_FILENAME_SUFFIX = "-settings.txt";
 
-    /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10 */
+    /**
+     * The genome build chosen by theuser, e.g., hg19, GRCh38, mm10
+     */
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
-    public String getGenomeBuild() {return genomeBuild.get();}
-    public void setGenomeBuild(String newDatabase) {genomeBuild.set(newDatabase);}
-    public StringProperty genomeBuildProperty() {return genomeBuild;}
 
-    /** This is coupled to genomeTranscriptomeList in the Controller
-     *  ("UCSC-hg19","UCSC-hg38", "UCSC-mm10");
-     *  Consider better design
-     *
-     *  TODO: eliminate redundant code after Settings class is integrated into gui HB
+    public String getGenomeBuild() {
+        return genomeBuild.get();
+    }
+
+    public void setGenomeBuild(String newDatabase) {
+        genomeBuild.set(newDatabase);
+    }
+
+    public StringProperty genomeBuildProperty() {
+        return genomeBuild;
+    }
+
+    /**
+     * This is coupled to genomeTranscriptomeList in the Controller
+     * ("UCSC-hg19","UCSC-hg38", "UCSC-mm10");
+     * Consider better design
+     * <p>
+     * TODO: eliminate redundant code after Settings class is integrated into gui HB
      */
 
-    public String genomeURL=null;
+    public String genomeURL = null;
+
     public String getGenomeURL() {
         return this.genomeURL;
     }
-    public String genomeBasename=null;
-    public String getGenomeBasename(){ return genomeBasename;}
 
-    public String transcriptsURL=null;
-    public String getTranscriptsURL(){return transcriptsURL;}
-    public String transcriptsBasename=null;
-    public String getTranscriptsBasename(){return transcriptsBasename;}
+    public String genomeBasename = null;
 
-    public String repeatsURL=null;
+    public String getGenomeBasename() {
+        return genomeBasename;
+    }
+
+    public String transcriptsURL = null;
+
+    public String getTranscriptsURL() {
+        return transcriptsURL;
+    }
+
+    public String transcriptsBasename = null;
+
+    public String getTranscriptsBasename() {
+        return transcriptsBasename;
+    }
+
+    public String repeatsURL = null;
 
     public Settings getSettings() {
         return settings;
@@ -71,37 +95,35 @@ public class Model {
         settings = Settings.factory();    // creates empty Settings object
     }
 
-    /** @return List of enzymes for the user to choose from. */
-    public List<RestrictionEnzyme> getRestrictionEnymes() { return enzymelist; }
+    /**
+     * @return List of enzymes for the user to choose from.
+     */
+    public List<RestrictionEnzyme> getRestrictionEnymes() {
+        return enzymelist;
+    }
 
-    /** This method expects there to be a file called enzymelist.tab in
+    /**
+     * This method expects there to be a file called enzymelist.tab in
      * src/main/resources. This file has a header line (with #) and
      * then a list of restriction enzymes structured as name\tsite
      */
     private void initializeEnzymesFromFile() {
         enzymelist = new ArrayList<>();
-        String fileName="enzymelist.tab";
+        String fileName = "enzymelist.tab";
         //InputStream s = Model.class.getClassLoader().getResourceAsStream("/data/enzymelist.tab");
-	File file = new File(getClass().getClassLoader().getResource("enzymelist.tab").getFile());
-	System.err.println("&&&&&&File"+file);
+        File file = new File(getClass().getClassLoader().getResource("enzymelist.tab").getFile());
         try {
-        BufferedReader br =  new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
-        // file = new File(getClass().getClassLoader().getResource("/home/robinp/GIT/captureCpipeline/panel_design/vpv/target/data/enzymelist.tab").getFile());
+            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
 
-        System.err.println("22 &&&&&&File"+file);
-	
-        //ClassLoader classLoader = getClass().getClassLoader();
-	// File file = new File(classLoader.getResource("data/enzymelist.tab").getFile());
             String line;
 
-            while ((line =br.readLine())!=null) {
+            while ((line = br.readLine()) != null) {
 
                 System.err.println(line);
                 if (line.startsWith("#"))
                     continue; /* skip header*/
                 String a[] = line.split("\\s");
-                System.err.println("N="+a.length);
-                RestrictionEnzyme re = new RestrictionEnzyme(a[0],a[1]);
+                RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 enzymelist.add(re);
             }
 
@@ -117,14 +139,14 @@ public class Model {
      * of paths and names that represent the sets of data we will need
      * to analyze any one genome.
      */
-     public void adjustGenomeDownloadPaths() throws DownloadFileNotFoundException {
+    public void adjustGenomeDownloadPaths() throws DownloadFileNotFoundException {
         String gb = getGenomeBuild();
-        if (gb.equals("UCSC-hg19")){
+        if (gb.equals("UCSC-hg19")) {
             this.datasource = DataSource.createUCSChg19();
-        } else if (gb.equals("UCSC-hg38")){
-             this.datasource = DataSource.createUCSChg38();
-         } else {
-            throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.",gb));
+        } else if (gb.equals("UCSC-hg38")) {
+            this.datasource = DataSource.createUCSChg38();
+        } else {
+            throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
         }
         this.genomeURL = datasource.getGenomeURL();
         this.settings.setGenomeFileFrom(this.genomeURL);
@@ -136,11 +158,11 @@ public class Model {
         geneList = new ArrayList<>();
         System.err.println("Genes");
         for (String g : symbols) {
-            if (g!=null && !g.isEmpty())
+            if (g != null && !g.isEmpty())
                 geneList.add(g.trim());
         }
         for (String g : geneList) {
-            System.err.println("\t\""+g+"\"");
+            System.err.println("\t\"" + g + "\"");
         }
     }
 
