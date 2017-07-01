@@ -80,6 +80,7 @@ public class VPVGene {
         this.viewPointList.add(vp);
     }
 
+    /** Dumps the information about the VPVGene and itsviewpoints for debugging. */
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         String strand="-";
