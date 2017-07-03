@@ -59,7 +59,6 @@ public class JannovarTranscriptFileBuilder {
         downloaddir=dirpath;
         setGenome(genome);
         setJannovarFileName();
-        runJannovar();
     }
 
     private void setJannovarFileName() {
@@ -85,7 +84,7 @@ public class JannovarTranscriptFileBuilder {
     }
 
     /** Start a task to let the Jannovar download run.*/
-    private void runJannovar() {
+    public void runJannovar() {
           Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
         Scene scene = new Scene(new Group());
         taskUpdateStage.setTitle("Jannovar download");

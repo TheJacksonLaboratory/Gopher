@@ -30,6 +30,8 @@ public class SettingsIOTest {
     @ClassRule
     public static TemporaryFolder folder= new TemporaryFolder();
 
+    private static File setttingsPath=null;
+
     private static Settings s=null;
 
     @BeforeClass
@@ -43,7 +45,7 @@ public class SettingsIOTest {
         File genomeFile = folder.newFile("mygenome");
         File transcriptFile = folder.newFile("mytranscripts");
         File repeatsFile = folder.newFile("myrepeats");
-        File setttingsPath = folder.newFile("testsettings");
+         setttingsPath = folder.newFile("testsettings");
         s.setGenomeFileTo(genomeFile.getAbsolutePath());
         s.setTranscriptsFileTo(transcriptFile.getAbsolutePath());
         s.setRepeatsFileTo(repeatsFile.getAbsolutePath());
@@ -108,7 +110,7 @@ public class SettingsIOTest {
     // Restore project settings from file, check that they are the same as what you saved.
     @Test
     public void test5() throws Exception {
-        Settings t = loadSettings("SettingsIOTestProject");
+        //Settings t = loadSettings(setttingsPath.getAbsolutePath());
         // The following does not work!
         //Assert.assertEquals(t,m.getSettings());
 

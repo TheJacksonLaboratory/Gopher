@@ -14,6 +14,8 @@ import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
+import vpvgui.gui.help.HelpPresenter;
+import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
@@ -131,6 +133,8 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML
     MenuItem showSettingsCurrentProject;
+
+    @FXML MenuItem helpMenuItem;
 
 
     @FXML
@@ -252,6 +256,13 @@ public class VPVMainPresenter implements Initializable {
             return; // assume the user clicked the cancel button, we do not need to show an error message
         }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
+        try {
+            builder.runJannovar();
+        } catch (Exception e) {
+            ErrorWindow.display("Error downloading Jannovar transcript file",
+                    String.format("Could not download Jannovar transcript file. Are you online?\n%s ",e.toString()));
+            return;
+        }
         String jannovarSerializedFilePath = builder.getSerializedFilePath();
         System.out.println("PATH=" + jannovarSerializedFilePath);
         this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
@@ -331,6 +342,12 @@ public class VPVMainPresenter implements Initializable {
      */
     private void saveSettings() throws IOException {
         SettingsIO.saveSettings(model);
+    }
+
+
+    @FXML public void showHelpWindow(ActionEvent e) {
+        System.out.println("Calling help");
+        HelpViewFactory.display();
     }
 
 

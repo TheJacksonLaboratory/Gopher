@@ -56,7 +56,7 @@ public class SettingsIO {
                 projectName + Model.PROJECT_FILENAME_SUFFIX);
         if (!projectSettingsPath.exists()) {
             throw new IOException("[SettingsIO.loadSettings] Cannot find settings file for project " +
-                    projectName + " ; exiting.");
+                    projectName);
         }
         return Settings.factory(projectSettingsPath.getAbsolutePath());
     }
