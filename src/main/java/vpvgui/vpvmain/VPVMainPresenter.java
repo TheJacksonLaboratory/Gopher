@@ -202,7 +202,11 @@ public class VPVMainPresenter implements Initializable {
         /* The model will directly update the settings object to reflect
         the genome build etc, and the following command will save the settings to disk.
          */
-        saveSettings();
+        try {
+            saveSettings();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void downloadGenome() {
@@ -251,7 +255,11 @@ public class VPVMainPresenter implements Initializable {
         String jannovarSerializedFilePath = builder.getSerializedFilePath();
         System.out.println("PATH=" + jannovarSerializedFilePath);
         this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
-        saveSettings();
+        try {
+            saveSettings();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -321,7 +329,7 @@ public class VPVMainPresenter implements Initializable {
      * This method gets called when user chooses to close Gui. Content of
      * {@link Settings} bean is written to platform-dependent default location.
      */
-    private void saveSettings() {
+    private void saveSettings() throws IOException {
         SettingsIO.saveSettings(model);
     }
 

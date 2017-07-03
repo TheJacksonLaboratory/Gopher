@@ -136,7 +136,7 @@ public class Settings implements Serializable {
     }
 
     public final void setRepeatsFileTo(String rft) {
-        repeatsFileTo.setValue(rft);
+         repeatsFileTo.setValue(rft);
     }
 
     public final StringProperty repeatsFileToProperty() {

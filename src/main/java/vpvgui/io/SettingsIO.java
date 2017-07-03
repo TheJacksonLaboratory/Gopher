@@ -65,26 +65,23 @@ public class SettingsIO {
      * This method gets called when user chooses to close Gui. Content of
      * {@link Settings} bean is written to platform-dependent default location.
      */
-    public static void saveSettings(Model model) {
+    public static void saveSettings(Model model) throws IOException {
         File settingsDir = getVPVDir();
         String projName = model.getSettings().getProjectName();
 
         if (projName == null || projName.isEmpty()) {
-            System.err.println("[SettingsIO.saveSettings] Cannot save settings without project name. Exiting.");
-            System.exit(1);
+            throw new IOException("[SettingsIO.saveSettings] Cannot save settings without project name. Exiting.");
         }
 
         // getVPVDir returns null if user's platform is unrecognized.
         if (settingsDir == null) {
-            System.err.println("[SettingsIO.saveSettings] Directory for settings files is null. Exiting.");
-            System.exit(1);
+            throw new IOException("[SettingsIO.saveSettings] Directory for settings files is null. Exiting.");
         }
 
         // Check whether directory already exists; if not, create it.
         if (!(settingsDir.exists() || settingsDir.mkdir())) {
-            System.err.println("[SettingsIO.saveSettings] Cannot create directory for settings files: " +
+            throw new IOException("[SettingsIO.saveSettings] Cannot create directory for settings files: " +
                     settingsDir.getPath() + " ; exiting.");
-            System.exit(1);
         }
 
         File projectSettingsPath = new File(settingsDir,
@@ -93,14 +90,31 @@ public class SettingsIO {
             // Create new file if one does not already exist.
             projectSettingsPath.createNewFile();
         } catch (IOException e) {
-            System.err.println("[SettingsIO.saveSettings] Cannot create settings file: " +
+            throw new IOException("[SettingsIO.saveSettings] Cannot create settings file: " +
                     projectSettingsPath.getPath() + " ; exiting.");
-            System.exit(1);
         }
 
         // If .vpvgui directory previously contained a settings file for this project,
         // it gets overwritten by the new file.
-        // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
-        Settings.saveToFile(model.getSettings(), projectSettingsPath);
+        // May throw IO exception
+        boolean result=Settings.saveToFile(model.getSettings(), projectSettingsPath);
+        if (!result) {
+            throw new IOException("Failed to save settings file for unknown reason");
+        }
     }
+
+
+    public static void saveSettings(Model model,File pathToSettingsFile) throws IOException {
+
+        // If .vpvgui directory previously contained a settings file for this project,
+        // it gets overwritten by the new file.
+        // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
+        boolean result=Settings.saveToFile(model.getSettings(), pathToSettingsFile);
+        if (!result) {
+            throw new IOException("Failed to save settings file for unknown reason");
+        }
+
+    }
+
+
 }
