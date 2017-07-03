@@ -2,6 +2,7 @@ package vpvgui.gui;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -49,6 +50,9 @@ public class EnzymeCheckBoxWindow {
             layout.getChildren().addAll(cb);
         }
         layout.setAlignment(Pos.BASELINE_LEFT);
+        Button okButton = new Button("OK");
+        okButton.setOnAction( e -> window.close() );
+        layout.getChildren().addAll(okButton);
         Scene scene = new Scene(layout);
         window.setScene(scene);
         window.showAndWait();
