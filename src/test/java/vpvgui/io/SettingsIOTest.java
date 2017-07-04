@@ -19,8 +19,8 @@ import static vpvgui.io.SettingsIO.*;
 import static vpvgui.io.Platform.getVPVDir;
 
 /**
- * @author Hannah Blau (blauh)
- *         created on 6/12/17.
+ * @author Hannah Blau (blauh), peter
+ * @version 0.0.2
  */
 public class SettingsIOTest {
     private static Model m = null;

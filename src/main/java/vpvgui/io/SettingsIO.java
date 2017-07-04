@@ -15,7 +15,7 @@ import static vpvgui.io.Platform.getVPVDir;
  * return a list of the names of existing projects collected from their stored settings files.
  *
  * @author Hannah Blau (blauh)
- * @version last modified 6/5/17
+ * @version 0.0.1
  */
 public class SettingsIO {
 

@@ -13,12 +13,13 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
+/**
+ * @author Hannah Blau (blauh), peter
+ * @version 0.0.2
+ */
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 
-/**
- * @author Hannah Blau (blauh)
- * @version last modified 6/9/17
- */
 public class SettingsTest {
     private static Settings s;
 
@@ -95,7 +96,7 @@ public class SettingsTest {
         for (int i = 0; i < 8; i++) {
             tgl.add("NewTargetGene" + i);
         }
-        assertFalse(t.isComplete());
+        Assert.assertFalse(t.isComplete());
 
         //System.out.print(t);
         boolean results = Settings.saveToFile(t, f);
