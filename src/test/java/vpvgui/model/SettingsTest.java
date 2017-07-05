@@ -7,7 +7,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runners.MethodSorters;
-import org.testng.Assert;
 
 import java.io.File;
 
@@ -61,20 +60,20 @@ public class SettingsTest {
 
         //System.out.print(t);
         //System.out.print(s);
-        Assert.assertTrue(s.isComplete());
+        assertTrue(s.isComplete());
     }
 
     /* Note: if Settings.saveToFile is successful it returns true. */
     @Test
     public void test1SaveToFile() throws Exception {
        boolean result = Settings.saveToFile(s, fileToSaveTo);
-       Assert.assertTrue(result);
+       assertTrue(result);
     }
 
     @Test
     public void test2Factory() throws Exception {
         Settings t = Settings.factory(fileToSaveTo.getAbsolutePath());
-        Assert.assertNotNull(t);
+        assertNotNull(t);
     }
 
     @Test
@@ -96,13 +95,13 @@ public class SettingsTest {
         for (int i = 0; i < 8; i++) {
             tgl.add("NewTargetGene" + i);
         }
-        Assert.assertFalse(t.isComplete());
+        assertFalse(t.isComplete());
 
         //System.out.print(t);
         boolean results = Settings.saveToFile(t, f);
-        Assert.assertTrue(results);
+        assertTrue(results);
 
         Settings u = Settings.factory(f.getAbsolutePath());
-        Assert.assertEquals(t,u);
+        assertEquals(t,u);
     }
 }
