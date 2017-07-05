@@ -144,7 +144,7 @@ public class ViewPoint {
 
         for (int i = 0; i < cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size() - 1; j++) {
-                Fragment restFrag = new Fragment("dirpath", cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1), false);
+                Fragment restFrag = new Fragment("dirpath", cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1, false);
                 restFragListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }
@@ -348,22 +348,86 @@ public class ViewPoint {
             }
         }
         if (found) {
-            System.out.println("hooray!");
+            //System.out.println("hooray!");
         }
-
-
-/*
-        boolean found=false;
-        for (int i = 0; i< getRestFragListMap().get(motif).size(); i++ ) {
-
-        }
-*/
-        //vp.getRestFragListMap().get(motif).
     }
 
 
     public String toString() {
         return String.format("%s: [%d-%d]",getReferenceID(),getStartPos(),getEndPos());
+    }
+
+    /**
+     *
+     * @param fragNumUp
+     * @param fragNumDown     *
+     * @param motif
+     * @param minSizeUp
+     * @param maxSizeUp
+     * @param minSizeDown
+     * @param maxSizeDown
+     * @param minFragSize
+     */
+    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize) {
+
+        // print out all arguments
+        System.out.println(fragNumUp);
+        System.out.println(fragNumDown);
+        System.out.println(motif);
+        System.out.println(minSizeUp);
+        System.out.println(maxSizeUp);
+        System.out.println(minSizeDown);
+        System.out.println(maxSizeDown);
+        System.out.println(minFragSize);
+
+
+
+        // iterate over all fragments of the viewpoint and set them to true
+        for(int i=0; i<restFragListMap.get(motif).size(); i++) {
+            restFragListMap.get(motif).get(i).setSelected(true);
+        }
+
+        // find the index of the fragment that contains genomicPos
+        Integer genomicPosFragIdx=-1;
+        for(int i=0; i<restFragListMap.get(motif).size(); i++) {
+            Integer fragStaPos=relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            Integer fragEndPos=relToAbsPos(restFragListMap.get(motif).get(i).getEndPos());
+            if(fragStaPos<genomicPos && genomicPos<fragEndPos){
+                genomicPosFragIdx=i;break;
+            }
+        }
+        if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");}
+
+        // originating from the centralized fragment containing 'genomicPos' go fragment-wise in UPSTREAM direction
+        System.out.println();
+        Integer fragCountUp=0;
+        for(int i=genomicPosFragIdx-1; 0<=i; i--) {
+
+            // filter for minFragSize
+            Integer len=relToAbsPos(restFragListMap.get(motif).get(i).getEndPos())-relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            if(len<minFragSize) {restFragListMap.get(motif).get(i).setSelected(false);}
+
+            // set fragments to false that are not entirely within the allowed range
+            Integer upLen=genomicPos-relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            if(maxSizeUp<upLen) {restFragListMap.get(motif).get(i).setSelected(false);}
+
+
+            if(restFragListMap.get(motif).get(i).getSelected()==true){
+                fragCountUp++;
+            }
+
+        }
+        System.out.println("...");
+        System.out.println(fragCountUp);
+
+
+
+
+
+
+
+
+
     }
 
 }
