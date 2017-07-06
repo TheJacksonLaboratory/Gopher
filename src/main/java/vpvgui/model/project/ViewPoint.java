@@ -373,20 +373,7 @@ public class ViewPoint {
      */
     public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize) {
 
-        // print out all arguments
-        /*
-        System.out.println(fragNumUp);
-        System.out.println(fragNumDown);
-        System.out.println(motif);
-        System.out.println(minSizeUp);
-        System.out.println(maxSizeUp);
-        System.out.println(minSizeDown);
-        System.out.println(maxSizeDown);
-        System.out.println(minFragSize);
-        */
-
-
-        // iterate over all fragments of the viewpoint and set them to true
+         // iterate over all fragments of the viewpoint and set them to true
         for(int i=0; i<restFragListMap.get(motif).size(); i++) {
             restFragListMap.get(motif).get(i).setSelected(true);
         }
@@ -402,32 +389,77 @@ public class ViewPoint {
         }
         if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");}
 
-        // originating from the centralized fragment containing 'genomicPos' go fragment-wise in UPSTREAM direction
-        //System.out.println();
-        Integer fragCountUp=0;
-        for(int i=genomicPosFragIdx-1; 0<=i; i--) {
+        // originating from the centralized fragment containing 'genomicPos' (included) go fragment-wise in UPSTREAM direction
+        Integer fragCountUp = 0;
+        for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
 
-            // filter for minFragSize
-            Integer len=relToAbsPos(restFragListMap.get(motif).get(i).getEndPos())-relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
-            if(len<minFragSize) {restFragListMap.get(motif).get(i).setSelected(false);}
-
-            // set fragments to false that are not entirely within the allowed range
-            Integer upLen=genomicPos-relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
-            if(maxSizeUp<upLen) {restFragListMap.get(motif).get(i).setSelected(false);}
-
-
-            if(restFragListMap.get(motif).get(i).getSelected()==true){
-                fragCountUp++;
+            // set fragment to 'false', if it is shorter than 'minFragSize'
+            Integer len = relToAbsPos(restFragListMap.get(motif).get(i).getEndPos()) - relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            if (len < minFragSize) {
+                restFragListMap.get(motif).get(i).setSelected(false);
             }
 
+            // set fragments to 'false' that are not entirely within the allowed range
+            Integer upLen = genomicPos - relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            if (maxSizeUp < upLen) {
+                restFragListMap.get(motif).get(i).setSelected(false);
+            }
+
+            // set fragment to 'false', if required number of fragments has already been found
+            if (fragNumUp + 1 < fragCountUp) {
+                restFragListMap.get(motif).get(i).setSelected(false);
+            }
+
+            // if after all this the fragment is still selected, increase count
+            if (restFragListMap.get(motif).get(i).getSelected() == true) {
+                fragCountUp++;
+            }
+        }
+        if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
+            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found.");
         }
 
-        //System.out.println(fragCountUp);
+        // originating from the centralized fragment containing 'genomicPos' (excluded) go fragment-wise in DOWNSTREAM direction
+        Integer fragCountDown = 0;
+        for (int i = genomicPosFragIdx+1; i<restFragListMap.get(motif).size(); i++) { // downstream
 
+            // set fragment to 'false', if it is shorter than 'minFragSize'
+            Integer len = relToAbsPos(restFragListMap.get(motif).get(i).getEndPos()) - relToAbsPos(restFragListMap.get(motif).get(i).getStartPos());
+            if (len < minFragSize) {
+                restFragListMap.get(motif).get(i).setSelected(false);
+            }
 
+            // set fragments to 'false' that are not entirely within the allowed range
+            Integer downLen = genomicPos - relToAbsPos(restFragListMap.get(motif).get(i).getEndPos());
+            if (maxSizeDown < downLen) {
+                restFragListMap.get(motif).get(i).setSelected(false);
+            }
 
+            // set fragment to 'false', if required number of fragments has already been found
+            if (fragNumDown <= fragCountDown) {
+                restFragListMap.get(motif).get(i).setSelected(false);
+            }
 
+            // if after all this the fragment is still selected, increase count
+            if (restFragListMap.get(motif).get(i).getSelected() == true) {
+                fragCountDown++;
+            }
+        }
+        if (fragCountDown < fragNumDown) {
+            System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountDown + " fragments were found.");
+        }
 
+        // set start position of the viewpoint to start position of the most upstream fragment
+        for (int i = 0; i<restFragListMap.get(motif).size(); i++) {
+            if(restFragListMap.get(motif).get(i).getSelected()==true) {
+                setStartPos(relToAbsPos(restFragListMap.get(motif).get(i).getStartPos()));
+                break;
+            }
+        }
+
+        // set end position of the viewpoint to end position of the most downstream fragment
+
+        setDerivationApproach("LUPIANEZ");
 
 
 

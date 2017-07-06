@@ -67,9 +67,9 @@ public class CuttingPositionMapTest {
     @Test
     public void testHashMap() throws Exception {
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testHashMap' prints to the screen ");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
 
         // print cutting motifs with '^' characters
         System.out.println();
@@ -134,9 +134,9 @@ public class CuttingPositionMapTest {
             s += testCuttingPositionMap.getHashMapOnly().get("ALL").get(i);
             System.out.println(s);
         }
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testHashMap' END");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
     }
 
 
@@ -157,9 +157,9 @@ public class CuttingPositionMapTest {
     @Test
     public void testGetNextCutPos() throws Exception {
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testgetNextCutPos' prints to the screen ");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
 
         /* test usual function calls for positions between two cutting sites */
 
@@ -169,22 +169,22 @@ public class CuttingPositionMapTest {
             Integer posB = testCuttingPositionMap.getHashMapOnly().get("ALL").get(1);
             Integer testPos=posA+((posB-posA)/2);
 
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for downstream direction...");
             Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
             System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
 
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for upstream direction...");
             nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
             System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
 
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for downstream direction...");
             nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
             System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
 
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for upstream direction...");
             nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
             System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
@@ -197,21 +197,21 @@ public class CuttingPositionMapTest {
 
         // last cutting position, downstream
         Integer testPos = testCuttingPositionMap.getHashMapOnly().get("ALL").get(testCuttingPositionMap.getHashMapOnly().get("ALL").size()-1) + 1;
-        System.out.println("---------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for downstream direction...");
         Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "down");
         System.out.println("Returned value: " + nextCutPos);
 
         // first cutting position, upstream
         testPos = testCuttingPositionMap.getHashMapOnly().get("ALL").get(0) - 1;
-        System.out.println("---------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for upstream direction...");
         nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "up");
         System.out.println("Returned value: " + nextCutPos);
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testgetNextCutPos' END");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
     }
 
     /* test unhandled IntegerOutOfRangeException for function 'testgetNextCutPos' */

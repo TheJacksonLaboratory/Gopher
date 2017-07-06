@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -101,9 +102,9 @@ public class ViewPointTest {
     @Test
     public void testExtendFragmentWise() throws Exception {
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testExtendFragmentWise' prints to the screen ");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
 
 
         /* create viewpoint for testing */
@@ -172,18 +173,18 @@ public class ViewPointTest {
         printLabledPos(testViewpointGATC.relToAbsPos(upstream_pos), "position upstream", true);
         printStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testExtendFragmentWise' END");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
     }
 
 
     @Test
     public void testFragmentListMap() throws Exception {
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testFragmentListMap' prints to the screen ");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         
 
         /* create viewpoint for testing */
@@ -224,18 +225,18 @@ public class ViewPointTest {
         testViewpointGATC.selectOrDeSelectFragment(18);
         printFragments(testViewpointGATC,"GATC");
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testFragmentListMap' END");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
     }
 
 
     @Test
     public void testGenerateViewpointLupianez() throws Exception {
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testGenerateViewpointLupianez' prints to the screen ");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         
         
         /* create viewpoint for testing */
@@ -252,28 +253,63 @@ public class ViewPointTest {
         ViewPoint testViewpointLupianez = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
         String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
 
+        System.out.println();
+        System.out.println("Arguments used to call the constructor function 'ViewPoint':");
+        System.out.println("\t" + "referenceSequenceID = " + referenceSequenceID);
+        System.out.println("\t" + "genomicPos = " + genomicPos);
+        System.out.println("\t" + "maxDistToGenomicPosUp = " + maxDistToGenomicPosUp);
+        System.out.println("\t" + "maxDistToGenomicPosDown = " + maxDistToGenomicPosDown);
+        System.out.println("\t" + "testCuttingPatterns = " + Arrays.toString(testCuttingPatterns));
+        System.out.println("\t" + "testFastaFile = " + testFastaFile);
+        System.out.println();
 
-        /* print to screen */
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println();
+        System.out.println("Total length of the sequence '" + referenceSequenceID + ": " + referenceSequence.length());
+        System.out.println();
 
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println();
+        System.out.println("Print initial fragments:");
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
+        printStaEndString(testViewpointLupianez.getStartPos(),testViewpointLupianez.getEndPos());
+        printFragments(testViewpointLupianez, "GATC");
 
-        Integer fragNumUp=3;
-        Integer fragNumDown=3;
+        Integer fragNumUp=2;
+        Integer fragNumDown=2;
         String motif="GATC";
         Integer minSizeUp=20;
         Integer maxSizeUp=95;
         Integer minSizeDown=20;
         Integer maxSizeDown=95;
         Integer minFragSize=22;
-
-        printFragments(testViewpointLupianez, "GATC");
         testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize);
+
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println();
+        System.out.println("Arguments used to call the function 'generateViewpointLupianez':");
+        System.out.println("\t" + "fragNumUp = " + fragNumUp);
+        System.out.println("\t" + "fragNumDown = " + fragNumDown);
+        System.out.println("\t" + "motif = " + motif);
+        System.out.println("\t" + "minSizeUp = " + minSizeUp);
+        System.out.println("\t" + "maxSizeUp = " + maxSizeUp);
+        System.out.println("\t" + "minSizeDown = " + minSizeDown);
+        System.out.println("\t" + "maxSizeDown = " + maxSizeDown);
+        System.out.println("\t" + "minFragSize = " + minFragSize);
+        System.out.println();
+
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println();
+        System.out.println("Print fragments after application of 'generateViewpointLupianez':");
+        printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
+        System.out.println(referenceSequence);
+        printStaEndString(testViewpointLupianez.getStartPos(),testViewpointLupianez.getEndPos());
         printFragments(testViewpointLupianez,"GATC");
 
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
         System.out.println("Test function 'testGenerateViewpointLupianez' END");
-        System.out.println("======================================================================");
+        System.out.println("=========================================================================================");
     }
 
 
