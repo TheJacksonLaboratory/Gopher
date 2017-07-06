@@ -67,9 +67,9 @@ public class CuttingPositionMapTest {
     @Test
     public void testHashMap() throws Exception {
 
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
         System.out.println("Test function 'testHashMap' prints to the screen ");
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
 
         // print cutting motifs with '^' characters
         System.out.println();
@@ -134,9 +134,9 @@ public class CuttingPositionMapTest {
             s += testCuttingPositionMap.getHashMapOnly().get("ALL").get(i);
             System.out.println(s);
         }
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
         System.out.println("Test function 'testHashMap' END");
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
     }
 
 
@@ -157,9 +157,9 @@ public class CuttingPositionMapTest {
     @Test
     public void testGetNextCutPos() throws Exception {
 
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
         System.out.println("Test function 'testgetNextCutPos' prints to the screen ");
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
 
         /* test usual function calls for positions between two cutting sites */
 
@@ -209,9 +209,9 @@ public class CuttingPositionMapTest {
         nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "up");
         System.out.println("Returned value: " + nextCutPos);
 
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
         System.out.println("Test function 'testgetNextCutPos' END");
-        System.out.println("===============================================================");
+        System.out.println("======================================================================");
     }
 
     /* test unhandled IntegerOutOfRangeException for function 'testgetNextCutPos' */

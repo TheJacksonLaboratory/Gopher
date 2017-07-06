@@ -79,6 +79,9 @@ public class ViewPoint {
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
 
+        setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
+        setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
+
         /* Peter: ich habe denfolgenden Code in Funktionen ausgelagert, damit er von wonaders ausgerufen werden kann */
         initCuttingPositionMap(referenceSequenceID, genomicPos, fastaReader, maxDistToGenomicPosUp, maxDistToGenomicPosDown, cuttingPatterns);
         initRestrictionFragments(cuttingPatterns);
@@ -371,6 +374,7 @@ public class ViewPoint {
     public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize) {
 
         // print out all arguments
+        /*
         System.out.println(fragNumUp);
         System.out.println(fragNumDown);
         System.out.println(motif);
@@ -379,7 +383,7 @@ public class ViewPoint {
         System.out.println(minSizeDown);
         System.out.println(maxSizeDown);
         System.out.println(minFragSize);
-
+        */
 
 
         // iterate over all fragments of the viewpoint and set them to true
@@ -399,7 +403,7 @@ public class ViewPoint {
         if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");}
 
         // originating from the centralized fragment containing 'genomicPos' go fragment-wise in UPSTREAM direction
-        System.out.println();
+        //System.out.println();
         Integer fragCountUp=0;
         for(int i=genomicPosFragIdx-1; 0<=i; i--) {
 
@@ -417,8 +421,8 @@ public class ViewPoint {
             }
 
         }
-        System.out.println("...");
-        System.out.println(fragCountUp);
+
+        //System.out.println(fragCountUp);
 
 
 
