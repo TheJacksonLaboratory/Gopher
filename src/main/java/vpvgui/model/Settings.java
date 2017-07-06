@@ -184,17 +184,6 @@ public class Settings implements Serializable {
                 getRepeatsFileTo().equals(settings.getRepeatsFileTo()) &&
                 getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList()) &&
                 getTargetGenesList().equals(settings.getTargetGenesList());
-/*
-        if (!getProjectName().equals(settings.getProjectName())) return false;
-        if (!getGenomeFileFrom().equals(settings.getGenomeFileFrom())) return false;
-        if (!getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom())) return false;
-        if (!getRepeatsFileFrom().equals(settings.getRepeatsFileFrom())) return false;
-        if (!getGenomeFileTo().equals(settings.getGenomeFileTo())) return false;
-        if (!getTranscriptsFileTo().equals(settings.getTranscriptsFileTo())) return false;
-        if (!getRepeatsFileTo().equals(settings.getRepeatsFileTo())) return false;
-        if (!getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList())) return false;
-        return getTargetGenesList().equals(settings.getTargetGenesList());
-*/
     }
 
     @Override
