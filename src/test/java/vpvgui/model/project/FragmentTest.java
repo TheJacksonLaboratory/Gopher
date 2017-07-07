@@ -19,8 +19,7 @@ public class FragmentTest {
     public static void setup() throws Exception {
         ClassLoader classLoader = FragmentTest.class.getClassLoader();
         String dirpath = classLoader.getResource("smallgenome").getFile();
-        fragment = new Fragment(dirpath, 1,2,false);
-
+        fragment = new Fragment(dirpath);
     }
 
     /* On my machine, fragment.getDirectoryPath() returns
@@ -70,6 +69,5 @@ public class FragmentTest {
         String expected = "CTTCA";
         String dna = fragment.getGenomicReferenceSequence(chromosome, 6, 10);
         Assert.assertEquals(expected,dna);
-
     }
 }

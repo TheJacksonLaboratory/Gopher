@@ -336,10 +336,10 @@ public class ViewPointTest {
 
     private void printFragments(ViewPoint vp, String motif) {
 
-        for (int i = 0; i < vp.getRestFragListMap().get(motif).size(); i++) {
-            Integer sta = vp.relToAbsPos(vp.getRestFragListMap().get(motif).get(i).getStartPos());
-            Integer end = vp.relToAbsPos(vp.getRestFragListMap().get(motif).get(i).getEndPos());
-            boolean selected = vp.getRestFragListMap().get(motif).get(i).getSelected();
+        for (int i = 0; i < vp.getRestSegListMap().get(motif).size(); i++) {
+            Integer sta = vp.relToAbsPos(vp.getRestSegListMap().get(motif).get(i).getStartPos());
+            Integer end = vp.relToAbsPos(vp.getRestSegListMap().get(motif).get(i).getEndPos());
+            boolean selected = vp.getRestSegListMap().get(motif).get(i).getSelected();
 
             String s = new String("");
             for (int j = 0; j <= end; j++) {
