@@ -276,15 +276,16 @@ public class ViewPointTest {
         printStaEndString(testViewpointLupianez.getStartPos(),testViewpointLupianez.getEndPos());
         printFragments(testViewpointLupianez, "GATC");
 
-        Integer fragNumUp=2;
-        Integer fragNumDown=2;
+        Integer fragNumUp=1;
+        Integer fragNumDown=1;
         String motif="GATC";
         Integer minSizeUp=20;
         Integer maxSizeUp=95;
         Integer minSizeDown=20;
         Integer maxSizeDown=95;
         Integer minFragSize=22;
-        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize);
+        double minRepFrag=0.4;
+        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag);
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();

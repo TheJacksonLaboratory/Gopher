@@ -10,17 +10,19 @@ public class Segment {
     private Integer startPos;
     private Integer endPos;
     private boolean selected;
-    private float repetitiveContent;
+    private double repetitiveContent;
+    private  Integer genomicPos;
 
 
     /* constructor */
 
-    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected) {
+    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, Integer genomicPos, boolean selected) {
 
         this.referenceSequenceID = referenceSequenceID;
         this.startPos = startPos;
         this.endPos = endPos;
         setSelected(selected);
+        this.genomicPos=genomicPos;
     }
 
 
@@ -56,7 +58,7 @@ public class Segment {
 
         /* get dna string */
 
-        String s = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
+        String s = fastaReader.getSubsequenceAt(referenceSequenceID, startPos+genomicPos+1, endPos+genomicPos+1).getBaseString();
 
 
         /* determine repetitive content */
@@ -67,11 +69,11 @@ public class Segment {
             if (Character.isUpperCase(s.charAt(i))) upperCase++;
         }
 
-        repetitiveContent = (float) lowerCase / (lowerCase + upperCase);
+        this.repetitiveContent = ((double) lowerCase / (lowerCase + (double) upperCase));
     }
 
 
-    public float getRepetitiveContent() {
+    public double getRepetitiveContent() {
         return repetitiveContent;
     }
 }

@@ -154,7 +154,7 @@ public class ViewPoint {
 
         for (int i = 0; i < cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size() - 1; j++) {
-                Segment restFrag = new Segment(referenceSequenceID, cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1, false);
+                Segment restFrag = new Segment(referenceSequenceID, cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1, genomicPos,false);
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }
@@ -383,7 +383,7 @@ public class ViewPoint {
      * @param maxSizeDown
      * @param minFragSize
      */
-    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize) {
+    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag) {
 
          // iterate over all fragments of the viewpoint and set them to true
         for(int i=0; i<restSegListMap.get(motif).size(); i++) {
@@ -422,12 +422,12 @@ public class ViewPoint {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
-      /*      restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
-            if(0.3<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
-                System.out.println(i + "\t" + restSegListMap.get(motif).get(i).getRepetitiveContent());
+            // set fragment to false, if the repetitive content is higher than a given threshold
+            restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
+            if(maxRepFrag<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
-*/
+
             // if after all this the fragment is still selected, increase count
             if (restSegListMap.get(motif).get(i).getSelected() == true) {
                 fragCountUp++;
@@ -455,6 +455,13 @@ public class ViewPoint {
 
             // set fragment to 'false', if required number of fragments has already been found
             if (fragNumDown <= fragCountDown) {
+                restSegListMap.get(motif).get(i).setSelected(false);
+            }
+
+            // set fragment to false, if the repetitive content is higher than a given threshold
+            restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
+            if(maxRepFrag<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
+                System.out.println(i + "\t" + restSegListMap.get(motif).get(i).getRepetitiveContent());
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
