@@ -30,9 +30,9 @@ public class SegmentTest {
         fasta = new File(testFastaFile);
         FastaReader = new IndexedFastaSequenceFile(fasta);
 
-        segment_1 = new Segment(referenceSequenceID,21,44,0,false);
-        segment_2 = new Segment(referenceSequenceID,69,92,0,false);
-        segment_3 = new Segment(referenceSequenceID,93,112,0,false);
+        segment_1 = new Segment(referenceSequenceID,21,44,false);
+        segment_2 = new Segment(referenceSequenceID,69,92,false);
+        segment_3 = new Segment(referenceSequenceID,93,112,false);
     }
 
 

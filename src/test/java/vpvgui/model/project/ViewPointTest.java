@@ -211,7 +211,7 @@ public class ViewPointTest {
         System.out.println(referenceSequence);
         printCuttingSites(testViewpointGATC, "GATC");
         printStaEndString(testViewpointGATC.getStartPos(),testViewpointGATC.getEndPos());
-        printFragments(testViewpointGATC,"GATC");
+        printViewPointSegments(testViewpointGATC,"GATC");
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
         System.out.println("If the 'selectOrDeSelectFragment' is called with a position that is within a restriction fragment,");
@@ -219,11 +219,11 @@ public class ViewPointTest {
         System.out.println();
         System.out.println();
         testViewpointGATC.selectOrDeSelectFragment(-20);
-        printFragments(testViewpointGATC,"GATC");
+        printViewPointSegments(testViewpointGATC,"GATC");
         testViewpointGATC.selectOrDeSelectFragment(-20);
-        printFragments(testViewpointGATC,"GATC");
+        printViewPointSegments(testViewpointGATC,"GATC");
         testViewpointGATC.selectOrDeSelectFragment(18);
-        printFragments(testViewpointGATC,"GATC");
+        printViewPointSegments(testViewpointGATC,"GATC");
 
         System.out.println("=========================================================================================");
         System.out.println("Test function 'testFragmentListMap' END");
@@ -274,7 +274,7 @@ public class ViewPointTest {
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(),testViewpointLupianez.getEndPos());
-        printFragments(testViewpointLupianez, "GATC");
+        printViewPointSegments(testViewpointLupianez, "GATC");
 
         Integer fragNumUp=1;
         Integer fragNumDown=1;
@@ -306,7 +306,7 @@ public class ViewPointTest {
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(),testViewpointLupianez.getEndPos());
-        printFragments(testViewpointLupianez,"GATC");
+        printViewPointSegments(testViewpointLupianez,"GATC");
 
         System.out.println("=========================================================================================");
         System.out.println("Test function 'testGenerateViewpointLupianez' END");
@@ -335,28 +335,32 @@ public class ViewPointTest {
     }
 
 
-    private void printFragments(ViewPoint vp, String motif) {
+    private void printViewPointSegments(ViewPoint vp, String motif) {
 
         for (int i = 0; i < vp.getRestSegListMap().get(motif).size(); i++) {
-            Integer sta = vp.relToAbsPos(vp.getRestSegListMap().get(motif).get(i).getStartPos());
-            Integer end = vp.relToAbsPos(vp.getRestSegListMap().get(motif).get(i).getEndPos());
+            Integer sta = vp.getRestSegListMap().get(motif).get(i).getStartPos();
+            Integer end = vp.getRestSegListMap().get(motif).get(i).getEndPos();
             boolean selected = vp.getRestSegListMap().get(motif).get(i).getSelected();
 
-            String s = new String("");
-            for (int j = 0; j <= end; j++) {
-                if (j < sta) {
-                    s += " ";
-                } else {
-                    if (selected) {
-                        s += "T";
-                    } else {
-                        s += "F";
-                    }
-                }
+            if (selected) {
+                printSegement(vp.getRestSegListMap().get(motif).get(i), 'T');
+            } else {
+                printSegement(vp.getRestSegListMap().get(motif).get(i), 'F');
+
             }
-            System.out.println(s);
+
+            ArrayList<Segment> marginSegments = vp.getRestSegListMap().get(motif).get(i).getSegmentMargins(3);
+
+            if (marginSegments.size() == 2) {
+                printSegement(marginSegments.get(0), '>');
+                printSegement(marginSegments.get(1), '<');
+            }
+            if (marginSegments.size() == 1) {
+                printSegement(marginSegments.get(0), '>');
+            }
         }
     }
+
 
 
     private void printLabledPos(Integer pos, String label, boolean above) {
@@ -401,6 +405,19 @@ public class ViewPointTest {
             if (l == relPosArr.size()) {
                 break;
             }
+        }
+        System.out.println(s);
+    }
+
+    private void printSegement(Segment segment, char symbol){
+
+        String s = new String("");
+
+        for(int i = 0; i< segment.getStartPos();i++) {
+             s += " ";
+        }
+        for(int i = 0; i<segment.length();i++) {
+            s += symbol;
         }
         System.out.println(s);
     }

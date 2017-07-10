@@ -154,7 +154,7 @@ public class ViewPoint {
 
         for (int i = 0; i < cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size() - 1; j++) {
-                Segment restFrag = new Segment(referenceSequenceID, cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j), cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1, genomicPos,false);
+                Segment restFrag = new Segment(referenceSequenceID, relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)), relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1),false);
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }
@@ -393,8 +393,8 @@ public class ViewPoint {
         // find the index of the fragment that contains genomicPos
         Integer genomicPosFragIdx=-1;
         for(int i=0; i<restSegListMap.get(motif).size(); i++) {
-            Integer fragStaPos=relToAbsPos(restSegListMap.get(motif).get(i).getStartPos());
-            Integer fragEndPos=relToAbsPos(restSegListMap.get(motif).get(i).getEndPos());
+            Integer fragStaPos=restSegListMap.get(motif).get(i).getStartPos();
+            Integer fragEndPos=restSegListMap.get(motif).get(i).getEndPos();
             if(fragStaPos<genomicPos && genomicPos<fragEndPos){
                 genomicPosFragIdx=i;break;
             }
@@ -461,7 +461,6 @@ public class ViewPoint {
             // set fragment to false, if the repetitive content is higher than a given threshold
             restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
             if(maxRepFrag<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
-                System.out.println(i + "\t" + restSegListMap.get(motif).get(i).getRepetitiveContent());
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
@@ -479,7 +478,7 @@ public class ViewPoint {
         // set start position of the viewpoint to start position of the most upstream fragment
         for (int i = 0; i<restSegListMap.get(motif).size(); i++) {
             if(restSegListMap.get(motif).get(i).getSelected()==true) {
-                setStartPos(relToAbsPos(restSegListMap.get(motif).get(i).getStartPos()));
+                setStartPos(restSegListMap.get(motif).get(i).getStartPos());
                 break;
             }
         }
@@ -487,7 +486,7 @@ public class ViewPoint {
         // set end position of the viewpoint to end position of the most downstream fragment
         for (int i = restSegListMap.get(motif).size()-1; 0<i; i--) {
             if(restSegListMap.get(motif).get(i).getSelected()==true) {
-                setEndPos(relToAbsPos(restSegListMap.get(motif).get(i).getEndPos()));
+                setEndPos(restSegListMap.get(motif).get(i).getEndPos());
                 break;
             }
         }
