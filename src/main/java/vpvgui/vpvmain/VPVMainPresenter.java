@@ -7,12 +7,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.analysisPane.VPAnalysisPresenter;
+import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.help.HelpPresenter;
 import vpvgui.gui.help.HelpViewFactory;
@@ -139,6 +142,10 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML
     private Tab analysistab;
+    /** Tab for the viewpoints (will show statistics and a table with individual viewpoints. */
+    @FXML private Tab viewpointTableTab;
+    /** Tab to show a selected viewpoint in a browser. */
+    @FXML private Tab singleviewpointTab;
 
     /**
      * Click this to choose the restriction enzymes with which to do the captuyre Hi-C cutting
@@ -181,8 +188,27 @@ public class VPVMainPresenter implements Initializable {
 
         }));
 
+        VPAnalysisView vpaView = new VPAnalysisView();
+        Tab t = new Tab();
+        Pane p = new Pane();
+
+
+        this.analysistab  = createTab(vpaView,"ViewPoint analysis");
+        /*VPAnalysisPresenter vpa = new VPAnalysisPresenter();
+        VPAnalysisView vp = new VPAnalysisView();
+        vp.set
+        this.analysistab.setContent(new VPAnalysisView());
+        //getContent().=new VPAnalysisPresenter();
+
         // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
-        // textLabel.textProperty().bind(textTextField.textProperty());
+        // textLabel.textProperty().bind(textTextField.textProperty());*/
+    }
+
+    private Tab createTab(Node content, String caption) {
+        Tab tab = new Tab();
+        tab.setContent(content);
+        tab.setText(caption);
+        return tab;
     }
 
     /**
@@ -298,7 +324,8 @@ public class VPVMainPresenter implements Initializable {
 
     public void createCaptureProbes() {
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
-        selectionModel.select(analysistab);
+        System.out.println("createCaptureProbes setting tab");
+        selectionModel.select(this.analysistab);
     }
 
     public void closeWindow() {

@@ -23,10 +23,13 @@ public class VPVGene {
     private boolean forward;
     /** this will keep count of the transcript start site position we have already seen
      * in order to avoid entering duplicate ViewPoint objects.
+     * The set then has all TSS (unique)
      */
     private Set<Integer> seenPositions;
 
     private List<ViewPoint> viewPointList;
+
+    private List<Integer> tssList;
 
     public VPVGene(String geneid, String symbol) {
         try {
@@ -36,6 +39,7 @@ public class VPVGene {
         }
         this.geneSymbol=symbol;
         this.viewPointList=new ArrayList<>();
+        this.tssList=new ArrayList<>();
         this.seenPositions=new HashSet<>();
     }
 
@@ -43,7 +47,8 @@ public class VPVGene {
         this.chromosome=c;
     }
 
-    /** Transform a Jannovar TranscriptModel to a VPVGene. */
+    /** Transform a Jannovar TranscriptModel to a VPVGene.
+     * TODO -- chromosomen stimmen fuer Maus nicht*/
     public static VPVGene geneFactory(TranscriptModel tmod) {
         VPVGene vpvg = new VPVGene(tmod.getGeneID(),tmod.getGeneSymbol());
         int c =tmod.getChr();

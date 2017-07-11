@@ -75,9 +75,8 @@ public class JannovarGeneGenerator {
             return null;
         }
         if (genelst==null) {
-            ErrorWindow.display("Error", "Attempt to validate an empty gene list. "+
-                    "Please upload file with gene symbols prior to validation");
-            return null;
+            System.err.println("[ERROR] First initialize the gene list and then runm this test");
+            System.exit(1);
         }
         this.invalidGeneSymbols = new HashSet<>();
         this.validGeneSymbols = new HashSet<>();

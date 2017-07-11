@@ -262,7 +262,7 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
-
+    /** TODO -- stimmt nicht fuer Maus */
     private String getChromosomeString(int c) {
          if (c>0 && c<23) {
             return String.format("chr%d",c);
