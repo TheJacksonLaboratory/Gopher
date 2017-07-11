@@ -8,9 +8,8 @@ import vpvgui.model.project.JannovarGeneGenerator;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 /**
  * Created by peterrobinson on 7/11/17.
@@ -27,8 +26,30 @@ public class TestViewPointCreation {
     entsprechend anpassen
      */
     @Test public void createProbesTest() throws Exception {
-        String transcriptfile= "???";// Path to Jannovar file ucsc_hg37.ser etc
-        List<String> symbols=null;///?????? - diese Liste mit Genesymbolen befuellen
+
+        // fill list of gene symbols from file
+        Integer maxNumOfSymbols=5;
+        Integer numOfSymbols=0;
+        ArrayList<String> symbols = new ArrayList<String>();
+        String transcriptfile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser";// Path to Jannovar file ucsc_hg37.ser etc
+        Scanner s = new Scanner(new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/genelistsample.txt"));
+        //Scanner s = new Scanner(new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"));
+        while (s.hasNext()) {
+            symbols.add(s.next());
+            numOfSymbols++;
+            if (numOfSymbols == maxNumOfSymbols) {
+                break;
+            }
+        }
+        s.close();
+
+        /*
+        // write list of gene symbols
+        Iterator<String> symbolsIterator = symbols.iterator();
+        while (symbolsIterator.hasNext()) {
+            System.out.println(symbolsIterator.next());
+        }
+        */
 
         int maxDistToGenomicPosUp = 200;// ??? Man wuerde diesen Wert vom GUI bekommen
         int maxDistToGenomicPosDown=200; // ???
@@ -36,7 +57,7 @@ public class TestViewPointCreation {
         List<VPVGene> vpvgenelist;
 
         if (transcriptfile==null) {
-            ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes");
+            ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes.");
             return;
         }
 
@@ -93,6 +114,19 @@ public class TestViewPointCreation {
         }
     }
 
+    private String getChromosomeStringMouse(int c) {
+        if (c>0 && c<23) {
+            return String.format("chr%d",c);
+        } else if (c==23) {
+            return "chrX";
+        } else if (c==24) {
+            return "chrY";
+        } else if (c==25) {
+            return "chrM";
+        } else {
+            return "???(Could not parse chromosome)";
+        }
+    }
 
 
     private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {
