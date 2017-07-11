@@ -61,6 +61,10 @@ public class JannovarTranscriptFileBuilder {
         setJannovarFileName();
     }
 
+    /** Initializes ther path where jannovar while be downloaded to. The path consists of the
+     * absolute paht to the directory chosen by the user and then a file name such as
+     * {@code hg38_ucsc.ser}.
+     */
     private void setJannovarFileName() {
         if (genomedatabase.equals("ucsc")) {
             if (genomebuild.equals("hg19")) {
@@ -69,6 +73,8 @@ public class JannovarTranscriptFileBuilder {
                 this.jannovarFileName =  this.downloaddir.getAbsolutePath() + File.separator + "hg38_ucsc.ser";
             } else if (genomebuild.equals("mm10")) {
                 this.jannovarFileName =  this.downloaddir.getAbsolutePath() + File.separator + "mm10_ucsc.ser";
+            } else if (genomebuild.equals("mm9")) {
+                this.jannovarFileName=this.downloaddir.getAbsolutePath() + File.separator + "mm9_ucsc.ser";
             }
         }
     }
@@ -85,7 +91,7 @@ public class JannovarTranscriptFileBuilder {
 
     /** Start a task to let the Jannovar download run.*/
     public void runJannovar() {
-          Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
+        Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
         Scene scene = new Scene(new Group());
         taskUpdateStage.setTitle("Jannovar download");
         taskUpdateStage.setWidth(400);

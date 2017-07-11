@@ -50,7 +50,12 @@ public class HelpViewFactory {
     private static String getHTML() {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body><h3>VPV Help</h3>");
-
+        sb.append("<p>VPV (<i>ViewPoint Viewer</i>) is designed to facilitate the design of Viewpoints for capture Hi-C and related"+
+        " methods by visualizing the restriction fragments that surround the one or multiple transcription"+
+        "start sites of a gene in the context of their genomic position and repat content."+
+        " Users can choose from several restriction enzymes and set a number of parameters that are explained below.</p>");
+        sb.append("<p><b>Genome Build</b>VPV currently supports hg37, hg38 and mm10. Choosing a genome build with the pull down menu" +
+                "will determine which files are downloaded by the Genome and Transcripts buttons.</p>");
         sb.append("</body></html>");
         return sb.toString();
 

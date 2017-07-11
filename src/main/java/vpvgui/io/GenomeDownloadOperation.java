@@ -3,13 +3,18 @@ package vpvgui.io;
 import java.io.File;
 
 /**
+ * This class encapsulates the operation of checking whether we have already
+ * downloaded a requested genome. We assume that there will be a file called
+ * {@code chromFa.tar.gz} and/or individual iunpacked chromosome files ({@code chr1.fa} etc.)
+ * in the directory of the user has previously downloaded the genome.  Note that the user is
+ * responsible for choosing the right directory.
+ * * @author Peter N Robinson
+ * @version 0.0.2 (July 11, 2017)
  * Created by robinp on 5/3/17.
  */
-public class UCSChg37Operation implements Operation {
+public class GenomeDownloadOperation implements Operation {
 
     private String directoryPath=null;
-    /** Location of the UCSC hg37 genome sequence, which is a tar archive with one file per chromosome. */
-    private static final String urlstring = "http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz";
     /** Basename of the file that we will store to disk */
     private static final String localFilename = "chromFa.tar.gz";
 
@@ -17,7 +22,7 @@ public class UCSChg37Operation implements Operation {
      * Download Entrez genes file to given dataDir
      * @param path path to directory where we want to download.
      */
-    public UCSChg37Operation(String path) {
+    public GenomeDownloadOperation(String path) {
         this.directoryPath=path;
     }
 

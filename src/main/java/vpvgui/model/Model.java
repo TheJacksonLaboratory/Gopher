@@ -1,9 +1,11 @@
 package vpvgui.model;
 
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.model.project.VPVGene;
+import vpvgui.model.project.ViewPoint;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class Model {
         return transcriptsBasename;
     }
 
-    public String repeatsURL = null;
+    //public String repeatsURL = null;
 
     public Settings getSettings() {
         return settings;
@@ -111,15 +113,11 @@ public class Model {
     private void initializeEnzymesFromFile() {
         enzymelist = new ArrayList<>();
         String fileName = "enzymelist.tab";
-        //InputStream s = Model.class.getClassLoader().getResourceAsStream("/data/enzymelist.tab");
         File file = new File(getClass().getClassLoader().getResource("enzymelist.tab").getFile());
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
-
             String line;
-
             while ((line = br.readLine()) != null) {
-
                 //System.err.println(line);
                 if (line.startsWith("#"))
                     continue; /* skip header*/
@@ -127,9 +125,7 @@ public class Model {
                 RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 enzymelist.add(re);
             }
-
             br.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,6 +142,10 @@ public class Model {
             this.datasource = DataSource.createUCSChg19();
         } else if (gb.equals("UCSC-hg38")) {
             this.datasource = DataSource.createUCSChg38();
+        } else if (gb.equals("UCSC-mm9")) {
+            this.datasource = DataSource.createUCSCmm9();
+        } else if (gb.equals("UCSC-mm10")) {
+            this.datasource = DataSource.createUCSCmm10();
         } else {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
         }
@@ -170,5 +170,28 @@ public class Model {
         for (VPVGene vg : geneList) {
             System.err.println(vg);
         }
+    }
+
+    public List<ViewPoint> getViewPointList() {
+        List<ViewPoint> vplist = new ArrayList<>();
+        Integer maxDistToGenomicPosUp=200;
+        Integer maxDistToGenomicPosDown=200;
+        String[] cutPat=new String[1];
+        cutPat[0] = "ACT";
+        IndexedFastaSequenceFile dummyFile=null;//TODO
+        for (VPVGene vpvg:this.geneList) {
+            List<Integer> tsslist = vpvg.getTSSlist();
+            String refSeqID = vpvg.getChromosome();
+            for (Integer i : tsslist) {
+                ViewPoint vp = new ViewPoint(refSeqID,i,maxDistToGenomicPosUp,maxDistToGenomicPosDown);
+                vplist.add(vp);
+            }
+        }
+            return vplist;
+    }
+
+    /** @return true if we have at least one VPVGene (which contain ViewPoints). */
+    public boolean viewpointsInitialized() {
+        return (this.geneList!=null && this.geneList.size()>0);
     }
 }

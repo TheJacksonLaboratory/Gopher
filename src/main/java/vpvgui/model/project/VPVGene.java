@@ -43,9 +43,19 @@ public class VPVGene {
         this.seenPositions=new HashSet<>();
     }
 
+    public List<Integer> getTSSlist() {
+        List<Integer> lst = new ArrayList<>();
+        lst.addAll(this.seenPositions);
+        return lst;
+    }
+
     public void setChromosome(String c) {
         this.chromosome=c;
     }
+    public String getChromosome() { return this.chromosome; }
+
+    public String getGeneSymbol() { return this.geneSymbol;}
+    public Integer getGeneID() { return this.entrezGeneID;}
 
     /** Transform a Jannovar TranscriptModel to a VPVGene.
      * TODO -- chromosomen stimmen fuer Maus nicht*/

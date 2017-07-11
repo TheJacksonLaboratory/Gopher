@@ -31,7 +31,7 @@ public class SettingsIO {
         List<String> projectNames = new ArrayList<>();
         int suffixStart;
 
-        if (!(settingsDir == null || (filesInDir = settingsDir.list()) == null)) {
+        if (settingsDir != null && (filesInDir = settingsDir.list()) != null) {
             for (String s : filesInDir) {
                 suffixStart = s.indexOf(Model.PROJECT_FILENAME_SUFFIX);
                 if (suffixStart > 0) {
@@ -50,8 +50,6 @@ public class SettingsIO {
      * @return Settings for specified project
      */
     public static Settings loadSettings(String projectName) throws IOException {
-//        File projectSettingsPath = new File(getVPVDir().getAbsolutePath()
-//                + File.separator + projectName + Model.PROJECT_FILENAME_SUFFIX);
         File projectSettingsPath = new File(getVPVDir(),
                 projectName + Model.PROJECT_FILENAME_SUFFIX);
         if (!projectSettingsPath.exists()) {
@@ -70,18 +68,18 @@ public class SettingsIO {
         String projName = model.getSettings().getProjectName();
 
         if (projName == null || projName.isEmpty()) {
-            throw new IOException("[SettingsIO.saveSettings] Cannot save settings without project name. Exiting.");
+            throw new IOException("[SettingsIO.saveSettings] Cannot save settings without project name.");
         }
 
         // getVPVDir returns null if user's platform is unrecognized.
         if (settingsDir == null) {
-            throw new IOException("[SettingsIO.saveSettings] Directory for settings files is null. Exiting.");
+            throw new IOException("[SettingsIO.saveSettings] Directory for settings files is null.");
         }
 
         // Check whether directory already exists; if not, create it.
         if (!(settingsDir.exists() || settingsDir.mkdir())) {
             throw new IOException("[SettingsIO.saveSettings] Cannot create directory for settings files: " +
-                    settingsDir.getPath() + " ; exiting.");
+                    settingsDir.getPath() + ".");
         }
 
         File projectSettingsPath = new File(settingsDir,
@@ -91,7 +89,7 @@ public class SettingsIO {
             projectSettingsPath.createNewFile();
         } catch (IOException e) {
             throw new IOException("[SettingsIO.saveSettings] Cannot create settings file: " +
-                    projectSettingsPath.getPath() + " ; exiting.");
+                    projectSettingsPath.getPath() + ".");
         }
 
         // If .vpvgui directory previously contained a settings file for this project,

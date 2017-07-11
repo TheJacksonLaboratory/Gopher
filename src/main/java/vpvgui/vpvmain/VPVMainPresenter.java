@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -63,13 +64,13 @@ public class VPVMainPresenter implements Initializable {
      * List of genome+gene files for download. Used by genomeChoiceBox
      */
     @FXML
-    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("UCSC-hg19", "UCSC-hg38", "UCSC-mm10");
+    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("UCSC-hg19", "UCSC-hg38", "UCSC-mm9","UCSC-mm10");
 
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
 
-    @FXML
-    private ChoiceBox<String> geneDefinitionsChoiceBox;
+    //@FXML
+    //private ChoiceBox<String> geneDefinitionsChoiceBox;
     /**
      * Clicking this button downloads the genome build and unpacks it.
      */
@@ -132,6 +133,9 @@ public class VPVMainPresenter implements Initializable {
     private TabPane tabpane;
 
     @FXML
+    private AnchorPane analysisPane;
+
+    @FXML
     private Tab setuptab;
 
     @FXML
@@ -148,20 +152,19 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Tab singleviewpointTab;
 
     /**
-     * Click this to choose the restriction enzymes with which to do the captuyre Hi-C cutting
+     * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting
      */
     @FXML
     private Button chooseEnzymeButton;
+
+
+    private VPAnalysisPresenter vpanalysispresenter;
+    private VPAnalysisView vpanalysisview;
 
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
         closeWindow();
-    }
-
-    @FXML
-    void showButtonClicked(ActionEvent event) {
-        System.out.println("Content: " + textTextField.getText());
     }
 
     @Override
@@ -185,31 +188,25 @@ public class VPVMainPresenter implements Initializable {
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
             setGenomeBuild(newValue);
-
         }));
 
-        VPAnalysisView vpaView = new VPAnalysisView();
-        Tab t = new Tab();
-        Pane p = new Pane();
 
+        this.vpanalysisview = new VPAnalysisView();
+        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
 
-        this.analysistab  = createTab(vpaView,"ViewPoint analysis");
-        /*VPAnalysisPresenter vpa = new VPAnalysisPresenter();
-        VPAnalysisView vp = new VPAnalysisView();
-        vp.set
-        this.analysistab.setContent(new VPAnalysisView());
-        //getContent().=new VPAnalysisPresenter();
+        createPanes();
+
 
         // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
         // textLabel.textProperty().bind(textTextField.textProperty());*/
     }
 
-    private Tab createTab(Node content, String caption) {
-        Tab tab = new Tab();
-        tab.setContent(content);
-        tab.setText(caption);
-        return tab;
+    private void createPanes() {
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
+        /* todo -- analogous for other tabs/p[anes.*/
     }
+
+
 
     /**
      * Initialize the bindings to Java bean properties in the model with
@@ -222,14 +219,15 @@ public class VPVMainPresenter implements Initializable {
     }
 
     private void setGenomeBuild(String newValue) {
-        System.out.println("I am getting newValue=" + newValue);
-        System.out.println("The model should have been set to this by binding, " + model.getGenomeBuild());
+        //System.out.println("I am getting newValue=" + newValue);
+        //System.out.println("The model should have been set to this by binding, " + model.getGenomeBuild());
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
-
+            ErrorWindow.display("Error getting genome path",e.toString());
+            return;
         }
-        /* The model will directly update the settings object to reflect
+        /* The model directly updates the settings object to reflect
         the genome build etc, and the following command will save the settings to disk.
          */
         try {
@@ -241,7 +239,6 @@ public class VPVMainPresenter implements Initializable {
 
     public void downloadGenome() {
 
-        //String genome = this.genomeChoiceBox.getValue();
         String genome = this.model.getGenomeURL();
         genome = this.genomeChoiceBox.getValue();
         try {
@@ -250,12 +247,12 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error", e.getMessage());
             return;
         }
-        /** The Model should now be set to hg19,hg38 or mm10 etc.*/
+        /** The Model should now be set to hg19, hg38, mm9, or mm10 etc.*/
 
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        Operation op = new UCSChg37Operation(file.getPath());
+        Operation op = new GenomeDownloadOperation(file.getPath());
         Downloader downloadTask = new Downloader(file, model.getGenomeURL(), model.getGenomeBasename(), genomeDownloadPI);
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);
@@ -300,7 +297,7 @@ public class VPVMainPresenter implements Initializable {
 
 
     }
-
+    /* TODO -- complete me */
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
@@ -325,6 +322,8 @@ public class VPVMainPresenter implements Initializable {
     public void createCaptureProbes() {
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
         System.out.println("createCaptureProbes setting tab");
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.showVPTable();
         selectionModel.select(this.analysistab);
     }
 
@@ -352,15 +351,7 @@ public class VPVMainPresenter implements Initializable {
 
 
     public void showSettingsOfCurrentProject() {
-
         SettingsViewFactory.showSettings(model.getSettings());
-
-       /* Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Settings");
-        alert.setHeaderText("Look, an Information Dialog");
-        alert.setContentText(this.model.getSettings().toString());
-
-        alert.showAndWait();*/
     }
 
     /**

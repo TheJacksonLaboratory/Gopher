@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.enzymebox.EnzymeBoxPresenter">
+   <children>
+      <Label text="Choose restriction enzyme" />
+      <CheckBox layoutX="14.0" layoutY="37.0" mnemonicParsing="false" text="CheckBox" />
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+   </children>
+</AnchorPane>
