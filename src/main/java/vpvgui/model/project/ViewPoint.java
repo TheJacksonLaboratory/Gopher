@@ -244,8 +244,15 @@ public class ViewPoint {
         return restSegListMap;
     }
 
-
-
+    public final ArrayList<Segment> getSelectedRestSegList(String cuttingMotif) {
+        ArrayList<Segment> selectedRestSegList = new ArrayList<Segment>();
+        for(Segment seg : restSegListMap.get(cuttingMotif)) {
+            if(seg.getSelected()==true) {
+                selectedRestSegList.add(seg);
+            }
+        }
+        return selectedRestSegList;
+    }
 
 
     /* wrapper/helper functions */
