@@ -362,7 +362,6 @@ public class ViewPointTest {
     }
 
 
-
     private void printLabledPos(Integer pos, String label, boolean above) {
 
         Integer labelOffset = label.length() / 2;

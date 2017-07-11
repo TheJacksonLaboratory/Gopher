@@ -18,7 +18,7 @@ public class VPVGene {
 
     private String geneSymbol=null;
 
-    private String chromosome=null;
+    private String referenceSequenceID=null;
 
     private boolean forward;
     /** this will keep count of the transcript start site position we have already seen
@@ -50,7 +50,7 @@ public class VPVGene {
     }
 
     public void setChromosome(String c) {
-        this.chromosome=c;
+        this.referenceSequenceID=c;
     }
     public String getChromosome() { return this.chromosome; }
 
@@ -58,7 +58,7 @@ public class VPVGene {
     public Integer getGeneID() { return this.entrezGeneID;}
 
     /** Transform a Jannovar TranscriptModel to a VPVGene.
-     * TODO -- chromosomen stimmen fuer Maus nicht*/
+     * TODO -- referenceSequenceIDn stimmen fuer Maus nicht*/
     public static VPVGene geneFactory(TranscriptModel tmod) {
         VPVGene vpvg = new VPVGene(tmod.getGeneID(),tmod.getGeneSymbol());
         int c =tmod.getChr();
@@ -102,7 +102,7 @@ public class VPVGene {
         if (forward) {
             strand="+";
         }
-        sb.append(String.format("%s [%s,%s]",geneSymbol,chromosome,strand));
+        sb.append(String.format("%s [%s,%s]",geneSymbol,referenceSequenceID,strand));
         if (this.viewPointList==null || this.viewPointList.size()==0) {
             sb.append("\nError: No View points");
         } else {
@@ -112,6 +112,18 @@ public class VPVGene {
         }
         sb.append("\n");
         return sb.toString();
+    }
+
+    public List<ViewPoint> getviewPointList(){
+        return viewPointList;
+    }
+    
+    public String getReferenceSequenceID() {
+        return  referenceSequenceID;
+    }
+
+    public String getGeneSymbol() {
+        return geneSymbol;
     }
 
 }

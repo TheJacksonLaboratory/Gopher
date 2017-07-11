@@ -96,7 +96,7 @@ public class CuttingPositionMap {
         uniqueSet.addAll(cuttingPositionListUnion);
         cuttingPositionListUnion.clear();
         cuttingPositionListUnion.addAll(uniqueSet);
-        Collections.sort(cuttingPositionListUnion); // sort
+        Collections.sort(cuttingPositionListUnion);
         cuttingPositionMap.put("ALL",cuttingPositionListUnion); // push array list to map
     }
 
