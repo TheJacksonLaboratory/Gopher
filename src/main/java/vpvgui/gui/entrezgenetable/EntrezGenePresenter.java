@@ -197,7 +197,7 @@ public class EntrezGenePresenter implements Initializable {
             String line =null;
             while ((line=br.readLine())!=null) {
                 //System.out.println(line);
-                symbols.add(line.trim().toUpperCase());
+                symbols.add(line.trim());
             }
         } catch (IOException err) {
             err.printStackTrace();

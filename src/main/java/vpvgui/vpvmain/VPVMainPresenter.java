@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import vpvgui.exception.DownloadFileNotFoundException;
@@ -18,7 +17,6 @@ import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
-import vpvgui.gui.help.HelpPresenter;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
@@ -299,7 +297,6 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         String jannovarSerializedFilePath = builder.getSerializedFilePath();
-        System.out.println("PATH=" + jannovarSerializedFilePath);
         this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
         try {
             saveSettings();
@@ -333,7 +330,6 @@ public class VPVMainPresenter implements Initializable {
 
     public void createCaptureProbes() {
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
-        System.out.println("createCaptureProbes setting tab");
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.showVPTable();
         selectionModel.select(this.analysistab);
@@ -376,7 +372,6 @@ public class VPVMainPresenter implements Initializable {
 
 
     @FXML public void showHelpWindow(ActionEvent e) {
-        System.out.println("Calling help");
         HelpViewFactory.display();
     }
 

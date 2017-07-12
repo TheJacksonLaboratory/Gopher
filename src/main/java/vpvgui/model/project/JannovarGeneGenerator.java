@@ -117,9 +117,10 @@ public class JannovarGeneGenerator {
         } catch (JannovarException e) {
             e.printStackTrace();
         }
-       /* for (String tm:transcriptmap.keySet()) {
+       for (String tm:transcriptmap.keySet()) {
             System.err.println(tm);
-        }*/
+            System.err.println(transcriptmap.get(tm));
+        }
         return transcriptmap;
     }
 
