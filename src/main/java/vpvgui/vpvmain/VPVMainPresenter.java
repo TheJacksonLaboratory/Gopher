@@ -253,6 +253,18 @@ public class VPVMainPresenter implements Initializable {
         dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         Operation op = new GenomeDownloadOperation(file.getPath());
+        if (file==null || file.getAbsolutePath()=="") {
+            ErrorWindow.display("Error","Could not get path to download genome.");
+            return;
+        }
+        if (model.getGenomeURL()==null || model.getGenomeURL().isEmpty()) {
+            ErrorWindow.display("Error","Genome URL (UCSC address) not initialized");
+            return;
+        }
+        if (model.getGenomeBasename()==null || model.getGenomeBasename().isEmpty()) {
+            ErrorWindow.display("Error","Genome Basename (usually chromFa.tar.gz) not initialized");
+            return;
+        }
         Downloader downloadTask = new Downloader(file, model.getGenomeURL(), model.getGenomeBasename(), genomeDownloadPI);
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);

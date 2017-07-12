@@ -60,12 +60,10 @@ public class SettingsViewFactory {
         sb.append("<p><ul>");
         sb.append(String.format("<li>Project name: %s</li>",settings.getProjectName()));
 
-        sb.append(String.format("<li>Genome file source: %s</li>", settings.getGenomeFileFrom()));
-        sb.append(String.format("<li>Transcripts file source: %s</li>", settings.getTranscriptsFileFrom()));
-        sb.append(String.format("<li>Repeats file source: %s</li>", settings.getRepeatsFileFrom()));
-        sb.append(String.format("<li>Genome file destination: %s</li>", settings.getGenomeFileTo()));
+        sb.append(String.format("<li>Genome file source: %s</li>", settings.getGenomeFileURL()));
+        sb.append(String.format("<li>Transcripts file source: %s</li>", settings.getTranscriptsJannovarName()));
+        sb.append(String.format("<li>Genome file destination: %s</li>", settings.getGenomeFileBasename()));
         sb.append(String.format("<li>Transcripts file destination: %s</li>", settings.getTranscriptsFileTo()));
-        sb.append(String.format("<li>Repeats file destination: %s</li>", settings.getRepeatsFileTo()));
         sb.append("<li>"+toStringHelper("Restriction Enzymes", settings.getRestrictionEnzymesList())+"</li>");
         sb.append("<li>"+toStringHelper("Target Genes", settings.getTargetGenesList())+"</li>");
 

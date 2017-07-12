@@ -52,7 +52,7 @@ public class VPVGene {
     public void setChromosome(String c) {
         this.referenceSequenceID=c;
     }
-    public String getChromosome() { return this.chromosome; }
+    public String getChromosome() { return this.referenceSequenceID; }
 
     public String getGeneSymbol() { return this.geneSymbol;}
     public Integer getGeneID() { return this.entrezGeneID;}
@@ -120,10 +120,6 @@ public class VPVGene {
     
     public String getReferenceSequenceID() {
         return  referenceSequenceID;
-    }
-
-    public String getGeneSymbol() {
-        return geneSymbol;
     }
 
 }

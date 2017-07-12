@@ -9,10 +9,7 @@ import vpvgui.model.project.ViewPoint;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Stream;
 
 /**
  * Created by peter on 05.05.17.
@@ -68,7 +65,8 @@ public class Model {
     public String genomeBasename = null;
 
     public String getGenomeBasename() {
-        return genomeBasename;
+        System.out.println("Get genome banesfrom from Model=" + settings.getGenomeFileBasename());
+        return this.settings.getGenomeFileBasename();
     }
 
     public String transcriptsURL = null;
@@ -150,8 +148,8 @@ public class Model {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
         }
         this.genomeURL = datasource.getGenomeURL();
-        this.settings.setGenomeFileFrom(this.genomeURL);
-        this.settings.setGenomeFileTo(this.genomeBasename);
+        this.settings.setGenomeFileURL(this.genomeURL);
+        this.settings.setGenomeFileBasename(this.genomeBasename);
         //this.transcriptsURL = datasource.getTranscriptsURL();
     }
 

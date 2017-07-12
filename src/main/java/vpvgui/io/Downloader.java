@@ -63,7 +63,9 @@ public class Downloader extends Task<Void> {
     protected File getLocalFilePath() { return  this.localFilePath; }
 
     protected void setLocalFilePath (String bname) {
+        System.err.println("setLocalFilepath bname="+bname);
         this.localFilePath = new File(this.localDir + File.separator + bname);
+        System.err.println("setLocalFilepath localFilePath="+localFilePath);
     }
 
    // public abstract boolean needToDownload();
@@ -106,7 +108,7 @@ public class Downloader extends Task<Void> {
     protected Void call()  {
         if (progress!=null)
             progress.setProgress(1.000); /* show progress as 100% */
-        System.err.println("[INFO] Downloading: \"" + urlstring + "\"");
+        System.out.println("[INFO] Downloading: \"" + urlstring + "\"");
 
         // The error handling can be improved with Java 7.
         String err = null;
@@ -119,9 +121,7 @@ public class Downloader extends Task<Void> {
         try {
             URL url = new URL(urlstring);
             URLConnection urlc = url.openConnection();
-            System.err.println("in try urlc="+urlc);
             reader = urlc.getInputStream();
-            System.err.println("in try reader = "+ reader.toString());
             System.out.println("URL host : "+ url.getHost() + "\n reader available="+reader.available());
             System.out.println("1 localFilePath="+localFilePath);
             writer = new FileOutputStream(localFilePath);

@@ -8,11 +8,8 @@ import vpvgui.model.Settings;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static vpvgui.io.SettingsIO.*;
-import static vpvgui.io.Platform.getVPVDir;
 
 /**
  * @author Hannah Blau (blauh), peter
@@ -35,12 +32,12 @@ public class SettingsIOTest {
         m = new Model();
         s = m.getSettings();
         s.setProjectName("SettingsIOTestProject");
-        s.setGenomeFileFrom("genomeFile.txt.gz");
-        s.setTranscriptsFileFrom("transcriptsFile.txt.gz");
+        s.setGenomeFileURL("genomeFile.txt.gz");
+        s.setTranscriptsJannovarName("transcriptsFile.txt.gz");
         File genomeFile = folder.newFile("mygenome");
         File transcriptFile = folder.newFile("mytranscripts");
         settingsPath = folder.newFile("testsettings");
-        s.setGenomeFileTo(genomeFile.getAbsolutePath());
+        s.setGenomeFileBasename(genomeFile.getAbsolutePath());
         s.setTranscriptsFileTo(transcriptFile.getAbsolutePath());
         ObservableList<String> rel = s.getRestrictionEnzymesList();
         ObservableList<String> tgl = s.getTargetGenesList();

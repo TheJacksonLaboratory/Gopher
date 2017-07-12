@@ -35,17 +35,14 @@ public class SettingsTest {
 
         s = Settings.factory();
         s.setProjectName("FancyProject");
-        s.setGenomeFileFrom("http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz");
-        s.setTranscriptsFileFrom("http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz");
-        s.setRepeatsFileFrom("http://hgdownload.soe.ucsc.edu/goldenPath/hg19/repeats.tar.gz");
+        s.setGenomeFileURL("http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz");
+        s.setTranscriptsJannovarName("http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz");
         File genomeFile = folder.newFile("mygenome");
         File transcriptFile = folder.newFile("mytranscripts");
         File repeatsFile = folder.newFile("myrepeats");
         File setttingsPath = folder.newFile("testsettings");
-        s.setGenomeFileTo(genomeFile.getAbsolutePath());
+        s.setGenomeFileBasename(genomeFile.getAbsolutePath());
         s.setTranscriptsFileTo(transcriptFile.getAbsolutePath());
-        s.setRepeatsFileTo(repeatsFile.getAbsolutePath());
-
         ObservableList<String> rel = s.getRestrictionEnzymesList();
         ObservableList<String> tgl = s.getTargetGenesList();
         for (int i = 0; i < 10; i++) {
@@ -85,11 +82,10 @@ public class SettingsTest {
         Settings t = Settings.factory();
 
         t.setProjectName("ANewFancyProject");
-        t.setGenomeFileFrom(genomeFrom.getAbsolutePath());
+        t.setGenomeFileURL(genomeFrom.getAbsolutePath());
         // leave transcriptFileFrom, repeatsFileFrom unspecified
-        t.setGenomeFileTo(genomeTo.getAbsolutePath());
+        t.setGenomeFileBasename(genomeTo.getAbsolutePath());
         // leave transcriptsFileTo unspecified
-        t.setRepeatsFileTo(repeatsTo.getAbsolutePath());
         // leave restrictionEnzymesList empty
         ObservableList<String> tgl = t.getTargetGenesList();
         for (int i = 0; i < 8; i++) {

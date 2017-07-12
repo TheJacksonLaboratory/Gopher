@@ -49,66 +49,56 @@ public class Settings implements Serializable {
 
     /* Path from which to download genome file
      */
-    private StringProperty genomeFileFrom = new SimpleStringProperty(this, "genomeFileFrom");
+    private StringProperty genomeFileURL = new SimpleStringProperty(this, "genomeFileURL");
 
-    public final String getGenomeFileFrom() {
-        return genomeFileFrom.getValue();
+    public final String getGenomeFileURL() {
+        return genomeFileURL.getValue();
     }
 
-    public final void setGenomeFileFrom(String gff) {
-        genomeFileFrom.setValue(gff);
+    public final void setGenomeFileURL(String gff) {
+        genomeFileURL.setValue(gff);
     }
 
-    public final StringProperty genomeFileFromProperty() {
-        return genomeFileFrom;
+    public final StringProperty genomeFileURLProperty() {
+        return genomeFileURL;
     }
 
     /* Path from which to download transcripts file
      */
-    private StringProperty transcriptsFileFrom = new SimpleStringProperty(this, "transcriptsFileFrom");
+    private StringProperty transcriptsJannovarName = new SimpleStringProperty(this, "transcriptsJannovarName");
 
-    public final String getTranscriptsFileFrom() {
-        return transcriptsFileFrom.getValue();
+    public final String getTranscriptsJannovarName() {
+        return transcriptsJannovarName.getValue();
     }
 
-    public final void setTranscriptsFileFrom(String tff) {
-        transcriptsFileFrom.setValue(tff);
+    public final void setTranscriptsJannovarName(String tff) {
+        transcriptsJannovarName.setValue(tff);
     }
 
-    public final StringProperty transcriptsFileFromProperty() {
-        return transcriptsFileFrom;
+    public final StringProperty transcriptsJannovarNameProperty() {
+        return transcriptsJannovarName;
     }
 
-    /* Path from which to download repeats file
+    /* Basename for the downloaded genome file. All of the UCSC files are called simply "chromFa.tar.gz", and this
+    * is the default value.
      */
-    private StringProperty repeatsFileFrom = new SimpleStringProperty(this, "repeatsFileFrom");
+    private StringProperty genomeFileBasename = new SimpleStringProperty(this, "genomeFileBasename","chromFa.tar.gz");
 
-    public final String getRepeatsFileFrom() {
-        return repeatsFileFrom.getValue();
+    public final String getGenomeFileBasename() {
+        return genomeFileBasename.getValue();
     }
 
-    public final void setRepeatsFileFrom(String rff) {
-        repeatsFileFrom.setValue(rff);
-    }
-
-    public final StringProperty repeatsFileFromProperty() {
-        return repeatsFileFrom;
-    }
-
-    /* Path where genome file should be stored
+    /** Set the genome file basename except if it is unspecified (in that case, use the default value
+     * of chromFa.tar.gz).
+     * @param gft
      */
-    private StringProperty genomeFileTo = new SimpleStringProperty(this, "genomeFileTo");
-
-    public final String getGenomeFileTo() {
-        return genomeFileTo.getValue();
+    public final void setGenomeFileBasename(String gft) {
+        if (gft==null || gft.isEmpty()) return;
+        if (!gft.equals(UNSPEC)) { genomeFileBasename.setValue(gft); }
     }
 
-    public final void setGenomeFileTo(String gft) {
-        genomeFileTo.setValue(gft);
-    }
-
-    public final StringProperty genomeFileToProperty() {
-        return genomeFileTo;
+    public final StringProperty genomeFileBasenameProperty() {
+        return genomeFileBasename;
     }
 
     /* Path where transcripts file should be stored
@@ -125,22 +115,6 @@ public class Settings implements Serializable {
 
     public final StringProperty transcriptsFileToProperty() {
         return transcriptsFileTo;
-    }
-
-    /* Path where repeats file should be stored
-     */
-    private StringProperty repeatsFileTo = new SimpleStringProperty(this, "repeatsFileTo");
-
-    public final String getRepeatsFileTo() {
-        return repeatsFileTo.getValue();
-    }
-
-    public final void setRepeatsFileTo(String rft) {
-         repeatsFileTo.setValue(rft);
-    }
-
-    public final StringProperty repeatsFileToProperty() {
-        return repeatsFileTo;
     }
 
     private ListProperty<String> restrictionEnzymesList =
@@ -176,12 +150,10 @@ public class Settings implements Serializable {
         Settings settings = (Settings) o;
 
         return getProjectName().equals(settings.getProjectName()) &&
-                getGenomeFileFrom().equals(settings.getGenomeFileFrom()) &&
-                getTranscriptsFileFrom().equals(settings.getTranscriptsFileFrom()) &&
-                getRepeatsFileFrom().equals(settings.getRepeatsFileFrom()) &&
-                getGenomeFileTo().equals(settings.getGenomeFileTo()) &&
+                getGenomeFileURL().equals(settings.getGenomeFileURL()) &&
+                getTranscriptsJannovarName().equals(settings.getTranscriptsJannovarName()) &&
+                getGenomeFileBasename().equals(settings.getGenomeFileBasename()) &&
                 getTranscriptsFileTo().equals(settings.getTranscriptsFileTo()) &&
-                getRepeatsFileTo().equals(settings.getRepeatsFileTo()) &&
                 getRestrictionEnzymesList().equals(settings.getRestrictionEnzymesList()) &&
                 getTargetGenesList().equals(settings.getTargetGenesList());
     }
@@ -189,12 +161,10 @@ public class Settings implements Serializable {
     @Override
     public int hashCode() {
         int result = getProjectName().hashCode();
-        result = 31 * result + getGenomeFileFrom().hashCode();
-        result = 31 * result + getTranscriptsFileFrom().hashCode();
-        result = 31 * result + getRepeatsFileFrom().hashCode();
-        result = 31 * result + getGenomeFileTo().hashCode();
+        result = 31 * result + getGenomeFileURL().hashCode();
+        result = 31 * result + getTranscriptsJannovarName().hashCode();
+        result = 31 * result + getGenomeFileBasename().hashCode();
         result = 31 * result + getTranscriptsFileTo().hashCode();
-        result = 31 * result + getRepeatsFileTo().hashCode();
         result = 31 * result + getRestrictionEnzymesList().hashCode();
         result = 31 * result + getTargetGenesList().hashCode();
         return result;
@@ -205,12 +175,10 @@ public class Settings implements Serializable {
         StringBuilder sb = new StringBuilder();
         //sb.append("Current settings:");
         sb.append(String.format("\nProject name: %s", makeHumanReadable(getProjectName())));
-        sb.append(String.format("\nGenome file source: %s", makeHumanReadable(getGenomeFileFrom())));
-        sb.append(String.format("\nTranscripts file source: %s", makeHumanReadable(getTranscriptsFileFrom())));
-        sb.append(String.format("\nRepeats file source: %s", makeHumanReadable(getRepeatsFileFrom())));
-        sb.append(String.format("\nGenome file destination: %s", makeHumanReadable(getGenomeFileTo())));
+        sb.append(String.format("\nGenome file source: %s", makeHumanReadable(getGenomeFileURL())));
+        sb.append(String.format("\nTranscripts file source: %s", makeHumanReadable(getTranscriptsJannovarName())));
+        sb.append(String.format("\nGenome file destination: %s", makeHumanReadable(getGenomeFileBasename())));
         sb.append(String.format("\nTranscripts file destination: %s", makeHumanReadable(getTranscriptsFileTo())));
-        sb.append(String.format("\nRepeats file destination: %s\n", makeHumanReadable(getRepeatsFileTo())));
         sb.append(toStringHelper("Restriction Enzymes", getRestrictionEnzymesList()));
         sb.append(toStringHelper("Target Genes", getTargetGenesList()));
         return sb.toString();
@@ -248,12 +216,10 @@ public class Settings implements Serializable {
         Settings settings = new Settings();
 
         settings.setProjectName("");
-        settings.setGenomeFileFrom("");
-        settings.setTranscriptsFileFrom("");
-        settings.setRepeatsFileFrom("");
-        settings.setGenomeFileTo("");
+        settings.setGenomeFileURL("");
+        settings.setTranscriptsJannovarName("");
+        settings.setGenomeFileBasename("");
         settings.setTranscriptsFileTo("");
-        settings.setRepeatsFileTo("");
         settings.setRestrictionEnzymesList(FXCollections.observableArrayList());
         settings.setTargetGenesList(FXCollections.observableArrayList());
         return settings;
@@ -283,22 +249,16 @@ public class Settings implements Serializable {
                         settings.setProjectName(makeComputerReadable(line.substring(colonIndex + 1).trim()));
                         break;
                     case "Genome file source" :
-                        settings.setGenomeFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        settings.setGenomeFileURL(makeComputerReadable(line.substring(colonIndex + 1).trim()));
                         break;
                     case "Transcripts file source" :
-                        settings.setTranscriptsFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
-                        break;
-                    case "Repeats file source" :
-                        settings.setRepeatsFileFrom(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        settings.setTranscriptsJannovarName(makeComputerReadable(line.substring(colonIndex + 1).trim()));
                         break;
                     case "Genome file destination" :
-                        settings.setGenomeFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
+                        settings.setGenomeFileBasename(makeComputerReadable(line.substring(colonIndex + 1).trim()));
                         break;
                     case "Transcripts file destination" :
                         settings.setTranscriptsFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
-                        break;
-                    case "Repeats file destination" :
-                        settings.setRepeatsFileTo(makeComputerReadable(line.substring(colonIndex + 1).trim()));
                         break;
                     case "Restriction Enzymes" :
                         readLst(line, br, settings.getRestrictionEnzymesList());
@@ -323,10 +283,9 @@ public class Settings implements Serializable {
      * @return true if object has no empty properties, false otherwise
      */
     public boolean isComplete() {
-        return !(getProjectName().isEmpty() || getGenomeFileFrom().isEmpty() ||
-                getTranscriptsFileFrom().isEmpty() || getRepeatsFileFrom().isEmpty() ||
-                getGenomeFileTo().isEmpty() || getTranscriptsFileTo().isEmpty() ||
-                getRepeatsFileTo().isEmpty() || getRestrictionEnzymesList().isEmpty() ||
+        return !(getProjectName().isEmpty() || getGenomeFileURL().isEmpty() ||
+                getTranscriptsJannovarName().isEmpty() || getGenomeFileBasename().isEmpty() ||
+                getTranscriptsFileTo().isEmpty() || getRestrictionEnzymesList().isEmpty() ||
                 getTargetGenesList().isEmpty());
     }
 
