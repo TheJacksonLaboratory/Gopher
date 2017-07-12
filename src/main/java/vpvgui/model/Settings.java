@@ -268,7 +268,7 @@ public class Settings implements Serializable {
                         break;
                     default :
                         System.out.println("[Settings.factory] Did not recognize setting: " + line);
-                        return null;
+                        //return null; JUST WARN, do not return NULL!
                 } // end switch
             } // end while
         } catch (IOException e) {
