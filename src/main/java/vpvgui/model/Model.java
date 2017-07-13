@@ -24,6 +24,8 @@ public class Model {
     private List<VPVGene> geneList;
     /** Settings for the current project. */
     private Settings settings;
+    /** Directory to which the Genome was downloaded */
+    private String genomeDirectoryPath=null;
 
     /**
      * This suffix is appended to the project name to get the name of the file for storing the
@@ -106,6 +108,12 @@ public class Model {
     public void setRestrictionEnzymes(List<RestrictionEnzyme> lst){
         this.enzymelist=lst;
     }
+
+    public void setGenomeDirectoryPath(String p) { this.genomeDirectoryPath=p;}
+    public void setGenomeDirectoryPath(File f) { this.genomeDirectoryPath=f.getAbsolutePath();}
+    public String getGenomeDirectoryPath() { return this.genomeDirectoryPath;}
+
+
 
     /**
      * This method expects there to be a file called enzymelist.tab in

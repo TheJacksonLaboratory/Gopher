@@ -1,6 +1,8 @@
 package vpvgui.gui.entrezgenetable;
 
+import de.charite.compbio.jannovar.data.Chromosome;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
+import de.charite.compbio.jannovar.reference.Strand;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.event.ActionEvent;
@@ -78,7 +80,7 @@ public class EntrezGenePresenter implements Initializable {
     }
 
 
-
+    private JannovarGeneGenerator jgg =null;
 
 
 
@@ -124,7 +126,7 @@ public class EntrezGenePresenter implements Initializable {
             ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes");
             return;
         }
-        JannovarGeneGenerator jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
+        this.jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
         /* key is a gene symbol,and value is a listof corresponding transcripts. */
         this.validGenes2TranscriptsMap = jgg.checkGenes(this.symbols);
         List<String>  validGeneSymbols = jgg.getValidGeneSymbols();
@@ -262,19 +264,9 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
-    /** TODO -- stimmt nicht fuer Maus */
+    /** Use the Jannovar Gene Generator object to get the correct chromosome string, e.g., chrX */
     private String getChromosomeString(int c) {
-         if (c>0 && c<23) {
-            return String.format("chr%d",c);
-        } else if (c==23) {
-            return "chrX";
-        } else if (c==24) {
-            return "chrY";
-        } else if (c==25) {
-            return "chrM";
-        } else {
-            return "???(Could not parse chromosome)";
-        }
+         return this.jgg.chromosomeId2Name(c);
     }
 
     @FXML public void acceptGenes() {
@@ -303,9 +295,9 @@ public class EntrezGenePresenter implements Initializable {
                 GenomeInterval iv = tmod.getTXRegion();
                 Integer pos=null;
                 if (tm.getStrand().isForward()) {
-                    pos = iv.getBeginPos();
+                    pos = iv.getGenomeBeginPos().getPos();
                 } else {
-                    pos = iv.getEndPos();
+                    pos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
                 ViewPoint vp = new ViewPoint(referenceSequenceID,pos,maxDistToGenomicPosUp,maxDistToGenomicPosDown);
                 vpvgene.addViewPoint(vp);

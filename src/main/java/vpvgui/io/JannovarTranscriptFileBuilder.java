@@ -1,15 +1,5 @@
 package vpvgui.io;
 
-import com.google.common.collect.ImmutableList;
-import de.charite.compbio.jannovar.Immutable;
-import de.charite.compbio.jannovar.JannovarException;
-import de.charite.compbio.jannovar.data.JannovarData;
-import de.charite.compbio.jannovar.data.JannovarDataSerializer;
-import de.charite.compbio.jannovar.datasource.DataSourceFactory;
-import de.charite.compbio.jannovar.datasource.DatasourceOptions;
-import de.charite.compbio.jannovar.datasource.InvalidDataSourceException;
-//import de.charite.compbio.jannovar.cmd.download.JannovarDownloadOptions;
-import de.charite.compbio.jannovar.impl.util.PathUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,20 +8,13 @@ import de.charite.compbio.jannovar.Jannovar;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.MessageConsole;
 
 /**
  * This class uses Jannovar to download and build a serialized transcript definition file

@@ -74,6 +74,8 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML
     private Button downloadGenome;
+    @FXML
+    private Button unpackIndexGenomeButton;
     /**
      * Label for the genome build we want to download.
      */
@@ -97,6 +99,11 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML
     private ProgressIndicator genomeDownloadPI;
+    /**
+     * Show progress in downloading the Genome and corresponding transcript definition file.
+     */
+    @FXML
+    private ProgressIndicator genomeUnpackIndexPI;
     /**
      * Button to download RefSeq.tar.gz (transcript/gene definition file
      */
@@ -254,6 +261,8 @@ public class VPVMainPresenter implements Initializable {
         if (file==null || file.getAbsolutePath()=="") {
             ErrorWindow.display("Error","Could not get path to download genome.");
             return;
+        } else {
+            this.model.setGenomeDirectoryPath(file);
         }
         if (model.getGenomeURL()==null || model.getGenomeURL().isEmpty()) {
             ErrorWindow.display("Error","Genome URL (UCSC address) not initialized");
@@ -274,7 +283,8 @@ public class VPVMainPresenter implements Initializable {
     /**
      * Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions.
      */
-    public void downloadTranscripts() {
+    @FXML public void downloadTranscripts(ActionEvent event) {
+        event.consume();
         String genome = this.genomeChoiceBox.getValue();
         try {
             this.model.adjustGenomeDownloadPaths();
@@ -303,9 +313,17 @@ public class VPVMainPresenter implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+
+    @FXML public void unpackAndIndexTranscripts(ActionEvent e) {
+        e.consume();
+        GenomeIndexer gindexer = new GenomeIndexer(this.model.getGenomeDirectoryPath());
+        gindexer.extractTarGZ();
 
     }
+
+
 
     /** This function is called after the user has chosen restriction enzymes in the
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
