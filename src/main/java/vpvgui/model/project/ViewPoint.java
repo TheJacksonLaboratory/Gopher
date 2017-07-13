@@ -50,6 +50,8 @@ public class ViewPoint {
     /* derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
     private String derivationApproach;
 
+    private boolean resolved;
+
     /* data structure for storing cutting site position relative to 'genomicPos' */
     private CuttingPositionMap cuttingPositionMap;
 
@@ -81,6 +83,7 @@ public class ViewPoint {
         setStartPos(genomicPos - maxDistToGenomicPosUp);
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
+        setResolved(false);
 
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
@@ -225,6 +228,15 @@ public class ViewPoint {
 
     public final void setDerivationApproach(String derivationApproach) {
         this.derivationApproach = derivationApproach;
+    }
+
+
+    public final boolean getResolved() {
+        return resolved;
+    }
+
+    public final void setResolved(boolean resolved) {
+        this.resolved = resolved;
     }
 
 
@@ -392,6 +404,8 @@ public class ViewPoint {
      */
     public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag) {
 
+        boolean resolved=true;
+
          // iterate over all fragments of the viewpoint and set them to true
         for(int i=0; i<restSegListMap.get(motif).size(); i++) {
             restSegListMap.get(motif).get(i).setSelected(true);
@@ -406,7 +420,7 @@ public class ViewPoint {
                 genomicPosFragIdx=i;break;
             }
         }
-        if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");}
+        if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");resolved=false;}
 
         // originating from the centralized fragment containing 'genomicPos' (included) go fragment-wise in UPSTREAM direction
         Integer fragCountUp = 0;
@@ -441,7 +455,8 @@ public class ViewPoint {
             }
         }
         if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
-            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found.");
+            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found for" + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
+            resolved=false;
         }
 
         // originating from the centralized fragment containing 'genomicPos' (excluded) go fragment-wise in DOWNSTREAM direction
@@ -478,6 +493,7 @@ public class ViewPoint {
         }
         if (fragCountDown < fragNumDown) {
             System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountDown + " fragments were found.");
+            resolved=false;
         }
 
         /* set start and end position of the viewpoint */
@@ -506,6 +522,7 @@ public class ViewPoint {
         /* set derivation approach */
 
         setDerivationApproach("LUPIANEZ");
+        setResolved(resolved);
     }
 
 }

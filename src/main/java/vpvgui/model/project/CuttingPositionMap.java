@@ -70,6 +70,10 @@ public class CuttingPositionMap {
         for(int i=0;i<cuttingPatterns.length;i++) {
 
             // get sequence around genomic position and convert everything to uppercase
+            if(fastaReader.getSequence(referenceSequenceID).length()<genomicPos + maxDistToGenomicPosDown) {
+                System.out.println("WARNING: maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + fastaReader.getSequence(referenceSequenceID).length() + ").");
+                maxDistToGenomicPosDown = fastaReader.getSequence(referenceSequenceID).length() - genomicPos;
+            }
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToGenomicPosUp,genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
 
             Pattern pattern = Pattern.compile(cuttingPatterns[i]);
