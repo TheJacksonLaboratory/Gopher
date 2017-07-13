@@ -103,6 +103,10 @@ public class Model {
         return enzymelist;
     }
 
+    public void setRestrictionEnzymes(List<RestrictionEnzyme> lst){
+        this.enzymelist=lst;
+    }
+
     /**
      * This method expects there to be a file called enzymelist.tab in
      * src/main/resources. This file has a header line (with #) and

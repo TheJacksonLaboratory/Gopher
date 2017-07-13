@@ -82,7 +82,7 @@ public class JannovarGeneGenerator {
         this.validGeneSymbols = new HashSet<>();
         Set<String> geneset = new HashSet<>();
         for (String s:genelst) {geneset.add(s);}
-        /** key: gene symbol, value: lkist of corresponding transcripts. */
+        /** key: gene symbol, value: list of corresponding transcripts. */
         Map<String,List<TranscriptModel>> transcriptmap =new HashMap<>();
 
         try {

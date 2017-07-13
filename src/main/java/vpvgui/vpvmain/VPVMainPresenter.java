@@ -306,11 +306,14 @@ public class VPVMainPresenter implements Initializable {
 
 
     }
-    /* TODO -- complete me */
+
+    /** This function is called after the user has chosen restriction enzymes in the
+     * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
+     * objects to the {@link Model}.*/
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
-
+        this.model.setRestrictionEnzymes(chosenEnzymes);
     }
 
     /**
