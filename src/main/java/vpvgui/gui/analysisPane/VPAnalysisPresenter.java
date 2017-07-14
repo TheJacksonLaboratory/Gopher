@@ -1,17 +1,26 @@
 package vpvgui.gui.analysisPane;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import vpvgui.model.Model;
 import vpvgui.model.project.VPVGene;
@@ -37,9 +46,11 @@ public class VPAnalysisPresenter implements Initializable {
 
     private Model model;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setInitialWebView();
+
         initTable();
     }
 
@@ -96,38 +107,27 @@ public class VPAnalysisPresenter implements Initializable {
      * Set up the table that will show the ViewPoints. Note that tview is constructed by fxml, do not call new.
      */
     private void initTable() {
+
         ObservableList columns = tview.getColumns();
         tview.setEditable(false);
-        TableColumn actionCol = new TableColumn("View");
+        TableColumn<VPRow,Boolean> actionCol = new TableColumn<>("View");
+        actionCol.setSortable(false);
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
+        actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<VPRow, Boolean>, ObservableValue<Boolean>>() {
+            @Override public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<VPRow, Boolean> features) {
+                return new SimpleBooleanProperty(features.getValue() != null);
+            }
+        });
+        // create a cell value factory with an add button for each row in the table.
+        actionCol.setCellFactory(new Callback<TableColumn<VPRow, Boolean>, TableCell<VPRow, Boolean>>() {
+            @Override public TableCell<VPRow, Boolean> call(TableColumn<VPRow, Boolean> personBooleanTableColumn) {
+                return new AddPersonCell(null, tview);
+            }
+        });
 
-        Callback<TableColumn<VPRow, String>, TableCell<VPRow, String>> cellFactory
-                = //
-                new Callback<TableColumn<VPRow, String>, TableCell<VPRow, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<VPRow, String> param) {
-                        final TableCell<VPRow, String> cell = new TableCell<VPRow, String>() {
-                            final Button btn = new Button("View in UCSC");
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    btn.setOnAction(event -> {
-                                        VPRow vpr = getTableView().getItems().get(getIndex());
-                                        System.out.println(vpr.getGenomicPos()
-                                                + "   " + vpr.getRefseqID());
-                                    });
-                                    setGraphic(btn);
-                                    setText(null);
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
+
+
         columns.add(actionCol);
         final TableColumn<VPRow,String> targetnamecol = createTextColumn("targetName", "Target");
         targetnamecol.setMinWidth(60);
@@ -167,6 +167,45 @@ public class VPAnalysisPresenter implements Initializable {
         columns.add(genomicposcol);
 
     }
+
+
+    /** A table cell containing a button for adding a new person. */
+    private class AddPersonCell extends TableCell<VPRow, Boolean> {
+        // a button for adding a new person.
+        final Button addButton = new Button("Add");
+        // pads and centers the add button in the cell.
+        final StackPane paddedButton = new StackPane();
+        // records the y pos of the last button press so that the add person dialog can be shown next to the cell.
+        final DoubleProperty buttonY = new SimpleDoubleProperty();
+
+        /**
+         * AddPersonCell constructor
+         *
+         * @param stage the stage in which the table is placed.
+         * @param table the table to which a new person can be added.
+         */
+        AddPersonCell(final Stage stage, final TableView table) {
+            paddedButton.setPadding(new Insets(3));
+            paddedButton.getChildren().add(addButton);
+            addButton.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    buttonY.set(mouseEvent.getScreenY());
+                }
+            });
+            addButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    showAddPersonDialog(stage, table, buttonY.get());
+                    table.getSelectionModel().select(getTableRow().getIndex());
+                }
+            });
+        }
+    }
+
+        private void showAddPersonDialog(Stage parent, final TableView<VPRow> table, double y) {
+            System.err.println("TEST SHOW ADD PERSON");
+        }
 
     private TableColumn createTextColumn(String name, String caption) {
         TableColumn column = new TableColumn(caption);
