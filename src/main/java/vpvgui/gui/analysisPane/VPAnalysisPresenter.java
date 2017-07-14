@@ -1,9 +1,6 @@
 package vpvgui.gui.analysisPane;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -110,19 +107,20 @@ public class VPAnalysisPresenter implements Initializable {
 
         ObservableList columns = tview.getColumns();
         tview.setEditable(false);
-        TableColumn<VPRow,Boolean> actionCol = new TableColumn<>("View");
+        TableColumn<VPRow,Button> actionCol = new TableColumn<>("View");
         actionCol.setSortable(false);
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
         // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
-        actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<VPRow, Boolean>, ObservableValue<Boolean>>() {
-            @Override public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<VPRow, Boolean> features) {
-                return new SimpleBooleanProperty(features.getValue() != null);
+        actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<VPRow, Button>, ObservableValue<Button>>() {
+            @Override public ObservableValue<Button> call(TableColumn.CellDataFeatures<VPRow, Button> features) {
+                return new SimpleObjectProperty<>();
             }
         });
         // create a cell value factory with an add button for each row in the table.
-        actionCol.setCellFactory(new Callback<TableColumn<VPRow, Boolean>, TableCell<VPRow, Boolean>>() {
-            @Override public TableCell<VPRow, Boolean> call(TableColumn<VPRow, Boolean> personBooleanTableColumn) {
-                return new AddPersonCell(null, tview);
+        actionCol.setCellFactory(new Callback<TableColumn<VPRow, Button>, TableCell<VPRow, Button>>() {
+            @Override public TableCell<VPRow, Button> call(TableColumn<VPRow, Button> personBooleanTableColumn) {
+                return new TableCell<>();
+                //return new AddPersonCell(null, tview); (
             }
         });
 
