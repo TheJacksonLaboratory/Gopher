@@ -51,8 +51,8 @@ public class ViewPoint {
 
     /* derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
     private String derivationApproach;
-
     private boolean resolved;
+    private Integer numOfSelectedFrags;
 
     /* data structure for storing cutting site position relative to 'genomicPos' */
     private CuttingPositionMap cuttingPositionMap;
@@ -159,7 +159,7 @@ public class ViewPoint {
 
         for (int i = 0; i < cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).size() - 1; j++) {
-                Segment restFrag = new Segment(referenceSequenceID, relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)), relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)-1),false);
+                Segment restFrag = new Segment(referenceSequenceID, relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1), relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)+1),false);
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }
@@ -240,6 +240,11 @@ public class ViewPoint {
     public final void setResolved(boolean resolved) {
         this.resolved = resolved;
     }
+
+    public final Integer getNumOfSelectedFrags() {
+        return numOfSelectedFrags;
+    }
+
 
 
     public Integer getGenomicPosOfGenomicRelativePos(Integer genomicPos, Integer genomicPosRelPos) {
@@ -404,7 +409,7 @@ public class ViewPoint {
      * @param maxSizeDown
      * @param minFragSize
      */
-    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag) {
+    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag, Integer marginSize) {
 
         boolean resolved=true;
 
@@ -418,37 +423,48 @@ public class ViewPoint {
         for(int i=0; i<restSegListMap.get(motif).size(); i++) {
             Integer fragStaPos=restSegListMap.get(motif).get(i).getStartPos();
             Integer fragEndPos=restSegListMap.get(motif).get(i).getEndPos();
-            if(fragStaPos<genomicPos && genomicPos<fragEndPos){
+            if(fragStaPos<=genomicPos && genomicPos<=fragEndPos){
                 genomicPosFragIdx=i;break;
             }
         }
-        if(genomicPosFragIdx==-1) {System.out.println("Error: At least one fragment must contain 'genomicPos'.");resolved=false;}
+        if(genomicPosFragIdx==-1) {System.out.println("ERROR: At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");resolved=false;}
 
         // originating from the centralized fragment containing 'genomicPos' (included) go fragment-wise in UPSTREAM direction
         Integer fragCountUp = 0;
         for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
 
             // set fragment to 'false', if it is shorter than 'minFragSize'
-            Integer len = relToAbsPos(restSegListMap.get(motif).get(i).getEndPos()) - relToAbsPos(restSegListMap.get(motif).get(i).getStartPos());
+            Integer len = restSegListMap.get(motif).get(i).getEndPos() - restSegListMap.get(motif).get(i).getStartPos();
             if (len < minFragSize) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
             // set fragments to 'false' that are not entirely within the allowed range
-            Integer upLen = genomicPos - relToAbsPos(restSegListMap.get(motif).get(i).getStartPos());
+            Integer upLen = genomicPos - restSegListMap.get(motif).get(i).getStartPos();
             if (maxSizeUp < upLen) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
             // set fragment to 'false', if required number of fragments has already been found
-            if (fragNumUp + 1 < fragCountUp) {
+            if (fragNumUp + 1 <= fragCountUp) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
+            /*
             // set fragment to false, if the repetitive content is higher than a given threshold
             restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
             if(maxRepFrag<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
                 restSegListMap.get(motif).get(i).setSelected(false);
+            }
+            */
+
+            // change this to: set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
+            ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
+            for (int j = 0; j < SegMargins.size(); j++) {
+                SegMargins.get(j).setRepetitiveContent(fastaReader);
+                if (maxRepFrag < SegMargins.get(j).getRepetitiveContent()) {
+                    restSegListMap.get(motif).get(i).setSelected(false);
+                }
             }
 
             // if after all this the fragment is still selected, increase count
@@ -457,7 +473,7 @@ public class ViewPoint {
             }
         }
         if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
-            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found for" + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
+            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
             resolved=false;
         }
 
@@ -466,13 +482,13 @@ public class ViewPoint {
         for (int i = genomicPosFragIdx+1; i<restSegListMap.get(motif).size(); i++) { // downstream
 
             // set fragment to 'false', if it is shorter than 'minFragSize'
-            Integer len = relToAbsPos(restSegListMap.get(motif).get(i).getEndPos()) - relToAbsPos(restSegListMap.get(motif).get(i).getStartPos());
+            Integer len = restSegListMap.get(motif).get(i).getEndPos() - restSegListMap.get(motif).get(i).getStartPos();
             if (len < minFragSize) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
             // set fragments to 'false' that are not entirely within the allowed range
-            Integer downLen = genomicPos - relToAbsPos(restSegListMap.get(motif).get(i).getEndPos());
+            Integer downLen = genomicPos - restSegListMap.get(motif).get(i).getEndPos();
             if (maxSizeDown < downLen) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
@@ -482,10 +498,23 @@ public class ViewPoint {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
+            /*
             // set fragment to false, if the repetitive content is higher than a given threshold
             restSegListMap.get(motif).get(i).setRepetitiveContent(fastaReader);
             if(maxRepFrag<restSegListMap.get(motif).get(i).getRepetitiveContent()) {
                 restSegListMap.get(motif).get(i).setSelected(false);
+            }
+            */
+
+            // change this to: set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
+            ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
+            for (int j = 0; j < SegMargins.size(); j++) {
+                SegMargins.get(j).setRepetitiveContent(fastaReader);
+                if (maxRepFrag < SegMargins.get(j).getRepetitiveContent() && restSegListMap.get(motif).get(i).getSelected()) {
+                    restSegListMap.get(motif).get(i).setSelected(false);
+                    System.out.println(referenceSequenceID + "\t" + SegMargins.get(j).getStartPos() + "\t" + SegMargins.get(j).getEndPos());
+
+                }
             }
 
             // if after all this the fragment is still selected, increase count
@@ -494,9 +523,10 @@ public class ViewPoint {
             }
         }
         if (fragCountDown < fragNumDown) {
-            System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountDown + " fragments were found.");
+            System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
             resolved=false;
         }
+        numOfSelectedFrags=fragCountUp+fragCountDown;
 
         /* set start and end position of the viewpoint */
 
