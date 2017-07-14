@@ -1,12 +1,6 @@
 package vpvgui.model.project;
 
-import de.charite.compbio.jannovar.reference.TranscriptModel;
-import javafx.beans.property.StringProperty;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class will represent Genes according to the way we are analyzing them in VPV.
@@ -25,11 +19,11 @@ public class VPVGene {
      * in order to avoid entering duplicate ViewPoint objects.
      * The set then has all TSS (unique)
      */
-    private Set<Integer> seenPositions;
+    private Set<Integer> positions;
 
     private List<ViewPoint> viewPointList;
 
-    private List<Integer> tssList;
+
 
     public VPVGene(String geneid, String symbol) {
         try {
@@ -39,13 +33,13 @@ public class VPVGene {
         }
         this.geneSymbol=symbol;
         this.viewPointList=new ArrayList<>();
-        this.tssList=new ArrayList<>();
-        this.seenPositions=new HashSet<>();
+        this.positions =new HashSet<>();
     }
-
+    /** @return a sorted list of TSS. */
     public List<Integer> getTSSlist() {
         List<Integer> lst = new ArrayList<>();
-        lst.addAll(this.seenPositions);
+        lst.addAll(this.positions);
+        Collections.sort(lst);
         return lst;
     }
 
@@ -56,46 +50,33 @@ public class VPVGene {
 
     public String getGeneSymbol() { return this.geneSymbol;}
     public Integer getGeneID() { return this.entrezGeneID;}
-
-    /** Transform a Jannovar TranscriptModel to a VPVGene.
-     * TODO -- referenceSequenceID stimmen fuer Maus nicht*/
-    public static VPVGene geneFactory(TranscriptModel tmod) {
-        VPVGene vpvg = new VPVGene(tmod.getGeneID(),tmod.getGeneSymbol());
-        int c =tmod.getChr();
-        if (c>0 && c<23) {
-            vpvg.setChromosome(String.format("chr%d",c));
-        } else if (c==23) {
-            vpvg.setChromosome("chrX");
-        } else if (c==24) {
-            vpvg.setChromosome("chrY");
-        } else if (c==25) {
-            vpvg.setChromosome("chrM");
-        }
-        if (tmod.getStrand().isForward()) {
-            vpvg.setForwardStrand();
-        } else {
-            vpvg.setReverseStrand();
-        }
-        return null;
-    }
-
+    /** Set this VPVGene to be on the forward strand */
     public  void setForwardStrand() {
         this.forward=true;
     }
-
+    /** Set this VPVGene to be on the reverse strand */
     public void setReverseStrand() {
         this.forward=false;
     }
-
+    /** Ich würde gern diese Funktion rausnehmen und die ViewPoints anders erzeugen! */
+    @Deprecated
     public void addViewPoint(ViewPoint vp) {
-        if (this.seenPositions.contains(vp.getGenomicPos())) {
+        if (this.positions.contains(vp.getGenomicPos())) {
             return;
         }
-        this.seenPositions.add(vp.getGenomicPos());
+        this.positions.add(vp.getGenomicPos());
         this.viewPointList.add(vp);
     }
 
-    /** Dumps the information about the VPVGene and itsviewpoints for debugging. */
+    /** This function adds a position (such as a transcription start site) that is the
+     * "central" or "important" position around which we want to construct a ViewPoint.
+     * @param pos
+     */
+    public void addGenomicPosition(int pos) {
+        this.positions.add(pos);
+    }
+
+    /** Dumps the information about the VPVGene and its viewpoints for debugging. */
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         String strand="-";
@@ -104,14 +85,14 @@ public class VPVGene {
         }
         sb.append(String.format("%s [%s,%s]",geneSymbol,referenceSequenceID,strand));
         if (this.viewPointList==null || this.viewPointList.size()==0) {
-            sb.append("\nError: No View points");
+           // no-op
         } else {
             for (ViewPoint vp : this.viewPointList) {
                 sb.append("\n\tViewPoint: "+vp);
             }
         }
-        for (Integer ii : seenPositions) {
-            sb.append("\n\tSeen pos: "+ ii + "(nOTE: Pos strand muss um 1 inkrementiert werden)");
+        for (Integer ii : positions) {
+            sb.append("\n\tTSS pos: "+ ii);
         }
         sb.append("\n");
         return sb.toString();

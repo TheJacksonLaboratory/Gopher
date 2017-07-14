@@ -36,6 +36,8 @@ public class ViewPoint {
 
     /* usually a chromosome */
     private String referenceSequenceID;
+    /** Name of the target of the viewpoint (often a gene).*/
+    private String targetName;
 
     /* central genomic coordinate of the viewpoint, usually a trancription start site */
     private Integer genomicPos;
@@ -93,11 +95,11 @@ public class ViewPoint {
         initRestrictionFragments(cuttingPatterns);
 
         this.fastaReader=fastaReader;
-
-
-
     }
 
+
+    public void setTargetName(String name) { this.targetName=name;}
+    public String getTargetName() { return this.targetName; }
 
     /**
      * This is the contructor of this class that is called from the input genes window.

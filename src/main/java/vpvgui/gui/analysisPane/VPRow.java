@@ -14,7 +14,9 @@ import vpvgui.model.project.ViewPoint;
 public class VPRow {
 
     private ViewPoint viewpoint;
-
+    /** The target is the target of a viewpoint, often a gene. Note that multiple viewpoints
+     * can have the same target, e.g., if the same gene has multiple transcription start sites.*/
+    private StringProperty targetName = new SimpleStringProperty("");
     private StringProperty refseqID = new SimpleStringProperty("");
     private IntegerProperty genomicPos = new SimpleIntegerProperty();
 
@@ -26,6 +28,7 @@ public class VPRow {
         viewpoint=vp;
         this.refseqID.set(vp.getReferenceID());
         this.genomicPos.set(vp.getGenomicPos());
+        this.targetName.set(vp.getTargetName());
     }
 
     public String getRefseqID() {
@@ -42,5 +45,13 @@ public class VPRow {
     public void setGenomicPos(Integer pos) {
         this.genomicPos.set(pos);
         this.viewpoint.setGenomicPos(pos);
+    }
+
+    public String getTargetName() {
+        return targetName.get();
+    }
+    public void setTargetName(String name) {
+        this.targetName.set(name);
+        this.viewpoint.setTargetName(name);
     }
 }

@@ -42,14 +42,14 @@ public class SettingsViewFactory {
     /*
         * Formats the list properties in human-readable format, checking for an empty list.
         */
-    private static String toStringHelper(String listName, ObservableList<String> lst) {
+    private static String joinEnzymes(ObservableList<String> lst) {
         if (lst==null || lst.isEmpty()) {
-            return (String.format(""));
+            return (String.format("not initialized"));
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s: (%d)\n", listName, lst.size()));
-        for (String s : lst) {
-            sb.append(String.format("\t%s\n", s));
+        sb.append(lst.get(0));
+        for (int i=0; i<lst.size();i++) {
+            sb.append(String.format("; %s", lst.get(i)));
         }
         return sb.toString();
     }
@@ -59,14 +59,11 @@ public class SettingsViewFactory {
         sb.append("<html><body><h3>VPV Settings</h3>");
         sb.append("<p><ul>");
         sb.append(String.format("<li>Project name: %s</li>",settings.getProjectName()));
-
-        sb.append(String.format("<li>Genome file source: %s</li>", settings.getGenomeFileURL()));
-        sb.append(String.format("<li>Transcripts file source: %s</li>", settings.getTranscriptsJannovarName()));
-        sb.append(String.format("<li>Genome file destination: %s</li>", settings.getGenomeFileBasename()));
-        sb.append(String.format("<li>Transcripts file destination: %s</li>", settings.getTranscriptsFileTo()));
-        sb.append("<li>"+toStringHelper("Restriction Enzymes", settings.getRestrictionEnzymesList())+"</li>");
-        sb.append("<li>"+toStringHelper("Target Genes", settings.getTargetGenesList())+"</li>");
-
+        sb.append(String.format("<li>Genome file: %s</li>", settings.getGenomeFileURL()));
+        sb.append(String.format("<li>Local Genome file name: %s</li>", settings.getGenomeFileBasename()));
+        sb.append(String.format("<li>Transcript (Jannovar) file: %s</li>", settings.getTranscriptsFileTo()));
+        sb.append(String.format("<li>Restriction Enzymes: %s</li>", joinEnzymes(settings.getRestrictionEnzymesList())));
+        sb.append(String.format("<li>Target Genes: n=%d</li>", settings.getTargetGenesList().size()));
         sb.append("</ul></p>");
         sb.append("</body></html>");
         return sb.toString();

@@ -1,16 +1,14 @@
 package vpvgui.gui.entrezgenetable;
 
-import de.charite.compbio.jannovar.data.Chromosome;
+
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.Strand;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
-import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -20,7 +18,7 @@ import vpvgui.gui.ErrorWindow;
 import vpvgui.model.Model;
 import vpvgui.model.project.JannovarGeneGenerator;
 import vpvgui.model.project.VPVGene;
-import vpvgui.model.project.ViewPoint;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,6 +29,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
+ * This is the window that appears so tha tthe user can upload target genes.
  * Created by peter on 01.07.17.
  */
 public class EntrezGenePresenter implements Initializable {
@@ -67,8 +66,6 @@ public class EntrezGenePresenter implements Initializable {
 
     private boolean isvalidated=false;
 
-    private int maxDistToGenomicPosUp =10000;
-    private int maxDistToGenomicPosDown = 10000;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -79,15 +76,10 @@ public class EntrezGenePresenter implements Initializable {
         this.signal = signal;
     }
 
-
-    private JannovarGeneGenerator jgg =null;
-
-
-
-    /*
-    public HashMap<String, Object> getResult() {
-        return this.result;
-    }*/
+    /** This object will find the Jannovar TranscriptModel objects that correspond to all of the
+     * transcripts that correspond to a Gene symbol.
+     */
+   private JannovarGeneGenerator jgg =null;
 
     /**
      * setting the stage of this view
@@ -146,33 +138,14 @@ public class EntrezGenePresenter implements Initializable {
         return n;
     }
 
-
-    private void parseGeneSymbolsWithJannovar(String[] symb) {
-        if (this.model==null) {
-            ErrorWindow.display("Error","Model was null (report to developers)");
-            return;
-        }
-        if (this.model.getSettings()==null) {
-            ErrorWindow.display("Error","Settings object was null (report to developers)");
-            return;
-        }
-        String transcriptfile=this.model.getSettings().getTranscriptsFileTo();
-        if (transcriptfile==null) {
-            ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes");
-            return;
-        }
-        JannovarGeneGenerator jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
-        //jgg.checkGenes(symb);
-    }
-
-
+   /** Sets the text that will be shown in the HTML View. */
     public void setData(String html) {
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
     }
 
 
-
+    /*
     private String joinWithNL(String[] a) {
         if (a==null || a.length==0)
             return "";
@@ -182,7 +155,7 @@ public class EntrezGenePresenter implements Initializable {
             sb.append("\n  ---"+a[i]);
         }
         return sb.toString();
-    }
+    }*/
 
     @FXML
     public void uploadGenes(ActionEvent e) {
@@ -295,17 +268,21 @@ public class EntrezGenePresenter implements Initializable {
                 GenomeInterval iv = tmod.getTXRegion();
                 Integer pos=null;
                 if (tm.getStrand().isForward()) {
-                    pos = iv.getGenomeBeginPos().getPos();
+                    /* Add 1 to convert from zero-based to one-based numbering */
+                    pos = iv.getGenomeBeginPos().getPos()+1;
                 } else {
+                    /* The last position of a minus-strand gene is the start position,
+                     * and the numbering is then one-based once it is flipped. Need to use
+                     * the withStrand to convert positions of minus-strand genes.
+                     */
                     pos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
-                ViewPoint vp = new ViewPoint(referenceSequenceID,pos,maxDistToGenomicPosUp,maxDistToGenomicPosDown);
-                vpvgene.addViewPoint(vp);
+                vpvgene.addGenomicPosition(pos);
             }
             vpvgenelist.add(vpvgene);
             this.model.setVPVGenes(vpvgenelist);
         }
-        System.out.println("added "+ vpvgenelist.size() + " vpv genes");
+        System.out.println("[INFO] EntrezGenePresenter: added "+ vpvgenelist.size() + " vpv genes");
         signal.accept(Signal.DONE);
     }
 
