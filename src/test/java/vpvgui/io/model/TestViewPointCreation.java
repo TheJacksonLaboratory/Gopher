@@ -1,6 +1,7 @@
 package vpvgui.io.model;
 
 import de.charite.compbio.jannovar.reference.GenomeInterval;
+import de.charite.compbio.jannovar.reference.Strand;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
@@ -144,9 +145,14 @@ public class TestViewPointCreation {
                 GenomeInterval iv = tmod.getTXRegion();
                 Integer genomicPos = null;
                 if (tm.getStrand().isForward()) {
-                    genomicPos = iv.getBeginPos();
+                    /* Add 1 to convert from zero-based to one-based numbering */
+                    genomicPos = iv.getGenomeBeginPos().getPos()+1;
                 } else {
-                    genomicPos = iv.getEndPos();
+                    /* The last position of a minus-strand gene is the start position,
+                     * and the numbering is then one-based once it is flipped. Need to use
+                     * the withStrand to convert positions of minus-strand genes.
+                     */
+                    genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
                 System.out.println(symbol);
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
