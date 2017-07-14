@@ -181,7 +181,8 @@ public class Model {
             System.err.println(vg);
         }
     }
-
+    /** Takes the list of VPVGenes and creates a list of ViewPoints.
+     * TODO -- add correct parameters.*/
     public List<ViewPoint> getViewPointList() {
         List<ViewPoint> vplist = new ArrayList<>();
         Integer maxDistToGenomicPosUp=200;
@@ -194,6 +195,7 @@ public class Model {
             String refSeqID = vpvg.getChromosome();
             for (Integer i : tsslist) {
                 ViewPoint vp = new ViewPoint(refSeqID,i,maxDistToGenomicPosUp,maxDistToGenomicPosDown);
+                vp.setTargetName(vpvg.getGeneSymbol());
                 vplist.add(vp);
             }
         }

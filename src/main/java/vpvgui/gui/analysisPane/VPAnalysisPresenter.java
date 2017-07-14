@@ -7,14 +7,12 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.Callback;
 import vpvgui.model.Model;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
@@ -48,8 +46,8 @@ public class VPAnalysisPresenter implements Initializable {
     public void setInitialWebView() {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body>");
-        sb.append("<h3>View Point Viewer");
-        sb.append("<p>Please set up and initialize analysis using the first Tab.</p>");
+        sb.append("<h3>View Point Viewer</h3>");
+        sb.append("<p>Please set up and initialize analysis using the Set Up Tab.</p>");
         sb.append("</body></html>");
         setData(sb.toString());
     }
@@ -100,7 +98,50 @@ public class VPAnalysisPresenter implements Initializable {
     private void initTable() {
         ObservableList columns = tview.getColumns();
         tview.setEditable(false);
+        TableColumn actionCol = new TableColumn("View");
+        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+
+        Callback<TableColumn<VPRow, String>, TableCell<VPRow, String>> cellFactory
+                = //
+                new Callback<TableColumn<VPRow, String>, TableCell<VPRow, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<VPRow, String> param) {
+                        final TableCell<VPRow, String> cell = new TableCell<VPRow, String>() {
+                            final Button btn = new Button("View in UCSC");
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        VPRow vpr = getTableView().getItems().get(getIndex());
+                                        System.out.println(vpr.getGenomicPos()
+                                                + "   " + vpr.getRefseqID());
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        columns.add(actionCol);
+        final TableColumn<VPRow,String> targetnamecol = createTextColumn("targetName", "Target");
+        targetnamecol.setMinWidth(60);
+        targetnamecol.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<VPRow, String>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<VPRow, String> event) {
+                        ((VPRow) event.getTableView().getItems().get(event.getTablePosition().getRow())).setTargetName(event.getNewValue());
+                    }
+                }
+        );
+        columns.add(targetnamecol);
         final TableColumn<VPRow,String> refseqcol = createTextColumn("refseqID", "Chromosome");
+        refseqcol.setMinWidth(60);
         refseqcol.setOnEditCommit(
                 new EventHandler<TableColumn.CellEditEvent<VPRow, String>>() {
                     @Override
@@ -111,7 +152,7 @@ public class VPAnalysisPresenter implements Initializable {
         );
         columns.add(refseqcol);
         final TableColumn<VPRow,Integer> genomicposcol = new TableColumn<>("Genomic Position");
-        genomicposcol.setMinWidth(40);
+        genomicposcol.setMinWidth(60);
         genomicposcol.setCellValueFactory(new PropertyValueFactory<VPRow,Integer>("genomicPos"));
         //?? genomicposcol.setCellFactory(TextFieldTableCell.forTableColumn());
         genomicposcol.setOnEditCommit(

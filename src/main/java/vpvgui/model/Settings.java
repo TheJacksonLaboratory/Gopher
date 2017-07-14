@@ -179,8 +179,8 @@ public class Settings implements Serializable {
         sb.append(String.format("\nTranscripts file source: %s", makeHumanReadable(getTranscriptsJannovarName())));
         sb.append(String.format("\nGenome file destination: %s", makeHumanReadable(getGenomeFileBasename())));
         sb.append(String.format("\nTranscripts file destination: %s", makeHumanReadable(getTranscriptsFileTo())));
-        sb.append(toStringHelper("Restriction Enzymes", getRestrictionEnzymesList()));
-        sb.append(toStringHelper("Target Genes", getTargetGenesList()));
+        sb.append(toStringHelper("\nRestriction Enzymes", getRestrictionEnzymesList()));
+        //sb.append(toStringHelper("\nTarget Genes", getTargetGenesList()));
         return sb.toString();
     }
 
