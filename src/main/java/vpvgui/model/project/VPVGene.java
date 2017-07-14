@@ -58,7 +58,7 @@ public class VPVGene {
     public Integer getGeneID() { return this.entrezGeneID;}
 
     /** Transform a Jannovar TranscriptModel to a VPVGene.
-     * TODO -- referenceSequenceIDn stimmen fuer Maus nicht*/
+     * TODO -- referenceSequenceID stimmen fuer Maus nicht*/
     public static VPVGene geneFactory(TranscriptModel tmod) {
         VPVGene vpvg = new VPVGene(tmod.getGeneID(),tmod.getGeneSymbol());
         int c =tmod.getChr();
@@ -109,6 +109,9 @@ public class VPVGene {
             for (ViewPoint vp : this.viewPointList) {
                 sb.append("\n\tViewPoint: "+vp);
             }
+        }
+        for (Integer ii : seenPositions) {
+            sb.append("\n\tSeen pos: "+ ii + "(nOTE: Pos strand muss um 1 inkrementiert werden)");
         }
         sb.append("\n");
         return sb.toString();
