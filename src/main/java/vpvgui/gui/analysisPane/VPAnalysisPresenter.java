@@ -110,19 +110,35 @@ public class VPAnalysisPresenter implements Initializable {
         TableColumn<VPRow,Button> actionCol = new TableColumn<>("View");
         actionCol.setSortable(false);
         actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        // define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
-        actionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<VPRow, Button>, ObservableValue<Button>>() {
-            @Override public ObservableValue<Button> call(TableColumn.CellDataFeatures<VPRow, Button> features) {
-                return new SimpleObjectProperty<>();
-            }
-        });
+        // this CellValueFactory generates a Button in column of the TableView
+        actionCol.setCellValueFactory(
+                new Callback<TableColumn.CellDataFeatures<VPRow, Button>, ObservableValue<Button>>() {
+                    @Override
+                    public ObservableValue<Button> call(TableColumn.CellDataFeatures<VPRow, Button> features) {
+
+                        // access the properties of the row where the Button is placed
+                        VPRow row = features.getValue();
+
+                        // access the properties of the column where the Button is placed
+                        TableColumn<VPRow, Button> column = features.getTableColumn();
+
+                        // Turn Button (or any other object) into ObservableValue that must be returned by this Callback
+                        ReadOnlyObjectProperty<Button> btnWrapper = new ReadOnlyObjectWrapper<>(new Button("Hey ya!"));
+
+                        // set action, e.g. creating a new tab
+                        btnWrapper.get().setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                System.out.println(String.format("Hi there from the row with Target: %s, Chromosome: %s, Genomic pos: %d ",
+                                        row.getTargetName(), row.getRefseqID(), row.getGenomicPos()));
+                            }
+                        });
+                        return btnWrapper;
+                    }
+                }
+        );
+
         // create a cell value factory with an add button for each row in the table.
-        actionCol.setCellFactory(new Callback<TableColumn<VPRow, Button>, TableCell<VPRow, Button>>() {
-            @Override public TableCell<VPRow, Button> call(TableColumn<VPRow, Button> personBooleanTableColumn) {
-                return new TableCell<>();
-                //return new AddPersonCell(null, tview); (
-            }
-        });
 
 
 
