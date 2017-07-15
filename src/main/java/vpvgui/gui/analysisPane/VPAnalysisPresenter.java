@@ -10,11 +10,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -42,12 +44,19 @@ public class VPAnalysisPresenter implements Initializable {
     private BooleanProperty editingStarted;
 
     private Model model;
+    /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
+     * UCSC browser.
+     */
+    private TabPane tabpane;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setInitialWebView();
-
+        /* The following line is needed to avoid a SSL handshake alert
+         * when opening the UCSC Browser.
+         */
+        System.setProperty("jsse.enableSNIExtension", "false");
         initTable();
     }
 
@@ -66,6 +75,10 @@ public class VPAnalysisPresenter implements Initializable {
     }
 
     public void setModel(Model m) { this.model=m; }
+
+    public void setTabPaneRef(TabPane tabp) {
+        this.tabpane=tabp;
+    }
 
 
     public void showVPTable() {
@@ -131,6 +144,7 @@ public class VPAnalysisPresenter implements Initializable {
                             public void handle(ActionEvent event) {
                                 System.out.println(String.format("Hi there from the row with Target: %s, Chromosome: %s, Genomic pos: %d ",
                                         row.getTargetName(), row.getRefseqID(), row.getGenomicPos()));
+                                addTabPane(row);
                             }
                         });
                         return btnWrapper;
@@ -180,6 +194,32 @@ public class VPAnalysisPresenter implements Initializable {
         );
         columns.add(genomicposcol);
 
+    }
+
+    private void addTabPane(VPRow row) {
+        final Tab tab = new Tab("Tab " + row.getTargetName());
+        tab.setClosable(true);
+        tab.setOnClosed(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                if (tabpane.getTabs()
+                        .size() == 2) {
+                    event.consume();
+                }
+            }
+        });
+        WebView  browser = new WebView();
+        WebEngine engine = browser.getEngine();
+        String url = "https://genome.ucsc.edu/cgi-bin/hgTracks?db=mm9&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr4%3A151709259%2D151714759&hgsid=599799979_TMuPBovtFYR9grIdzARnJ2XDq9NE";
+        engine.load(url);
+        VBox vb = new VBox();
+        vb.setPadding(new Insets(30, 50, 50, 50));
+        vb.setSpacing(10);
+        vb.setAlignment(Pos.CENTER);
+        vb.getChildren().addAll(browser);
+        tab.setContent(vb);
+        this.tabpane.getTabs().add(tab);
+        this.tabpane.getSelectionModel().select(tab);
     }
 
 

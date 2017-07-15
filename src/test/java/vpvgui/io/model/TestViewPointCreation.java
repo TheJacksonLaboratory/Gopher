@@ -156,7 +156,14 @@ public class TestViewPointCreation {
                 }
                 System.out.println(symbol);
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, maxRepFrag);
+               /*
+                public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp,
+                Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag, Integer marginSize) {
+                @PeterHansen--ich habe unten "marginSize" ergänzt, es hatte gefehlt und bei mir nicht kompiliert!
+                */
+               Integer marginSize=42;
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
+                        minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
             }
             vpvGeneList.add(vpvgene);

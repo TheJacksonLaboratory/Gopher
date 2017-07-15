@@ -198,6 +198,8 @@ public class VPVMainPresenter implements Initializable {
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
 
         createPanes();
 
