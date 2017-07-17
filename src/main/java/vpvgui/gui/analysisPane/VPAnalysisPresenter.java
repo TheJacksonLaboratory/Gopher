@@ -15,12 +15,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import vpvgui.gui.viewpointpanel.ViewPointPresenter;
+import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
@@ -40,6 +43,9 @@ public class VPAnalysisPresenter implements Initializable {
 
     @FXML
     private TableView tview;
+
+    @FXML
+    private AnchorPane pane;
 
     private BooleanProperty editingStarted;
 
@@ -79,6 +85,8 @@ public class VPAnalysisPresenter implements Initializable {
     public void setTabPaneRef(TabPane tabp) {
         this.tabpane=tabp;
     }
+
+    public AnchorPane getPane() { return this.pane; }
 
 
     public void showVPTable() {
@@ -208,54 +216,21 @@ public class VPAnalysisPresenter implements Initializable {
                 }
             }
         });
-        WebView  browser = new WebView();
-        WebEngine engine = browser.getEngine();
-        String url = "https://genome.ucsc.edu/cgi-bin/hgTracks?db=mm9&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr4%3A151709259%2D151714759&hgsid=599799979_TMuPBovtFYR9grIdzARnJ2XDq9NE";
-        engine.load(url);
-        VBox vb = new VBox();
-        vb.setPadding(new Insets(30, 50, 50, 50));
-        vb.setSpacing(10);
-        vb.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(browser);
-        tab.setContent(vb);
+
+        ViewPointView vpv = new ViewPointView();
+        ViewPointPresenter vpp= (ViewPointPresenter) vpv.getPresenter();
+        vpp.setModel(this.model);
+        //vpp.setTabPaneRef(this.tabpane);
+        vpp.setVPRow(row);
+        vpp.sendToUCSC();
+        tab.setContent(vpp.getPane());
+
+
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
     }
 
 
-    /** A table cell containing a button for adding a new person. */
-    private class AddPersonCell extends TableCell<VPRow, Boolean> {
-        // a button for adding a new person.
-        final Button addButton = new Button("Add");
-        // pads and centers the add button in the cell.
-        final StackPane paddedButton = new StackPane();
-        // records the y pos of the last button press so that the add person dialog can be shown next to the cell.
-        final DoubleProperty buttonY = new SimpleDoubleProperty();
-
-        /**
-         * AddPersonCell constructor
-         *
-         * @param stage the stage in which the table is placed.
-         * @param table the table to which a new person can be added.
-         */
-        AddPersonCell(final Stage stage, final TableView table) {
-            paddedButton.setPadding(new Insets(3));
-            paddedButton.getChildren().add(addButton);
-            addButton.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    buttonY.set(mouseEvent.getScreenY());
-                }
-            });
-            addButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-                    showAddPersonDialog(stage, table, buttonY.get());
-                    table.getSelectionModel().select(getTableRow().getIndex());
-                }
-            });
-        }
-    }
 
         private void showAddPersonDialog(Stage parent, final TableView<VPRow> table, double y) {
             System.err.println("TEST SHOW ADD PERSON");

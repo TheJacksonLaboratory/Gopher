@@ -154,7 +154,7 @@ public class VPVMainPresenter implements Initializable {
     /** Tab for the viewpoints (will show statistics and a table with individual viewpoints. */
     @FXML private Tab viewpointTableTab;
     /** Tab to show a selected viewpoint in a browser. */
-    @FXML private Tab singleviewpointTab;
+    //@FXML private Tab singleviewpointTab;
 
     /**
      * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting

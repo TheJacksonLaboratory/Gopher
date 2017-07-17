@@ -54,4 +54,13 @@ public class VPRow {
         this.targetName.set(name);
         this.viewpoint.setTargetName(name);
     }
+
+    /**
+     * Send a dummy URL for now -- later customize it!
+     * @return
+     */
+    public String getURL() {
+        String url = "https://genome.ucsc.edu/cgi-bin/hgTracks?db=mm9&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr4%3A151709259%2D151714759&hgsid=599799979_TMuPBovtFYR9grIdzARnJ2XDq9NE";
+        return url;
+    }
 }
