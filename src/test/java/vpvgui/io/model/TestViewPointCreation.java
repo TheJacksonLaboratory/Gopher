@@ -109,6 +109,8 @@ public class TestViewPointCreation {
             symbols.add(s.next());
         }
         s.close();
+        System.out.println("Number of entered gene symbols:" + symbols.size());
+
 
         /* get Jannovar annotation and create ViewPoint objects */
 
@@ -138,6 +140,14 @@ public class TestViewPointCreation {
         }
         out_invalid_symbols.close();
         System.out.println("Number of invalid gene symbols: " + invalidGeneSymbols.size());
+        System.out.println("Number of valid gene symbols: " + validGeneSymbols.size());
+        System.out.println("validGenes2TranscriptsMap.size(): " + validGenes2TranscriptsMap.size());
+
+        /* read refSeq.txt to map of TSS lists */
+
+        Map<String,List<Integer>> geneMapOfTssLists=null;
+
+
 
 
         /* apply our viewpoint derivation method to all TSS */
@@ -267,7 +277,7 @@ public class TestViewPointCreation {
                         Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getStartPos();
                         Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getEndPos();
                         out_fragment_margins.println(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
-                        uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_vp" + j + "_frag" + k + "_margin" +l);
+                        uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol);
                     }
 
                 }
