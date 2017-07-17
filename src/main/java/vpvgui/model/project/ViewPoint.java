@@ -63,6 +63,7 @@ public class ViewPoint {
 
     private IndexedFastaSequenceFile fastaReader;
 
+    private String warnings;
 
     /* constructor function */
 
@@ -86,6 +87,7 @@ public class ViewPoint {
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
         setResolved(false);
+        warnings="";
 
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
@@ -245,6 +247,9 @@ public class ViewPoint {
         return numOfSelectedFrags;
     }
 
+    public final String getWarnings() {
+        return warnings;
+    }
 
 
     public Integer getGenomicPosOfGenomicRelativePos(Integer genomicPos, Integer genomicPosRelPos) {
@@ -473,7 +478,8 @@ public class ViewPoint {
             }
         }
         if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
-            System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
+            warnings += "WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+            //System.out.println("WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
             resolved=false;
         }
 
@@ -521,7 +527,8 @@ public class ViewPoint {
             }
         }
         if (fragCountDown < fragNumDown) {
-            System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
+            warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+            //System.out.println("WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".");
             resolved=false;
         }
         numOfSelectedFrags=fragCountUp+fragCountDown;

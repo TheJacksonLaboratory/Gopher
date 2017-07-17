@@ -7,16 +7,15 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import vpvgui.gui.ErrorWindow;
-import vpvgui.model.project.JannovarGeneGenerator;
-import vpvgui.model.project.Segment;
-import vpvgui.model.project.VPVGene;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.project.*;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by peterrobinson on 7/11/17.
@@ -69,7 +68,7 @@ public class TestViewPointCreation {
         cuttingPatterns = new String[]{"GATC"};
         maxDistToGenomicPosUp = 10000;
         maxDistToGenomicPosDown = 10000;
-        fasta = new File("/home/peter/storage_1/agilent_project/data/genomes/mm9/Genome_Fasta_Files/mm9.fa");
+        fasta = new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_fasta/mm9.fa");
         fastaReader = new IndexedFastaSequenceFile(fasta);
 
         /* set viewpoint parameters as requested by Darío */
@@ -143,15 +142,99 @@ public class TestViewPointCreation {
         System.out.println("Number of valid gene symbols: " + validGeneSymbols.size());
         System.out.println("validGenes2TranscriptsMap.size(): " + validGenes2TranscriptsMap.size());
 
+
         /* read refSeq.txt to map of TSS lists */
 
-        Map<String,List<Integer>> geneMapOfTssLists=null;
+        HashMap<String,String> geneMapOfTss = new HashMap<String,String>();
+        File file = new File("refGene.txt");
+        Scanner refGeneFile = new Scanner(file);
+        while (refGeneFile.hasNextLine()) {
+            String[] line = refGeneFile.nextLine().split("\t");
+            String chr = line[2];
+            if(chr.contains("_")) {continue;} // skip random chromosomes
+            String strand = line[3];
+            Integer tssPos;
+            if(strand.equals("+")) {
+                tssPos = Integer.parseInt(line[4]);
+            }
+            else {
+                tssPos = Integer.parseInt(line[5])-1;
+            }
+            String geneSymbol= line[12];
+            String key = chr + "\t" + tssPos.toString() + "\t" + strand + "\t" + geneSymbol;
+            geneMapOfTss.put(key,key);
+        }
+
+        System.out.println("*******");
+
+         /* create a proper HashMap with gene symbols as keys and lists of TSS as values */
+
+        HashMap<String,ArrayList<TranscriptionStartSite>> geneMapOfTssLists = new HashMap<String,ArrayList<TranscriptionStartSite>>();
+        for (String key : geneMapOfTss.keySet()) {
+            String[] line =  key.split("\t");
+            String chr = line[0];
+            Integer pos = Integer.parseInt(line[1]);
+            String strand = line[2];
+            String geneSymbol = line[3];
+            TranscriptionStartSite newTSS = new TranscriptionStartSite(chr,pos,strand);
+            if(geneMapOfTssLists.isEmpty() || !geneMapOfTssLists.containsKey(geneSymbol)){
+                ArrayList<TranscriptionStartSite> newList = new ArrayList<TranscriptionStartSite>();
+                newList.add(newTSS);
+                geneMapOfTssLists.put(geneSymbol,newList);
+            } else {
+                geneMapOfTssLists.get(geneSymbol).add(newTSS);
+            }
+        }
+
+        System.out.println("*******");
+
+        /* check how many of the entered symbols can be found in refGene.txt */
+
+        System.out.println("totalNumberOfEnteredSymbols: " + symbols.size());
+
+        Integer numberOfFoundSymbols = 0;
+        Integer numberOfSymbolsNotFound = 0;
+        for(int i=0;i<symbols.size();i++) {
+            if(geneMapOfTssLists.containsKey(symbols.get(i))) {
+                numberOfFoundSymbols++;
+            }
+            else {
+                numberOfSymbolsNotFound++;
+                System.out.println(symbols.get(i));
+            }
+        }
+        System.out.println("numberOfFoundSymbols: " + numberOfFoundSymbols);
+        System.out.println("numberOfSymbolsNotFound: " + numberOfSymbolsNotFound);
+
+        System.out.println("*******");
+
+        /* apply our viewpoint derivation method to all TSS */
+
+        vpvGeneList = new ArrayList<>();
+        for (String symbol : symbols) {
+            if(!geneMapOfTssLists.containsKey(symbol)) {continue;}
+            VPVGene vpvgene=new VPVGene(symbol,symbol);
+            for (int i=0;i<geneMapOfTssLists.get(symbol).size();i++) {
+                String referenceSequenceID = geneMapOfTssLists.get(symbol).get(i).getReferenceSequenceID();
+                Integer gPos = geneMapOfTssLists.get(symbol).get(i).getPos();
+                ViewPoint vp = new ViewPoint(referenceSequenceID,gPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
+                        minFragSize, maxRepFrag,marginSize);
+                vpvgene.addViewPoint(vp);
+                vpvgene.setChromosome(referenceSequenceID);
+             }
+            vpvGeneList.add(vpvgene);
+        }
+
+
+
+
 
 
 
 
         /* apply our viewpoint derivation method to all TSS */
-
+/*
         vpvGeneList = new ArrayList<>();
         for (String symbol : validGenes2TranscriptsMap.keySet()) {
             List<TranscriptModel> transcriptList=validGenes2TranscriptsMap.get(symbol);
@@ -169,13 +252,13 @@ public class TestViewPointCreation {
                 GenomeInterval iv = tmod.getTXRegion();
                 Integer genomicPos = null;
                 if (tm.getStrand().isForward()) {
-                    /* Add 1 to convert from zero-based to one-based numbering */
+                    /* Add 1 to convert from zero-based to one-based numbering
                     genomicPos = iv.getGenomeBeginPos().getPos()+1;
                 } else {
                     /* The last position of a minus-strand gene is the start position,
                      * and the numbering is then one-based once it is flipped. Need to use
                      * the withStrand to convert positions of minus-strand genes.
-                     */
+
                     genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
@@ -185,6 +268,7 @@ public class TestViewPointCreation {
             }
             vpvGeneList.add(vpvgene);
         }
+        */
 
         /* iterate over all genes and viewpoints within and print to BED format */
 
