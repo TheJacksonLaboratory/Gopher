@@ -512,8 +512,6 @@ public class ViewPoint {
                 SegMargins.get(j).setRepetitiveContent(fastaReader);
                 if (maxRepFrag < SegMargins.get(j).getRepetitiveContent() && restSegListMap.get(motif).get(i).getSelected()) {
                     restSegListMap.get(motif).get(i).setSelected(false);
-                    System.out.println(referenceSequenceID + "\t" + SegMargins.get(j).getStartPos() + "\t" + SegMargins.get(j).getEndPos());
-
                 }
             }
 

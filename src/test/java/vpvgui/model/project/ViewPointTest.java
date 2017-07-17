@@ -247,6 +247,7 @@ public class ViewPointTest {
         Integer maxDistToGenomicPosDown=115;
         String[] testCuttingPatterns = new String[]{"^GATC","A^AGCTT"};
         String testFastaFile="src/test/resources/testgenome/test_genome.fa";
+        Integer marginSize = 250;
 
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
@@ -285,7 +286,7 @@ public class ViewPointTest {
         Integer maxSizeDown=95;
         Integer minFragSize=22;
         double minRepFrag=0.4;
-       // testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag);
+       // testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();

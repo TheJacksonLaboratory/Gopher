@@ -106,4 +106,7 @@ public class VPVGene {
         return  referenceSequenceID;
     }
 
+    public boolean isForward() {
+        return forward;
+    }
 }
