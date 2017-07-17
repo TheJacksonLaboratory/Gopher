@@ -61,7 +61,7 @@ public class TestViewPointCreation {
         /* set parameters for gene and TSS extraction */
 
         transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2_plus_only.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
 
         /* set initial viewpoint patrameters */
 
@@ -87,7 +87,7 @@ public class TestViewPointCreation {
         /* set other parameters */
 
         outPath = "/home/peter/IdeaProjects/git_vpv_workspace/VPV/";
-        outPrefix = "gonad_unresolved";
+        outPrefix = "gonad";
     }
 
 
@@ -148,18 +148,44 @@ public class TestViewPointCreation {
                 } else {
                     genomicPos = iv.getEndPos();
                 }
-                System.out.println(symbol);
+                //System.out.println(symbol + "\t" + referenceSequenceID + "\t" + genomicPos);
+
+                //System.out.println(symbol);
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, maxRepFrag);
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
             }
             vpvGeneList.add(vpvgene);
         }
 
         /* iterate over all genes and viewpoints within and print to BED format */
+
         printRestFragsToBed(outPath, outPrefix, vpvGeneList);
 
 
+        /* calculate summary statistics */
+
+        Integer numberOfResolvedViewpoints = 0;
+        Integer numberOfUnresolvedViewpoints = 0;
+        for (int i = 0; i < vpvGeneList.size(); i++) {
+            for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
+                if(vpvGeneList.get(i).getviewPointList().get(j).getResolved()) {
+                    numberOfResolvedViewpoints++;
+                } else {
+                    numberOfUnresolvedViewpoints++;
+                    String geneSymbol = vpvGeneList.get(i).getGeneSymbol();
+                    String strand = new String();
+                    if(vpvGeneList.get(i).isForward()) {
+                        strand = "+";
+                    } else {
+                        strand = "-";
+                    }
+                    System.out.println(geneSymbol + "\t" + strand);
+                }
+            }
+         }
+         System.out.println("numberOfResolvedViewpoints: " + numberOfResolvedViewpoints);
+         System.out.println("numberOfUnresolvedViewpoints: " + numberOfUnresolvedViewpoints);
     }
 
 
@@ -185,18 +211,30 @@ public class TestViewPointCreation {
         description = outPrefix + "_fragment_margins";
         out_fragment_margins.println("track name='" + description + "' description='" + description + "'");
 
+        fileName = outPrefix + "_genomic_positions.bed";
+        PrintStream out_genomic_positions = new PrintStream(new FileOutputStream(outPath+fileName));
+        description = new String();
+        description = outPrefix + "_genomic_positions";
+        out_genomic_positions.println("track name='" + description + "' description='" + description + "'");
+
 
         for (int i = 0; i < vpvGeneList.size(); i++) {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
-
-                if(vpvGeneList.get(i).getviewPointList().get(j).getResolved()) {continue;}
 
                 // print viewpoint
                 String getReferenceSequenceID = vpvGeneList.get(i).getReferenceSequenceID();
                 Integer vpStaPos = vpvGeneList.get(i).getviewPointList().get(j).getStartPos();
                 Integer vpEndPos = vpvGeneList.get(i).getviewPointList().get(j).getEndPos();
+                Integer vpGenomicPos = vpvGeneList.get(i).getviewPointList().get(j).getGenomicPos();
                 String geneSymbol = vpvGeneList.get(i).getGeneSymbol();
-                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol);
+                Integer viewPointScore=0;
+                if(vpvGeneList.get(i).getviewPointList().get(j).getResolved()) {
+                    viewPointScore=1;
+                }
+                viewPointScore=vpvGeneList.get(i).getviewPointList().get(j).getNumOfSelectedFrags();
+                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
+
+                out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 // print selected fragments of the viewpoint
                 ArrayList<Segment> selectedRestSegList = vpvGeneList.get(i).getviewPointList().get(j).getSelectedRestSegList(cuttingMotif);
@@ -217,7 +255,10 @@ public class TestViewPointCreation {
             }
 
         }
-        System.setOut(out_viewpoints);
+        out_viewpoints.close();
+        out_genomic_positions.close();
+        out_fragments.close();
+        out_fragment_margins.close();
      }
 
 
