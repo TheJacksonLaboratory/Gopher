@@ -62,7 +62,7 @@ public class TestViewPointCreation {
         /* set parameters for gene and TSS extraction */
 
         transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2_plus_only.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
 
         /* set initial viewpoint patrameters */
 
@@ -82,7 +82,7 @@ public class TestViewPointCreation {
         minSizeDown = 1500;
         maxSizeDown = 5000;
         minFragSize = 130;
-        maxRepFrag = 0.9;
+        maxRepFrag = 0.5;
         marginSize = 250;
 
         /* set other parameters */
@@ -128,6 +128,20 @@ public class TestViewPointCreation {
         int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
 
 
+        /* print invalid gene symbols to file */
+
+        String fileName = outPrefix + "_invalid_symbols.txt";
+        PrintStream out_invalid_symbols = new PrintStream(new FileOutputStream(outPath+fileName));
+
+        for(int i = 0; i < invalidGeneSymbols.size(); i++) {
+            out_invalid_symbols.println(invalidGeneSymbols.get(i));
+        }
+        out_invalid_symbols.close();
+        System.out.println("Number of invalid gene symbols: " + invalidGeneSymbols.size());
+
+
+        /* apply our viewpoint derivation method to all TSS */
+
         vpvGeneList = new ArrayList<>();
         for (String symbol : validGenes2TranscriptsMap.keySet()) {
             List<TranscriptModel> transcriptList=validGenes2TranscriptsMap.get(symbol);
@@ -154,14 +168,7 @@ public class TestViewPointCreation {
                      */
                     genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
-                System.out.println(symbol);
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-               /*
-                public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp,
-                Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag, Integer marginSize) {
-                @PeterHansen--ich habe unten "marginSize" ergänzt, es hatte gefehlt und bei mir nicht kompiliert!
-                */
-               Integer marginSize=42;
                 vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
                         minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
@@ -185,13 +192,6 @@ public class TestViewPointCreation {
                 } else {
                     numberOfUnresolvedViewpoints++;
                     String geneSymbol = vpvGeneList.get(i).getGeneSymbol();
-                    String strand = new String();
-                    if(vpvGeneList.get(i).isForward()) {
-                        strand = "+";
-                    } else {
-                        strand = "-";
-                    }
-                    System.out.println(geneSymbol + "\t" + strand);
                 }
             }
          }
@@ -228,10 +228,16 @@ public class TestViewPointCreation {
         description = outPrefix + "_genomic_positions";
         out_genomic_positions.println("track name='" + description + "' description='" + description + "'");
 
+        fileName = outPrefix + "_fragment_margins_unique.txt";
+        PrintStream out_fragment_margins_unique = new PrintStream(new FileOutputStream(outPath+fileName));
+        description = new String();
+        description = outPrefix + "_fragment_margins_unique";
+        out_fragment_margins_unique.println("track name='" + description + "' description='" + description + "'");
+
+        Set<String> uniqueFragmentMargins = new HashSet<String>();
 
         for (int i = 0; i < vpvGeneList.size(); i++) {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
-
 
                 // print viewpoint
                 String getReferenceSequenceID = vpvGeneList.get(i).getReferenceSequenceID();
@@ -261,6 +267,7 @@ public class TestViewPointCreation {
                         Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getStartPos();
                         Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getEndPos();
                         out_fragment_margins.println(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
+                        uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_vp" + j + "_frag" + k + "_margin" +l);
                     }
 
                 }
@@ -271,11 +278,21 @@ public class TestViewPointCreation {
         out_genomic_positions.close();
         out_fragments.close();
         out_fragment_margins.close();
+
+        /* print out unique set of margins for enrichment (and calculate the total length of all  margins) */
+        Integer totalLengthOfMargins=0;
+        for (String s : uniqueFragmentMargins) {
+            out_fragment_margins_unique.println(s);
+            String[] parts = s.split("\t");
+            Integer sta = Integer.parseInt(parts[1]);
+            Integer end = Integer.parseInt(parts[2]);
+            Integer len = end - sta;
+            totalLengthOfMargins = totalLengthOfMargins + len;
+        }
+        out_fragment_margins_unique.close();
+
+        System.out.println("totalLengthOfMargins: " + totalLengthOfMargins);
      }
-
-
-
-
 
 
     /** TODO -- stimmt nicht fuer Maus */
