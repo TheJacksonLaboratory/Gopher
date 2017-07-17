@@ -1,6 +1,7 @@
 package vpvgui.io.model;
 
 import de.charite.compbio.jannovar.reference.GenomeInterval;
+import de.charite.compbio.jannovar.reference.Strand;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
@@ -144,15 +145,25 @@ public class TestViewPointCreation {
                 GenomeInterval iv = tmod.getTXRegion();
                 Integer genomicPos = null;
                 if (tm.getStrand().isForward()) {
-                    genomicPos = iv.getBeginPos();
+                    /* Add 1 to convert from zero-based to one-based numbering */
+                    genomicPos = iv.getGenomeBeginPos().getPos()+1;
                 } else {
-                    genomicPos = iv.getEndPos();
+                    /* The last position of a minus-strand gene is the start position,
+                     * and the numbering is then one-based once it is flipped. Need to use
+                     * the withStrand to convert positions of minus-strand genes.
+                     */
+                    genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
-                //System.out.println(symbol + "\t" + referenceSequenceID + "\t" + genomicPos);
-
-                //System.out.println(symbol);
+                System.out.println(symbol);
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, maxRepFrag,marginSize);
+               /*
+                public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp,
+                Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag, Integer marginSize) {
+                @PeterHansen--ich habe unten "marginSize" ergänzt, es hatte gefehlt und bei mir nicht kompiliert!
+                */
+               Integer marginSize=42;
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
+                        minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
             }
             vpvGeneList.add(vpvgene);
@@ -220,6 +231,7 @@ public class TestViewPointCreation {
 
         for (int i = 0; i < vpvGeneList.size(); i++) {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
+
 
                 // print viewpoint
                 String getReferenceSequenceID = vpvGeneList.get(i).getReferenceSequenceID();
