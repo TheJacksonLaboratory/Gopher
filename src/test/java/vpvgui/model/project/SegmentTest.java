@@ -47,6 +47,5 @@ public class SegmentTest {
 
         segment_3.setRepetitiveContent(FastaReader);
         System.out.println(segment_3.getRepetitiveContent());
-
     }
 }
