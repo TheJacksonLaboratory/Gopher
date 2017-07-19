@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
@@ -19,6 +20,10 @@ import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
+import vpvgui.gui.proxy.SetProxyPresenter;
+import vpvgui.gui.proxy.SetProxyView;
+import vpvgui.gui.settings.SettingsPresenter;
+import vpvgui.gui.settings.SettingsView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
@@ -409,6 +414,31 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML public void showHelpWindow(ActionEvent e) {
         HelpViewFactory.display();
+    }
+
+    /** Todo open a window to set the Proxy. */
+    @FXML void setProxyDialog(ActionEvent e) {
+        Stage window;
+        String windowTitle = "VPV Settings";
+        window = new Stage();
+        window.setOnCloseRequest( event -> {window.close();} );
+        window.setTitle(windowTitle);
+
+        SetProxyView view = new SetProxyView();
+        SetProxyPresenter presenter = (SetProxyPresenter) view.getPresenter();
+        presenter.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+        window.setScene(new Scene(view.getView()));
+        window.showAndWait();
     }
 
 

@@ -47,11 +47,19 @@ public class Model {
     public StringProperty genomeBuildProperty() {
         return genomeBuild;
     }
-
+    /** Minimum size upstream of the view point. */
     final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty(-1);
     public IntegerProperty minSizeUpProperty() { return minSizeUpProperty;  }
     public int minSizeUp() {return minSizeUpProperty.get();}
     public void setMinSizeUpProperty(Integer i) { this.minSizeUpProperty.setValue(i);}
+
+    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty(-1);
+    public IntegerProperty minSizeDownProperty() { return minSizeDownProperty;  }
+    public int minSizeDown() {return minSizeDownProperty.get();}
+    public void setMinSizeDownProperty(Integer i) { this.minSizeDownProperty.setValue(i);}
+
+
+
 
     /**
      * This is coupled to genomeTranscriptomeList in the Controller

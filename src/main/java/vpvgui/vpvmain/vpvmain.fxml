@@ -38,6 +38,7 @@
                         <items>
                           <MenuItem mnemonicParsing="false" text="Delete" />
                               <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
+                              <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
                         </items>
                       </Menu>
                     </menus>
