@@ -60,15 +60,15 @@ public class TestViewPointCreation {
 
         /* set parameters for gene and TSS extraction */
 
-        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
+        transcriptFile= "/Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser
+        geneFile="/Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
 
         /* set initial viewpoint patrameters */
 
         cuttingPatterns = new String[]{"GATC"};
         maxDistToGenomicPosUp = 10000;
         maxDistToGenomicPosDown = 10000;
-        fasta = new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_fasta/mm9.fa");
+        fasta = new File("/Users/hansep/IdeaProjects/VPV/mm9_fasta/mm9.fa");
         fastaReader = new IndexedFastaSequenceFile(fasta);
 
         /* set viewpoint parameters as requested by Darío */
@@ -81,13 +81,13 @@ public class TestViewPointCreation {
         minSizeDown = 1500;
         maxSizeDown = 5000;
         minFragSize = 130;
-        maxRepFrag = 0.5;
+        maxRepFrag = 0.6;
         marginSize = 250;
 
         /* set other parameters */
 
-        outPath = "/home/peter/IdeaProjects/git_vpv_workspace/VPV/";
-        outPrefix = "gonad";
+        outPath = "/Users/hansep/IdeaProjects/VPV/";
+        outPrefix = "gonad_RC06";
     }
 
 
@@ -146,12 +146,13 @@ public class TestViewPointCreation {
         /* read refSeq.txt to map of TSS lists */
 
         HashMap<String,String> geneMapOfTss = new HashMap<String,String>();
-        File file = new File("refGene.txt");
+        HashMap<String,String> geneMapOfTssHelp = new HashMap<String,String>();
+        Integer countSymbolsWithTssOnDifferentChromosomes = 0;
+        File file = new File("/Users/hansep/IdeaProjects/VPV/mm9_fasta/refGene.txt");
         Scanner refGeneFile = new Scanner(file);
         while (refGeneFile.hasNextLine()) {
             String[] line = refGeneFile.nextLine().split("\t");
             String chr = line[2];
-            if(chr.contains("_")) {continue;} // skip random chromosomes
             String strand = line[3];
             Integer tssPos;
             if(strand.equals("+")) {
@@ -161,10 +162,27 @@ public class TestViewPointCreation {
                 tssPos = Integer.parseInt(line[5])-1;
             }
             String geneSymbol= line[12];
+            if(chr.contains("_") && (geneSymbol.equals("Tsnax") || geneSymbol.equals("Uba1y") || geneSymbol.equals("Gm1993"))) {continue;} // skip random chromosomes
+            if(geneMapOfTssHelp.containsKey(geneSymbol)) {
+                String prevGeneChr = geneMapOfTssHelp.get(geneSymbol);
+                if(!prevGeneChr.equals(chr)) {
+                    // check if affected symbol is in our list
+                    if(symbols.contains(geneSymbol)) {
+                        //System.out.println(prevGeneChr);
+                        //System.out.println(chr + "\t" + tssPos.toString() + "\t" + strand + "\t" + geneSymbol);
+                    }
+                    countSymbolsWithTssOnDifferentChromosomes++;
+
+                }
+            }
+            if(chr.contains("random") && symbols.contains(geneSymbol)) {
+                System.out.println(geneSymbol + "\t" + chr);
+            }
             String key = chr + "\t" + tssPos.toString() + "\t" + strand + "\t" + geneSymbol;
             geneMapOfTss.put(key,key);
+            geneMapOfTssHelp.put(geneSymbol,chr);
         }
-
+        System.out.println(countSymbolsWithTssOnDifferentChromosomes);
         System.out.println("*******");
 
          /* create a proper HashMap with gene symbols as keys and lists of TSS as values */
