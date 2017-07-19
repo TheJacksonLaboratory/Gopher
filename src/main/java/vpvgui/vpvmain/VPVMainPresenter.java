@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.converter.NumberStringConverter;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
@@ -116,8 +117,19 @@ public class VPVMainPresenter implements Initializable {
     private ProgressIndicator transcriptDownloadPI;
 
 
-    @FXML
-    private TextField textTextField;
+
+    //private TextField textTextField;
+
+    @FXML private TextField fragNumUpTextField;
+    @FXML private TextField fragNumDownTextField;
+    @FXML private TextField minSizeUpTextField;
+    @FXML private TextField maxSizeUpTextField;
+    @FXML private TextField minSizeDownTextField;
+    @FXML private TextField maxSizeDownTextField;
+    @FXML private TextField minFragSizeTextField;
+    @FXML private TextField maxRepFragTextField;
+
+
 
     @FXML
     private Button showButton;
@@ -221,6 +233,7 @@ public class VPVMainPresenter implements Initializable {
      */
     private void initializeBindings() {
         genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
+        this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
         //genomeBuildLabel.textProperty().bind(genomeChoiceBox.valueProperty());
 
     }

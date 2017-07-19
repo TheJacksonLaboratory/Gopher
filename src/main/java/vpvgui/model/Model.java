@@ -1,8 +1,8 @@
 package vpvgui.model;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.util.converter.NumberStringConverter;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
@@ -41,14 +41,17 @@ public class Model {
     public String getGenomeBuild() {
         return genomeBuild.get();
     }
-
     public void setGenomeBuild(String newDatabase) {
         genomeBuild.set(newDatabase);
     }
-
     public StringProperty genomeBuildProperty() {
         return genomeBuild;
     }
+
+    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty(-1);
+    public IntegerProperty minSizeUpProperty() { return minSizeUpProperty;  }
+    public int minSizeUp() {return minSizeUpProperty.get();}
+    public void setMinSizeUpProperty(Integer i) { this.minSizeUpProperty.setValue(i);}
 
     /**
      * This is coupled to genomeTranscriptomeList in the Controller
@@ -206,4 +209,6 @@ public class Model {
     public boolean viewpointsInitialized() {
         return (this.geneList!=null && this.geneList.size()>0);
     }
+
+
 }
