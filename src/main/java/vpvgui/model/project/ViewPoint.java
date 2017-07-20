@@ -120,7 +120,7 @@ public class ViewPoint {
         setDerivationApproach("INITIAL");
     }
 
-    /**
+    /*
      * TODO -- need to execute this to finish initializing ViewPoint objects made from GUI
      */
     public void initCuttingPositionMap(String referenceSequenceID, Integer genomicPos, IndexedFastaSequenceFile fastaReader, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns) {
@@ -276,10 +276,21 @@ public class ViewPoint {
         return selectedRestSegList;
     }
 
+
     /* ------------------------ */
     /* wrapper/helper functions */
     /* ------------------------ */
 
+    /**
+     * <p style="color:red">This function is unfinished!</p>
+     * This function was intended to support the selection of fragments through the GUI.
+     * The implementation turned out to be more difficult than expected, especially the handling of exceptions.
+     * This lead to a new concept of selected and unselected <i>Segments</i> which seems to be more suitable.
+     *
+     * @param fromThisPos genomic position.
+     * @throws IntegerOutOfRangeException
+     * @throws NoCuttingSiteFoundUpOrDownstreamException is thrown by the function <i>getNextCutPos()</i>.
+     */
     public void extendFragmentWise(Integer fromThisPos) throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
 
         /* The viewpoint will be extended up to the next cutting site. */
@@ -310,6 +321,33 @@ public class ViewPoint {
             /* CASE 5: If 'fromThisPos' is downstream of the interval ['genomicPos'-'maxDistToGenomicPosUp','genomicPos'+'maxDistToGenomicPosDown'],
                     the viewpoint extended in to the outmost cutting site downstream within this interval. */
 
+    }
+
+    /**
+     * <p style="color:red">This function is unfinished!</p>
+     * Given a position the fragment containing this position will be selected if it is selected and the other way around.
+     * @param pos genomic position.
+     */
+    public void selectOrDeSelectFragment(Integer pos) {
+
+        /* find the fragments that contains 'pos' */
+
+        Object[] cuttingPatterns = restSegListMap.keySet().toArray();
+
+        boolean found = false;
+        for (int i = 0; i < cuttingPatterns.length; i++) {
+            for (int j = 0; j < restSegListMap.get(cuttingPatterns[i]).size(); j++) {
+                Integer sta = restSegListMap.get(cuttingPatterns[i]).get(j).getStartPos();
+                Integer end = restSegListMap.get(cuttingPatterns[i]).get(j).getEndPos();
+                if (sta < pos && pos < end) {
+                    restSegListMap.get(cuttingPatterns[i]).get(j).setSelected(!restSegListMap.get(cuttingPatterns[i]).get(j).getSelected());
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            // TODO: Throw exception
+        }
     }
 
 
@@ -373,30 +411,6 @@ public class ViewPoint {
     public Integer vpIdxToRelPos(Integer vpIdx) {
         return vpIdx - genomicPos + startPos;
     }
-
-
-    public void selectOrDeSelectFragment(Integer pos) {
-
-        /* find the fragments that contains 'pos' */
-
-        Object[] cuttingPatterns = restSegListMap.keySet().toArray();
-
-        boolean found = false;
-        for (int i = 0; i < cuttingPatterns.length; i++) {
-            for (int j = 0; j < restSegListMap.get(cuttingPatterns[i]).size(); j++) {
-                Integer sta = restSegListMap.get(cuttingPatterns[i]).get(j).getStartPos();
-                Integer end = restSegListMap.get(cuttingPatterns[i]).get(j).getEndPos();
-                if (sta < pos && pos < end) {
-                    restSegListMap.get(cuttingPatterns[i]).get(j).setSelected(!restSegListMap.get(cuttingPatterns[i]).get(j).getSelected());
-                    found = true;
-                }
-            }
-        }
-        if (found) {
-            //System.out.println("hooray!");
-        }
-    }
-
 
     public String toString() {
         return String.format("%s: [%d-%d]",getReferenceID(),getStartPos(),getEndPos());
