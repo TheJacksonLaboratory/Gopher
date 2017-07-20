@@ -26,8 +26,8 @@
                <children>
                   <Label text="HTTP Proxy" />
                   <Label text="HTTP Port" GridPane.rowIndex="1" />
-                  <TextField fx:id="portTextField" GridPane.columnIndex="1" />
-                  <TextField fx:id="proxyTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="proxyTextField" GridPane.columnIndex="1" />
+                  <TextField fx:id="portTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <Button mnemonicParsing="false" onAction="#acceptProxy" text="Accept" />

@@ -36,6 +36,9 @@ public class JannovarTranscriptFileBuilder {
 
     List<String> datasources= new ArrayList<>();;
 
+    private Integer port=null;
+
+    private String proxy=null;
 
 
     public JannovarTranscriptFileBuilder( String genome, File dirpath){
@@ -44,7 +47,14 @@ public class JannovarTranscriptFileBuilder {
         setJannovarFileName();
     }
 
-    /** Initializes ther path where jannovar while be downloaded to. The path consists of the
+    public void setProxy(String httpProxy, int port) {
+        System.out.println("JannovarTranscriptBuilder, setting proxy:"+httpProxy+":"+port);
+        this.port=port; this.proxy=httpProxy;
+    }
+    public boolean hasProxy() { return this.proxy!=null && this.port!=null; }
+
+
+    /** Initializes the path where jannovar while be downloaded to. The path consists of the
      * absolute paht to the directory chosen by the user and then a file name such as
      * {@code hg38_ucsc.ser}.
      */
@@ -72,6 +82,19 @@ public class JannovarTranscriptFileBuilder {
         genomebuild=fields[1].toLowerCase();
     }
 
+    private String[] getJannovarCommand(String database) {
+        if (hasProxy()) {
+            String pr=String.format("%s:%d",this.proxy,this.port);
+            String A[] = {"download","-d",database,"--download-dir",downloaddir.getAbsolutePath(),"--http-proxy",pr};
+            return A;
+        } else {
+            String B[]={"download","-d",database,"--download-dir",downloaddir.getAbsolutePath()};
+            return B;
+        }
+    }
+
+
+
     /** Start a task to let the Jannovar download run.*/
     public void runJannovar() {
         Stage taskUpdateStage = new Stage(StageStyle.UTILITY);
@@ -95,7 +118,7 @@ public class JannovarTranscriptFileBuilder {
                 if (f.exists())
                     return null; /* Don't download if File already exists!! */
                 String dbase=String.format("%s/%s",genomebuild,genomedatabase);
-                String argv[] = {"download","-d",dbase,"--download-dir",downloaddir.getAbsolutePath()};
+                String argv[] = getJannovarCommand(dbase);
                 Jannovar.main(argv);
                 return null;
             }

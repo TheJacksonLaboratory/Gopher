@@ -58,8 +58,19 @@ public class Model {
     public int minSizeDown() {return minSizeDownProperty.get();}
     public void setMinSizeDownProperty(Integer i) { this.minSizeDownProperty.setValue(i);}
 
+    private Integer httpProxyPort=null;
+    private String httpProxy=null;
 
+    public void setHttpProxyPort(Integer httpProxyPort) {
+        this.httpProxyPort = httpProxyPort;
+    }
+    public Integer getHttpProxyPort() { return this.httpProxyPort;}
+    public void setHttpProxy(String proxy){
+        this.httpProxy=proxy;
+    }
+    public String getHttpProxy() { return httpProxy;}
 
+    public boolean needsProxy() { return httpProxy!=null && httpProxyPort !=null; }
 
     /**
      * This is coupled to genomeTranscriptomeList in the Controller

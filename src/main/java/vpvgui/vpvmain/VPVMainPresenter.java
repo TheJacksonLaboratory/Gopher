@@ -319,6 +319,9 @@ public class VPVMainPresenter implements Initializable {
             return; // assume the user clicked the cancel button, we do not need to show an error message
         }
         JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
+        if (model.needsProxy()){
+            builder.setProxy(model.getHttpProxy(),model.getHttpProxyPort());
+        }
         try {
             builder.runJannovar();
         } catch (Exception e) {
@@ -439,6 +442,11 @@ public class VPVMainPresenter implements Initializable {
         });
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
+        int port=presenter.getPort();
+        String proxy=presenter.getProxy();
+        this.model.setHttpProxy(proxy);
+        this.model.setHttpProxyPort(port);
+
     }
 
 
