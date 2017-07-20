@@ -24,11 +24,12 @@ public class SegmentTest {
         String testFastaFile="src/test/resources/testgenome/test_genome.fa";
         String referenceSequenceID="chr_t4_GATC_short_20bp_and_long_24bp_fragments";
 
-
         /* create IndexedFastaSequenceFile object */
 
         fasta = new File(testFastaFile);
         FastaReader = new IndexedFastaSequenceFile(fasta);
+
+        /* create Segment objects for testing */
 
         segment_1 = new Segment(referenceSequenceID,21,44,false);
         segment_2 = new Segment(referenceSequenceID,69,92,false);
