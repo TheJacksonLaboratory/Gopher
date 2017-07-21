@@ -571,4 +571,42 @@ public class ViewPoint {
         double score = nD.cumulativeProbability(-dist);
         return score;
     }
+
+    public double getViewpointScore(String motif, Integer marginSize) {
+
+        double score = 0.0;
+
+        /* iterate over all selected fragments */
+
+        for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
+            double repCont = 0;
+            double positionScoreSumFragment = 0;
+            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+
+                /* get repetitive content of the fragment margins */
+
+                repCont = 0;
+                ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
+                for (int j = 0; j < SegMargins.size(); j++) {
+                    SegMargins.get(j).setRepetitiveContent(fastaReader);
+                    repCont = repCont + SegMargins.get(j).getRepetitiveContent();
+                }
+                System.out.println(repCont);
+
+                /* get position distance score for each position of the fragment */
+
+                positionScoreSumFragment = 0;
+                for (int j = restSegListMap.get(motif).get(i).getStartPos(); j < restSegListMap.get(motif).get(i).getEndPos(); j++) {
+                    Integer dist = j - genomicPos;
+                    if (dist < 0) {
+                        positionScoreSumFragment = positionScoreSumFragment + getViewpointPositionDistanceScore(-1 * dist, maxDistToGenomicPosUp);
+                    } else {
+                        positionScoreSumFragment = positionScoreSumFragment + getViewpointPositionDistanceScore(dist, maxDistToGenomicPosDown);
+                    }
+                }
+            }
+            score = score + (1 - repCont) * positionScoreSumFragment;
+        }
+        return score;
+    }
 }
