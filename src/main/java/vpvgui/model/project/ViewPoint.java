@@ -5,8 +5,10 @@ import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
+import org.apache.commons.*;
 
 import javax.swing.text.View;
 import java.util.*;
@@ -559,5 +561,14 @@ public class ViewPoint {
 
         setDerivationApproach("LUPIANEZ");
         setResolved(resolved);
+    }
+
+
+    public double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
+        double sd = maxDistToGenomicPos/6;
+        double mean = -3*sd;
+        NormalDistribution nD = new NormalDistribution(mean,sd);
+        double score = nD.cumulativeProbability(-dist);
+        return score;
     }
 }

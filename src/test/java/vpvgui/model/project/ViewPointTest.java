@@ -322,6 +322,15 @@ public class ViewPointTest {
         System.out.println("=========================================================================================");
     }
 
+    @Test
+    public void testGetViewpointPositionDistanceScore() throws FileNotFoundException {
+
+        Integer maxDistToGenomicPos = 1000;
+        for(Integer dist = 0;dist<=maxDistToGenomicPos;dist++) {
+            double score = testViewpoint.getViewpointPositionDistanceScore(dist,maxDistToGenomicPos);
+            System.out.println(dist+0 + "\t" + score);
+        }
+    }
 
     /* test utility functions */
 
