@@ -29,8 +29,21 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * This is the window that appears so tha tthe user can upload target genes.
- * Created by peter on 01.07.17.
+ * This is the window that appears so that the user can upload target genes. The dialog has three buttons.
+ * <ol>
+ *     <li>Upload causes {@link #uploadGenes(ActionEvent)} to be run, which fills the set {@link #symbols}.
+ *     This set can contain valid and invalid symbols</li>
+ *     <li>Validate causes {@link #validateGeneSymbols(ActionEvent)} to be run, which fills the map
+ *     {@link #validGenes2TranscriptsMap} that has all valid symbols (key) with their corresponding transcripts (value), whereby
+ *     only one transcriptmodel is stored per distinct transcription start site. The function also displays lists of valid and invalid
+ *     gene symbols in the dialog</li>
+ *     <li>Accept causes {@link #acceptGenes()} to be run, which creates a list of {@link VPVGene} objects - one for
+ *     each valid symbol -- and passes this to the {@link Model}. It also causes the dialog to close</li>
+ * </ol>
+ * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link VPVGene} objects to the model.
+ * This list should then be used to create {@link vpvgui.model.project.ViewPoint} objects elsewhere in the code.
+ * @author Peter Robinson
+ * @version 0.0.2 (2017-07-22)
  */
 public class EntrezGenePresenter implements Initializable {
     @FXML
@@ -107,8 +120,6 @@ public class EntrezGenePresenter implements Initializable {
      */
     @FXML public void validateGeneSymbols(ActionEvent e) {
         e.consume();
-
-
         if (this.model.getSettings()==null) {
             ErrorWindow.display("Error","Settings object was null (report to developers)");
             return;
@@ -129,6 +140,7 @@ public class EntrezGenePresenter implements Initializable {
         isvalidated=true;
     }
 
+    /** @return total number of transcripts. */
     private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {
         int n=0;
         for (String s : mp.keySet()) {
@@ -143,19 +155,6 @@ public class EntrezGenePresenter implements Initializable {
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
     }
-
-
-    /*
-    private String joinWithNL(String[] a) {
-        if (a==null || a.length==0)
-            return "";
-        StringBuilder sb = new StringBuilder();
-        sb.append(a[0]);
-        for (int i=1;i<a.length;i++) {
-            sb.append("\n  ---"+a[i]);
-        }
-        return sb.toString();
-    }*/
 
     @FXML
     public void uploadGenes(ActionEvent e) {

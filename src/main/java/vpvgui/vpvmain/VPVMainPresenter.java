@@ -22,18 +22,18 @@ import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
-import vpvgui.gui.settings.SettingsPresenter;
-import vpvgui.gui.settings.SettingsView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.Settings;
+import vpvgui.model.project.ViewPointFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 
@@ -45,16 +45,12 @@ import java.util.ResourceBundle;
  */
 public class VPVMainPresenter implements Initializable {
 
-    /**
-     * The Model for the entire analysis.
-     */
+    /** The Model for the entire analysis. */
     private Model model = null;
 
     private Stage primaryStage;
 
-    public void initStage(Stage stage) {
-        primaryStage = stage;
-    }
+
 
 
     /**
@@ -68,7 +64,7 @@ public class VPVMainPresenter implements Initializable {
      * List of genome+gene files for download. Used by genomeChoiceBox
      */
     @FXML
-    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("UCSC-hg19", "UCSC-hg38", "UCSC-mm9","UCSC-mm10");
+    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
 
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
@@ -132,9 +128,9 @@ public class VPVMainPresenter implements Initializable {
     @FXML private TextField minSizeDownTextField;
     @FXML private TextField maxSizeDownTextField;
     @FXML private TextField minFragSizeTextField;
-    @FXML private TextField maxRepFragTextField;
-
-
+    @FXML private TextField maxRepContentTextField;
+    /** Show which enzymes the user has chosen. */
+    @FXML private Label restrictionEnzymeLabel;
 
     @FXML
     private Button showButton;
@@ -225,6 +221,12 @@ public class VPVMainPresenter implements Initializable {
         // textLabel.textProperty().bind(textTextField.textProperty());*/
     }
 
+    public void initStage(Stage stage) {
+        primaryStage = stage;
+    }
+
+
+
     private void createPanes() {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
         /* todo -- analogous for other tabs/p[anes.*/
@@ -238,8 +240,15 @@ public class VPVMainPresenter implements Initializable {
      */
     private void initializeBindings() {
         genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
+        this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
+        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
         this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-        //genomeBuildLabel.textProperty().bind(genomeChoiceBox.valueProperty());
+        this.maxSizeUpTextField.textProperty().bindBidirectional(model.maxSizeUpProperty(),new NumberStringConverter());
+        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
+        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
+        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
+        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
+
 
     }
 
@@ -262,8 +271,14 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
+    /** This downloads the tar-gzip genome file as chosen by the user from the UCSC download site.
+     * It places the compressed file into the directory chosen by the user. The path to the directory
+     * is stored in the {@link Model} object using the {@link Model#setGenomeDirectoryPath} function.
+     * Following this the user needs to uncompress and index the genome files using the function
+     * {@link #unpackAndIndexGenome(ActionEvent)} which is called after the corresponding button
+     * is clicked in the GUI.
+     */
     public void downloadGenome() {
-
         String genome = this.model.getGenomeURL();
         genome = this.genomeChoiceBox.getValue();
         try {
@@ -338,11 +353,14 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
-
-    @FXML public void unpackAndIndexTranscripts(ActionEvent e) {
+    /** ToDo wrap this in a Task! */
+    @FXML public void unpackAndIndexGenome(ActionEvent e) {
         e.consume();
         GenomeIndexer gindexer = new GenomeIndexer(this.model.getGenomeDirectoryPath());
         gindexer.extractTarGZ();
+        gindexer.indexFastaFiles();
+        Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
+        model.setIndexedFastaFiles(indexedFa);
 
     }
 
@@ -354,11 +372,16 @@ public class VPVMainPresenter implements Initializable {
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
-        this.model.setRestrictionEnzymes(chosenEnzymes);
+        this.model.setChosenRestrictionEnzymes(chosenEnzymes);
+        this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }
 
     /**
      * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
+     * The effect of the command <pre>EntrezGeneViewFactory.display(this.model);</pre>
+     * is to pass a list of {@link vpvgui.model.project.VPVGene} objects to the {@link Model}.
+     * These objects are used with other information in the Model to create {@link vpvgui.model.project.ViewPoint}
+     * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
      *
      * @param e
@@ -372,7 +395,17 @@ public class VPVMainPresenter implements Initializable {
         e.consume();
     }
 
+    /**
+     * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
+     * these will have been entered as {@link vpvgui.model.project.VPVGene} objects into the {@link Model}
+     * object. This function will use the {@link vpvgui.model.project.VPVGene} obejcts and other information
+     * to create {@link vpvgui.model.project.ViewPoint} objects that will then be displayed in the
+     * {@link VPAnalysisPresenter} Tab.
+     */
     public void createCaptureProbes() {
+        ViewPointFactory factory = new ViewPointFactory(model);
+        factory.createViewPoints();
+        /* The above puts the created viewpoints into the model. */
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.showVPTable();

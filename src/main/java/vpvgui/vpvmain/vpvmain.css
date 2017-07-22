@@ -49,3 +49,11 @@
     -fx-hgap: 10;
     -fx-vgap: 10;
 }
+
+.bluelabel {
+    -fx-font-size: 11pt;
+    -fx-font-family: "monospace";
+    -fx-font-style: italic;
+     -fx-text-fill: blue;
+    -fx-opacity: 0.75;
+}

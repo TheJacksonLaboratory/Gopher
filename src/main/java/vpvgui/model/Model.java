@@ -1,5 +1,6 @@
 package vpvgui.model;
 
+import com.sun.org.apache.regexp.internal.RE;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.beans.property.*;
 import javafx.util.converter.NumberStringConverter;
@@ -10,6 +11,7 @@ import vpvgui.model.project.ViewPoint;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by peter on 05.05.17.
@@ -18,14 +20,26 @@ import java.util.List;
 public class Model {
 
     private DataSource datasource = null;
-
+    /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist;
-
+    /** The enzymes chosen by the user for ViewPoint production. */
+    private List<RestrictionEnzyme> chosenEnzymelist;
+    private List<ViewPoint> viewpointList=null;
     private List<VPVGene> geneList;
     /** Settings for the current project. */
     private Settings settings;
     /** Directory to which the Genome was downloaded */
     private String genomeDirectoryPath=null;
+    /** @return array of enzyme cutting sites. */
+    public String[] getCuttingPatterns() {
+        int n = this.enzymelist.size();
+        String patterns[]=new String[n];
+        for (int i=0;i<n;i++) {
+            RestrictionEnzyme re = enzymelist.get(i);
+            patterns[i]=re.getSite();
+        }
+        return patterns;
+    }
 
     /**
      * This suffix is appended to the project name to get the name of the file for storing the
@@ -39,7 +53,7 @@ public class Model {
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
 
     public String getGenomeBuild() {
-        return genomeBuild.get();
+        return genomeBuild.getValue();
     }
     public void setGenomeBuild(String newDatabase) {
         genomeBuild.set(newDatabase);
@@ -48,29 +62,49 @@ public class Model {
         return genomeBuild;
     }
     /** Minimum size upstream of the view point. */
-    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty(-1);
+    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty();
     public IntegerProperty minSizeUpProperty() { return minSizeUpProperty;  }
-    public int minSizeUp() {return minSizeUpProperty.get();}
+    public int minSizeUp() {return minSizeUpProperty.getValue();}
     public void setMinSizeUpProperty(Integer i) { this.minSizeUpProperty.setValue(i);}
 
-    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty(-1);
+    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty();
     public IntegerProperty minSizeDownProperty() { return minSizeDownProperty;  }
-    public int minSizeDown() {return minSizeDownProperty.get();}
+    public int minSizeDown() {return minSizeDownProperty.getValue();}
     public void setMinSizeDownProperty(Integer i) { this.minSizeDownProperty.setValue(i);}
 
-    private Integer httpProxyPort=null;
-    private String httpProxy=null;
+    final private IntegerProperty maxSizeUpProperty = new SimpleIntegerProperty();
+    public IntegerProperty maxSizeUpProperty() { return maxSizeUpProperty;  }
+    public int maxSizeUp() {return maxSizeUpProperty.getValue();}
+    public void setMaxSizeUpProperty(Integer i) { this.maxSizeUpProperty.setValue(i);}
 
-    public void setHttpProxyPort(Integer httpProxyPort) {
-        this.httpProxyPort = httpProxyPort;
-    }
-    public Integer getHttpProxyPort() { return this.httpProxyPort;}
-    public void setHttpProxy(String proxy){
-        this.httpProxy=proxy;
-    }
-    public String getHttpProxy() { return httpProxy;}
+    final private IntegerProperty maxSizeDownProperty = new SimpleIntegerProperty();
+    public IntegerProperty maxSizeDownProperty() { return maxSizeDownProperty;  }
+    public int maxSizeDown() {return maxSizeDownProperty.getValue();}
+    public void setMaxSizeDownProperty(Integer i) { this.maxSizeDownProperty.setValue(i);}
 
-    public boolean needsProxy() { return httpProxy!=null && httpProxyPort !=null; }
+    final private IntegerProperty minFragSizeProperty = new SimpleIntegerProperty();
+    public IntegerProperty minFragSizeProperty() { return minFragSizeProperty;  }
+    public int minFragSize() { return minFragSizeProperty.getValue(); }
+    public void setMinFragSizeProperty(Integer i) { this.minFragSizeProperty.setValue(i);}
+
+    final private IntegerProperty fragNumUpProperty = new SimpleIntegerProperty();
+    public IntegerProperty fragNumUpProperty() { return fragNumUpProperty;  }
+    public int fragNumUp() { return fragNumUpProperty.getValue(); }
+    public void setFragNumUpProperty(Integer i) { this.fragNumUpProperty.setValue(i);}
+
+    final private IntegerProperty fragNumDownProperty = new SimpleIntegerProperty();
+    public IntegerProperty fragNumDownProperty() { return fragNumDownProperty;  }
+    public int fragNumDown() { return fragNumDownProperty.getValue(); }
+    public void setFragNumDownProperty(Integer i) { this.fragNumDownProperty.setValue(i);}
+
+    final private DoubleProperty maxRepeatContentProperty = new SimpleDoubleProperty();
+    public DoubleProperty maxRepeatContentProperty() {return maxRepeatContentProperty; }
+    public double maxRepeatContent() {return maxRepeatContentProperty.getValue();}
+    public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
+
+    private Map<String, String> indexedFaFiles=null;
+
+    public List<VPVGene> getVPVGeneList() { return this.geneList; }
 
     /**
      * This is coupled to genomeTranscriptomeList in the Controller
@@ -170,13 +204,13 @@ public class Model {
      */
     public void adjustGenomeDownloadPaths() throws DownloadFileNotFoundException {
         String gb = getGenomeBuild();
-        if (gb.equals("UCSC-hg19")) {
+        if (gb.equals("hg19")) {
             this.datasource = DataSource.createUCSChg19();
-        } else if (gb.equals("UCSC-hg38")) {
+        } else if (gb.equals("hg38")) {
             this.datasource = DataSource.createUCSChg38();
-        } else if (gb.equals("UCSC-mm9")) {
+        } else if (gb.equals("mm9")) {
             this.datasource = DataSource.createUCSCmm9();
-        } else if (gb.equals("UCSC-mm10")) {
+        } else if (gb.equals("mm10")) {
             this.datasource = DataSource.createUCSCmm10();
         } else {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
@@ -203,31 +237,47 @@ public class Model {
             System.err.println(vg);
         }
     }
-    /** Takes the list of VPVGenes and creates a list of ViewPoints.
-     * TODO -- add correct parameters.*/
+    /** @return list of all {@link ViewPoint} objects to be displayed. */
     public List<ViewPoint> getViewPointList() {
-        List<ViewPoint> vplist = new ArrayList<>();
-        Integer maxDistToGenomicPosUp=200;
-        Integer maxDistToGenomicPosDown=200;
-        String[] cutPat=new String[1];
-        cutPat[0] = "ACT";
-        IndexedFastaSequenceFile dummyFile=null;//TODO
-        for (VPVGene vpvg:this.geneList) {
-            List<Integer> tsslist = vpvg.getTSSlist();
-            String refSeqID = vpvg.getChromosome();
-            for (Integer i : tsslist) {
-                ViewPoint vp = new ViewPoint(refSeqID,i,maxDistToGenomicPosUp,maxDistToGenomicPosDown);
-                vp.setTargetName(vpvg.getGeneSymbol());
-                vplist.add(vp);
-            }
-        }
-            return vplist;
+        return this.viewpointList;
     }
 
     /** @return true if we have at least one VPVGene (which contain ViewPoints). */
     public boolean viewpointsInitialized() {
-        return (this.geneList!=null && this.geneList.size()>0);
+        return (this.viewpointList!=null && this.viewpointList.size()>0);
     }
 
 
+    public void setIndexedFastaFiles(Map<String, String> indexedFa) {
+        this.indexedFaFiles=indexedFa;
+    }
+
+    public String getIndexFastaFilePath(String contigname) {
+        if (! this.indexedFaFiles.containsKey(contigname)) {
+            System.err.println("[ERROR]--cound not find contig");
+            //TODO Set up exception for this
+            return null;
+        } else {
+            return this.indexedFaFiles.get(contigname);
+        }
+    }
+
+    public void setViewPoints(List<ViewPoint> viewpointlist) {
+        this.viewpointList=viewpointlist;
+    }
+
+    public String getRestrictionEnzymeString() {
+        StringBuilder sb = new StringBuilder();
+        boolean morethanone=false;
+        for (RestrictionEnzyme re:chosenEnzymelist) {
+            if (morethanone) sb.append("; ");
+            sb.append(re.getName());
+            morethanone=true;
+        }
+        return sb.toString();
+    }
+
+    public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
+        this.chosenEnzymelist = chosenEnzymes;
+    }
 }

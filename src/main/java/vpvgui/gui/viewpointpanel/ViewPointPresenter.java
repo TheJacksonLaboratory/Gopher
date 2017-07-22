@@ -32,7 +32,7 @@ public class ViewPointPresenter implements Initializable {
     private TableView tview;
 
     private Model model;
-
+    /** The VPRow contains a reference to a ViewPoint object. */
     private VPRow vprow;
     /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
      * UCSC browser.

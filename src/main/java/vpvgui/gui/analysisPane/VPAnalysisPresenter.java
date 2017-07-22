@@ -86,11 +86,10 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane=tabp;
     }
 
-    public AnchorPane getPane() { return this.pane; }
+   // public AnchorPane getPane() { return this.pane; }
 
 
     public void showVPTable() {
-        System.out.println("ShowVPTable");
         if (! this.model.viewpointsInitialized()) {
             System.out.println("[View Points not initialized");
             return;
@@ -103,12 +102,10 @@ public class VPAnalysisPresenter implements Initializable {
         }
         List<ViewPoint> vpl = this.model.getViewPointList();
         for (ViewPoint v : vpl) {
-            viewpointlist.add(new VPRow(v));
+            viewpointlist.add(new VPRow(v,this.model));
         }
         tview.setItems(viewpointlist);
         tview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        //this.tview.getChildren().clear();
-        //this.tview.getChildren().add(tview);
     }
 
     private void updateWebview() {
@@ -230,11 +227,6 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane.getSelectionModel().select(tab);
     }
 
-
-
-        private void showAddPersonDialog(Stage parent, final TableView<VPRow> table, double y) {
-            System.err.println("TEST SHOW ADD PERSON");
-        }
 
     private TableColumn createTextColumn(String name, String caption) {
         TableColumn column = new TableColumn(caption);

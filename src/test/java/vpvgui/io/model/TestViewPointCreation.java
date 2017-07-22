@@ -9,7 +9,6 @@ import org.junit.Test;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.*;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -145,8 +144,8 @@ public class TestViewPointCreation {
 
         /* read refSeq.txt to map of TSS lists */
 
-        HashMap<String,String> geneMapOfTss = new HashMap<String,String>();
-        HashMap<String,String> geneMapOfTssHelp = new HashMap<String,String>();
+        HashMap<String,String> geneMapOfTss = new HashMap<>();
+        HashMap<String,String> geneMapOfTssHelp = new HashMap<>();
         Integer countSymbolsWithTssOnDifferentChromosomes = 0;
         File file = new File("/Users/hansep/IdeaProjects/VPV/mm9_fasta/refGene.txt");
         Scanner refGeneFile = new Scanner(file);

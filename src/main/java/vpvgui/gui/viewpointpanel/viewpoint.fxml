@@ -8,10 +8,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane fx:id="pane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
+<AnchorPane fx:id="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
    <children>
-      <WebView fx:id="wview" layoutX="-7.0" prefHeight="190.0" prefWidth="608.0" />
+      <WebView fx:id="wview" prefHeight="200.0" prefWidth="604.0" />
       <TableView fx:id="tview" layoutX="3.0" layoutY="191.0" prefHeight="147.0" prefWidth="601.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />

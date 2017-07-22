@@ -4,6 +4,9 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 
 import java.util.ArrayList;
 
+/**
+ * This class is a temporary substitute fot the class <i>Fragment</i>, because there was consensus about the concept of the class fragment.
+ */
 public class Segment {
 
     /* fields */
@@ -13,7 +16,7 @@ public class Segment {
     private Integer endPos;
     private boolean selected;
     private double repetitiveContent;
-    private  Integer genomicPos;
+    private Integer genomicPos;
 
 
     /* constructor */
@@ -24,7 +27,7 @@ public class Segment {
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
         setSelected(selected);
-        this.genomicPos=genomicPos;
+        this.genomicPos = genomicPos;
     }
 
 
@@ -42,7 +45,7 @@ public class Segment {
         this.selected = selected;
     }
 
-    public boolean getSelected() {
+    public boolean isSelected() {
         return selected;
     }
 
@@ -51,12 +54,13 @@ public class Segment {
     }
 
 
+    /**
+     * This function calculates the repetitive content of this segment by counting lower and uppercase.
+     * Afterwards the field <i>repetitiveContent</i> is set to the dtermined value.
+     *
+     * @param fastaReader IndexedFastaSequenceFile
+     */
     public void setRepetitiveContent(IndexedFastaSequenceFile fastaReader) {
-
-        /* check if 'referenceSequenceID' is contained in 'fastaReader' */
-
-        // TODO
-
 
         /* get dna string */
 
@@ -75,10 +79,24 @@ public class Segment {
     }
 
 
+    /**
+     * This function returns the repetitive content calculated by the function <i>setRepetitiveContent</i>.
+     *
+     * @return repetitive content of this segment.
+     */
     public double getRepetitiveContent() {
         return repetitiveContent;
     }
 
+
+    /**
+     * This function creates either a list with one new object of the class <i>Segment</i>,
+     * if this segment is shorter than two times <i>marginSize</i>,
+     * or a list with two new objects of class <i>Segment</i> with a length of <i>marginSize</i> otherwise.
+     *
+     * @param marginSize
+     * @return list of either one or two segment objects.
+     */
     public ArrayList<Segment> getSegmentMargins(Integer marginSize) {
 
         ArrayList<Segment> marginList = new ArrayList<>();
@@ -88,7 +106,7 @@ public class Segment {
 
         if (2 * marginSize < length()) { // return a pair of Segment objects
 
-            upStreamFrag = new Segment(referenceSequenceID, startPos, startPos + marginSize-1, true);
+            upStreamFrag = new Segment(referenceSequenceID, startPos, startPos + marginSize - 1, true);
             marginList.add(upStreamFrag);
             downStreamFrag = new Segment(referenceSequenceID, endPos - marginSize + 1, endPos, true);
             marginList.add(downStreamFrag);
@@ -101,5 +119,3 @@ public class Segment {
         return marginList;
     }
 }
-
-

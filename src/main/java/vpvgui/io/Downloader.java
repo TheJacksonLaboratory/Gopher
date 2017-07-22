@@ -180,7 +180,7 @@ public class Downloader extends Task<Void> {
             return; // todo give user feedback
         }
         if (this.localDir.getParentFile().exists()) {
-           return;// System.err.println(String.format("Cowardly refusing to create " + "directory \"%s\" since it already exists", this.localFilePath.getParent()));
+           return;
         } else {
             this.localDir.mkdir();
         }
