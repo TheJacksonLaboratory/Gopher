@@ -19,8 +19,10 @@ import java.io.*;
  *  </pre>
  * Note that for the UCSC files, there is one sequence per file, and thus the fai files have only one line.
  * Also note that I did not use the HTSJDK indexer because it is not available in the versions of the library in maven
- * central. We can later use their implementation if this changes.
- * Created by peterrobinson on 7/22/17.
+ * central. We can later use their implementation if this changes. The class should create a fasta index equivalent to
+ * what would be produced by <pre>$ samtools faidx test.fa</pre>.
+ * @author Peter Robinson
+ * @version 0.0.1 (7/22/17).
  */
 public class FASTAIndexer {
 

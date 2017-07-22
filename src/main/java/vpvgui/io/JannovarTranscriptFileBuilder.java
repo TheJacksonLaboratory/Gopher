@@ -25,7 +25,7 @@ import vpvgui.gui.ErrorWindow;
 public class JannovarTranscriptFileBuilder {
     private File downloaddir=null;
     /** should be one of hg19,hg38,mm10 */
-    private String genomebuild;
+    private String genomebuild=null;
     /** should be UCSC, may allow others in the future */
     private String genomedatabase=null;
     /** SHould be set to the name of the serialized file, e.g., {@code hg19_ucsc.ser}. */
@@ -38,7 +38,7 @@ public class JannovarTranscriptFileBuilder {
 
 
 
-    public JannovarTranscriptFileBuilder( String genome, File dirpath){
+    public JannovarTranscriptFileBuilder(String genome, File dirpath){
         downloaddir=dirpath;
         setGenome(genome);
         setJannovarFileName();
@@ -63,13 +63,8 @@ public class JannovarTranscriptFileBuilder {
     }
 
     private void setGenome(String genome) {
-        String fields[]=genome.split("-");
-        if (fields.length != 2) {
-            ErrorWindow.display("Error","Did not recognize genome build (should never happen):"+genome);
-            return;
-        }
-        genomedatabase=fields[0].toLowerCase();
-        genomebuild=fields[1].toLowerCase();
+        genomedatabase="ucsc";
+        genomebuild=genome.toLowerCase();
     }
 
     /** Start a task to let the Jannovar download run.*/

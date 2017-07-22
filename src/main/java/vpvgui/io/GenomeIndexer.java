@@ -6,6 +6,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is responsible for g-unzipping and indexing a downloaded genome file.
@@ -14,6 +16,10 @@ import java.io.*;
 public class GenomeIndexer {
 
     private String genomeDirectoryPath=null;
+    /** Key: name of chromosome or contig; value-absolute path to the corresponding
+     * FASTA file on disk
+     */
+    private Map<String,String> indexedFastaFiles;
 
     private static final String genomeFileNameTarGZ = "chromFa.tar.gz";
     private static final String genomeFileNameTar = "chromFa.tar";
@@ -27,6 +33,7 @@ public class GenomeIndexer {
      */
     public GenomeIndexer(String directoryPath) {
         this.genomeDirectoryPath=directoryPath;
+        this.indexedFastaFiles=new HashMap<>();
     }
 
     /** @return true if the chromFGa.tar.gz file has been previously extract (note we only check for the
@@ -37,6 +44,8 @@ public class GenomeIndexer {
         File f = new File(this.genomeDirectoryPath + File.separator + "chr1.fa");
         return f.exists();
     }
+
+    public Map<String,String> getIndexedFastaFiles() { return this.indexedFastaFiles; }
 
 
     /** This function uses the apache librarty to transform the chromFa.tar.gz file into the individual chromosome files.*/
@@ -99,6 +108,8 @@ public class GenomeIndexer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                String name=faidx.getContigname();
+                this.indexedFastaFiles.put(name,fileEntry.getAbsolutePath());
             }
         }
     }
