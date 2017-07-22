@@ -45,16 +45,12 @@ import java.util.ResourceBundle;
  */
 public class VPVMainPresenter implements Initializable {
 
-    /**
-     * The Model for the entire analysis.
-     */
+    /** The Model for the entire analysis. */
     private Model model = null;
 
     private Stage primaryStage;
 
-    public void initStage(Stage stage) {
-        primaryStage = stage;
-    }
+
 
 
     /**
@@ -133,8 +129,8 @@ public class VPVMainPresenter implements Initializable {
     @FXML private TextField maxSizeDownTextField;
     @FXML private TextField minFragSizeTextField;
     @FXML private TextField maxRepContentTextField;
-
-
+    /** Show which enzymes the user has chosen. */
+    @FXML private Label restrictionEnzymeLabel;
 
     @FXML
     private Button showButton;
@@ -224,6 +220,12 @@ public class VPVMainPresenter implements Initializable {
         // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
         // textLabel.textProperty().bind(textTextField.textProperty());*/
     }
+
+    public void initStage(Stage stage) {
+        primaryStage = stage;
+    }
+
+
 
     private void createPanes() {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
@@ -367,7 +369,8 @@ public class VPVMainPresenter implements Initializable {
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
         List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
-        this.model.setRestrictionEnzymes(chosenEnzymes);
+        this.model.setChosenRestrictionEnzymes(chosenEnzymes);
+        this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }
 
     /**

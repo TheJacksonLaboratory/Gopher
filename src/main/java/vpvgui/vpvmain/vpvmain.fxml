@@ -142,6 +142,7 @@
                                        </padding>
                                     </Label>
                                     <Label text="Todo-menu with approaches " GridPane.columnIndex="3" />
+                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" GridPane.columnIndex="3" GridPane.rowIndex="5" />
                                  </children>
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />

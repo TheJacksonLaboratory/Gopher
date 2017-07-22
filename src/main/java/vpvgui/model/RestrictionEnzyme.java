@@ -14,6 +14,7 @@ public class RestrictionEnzyme {
     public RestrictionEnzyme(String n, String s) {
         name=n;
         site=s;
+        System.out.println("COTR "+n +"'"+s);
     }
 
     public String getName() {

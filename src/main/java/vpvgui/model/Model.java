@@ -1,5 +1,6 @@
 package vpvgui.model;
 
+import com.sun.org.apache.regexp.internal.RE;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.beans.property.*;
 import javafx.util.converter.NumberStringConverter;
@@ -19,8 +20,10 @@ import java.util.Map;
 public class Model {
 
     private DataSource datasource = null;
-
+    /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist;
+    /** The enzymes chosen by the user for ViewPoint production. */
+    private List<RestrictionEnzyme> chosenEnzymelist;
     private List<ViewPoint> viewpointList=null;
     private List<VPVGene> geneList;
     /** Settings for the current project. */
@@ -261,5 +264,20 @@ public class Model {
 
     public void setViewPoints(List<ViewPoint> viewpointlist) {
         this.viewpointList=viewpointlist;
+    }
+
+    public String getRestrictionEnzymeString() {
+        StringBuilder sb = new StringBuilder();
+        boolean morethanone=false;
+        for (RestrictionEnzyme re:chosenEnzymelist) {
+            if (morethanone) sb.append("; ");
+            sb.append(re.getName());
+            morethanone=true;
+        }
+        return sb.toString();
+    }
+
+    public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
+        this.chosenEnzymelist = chosenEnzymes;
     }
 }
