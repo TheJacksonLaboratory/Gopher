@@ -68,7 +68,7 @@ public class ViewPointFactory {
     public void createViewPoints() {
         String cuttingMotif=this.cuttingPatterns[0];/* TODO -- Why do we need this instead of taking cutting patterns? */
         for (VPVGene vpvgene:this.vpvGeneList) {
-            String referenceSequenceID = vpvgene.getReferenceSequenceID();/* Usually a chromosome */
+            String referenceSequenceID = vpvgene.getContigID();/* Usually a chromosome */
             String path=this.model.getIndexFastaFilePath(referenceSequenceID);
             if (path==null) {
                 System.err.println("[ERROR] could not retireve faidx file for "+referenceSequenceID);

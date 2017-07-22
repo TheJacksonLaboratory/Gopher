@@ -1,7 +1,5 @@
 package vpvgui.io.model;
 
-import de.charite.compbio.jannovar.reference.GenomeInterval;
-import de.charite.compbio.jannovar.reference.Strand;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
@@ -351,7 +349,7 @@ public class TestViewPointCreation {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
 
                 // print viewpoint
-                String getReferenceSequenceID = vpvGeneList.get(i).getReferenceSequenceID();
+                String getReferenceSequenceID = vpvGeneList.get(i).getContigID();
                 Integer vpStaPos = vpvGeneList.get(i).getviewPointList().get(j).getStartPos();
                 Integer vpEndPos = vpvGeneList.get(i).getviewPointList().get(j).getEndPos();
                 Integer vpGenomicPos = vpvGeneList.get(i).getviewPointList().get(j).getGenomicPos();

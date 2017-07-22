@@ -15,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import vpvgui.framework.Signal;
 import vpvgui.gui.ErrorWindow;
+import vpvgui.io.RefGeneParser;
 import vpvgui.model.Model;
 import vpvgui.model.project.JannovarGeneGenerator;
 import vpvgui.model.project.VPVGene;
@@ -60,6 +61,8 @@ public class EntrezGenePresenter implements Initializable {
      */
     private Model model=null;
 
+    RefGeneParser parser=null;
+
     /** This will hold the string with the list of genes entered by the user. */
     private String geneListString=null;
 
@@ -70,6 +73,8 @@ public class EntrezGenePresenter implements Initializable {
     private List<String> symbols=null;
 
     private Map<String,List<TranscriptModel>> validGenes2TranscriptsMap=null;
+
+    private Map<String,VPVGene> validSymbol2VPVGeneMap=null;
 
     private List<VPVGene> vpvgenelist;
 
@@ -126,29 +131,24 @@ public class EntrezGenePresenter implements Initializable {
         }
         String transcriptfile=this.model.getSettings().getTranscriptsFileTo();
         if (transcriptfile==null) {
-            ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes");
+            ErrorWindow.display("Error retrieving  transcript file","Generate Jannovar transcript file before loading genes");
             return;
         }
-        this.jgg = new JannovarGeneGenerator(this.model.getSettings().getTranscriptsFileTo());
-        /* key is a gene symbol,and value is a listof corresponding transcripts. */
-        this.validGenes2TranscriptsMap = jgg.checkGenes(this.symbols);
-        List<String>  validGeneSymbols = jgg.getValidGeneSymbols();
-        List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
-        int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
+        String path = this.model.getRefGenePath();
+        if (path==null) {
+            ErrorWindow.display("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        this.parser = new RefGeneParser(path);
+        parser.checkGenes(this.symbols);
+        List<String>  validGeneSymbols = parser.getValidGeneSymbols();
+        List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
+        int n_transcripts = validSymbol2VPVGeneMap.size();
         String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,validGenes2TranscriptsMap.size(), n_transcripts);
         setData(html);
         isvalidated=true;
     }
 
-    /** @return total number of transcripts. */
-    private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {
-        int n=0;
-        for (String s : mp.keySet()) {
-            List<TranscriptModel> lst = mp.get(s);
-            n += lst.size();
-        }
-        return n;
-    }
 
    /** Sets the text that will be shown in the HTML View. */
     public void setData(String html) {
@@ -237,51 +237,22 @@ public class EntrezGenePresenter implements Initializable {
     }
 
     /** Use the Jannovar Gene Generator object to get the correct chromosome string, e.g., chrX */
-    private String getChromosomeString(int c) {
-         return this.jgg.chromosomeId2Name(c);
-    }
+   // private String getChromosomeString(int c) {
+    //     return this.jgg.chromosomeId2Name(c);
+    //}
 
     @FXML public void acceptGenes() {
         if (!isvalidated) {
             ErrorWindow.display("Error","Please validate genes for accepting them!");
             return;
         }
-        if (validGenes2TranscriptsMap==null || validGenes2TranscriptsMap.size()==0) {
-            ErrorWindow.display("Error","Unable to parse even one valid transcript, please revise the gene symbol file!");
+        if (parser==null ) {
+            ErrorWindow.display("Error","Please validate genes for accepting them!");
             return;
         }
-        vpvgenelist = new ArrayList<>();
-        for (String symbol : validGenes2TranscriptsMap.keySet()) {
-            List<TranscriptModel> transcriptList=validGenes2TranscriptsMap.get(symbol);
-            TranscriptModel tm = transcriptList.get(0);
-            String referenceSequenceID=getChromosomeString(tm.getChr());
-            String id = tm.getGeneID();
-            VPVGene vpvgene=new VPVGene(id,symbol);
-            vpvgene.setChromosome(referenceSequenceID);
-            if (tm.getStrand().isForward()) {
-                vpvgene.setForwardStrand();
-            } else {
-                vpvgene.setReverseStrand();
-            }
-            for (TranscriptModel tmod: transcriptList) {
-                GenomeInterval iv = tmod.getTXRegion();
-                Integer pos=null;
-                if (tm.getStrand().isForward()) {
-                    /* Add 1 to convert from zero-based to one-based numbering */
-                    pos = iv.getGenomeBeginPos().getPos()+1;
-                } else {
-                    /* The last position of a minus-strand gene is the start position,
-                     * and the numbering is then one-based once it is flipped. Need to use
-                     * the withStrand to convert positions of minus-strand genes.
-                     */
-                    pos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
-                }
-                vpvgene.addGenomicPosition(pos);
-            }
-            vpvgenelist.add(vpvgene);
-            this.model.setVPVGenes(vpvgenelist);
-        }
-        System.out.println("[INFO] EntrezGenePresenter: added "+ vpvgenelist.size() + " vpv genes");
+        this.model.setVPVGenes(this.parser.getVPVGeneList());
+
+       // System.out.println("[INFO] EntrezGenePresenter: added "+ this.parser.getVPVGeneList().size() + " vpv genes");
         signal.accept(Signal.DONE);
     }
 

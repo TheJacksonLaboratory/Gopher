@@ -131,6 +131,14 @@ public class VPVMainPresenter implements Initializable {
     @FXML private TextField maxRepContentTextField;
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
+    /** Show how many valid genes were uploaded by user. */
+    @FXML private Label nValidGenesLabel;
+    /** Show the name of the downloaded genome we areusing. */
+    @FXML private Label downloadedGenomeLabel;
+    /** Show status of unpacking and indexing the downloaded genome. */
+    @FXML private Label unpackIndexGenomeLabel;
+    /** Show name of downloaded transcripts file. */
+    @FXML private Label downloadedTranscriptsLabel;
 
     @FXML
     private Button showButton;
@@ -315,9 +323,47 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
+
+   @FXML public void downloadRefGeneTranscripts(ActionEvent e) {
+        String genome = this.model.getGenomeURL();
+        if (genome==null)
+            genome=genomeChoiceBox.getValue();
+        RefSeqDownloader rsd = new RefSeqDownloader(genome);
+        String transcriptName = rsd.getTranscriptName();
+        String basename=rsd.getBaseName();
+        String url=null;
+        try {
+            url = rsd.getURL();
+        } catch (DownloadFileNotFoundException dfne) {
+            ErrorWindow.display("Could not identify RefGene file for genome",dfne.getMessage());
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath()=="") {
+            ErrorWindow.display("Error","Could not get path to download transcript file.");
+            return;
+        }
+        Operation op = new TranscriptDownloadOperation(file.getPath());
+        Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
+        if (downloadTask.needToDownload(op)) {
+            Thread th = new Thread(downloadTask);
+            th.setDaemon(true);
+            th.start();
+        }
+        /* ToDo-check for completion of download before setting this variable. */
+       String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+       this.model.setRefGenePath(abspath);
+       this.downloadedTranscriptsLabel.setText(transcriptName);
+       e.consume();
+    }
+
+
     /**
+     * TODO delete this, replaced by parsing RefGene.txt.gz (check it works first)
      * Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions.
-     */
+
     @FXML public void downloadTranscripts(ActionEvent event) {
         event.consume();
         String genome = this.genomeChoiceBox.getValue();
@@ -351,7 +397,7 @@ public class VPVMainPresenter implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } */
 
     /** ToDo wrap this in a Task! */
     @FXML public void unpackAndIndexGenome(ActionEvent e) {
@@ -392,6 +438,7 @@ public class VPVMainPresenter implements Initializable {
          * add information about the restriction enzymes and the indexed FASTA file.
          */
         this.model.debugPrintVPVGenes();
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
         e.consume();
     }
 

@@ -7,30 +7,26 @@ import java.util.*;
  * One of the target genes for which we want to design capture C probes
  */
 public class VPVGene {
-
-    private Integer entrezGeneID=null;
-
+    /** An NCBI RefSeq id such as NM_001353311. */
+    private String refSeqID =null;
+    /** A gene symbolsuch as IGSF11 */
     private String geneSymbol=null;
-
-    private String referenceSequenceID=null;
-
+    /** The contig where the RefSeq lives, e.g., chr8.*/
+    private String contigID =null;
+    /** Is this a plus strand gene? */
     private boolean forward;
     /** this will keep count of the transcript start site position we have already seen
      * in order to avoid entering duplicate ViewPoint objects.
      * The set then has all TSS (unique)
      */
     private Set<Integer> positions;
-
-    private List<ViewPoint> viewPointList;
+    /** Remove this, we do not need it followiing refactor. */
+   @Deprecated  private List<ViewPoint> viewPointList;
 
 
 
     public VPVGene(String geneid, String symbol) {
-        try {
-            this.entrezGeneID=Integer.parseInt(geneid);
-        } catch (NumberFormatException e) {
-            this.entrezGeneID=0;
-        }
+        this.refSeqID =geneid;
         this.geneSymbol=symbol;
         this.viewPointList=new ArrayList<>();
         this.positions =new HashSet<>();
@@ -44,12 +40,12 @@ public class VPVGene {
     }
 
     public void setChromosome(String c) {
-        this.referenceSequenceID=c;
+        this.contigID =c;
     }
-    public String getChromosome() { return this.referenceSequenceID; }
+    public String getChromosome() { return this.contigID; }
 
     public String getGeneSymbol() { return this.geneSymbol;}
-    public Integer getGeneID() { return this.entrezGeneID;}
+    public String getRefSeqID() { return this.refSeqID;}
     /** Set this VPVGene to be on the forward strand */
     public  void setForwardStrand() {
         this.forward=true;
@@ -83,16 +79,13 @@ public class VPVGene {
         if (forward) {
             strand="+";
         }
-        sb.append(String.format("%s [%s,%s]",geneSymbol,referenceSequenceID,strand));
-        if (this.viewPointList==null || this.viewPointList.size()==0) {
+        sb.append(String.format("%s [%s,%s]",geneSymbol, contigID,strand));
+        if (this.positions==null || this.positions.size()==0) {
            // no-op
         } else {
-            for (ViewPoint vp : this.viewPointList) {
-                sb.append("\n\tViewPoint: "+vp);
+            for (Integer ii : positions) {
+                sb.append("\n\tTSS pos: " + ii);
             }
-        }
-        for (Integer ii : positions) {
-            sb.append("\n\tTSS pos: "+ ii);
         }
         sb.append("\n");
         return sb.toString();
@@ -102,11 +95,16 @@ public class VPVGene {
         return viewPointList;
     }
     
-    public String getReferenceSequenceID() {
-        return  referenceSequenceID;
+    public String getContigID() {
+        return contigID;
     }
 
     public boolean isForward() {
         return forward;
+    }
+
+    public int n_viewpointstarts() {
+        if (this.positions==null) return 0;
+        else return this.positions.size();
     }
 }

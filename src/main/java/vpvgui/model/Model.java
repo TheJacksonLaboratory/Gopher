@@ -21,15 +21,21 @@ public class Model {
 
     private DataSource datasource = null;
     /** This is a list of all possible enzymes from which the user can choose one on more. */
-    private List<RestrictionEnzyme> enzymelist;
+    private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
-    private List<RestrictionEnzyme> chosenEnzymelist;
+    private List<RestrictionEnzyme> chosenEnzymelist=null;
     private List<ViewPoint> viewpointList=null;
-    private List<VPVGene> geneList;
+    private List<VPVGene> geneList=null;
     /** Settings for the current project. */
-    private Settings settings;
+    private Settings settings=null;
     /** Directory to which the Genome was downloaded */
     private String genomeDirectoryPath=null;
+    /** Proxy (null if not needed/not set) */
+    private String httpProxy=null;
+    /** Proxy port (null if not set) */
+    private Integer httpPort=null;
+
+
     /** @return array of enzyme cutting sites. */
     public String[] getCuttingPatterns() {
         int n = this.enzymelist.size();
@@ -101,6 +107,8 @@ public class Model {
     public DoubleProperty maxRepeatContentProperty() {return maxRepeatContentProperty; }
     public double maxRepeatContent() {return maxRepeatContentProperty.getValue();}
     public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
+
+    private String refGenePath=null;
 
     private Map<String, String> indexedFaFiles=null;
 
@@ -280,4 +288,29 @@ public class Model {
     public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
         this.chosenEnzymelist = chosenEnzymes;
     }
+
+    public void setHttpProxyPort(int port) {this.httpPort=port; }
+    public Integer getHttpProxyPort() { return this.httpPort; }
+    public String getHttpProxy() { return this.httpProxy; }
+    public void setHttpProxy(String proxy) {this.httpProxy=proxy; }
+    public boolean needsProxy() { return (httpProxy!=null && httpPort!=null); }
+    /** @return number of successfully parsed genes. */
+    public int n_valid_genes() {
+        if (this.geneList==null) return 0;
+        else return this.geneList.size();
+    }
+    /** @return number of viewppoint starts (e.g., TSS) of the valid genes. */
+    public int n_viewpointStarts() {
+        if (this.geneList==null) return 0;
+        int n=0;
+        for (VPVGene g:geneList) {
+            n+=g.n_viewpointstarts();
+        }
+        return n;
+    }
+
+
+    public void setRefGenePath(String p) { refGenePath=p; }
+    public String getRefGenePath() { return this.refGenePath; }
+
 }

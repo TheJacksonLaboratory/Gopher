@@ -31,6 +31,7 @@
                     <menus>
                       <Menu mnemonicParsing="false" text="File">
                         <items>
+                              <MenuItem mnemonicParsing="false" text="New" />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
@@ -90,7 +91,7 @@
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadTranscripts" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                     <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                     <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="4">
@@ -129,7 +130,7 @@
                                           <Insets />
                                        </GridPane.margin>
                                     </Button>
-                                    <Label text="Label" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    <Label fx:id="downloadedGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                     <Label text="Genome build" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
@@ -142,7 +143,10 @@
                                        </padding>
                                     </Label>
                                     <Label text="Todo-menu with approaches " GridPane.columnIndex="3" />
-                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                    <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                                    <Label fx:id="unpackIndexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                    <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4" />
                                  </children>
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />

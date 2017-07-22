@@ -8,8 +8,9 @@ import org.testng.Assert;
  */
 public class VPVGeneTest {
 
-    private static String symbol="YFG42";
-    private static String geneid="42";
+    private static String symbol="FAM216B";
+    private static String geneid="NM_182508";
+
 
 
 
@@ -17,7 +18,6 @@ public class VPVGeneTest {
     public void testVPVGeneCTOR() {
         VPVGene gene = new VPVGene(geneid,symbol);
         Assert.assertEquals(symbol,gene.getGeneSymbol());
-        Integer expected = 42;
-        Assert.assertEquals(expected,gene.getGeneID());
+        Assert.assertEquals(geneid,gene.getRefSeqID());
     }
 }
