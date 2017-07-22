@@ -39,7 +39,7 @@ public class Model {
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
 
     public String getGenomeBuild() {
-        return genomeBuild.get();
+        return genomeBuild.getValue();
     }
     public void setGenomeBuild(String newDatabase) {
         genomeBuild.set(newDatabase);
@@ -48,18 +48,45 @@ public class Model {
         return genomeBuild;
     }
     /** Minimum size upstream of the view point. */
-    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty(-1);
+    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty();
     public IntegerProperty minSizeUpProperty() { return minSizeUpProperty;  }
-    public int minSizeUp() {return minSizeUpProperty.get();}
+    public int minSizeUp() {return minSizeUpProperty.getValue();}
     public void setMinSizeUpProperty(Integer i) { this.minSizeUpProperty.setValue(i);}
 
-    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty(-1);
+    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty();
     public IntegerProperty minSizeDownProperty() { return minSizeDownProperty;  }
-    public int minSizeDown() {return minSizeDownProperty.get();}
+    public int minSizeDown() {return minSizeDownProperty.getValue();}
     public void setMinSizeDownProperty(Integer i) { this.minSizeDownProperty.setValue(i);}
 
+    final private IntegerProperty maxSizeUpProperty = new SimpleIntegerProperty();
+    public IntegerProperty maxSizeUpProperty() { return maxSizeUpProperty;  }
+    public int maxSizeUp() {return maxSizeUpProperty.getValue();}
+    public void setMaxSizeUpProperty(Integer i) { this.maxSizeUpProperty.setValue(i);}
 
+    final private IntegerProperty maxSizeDownProperty = new SimpleIntegerProperty();
+    public IntegerProperty maxSizeDownProperty() { return maxSizeDownProperty;  }
+    public int maxSizeDown() {return maxSizeDownProperty.getValue();}
+    public void setMaxSizeDownProperty(Integer i) { this.maxSizeDownProperty.setValue(i);}
 
+    final private IntegerProperty minFragSizeProperty = new SimpleIntegerProperty();
+    public IntegerProperty minFragSizeProperty() { return minFragSizeProperty;  }
+    public int minFragSize() { return minFragSizeProperty.getValue(); }
+    public void setMinFragSizeProperty(Integer i) { this.minFragSizeProperty.setValue(i);}
+
+    final private IntegerProperty fragNumUpProperty = new SimpleIntegerProperty();
+    public IntegerProperty fragNumUpProperty() { return fragNumUpProperty;  }
+    public int fragNumUp() { return fragNumUpProperty.getValue(); }
+    public void setFragNumUpProperty(Integer i) { this.fragNumUpProperty.setValue(i);}
+
+    final private IntegerProperty fragNumDownProperty = new SimpleIntegerProperty();
+    public IntegerProperty fragNumDownProperty() { return fragNumDownProperty;  }
+    public int fragNumDown() { return fragNumDownProperty.getValue(); }
+    public void setFragNumDownProperty(Integer i) { this.fragNumDownProperty.setValue(i);}
+
+    final private DoubleProperty maxRepeatContentProperty = new SimpleDoubleProperty();
+    public DoubleProperty maxRepeatContentProperty() {return maxRepeatContentProperty; }
+    public double maxRepeatContent() {return maxRepeatContentProperty.getValue();}
+    public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
 
     /**
      * This is coupled to genomeTranscriptomeList in the Controller

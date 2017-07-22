@@ -1,20 +1,11 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import htsjdk.samtools.reference.ReferenceSequence;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
-import org.apache.commons.*;
 
-import javax.swing.text.View;
 import java.util.*;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * A region, usually at the transcription start site (TSS) of a gene, that will be enriched in a Capture-C experiment.
@@ -66,6 +57,33 @@ public class ViewPoint {
     private IndexedFastaSequenceFile fastaReader;
 
     private String warnings;
+
+    /** @return a list of Segments of a viewpoint that are active and will be displayed on the UCSC Browser. */
+    public List<Segment> getActiveSegments() {
+        List<Segment> segs=new ArrayList<>();
+        if (restSegListMap==null) {
+            int len=this.getEndPos()-this.startPos;
+            int fakestart=this.startPos + len/10;
+            int fakeend=this.startPos+ len/5;
+            Segment fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
+            segs.add(fake);
+            fakestart=this.startPos + 3*len/10;
+            fakeend=this.startPos+ 4*len/10;
+            fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
+            segs.add(fake);
+            return segs;
+        }
+        for (ArrayList<Segment> seglst:restSegListMap.values()) {
+            for (Segment seg:seglst) {
+                if (seg.isSelected())
+                   segs.add(seg);
+            }
+            break; /* For testing just take the first enzyme!! TODO CHECK THIS */
+        }
+        return segs;
+    }
+
+
 
     /* constructor function */
 
@@ -271,7 +289,7 @@ public class ViewPoint {
     public final ArrayList<Segment> getSelectedRestSegList(String cuttingMotif) {
         ArrayList<Segment> selectedRestSegList = new ArrayList<Segment>();
         for(Segment seg : restSegListMap.get(cuttingMotif)) {
-            if(seg.getSelected()==true) {
+            if(seg.isSelected()==true) {
                 selectedRestSegList.add(seg);
             }
         }
@@ -342,7 +360,7 @@ public class ViewPoint {
                 Integer sta = restSegListMap.get(cuttingPatterns[i]).get(j).getStartPos();
                 Integer end = restSegListMap.get(cuttingPatterns[i]).get(j).getEndPos();
                 if (sta < pos && pos < end) {
-                    restSegListMap.get(cuttingPatterns[i]).get(j).setSelected(!restSegListMap.get(cuttingPatterns[i]).get(j).getSelected());
+                    restSegListMap.get(cuttingPatterns[i]).get(j).setSelected(!restSegListMap.get(cuttingPatterns[i]).get(j).isSelected());
                     found = true;
                 }
             }
@@ -489,7 +507,7 @@ public class ViewPoint {
             }
 
             // if after all this the fragment is still selected, increase count
-            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+            if (restSegListMap.get(motif).get(i).isSelected() == true) {
                 fragCountUp++;
             }
         }
@@ -523,13 +541,13 @@ public class ViewPoint {
             ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
             for (int j = 0; j < SegMargins.size(); j++) {
                 SegMargins.get(j).setRepetitiveContent(fastaReader);
-                if (maxRepFrag < SegMargins.get(j).getRepetitiveContent() && restSegListMap.get(motif).get(i).getSelected()) {
+                if (maxRepFrag < SegMargins.get(j).getRepetitiveContent() && restSegListMap.get(motif).get(i).isSelected()) {
                     restSegListMap.get(motif).get(i).setSelected(false);
                 }
             }
 
             // if after all this the fragment is still selected, increase count
-            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+            if (restSegListMap.get(motif).get(i).isSelected() == true) {
                 fragCountDown++;
             }
         }
@@ -543,7 +561,7 @@ public class ViewPoint {
 
         // set start position of the viewpoint to start position of the most upstream fragment
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
-            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+            if (restSegListMap.get(motif).get(i).isSelected() == true) {
                 setStartPos(restSegListMap.get(motif).get(i).getStartPos());
                 break;
             }
@@ -551,7 +569,7 @@ public class ViewPoint {
 
         // set end position of the viewpoint to end position of the most downstream fragment
         for (int i = restSegListMap.get(motif).size() - 1; 0 < i; i--) {
-            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+            if (restSegListMap.get(motif).get(i).isSelected() == true) {
                 setEndPos(restSegListMap.get(motif).get(i).getEndPos());
                 break;
             }
@@ -581,7 +599,7 @@ public class ViewPoint {
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
             double repCont = 0;
             double positionScoreSumFragment = 0;
-            if (restSegListMap.get(motif).get(i).getSelected() == true) {
+            if (restSegListMap.get(motif).get(i).isSelected() == true) {
 
                 /* get repetitive content of the fragment margins */
 

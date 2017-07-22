@@ -103,7 +103,7 @@ public class VPAnalysisPresenter implements Initializable {
         }
         List<ViewPoint> vpl = this.model.getViewPointList();
         for (ViewPoint v : vpl) {
-            viewpointlist.add(new VPRow(v));
+            viewpointlist.add(new VPRow(v,this.model));
         }
         tview.setItems(viewpointlist);
         tview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

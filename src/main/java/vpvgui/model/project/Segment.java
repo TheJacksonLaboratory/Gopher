@@ -45,7 +45,7 @@ public class Segment {
         this.selected = selected;
     }
 
-    public boolean getSelected() {
+    public boolean isSelected() {
         return selected;
     }
 

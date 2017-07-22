@@ -22,8 +22,6 @@ import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
-import vpvgui.gui.settings.SettingsPresenter;
-import vpvgui.gui.settings.SettingsView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
@@ -132,7 +130,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML private TextField minSizeDownTextField;
     @FXML private TextField maxSizeDownTextField;
     @FXML private TextField minFragSizeTextField;
-    @FXML private TextField maxRepFragTextField;
+    @FXML private TextField maxRepContentTextField;
 
 
 
@@ -238,8 +236,15 @@ public class VPVMainPresenter implements Initializable {
      */
     private void initializeBindings() {
         genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
+        this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
+        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
         this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-        //genomeBuildLabel.textProperty().bind(genomeChoiceBox.valueProperty());
+        this.maxSizeUpTextField.textProperty().bindBidirectional(model.maxSizeUpProperty(),new NumberStringConverter());
+        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
+        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
+        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
+        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
+
 
     }
 
@@ -335,11 +340,12 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
-
+    /** ToDo wrap this in a Task! */
     @FXML public void unpackAndIndexTranscripts(ActionEvent e) {
         e.consume();
         GenomeIndexer gindexer = new GenomeIndexer(this.model.getGenomeDirectoryPath());
         gindexer.extractTarGZ();
+        gindexer.indexFastaFiles();
 
     }
 

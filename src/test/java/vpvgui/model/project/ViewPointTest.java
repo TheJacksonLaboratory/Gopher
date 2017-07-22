@@ -1,16 +1,12 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.tools.ant.util.StringUtils;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
@@ -358,7 +354,7 @@ public class ViewPointTest {
         for (int i = 0; i < vp.getRestSegListMap().get(motif).size(); i++) {
             Integer sta = vp.getRestSegListMap().get(motif).get(i).getStartPos();
             Integer end = vp.getRestSegListMap().get(motif).get(i).getEndPos();
-            boolean selected = vp.getRestSegListMap().get(motif).get(i).getSelected();
+            boolean selected = vp.getRestSegListMap().get(motif).get(i).isSelected();
 
             if (selected) {
                 printSegement(vp.getRestSegListMap().get(motif).get(i), 'T');
