@@ -1,4 +1,4 @@
-package vpvgui.io.model;
+package vpvgui.model;
 
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;

@@ -31,7 +31,8 @@ import java.util.zip.GZIPInputStream;
  *
  */
 public class RefGeneParser {
-
+    /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
+     * the gene list uploaded by the user. */
     private Map<String, VPVGene> genemap=null;
 
     /** The set of gene symbols that we could not find in Jannovar--and ergo,that we regard as being invalid because
@@ -151,6 +152,8 @@ public class RefGeneParser {
         }
         return genelist;
     }
+
+    public int n_totalRefGenes() { return this.genemap.size(); }
 
 
 

@@ -1,8 +1,8 @@
 package vpvgui.io;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.testng.Assert;
 import vpvgui.model.project.Fragment;
 import vpvgui.model.project.FragmentTest;
 
