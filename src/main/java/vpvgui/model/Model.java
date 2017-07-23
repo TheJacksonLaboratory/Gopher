@@ -1,17 +1,18 @@
 package vpvgui.model;
 
-import com.sun.org.apache.regexp.internal.RE;
-import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+
 import javafx.beans.property.*;
-import javafx.util.converter.NumberStringConverter;
 import vpvgui.exception.DownloadFileNotFoundException;
+import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
+import static vpvgui.io.Platform.getVPVDir;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by peter on 05.05.17.
@@ -34,7 +35,19 @@ public class Model {
     private String httpProxy=null;
     /** Proxy port (null if not set) */
     private Integer httpPort=null;
+    /** the name of the project that will be used to write the settings file (default: vpvgui). */
+    private String projectName="vpvgui";
+    /** This suffix is appended to the project name to get the name of the file for storing project settings. */
+    public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
+    /** HAs the UCSC Genome build been unpacked yet? :*/
+    private boolean genomeUnpacked=false;
+    /** Has the downloaded genome been FASTA indexed yet? */
+    private boolean genomeIndexed=false;
+    /** Path to the file with the uploaded target genes. */
+    private String targetGenesPath=null;
 
+    public void setTargetGenesPath(String path){this.targetGenesPath=path; }
+    public String getTargetGenesPath() { return this.targetGenesPath; }
 
     /** @return array of enzyme cutting sites. */
     public String[] getCuttingPatterns() {
@@ -47,17 +60,12 @@ public class Model {
         return patterns;
     }
 
-    /**
-     * This suffix is appended to the project name to get the name of the file for storing the
-     * project settings.
-     */
-    public static final String PROJECT_FILENAME_SUFFIX = "-settings.txt";
+
 
     /**
      * The genome build chosen by theuser, e.g., hg19, GRCh38, mm10
      */
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
-
     public String getGenomeBuild() {
         return genomeBuild.getValue();
     }
@@ -107,20 +115,18 @@ public class Model {
     public DoubleProperty maxRepeatContentProperty() {return maxRepeatContentProperty; }
     public double maxRepeatContent() {return maxRepeatContentProperty.getValue();}
     public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
-
+    /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
 
     private Map<String, String> indexedFaFiles=null;
 
     public List<VPVGene> getVPVGeneList() { return this.geneList; }
 
-    /**
-     * This is coupled to genomeTranscriptomeList in the Controller
-     * ("UCSC-hg19","UCSC-hg38", "UCSC-mm10");
-     * Consider better design
-     * <p>
-     * TODO: eliminate redundant code after Settings class is integrated into gui HB
-     */
+    public boolean isGenomeUnpacked() { return genomeUnpacked; }
+    public boolean isGenomeIndexed() { return genomeIndexed; }
+    public void setGenomeUnpacked() { this.genomeUnpacked=true;}
+    public void setGenomeIndexed() { this.genomeIndexed=true;}
+
 
     public String genomeURL = null;
 
@@ -129,25 +135,27 @@ public class Model {
     }
 
     public String genomeBasename = null;
+    /** The complete URLof the chosen transcript definition from UCSC. */
+    public String transcriptsURL = null;
+
 
     public String getGenomeBasename() {
         System.out.println("Get genome banesfrom from Model=" + settings.getGenomeFileBasename());
         return this.settings.getGenomeFileBasename();
     }
 
-    public String transcriptsURL = null;
+
 
     public String getTranscriptsURL() {
         return transcriptsURL;
     }
+    public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
 
     public String transcriptsBasename = null;
 
     public String getTranscriptsBasename() {
         return transcriptsBasename;
     }
-
-    //public String repeatsURL = null;
 
     public Settings getSettings() {
         return settings;
@@ -312,5 +320,144 @@ public class Model {
 
     public void setRefGenePath(String p) { refGenePath=p; }
     public String getRefGenePath() { return this.refGenePath; }
+
+    public void setProjectName(String name) { this.projectName=name;}
+    public String getProjectName() { return this.projectName; }
+
+
+    /** Write the settings included in the model to a file.
+     * The file will be in the .vpvgui directory in the user's
+     * home directory, and will be named according to the project
+     * name (default: vpvgui.vpv_settings).
+     * @param model
+     */
+    public static void writeSettingsToFile(Model model) {
+        File dir=getVPVDir();
+        File settingsFile=new File(dir+File.separator+model.projectName);
+        Properties properties = new Properties();
+        properties.setProperty("project_name", model.getProjectName());
+        properties.setProperty("genome_build",model.getGenomeBuild());
+        properties.setProperty("path_to_downloaded_genome_directory",model.getGenomeDirectoryPath());
+        String unpacked=model.isGenomeUnpacked()?"true":"false";
+        properties.setProperty("genome_unpacked",unpacked);
+        String indexed=model.isGenomeIndexed()?"true":"false";
+        properties.setProperty("genome_indexed",indexed);
+        properties.setProperty("transcript_url",model.getTranscriptsURL());
+        properties.setProperty("refgene_path",model.getRefGenePath());
+        properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());
+        properties.setProperty("target_genes_path",model.getTargetGenesPath());
+        properties.setProperty("fragNumUp",String.format("%d",model.fragNumUp()));
+        properties.setProperty("fragNumDown",String.format("%d",model.fragNumDown()));
+        properties.setProperty("minSizeUp",String.format("%d",model.minSizeUp()));
+        properties.setProperty("minSizeDown",String.format("%d",model.minSizeDown()));
+        properties.setProperty("maxSizeUp",String.format("%d",model.maxSizeUp()));
+        properties.setProperty("maxSizeDown",String.format("%d",model.maxSizeDown()));
+        properties.setProperty("minFragSize",String.format("%d",model.minFragSize()));
+        properties.setProperty("maxRepeatContent",String.format("%f",model.maxRepeatContent()));
+        try {
+            OutputStream output = new FileOutputStream(settingsFile.getAbsolutePath());
+            properties.store(output, null);
+        } catch (IOException e) {
+            ErrorWindow.display("Could not write settings to file",e.getMessage());
+        }
+    }
+
+
+    public static Model initializeModelFromSettingsFile(String name) {
+        Model model = new Model();
+        File dir=getVPVDir();
+        File settingsFile=new File(dir+File.separator+name);
+        if (!settingsFile.exists()) {
+            ErrorWindow.display("Could not read settings file",
+                    String.format("Settings file %s did not exist",settingsFile.getAbsolutePath()));
+            return model; /* empty model. */
+        }
+        Properties properties=null;
+        try {
+            InputStream input = new FileInputStream("config.properties");
+            properties = new Properties();
+            properties.load(input);
+        } catch (IOException e) {
+            ErrorWindow.display("Could not read settings file",
+                    e.getMessage());
+            return model; /* empty model. */
+        }
+        String projectName = properties.getProperty("project_name");
+        if (projectName!=null)
+            model.setProjectName(projectName);
+        String genomeBuild = properties.getProperty("genome_build");
+        if (genomeBuild!=null){
+            model.setGenomeBuild(genomeBuild);
+        }
+        String path_to_downloaded_genome_directory = properties.getProperty("path_to_downloaded_genome_directory");
+        if (path_to_downloaded_genome_directory!=null) {
+            model.setGenomeDirectoryPath(path_to_downloaded_genome_directory);
+        }
+        String unpacked=properties.getProperty("genome_unpacked");
+        if (unpacked!=null && unpacked.equals("true")){
+            model.setGenomeUnpacked();
+        }
+        String indexed=properties.getProperty("genome_indexed");
+        if (indexed!=null && indexed.equals("true")){
+            model.setGenomeIndexed();
+        }
+        String transcriptURL=properties.getProperty("transcript_url");
+        if (transcriptURL!=null) {
+            model.setTranscriptsURL(transcriptURL);
+        }
+        String refgene_path=properties.getProperty("refgene_path");
+        if (refgene_path!=null) {
+            model.setRefGenePath(refgene_path);
+        }
+        String restriction_enzymes = properties.getProperty("restriction_enzymes");
+        System.err.println("[TODO] -import enzymes from settings: "+restriction_enzymes);
+        String target_genes_path = properties.getProperty("target_genes_path");
+        if (target_genes_path!=null) {
+            model.setTargetGenesPath(target_genes_path);
+        }
+        String fragNumUp = properties.getProperty("fragNumUp");
+        if (fragNumUp!=null) {
+            Integer i = Integer.parseInt(fragNumUp);
+            model.setFragNumUpProperty(i);
+        }
+        String fragNumDown = properties.getProperty("fragNumDown");
+        if (fragNumDown!=null) {
+            Integer i = Integer.parseInt(fragNumDown);
+            model.setFragNumDownProperty(i);
+        }
+        String minSizeUp = properties.getProperty("minSizeUp");
+        if (minSizeUp!=null) {
+            Integer i = Integer.parseInt(minSizeUp);
+            model.setMinSizeUpProperty(i);
+        }
+        String minSizeDown = properties.getProperty("minSizeDown");
+        if (minSizeDown!=null) {
+            Integer i = Integer.parseInt(minSizeDown);
+            model.setMinSizeDownProperty(i);
+        }
+        String maxSizeUp = properties.getProperty("maxSizeUp");
+        if (maxSizeUp!=null) {
+            Integer i = Integer.parseInt(maxSizeUp);
+            model.setMaxSizeUpProperty(i);
+        }
+        String maxSizeDown = properties.getProperty("maxSizeDown");
+        if (maxSizeDown!=null) {
+            Integer i = Integer.parseInt(maxSizeDown);
+            model.setMaxSizeDownProperty(i);
+        }
+        String minFragSize = properties.getProperty("minFragSize");
+        if (minFragSize!=null) {
+            Integer i = Integer.parseInt(minFragSize);
+            model.setMinFragSizeProperty(i);
+        }
+        String maxRepeatContent = properties.getProperty("maxRepeatContent");
+        if (maxRepeatContent!=null) {
+            Double d = Double.parseDouble(maxRepeatContent);
+            model.setMaxRepeatContentProperty(d);
+        }
+        return model;
+    }
+
+
 
 }

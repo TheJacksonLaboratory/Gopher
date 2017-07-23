@@ -163,6 +163,8 @@ public class EntrezGenePresenter implements Initializable {
         if (file == null) {
             System.err.println("[ERROR] Could not open genes file -TODO throw exception");
             return;
+        } else {
+            this.model.setRefGenePath(file.getAbsolutePath());
         }
         StringBuilder sb = new StringBuilder();
         this.symbols = new ArrayList<>();
