@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
+import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
@@ -50,6 +51,7 @@ public class VPVMainPresenter implements Initializable {
 
     private Stage primaryStage;
 
+    static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
 
 
 
@@ -77,7 +79,9 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     private Button downloadGenome;
     @FXML
-    private Button unpackIndexGenomeButton;
+    private Button decompressGenomeButton;
+    @FXML
+    private Button indexGenomeButton;
     /**
      * Label for the genome build we want to download.
      */
@@ -105,7 +109,9 @@ public class VPVMainPresenter implements Initializable {
      * Show progress in downloading the Genome and corresponding transcript definition file.
      */
     @FXML
-    private ProgressIndicator genomeUnpackIndexPI;
+    private ProgressIndicator genomeDecompressPI;
+    @FXML
+    private ProgressIndicator genomeIndexPI;
     /**
      * Button to download RefSeq.tar.gz (transcript/gene definition file
      */
@@ -116,10 +122,6 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML
     private ProgressIndicator transcriptDownloadPI;
-
-
-
-    //private TextField textTextField;
 
     @FXML private TextField fragNumUpTextField;
     @FXML private TextField fragNumDownTextField;
@@ -135,8 +137,10 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Label nValidGenesLabel;
     /** Show the name of the downloaded genome we areusing. */
     @FXML private Label downloadedGenomeLabel;
-    /** Show status of unpacking and indexing the downloaded genome. */
-    @FXML private Label unpackIndexGenomeLabel;
+    /** Show status of unpacking the downloaded genome. */
+    @FXML private Label decompressGenomeLabel;
+    /** Show status of indexing the downloaded genome. */
+    @FXML private Label indexGenomeLabel;
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
 
@@ -173,11 +177,8 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     private Tab analysistab;
     /** Tab for the viewpoints (will show statistics and a table with individual viewpoints. */
-    @FXML private Tab viewpointTableTab;
-    /** Tab to show a selected viewpoint in a browser. */
-    //@FXML private Tab singleviewpointTab;
-
-    /**
+    //@FXML private Tab viewpointTableTab;
+       /**
      * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting
      */
     @FXML
@@ -195,6 +196,7 @@ public class VPVMainPresenter implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        logger.trace("initialize() called");
         this.model = new Model();
         initializeBindings();
         // initialize settings. First check if already exists
@@ -260,12 +262,17 @@ public class VPVMainPresenter implements Initializable {
 
     }
 
-    private void setGenomeBuild(String newValue) {
+    private void setGenomeBuild(String build) {
+        logger.info("Setting genome build to "+build);
+        this.genomeBuildLabel.setText(build);
+        this.model.setGenomeBuild(build);
         //System.out.println("I am getting newValue=" + newValue);
         //System.out.println("The model should have been set to this by binding, " + model.getGenomeBuild());
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
+            logger.error("Not Able to find download URL for genome build "+build);
+            logger.error(e,e);
             ErrorWindow.display("Error getting genome path",e.toString());
             return;
         }
@@ -283,15 +290,18 @@ public class VPVMainPresenter implements Initializable {
      * It places the compressed file into the directory chosen by the user. The path to the directory
      * is stored in the {@link Model} object using the {@link Model#setGenomeDirectoryPath} function.
      * Following this the user needs to uncompress and index the genome files using the function
-     * {@link #unpackAndIndexGenome(ActionEvent)} which is called after the corresponding button
+     * {@link #decompressGenome(ActionEvent)} which is called after the corresponding button
      * is clicked in the GUI.
      */
     public void downloadGenome() {
         String genome = this.model.getGenomeURL();
+        logger.info("About to download genome from "+genome);
         genome = this.genomeChoiceBox.getValue();
         try {
             this.model.adjustGenomeDownloadPaths();
         } catch (DownloadFileNotFoundException e) {
+            logger.error("Unable to download genome from "+genome);
+            logger.error(e,e);
             ErrorWindow.display("Error", e.getMessage());
             return;
         }
@@ -400,13 +410,24 @@ public class VPVMainPresenter implements Initializable {
     } */
 
     /** ToDo wrap this in a Task! */
-    @FXML public void unpackAndIndexGenome(ActionEvent e) {
+    @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
-        GenomeIndexer gindexer = new GenomeIndexer(this.model.getGenomeDirectoryPath());
+        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath());
+        gindexer.extractTarGZ();
+        //gindexer.indexFastaFiles();
+       // Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
+        //model.setIndexedFastaFiles(indexedFa);
+
+    }
+
+    /** ToDo wrap this in a Task! */
+    @FXML public void indexGenome(ActionEvent e) {
+        e.consume();
+        /*GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath());
         gindexer.extractTarGZ();
         gindexer.indexFastaFiles();
         Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
-        model.setIndexedFastaFiles(indexedFa);
+        model.setIndexedFastaFiles(indexedFa);*/
 
     }
 

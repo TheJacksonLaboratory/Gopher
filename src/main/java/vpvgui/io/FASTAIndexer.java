@@ -1,6 +1,8 @@
 package vpvgui.io;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class creates a FASTA index for the FASTA file passed to the constructor.
@@ -26,6 +28,9 @@ import java.io.*;
  */
 public class FASTAIndexer {
 
+    /** Path to the directory where we will download and decompress the genome file. */
+    private String genomeDirectoryPath=null;
+
     private String path=null;
 
     private String contigname=null;
@@ -33,6 +38,10 @@ public class FASTAIndexer {
     private long byte_index;
     private long bases_per_line;
     private long bytes_per_line;
+    /** Key: name of chromosome or contig; value-absolute path to the corresponding
+     * FASTA file on disk. */
+    private Map<String,String> indexedFastaFiles;
+
 
     public String getContigname() {
         return contigname;
@@ -54,10 +63,8 @@ public class FASTAIndexer {
         return bytes_per_line;
     }
 
-    public String getPath() {
-
-        return path;
-    }
+    public String getPath() { return path; }
+    public Map<String,String> getIndexedFastaFiles() { return this.indexedFastaFiles; }
 
     /**
      *
@@ -65,6 +72,7 @@ public class FASTAIndexer {
      */
     public FASTAIndexer(String path){
         this.path=path;
+        this.indexedFastaFiles=new HashMap<>();
     }
 
 
@@ -99,6 +107,36 @@ public class FASTAIndexer {
             this.n_bases += line.length();
         }
         file.close();
+    }
+
+    /** Create FAI indices for all FASTA files in {@link #genomeDirectoryPath} (only if needed). */
+    public void indexFastaFiles() {
+        final File genomeDirectory = new File(this.genomeDirectoryPath);
+        for (final File fileEntry : genomeDirectory.listFiles()) {
+            if (fileEntry.isDirectory()) {
+                continue;
+            } else if (!fileEntry.getPath().endsWith(".fa")) {
+                continue;
+            } else if (fastaFAIalreadyExists(fileEntry.getAbsolutePath())) {
+                continue;
+            } else {
+                    /* if we get here, we have a FASTA file ending with ".fa" that has not yet been indexed */
+                FASTAIndexer faidx = new FASTAIndexer((fileEntry.getAbsolutePath()));
+                try {
+                    faidx.createFASTAindex();
+                    faidx.writeFASTAIndex();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String name=faidx.getContigname();
+                this.indexedFastaFiles.put(name,fileEntry.getAbsolutePath());
+            }
+        }
+    }
+
+    private boolean fastaFAIalreadyExists(String path) {
+        File f=new File(String.format("%s.fai",path));
+        return f.exists();
     }
 
 }

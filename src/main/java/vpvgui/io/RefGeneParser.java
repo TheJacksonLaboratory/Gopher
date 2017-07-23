@@ -28,7 +28,8 @@ import java.util.zip.GZIPInputStream;
  *     <li>cdsEndStat</li>
  *     <li>exonFrames</li>
  * </ol>
- *
+ * @author Peter Robinson
+ * @version 0.0.2 (2017-07-23)
  */
 public class RefGeneParser {
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
@@ -69,7 +70,7 @@ public class RefGeneParser {
                     gPos = Integer.parseInt(A[5])-1;
                 }
                 String name2=A[12];
-                System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
+                //System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
                 VPVGene gene=null;
                 if (genemap.containsKey(name2)) {
                     gene = genemap.get(name2);
@@ -153,8 +154,21 @@ public class RefGeneParser {
         return genelist;
     }
 
+    /** @return the total number of {@link vpvgui.model.project.VPVGene} objects created from parsing the
+     * refGene.txt.gz file.
+     */
     public int n_totalRefGenes() { return this.genemap.size(); }
 
-
+    /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
+     * number of viewpoints we will design for this gene. Intended for unit testing.
+     * @return number of distinct transcription start sites over all VPVGenes.
+     */
+    public int n_totalTSSstarts() {
+        int n=0;
+        for (VPVGene vpg :genemap.values()) {
+            n+=vpg.n_viewpointstarts();
+        }
+        return n;
+    }
 
 }

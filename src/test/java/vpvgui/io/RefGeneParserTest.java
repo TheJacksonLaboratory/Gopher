@@ -104,4 +104,14 @@ public class RefGeneParserTest {
         Assert.assertEquals(expectedPos,gPosList.get(0));
     }
 
+    /** There are 25 lines corresponding to 19 genes and 22 distinct transcription start sites
+     * in the refGeneSmall.txt.gz file.
+     */
+    @Test
+    public void testNumberOfStartPoints() {
+        int expected=22;
+        Assert.assertEquals(expected,parser.n_totalTSSstarts());
+
+    }
+
 }

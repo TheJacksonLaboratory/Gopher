@@ -2,6 +2,7 @@ package vpvgui.io;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
+import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 
 import java.io.File;
@@ -13,6 +14,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class Downloader extends Task<Void> {
+
+    static Logger logger = Logger.getLogger(Downloader.class.getName());
 
     /** An error message, if an error occured */
     protected String errorMessage=null;
@@ -68,7 +71,6 @@ public class Downloader extends Task<Void> {
         System.err.println("setLocalFilepath localFilePath="+localFilePath);
     }
 
-   // public abstract boolean needToDownload();
 
 
     public boolean hasError() {
@@ -146,8 +148,7 @@ public class Downloader extends Task<Void> {
                     threshold += block;
                 }
             }
-            //System.err.println();
-            System.err.println("[INFO] Done. " + (new Integer(totalBytesRead).toString()) + "(" + size + ") bytes read.");
+            logger.info("Successful download from "+urlstring+": " + (new Integer(totalBytesRead).toString()) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
             err = String.format("Could not interpret url: \"%s\"\n%s", urlstring, e.toString());
@@ -161,6 +162,8 @@ public class Downloader extends Task<Void> {
             err = e.getMessage();
         }
         if (err != null) {
+            logger.error("Failure to download from \""+urlstring+"\"");
+            logger.error(err);
             ErrorWindow.display("Error downloading",err);
             progress.setProgress(0.00);
             return null;
@@ -175,13 +178,14 @@ public class Downloader extends Task<Void> {
      *  does nothing.
      */
     protected void makeDirectoryIfNotExist() {
-        System.out.println("localDir = "+ localDir);
         if (localDir==null) {
-            return; // todo give user feedback
+            logger.error("Null pointer passed, unable to make directory.");
+            return;
         }
         if (this.localDir.getParentFile().exists()) {
            return;
         } else {
+            logger.info("Creating directory: "+ localDir);
             this.localDir.mkdir();
         }
     }

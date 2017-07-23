@@ -79,35 +79,36 @@
                                 <rowConstraints>
                                     <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label fx:id="genomeBuildLabel" prefHeight="16.0" prefWidth="121.0" text="Genome" GridPane.rowIndex="2">
+                                    <Label prefHeight="16.0" prefWidth="121.0" text="Genome" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                     <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="4">
+                                    <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                    <Label prefHeight="18.0" prefWidth="228.0" text="Unpack/index genome" GridPane.rowIndex="3">
+                                    <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                    <Label prefHeight="18.0" prefWidth="228.0" text="Decompress genome" GridPane.rowIndex="3">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="unpackIndexGenomeButton" mnemonicParsing="false" onAction="#unpackAndIndexGenome" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <ProgressIndicator fx:id="genomeUnpackIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                    <Label text="Restriction enzyme(s)" GridPane.rowIndex="5">
+                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                    <Label text="Restriction enzyme(s)" GridPane.rowIndex="6">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
@@ -115,17 +116,17 @@
                                           <Tooltip text="Empty Tooltip" />
                                        </tooltip>
                                     </Label>
-                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
                                     </Button>
-                                    <Label text="Target genes" GridPane.rowIndex="6">
+                                    <Label text="Target genes" GridPane.rowIndex="7">
                                        <GridPane.margin>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
@@ -143,10 +144,19 @@
                                        </padding>
                                     </Label>
                                     <Label text="Todo-menu with approaches " GridPane.columnIndex="3" />
-                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                                    <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6" />
-                                    <Label fx:id="unpackIndexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                                    <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                                    <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                                    <Label fx:id="decompressGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                    <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                    <Label text="Index Genome FASTA" GridPane.rowIndex="4">
+                                       <GridPane.margin>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                    <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                    <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />

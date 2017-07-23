@@ -61,12 +61,6 @@
             <version>2.10.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.samtools/htsjdk -->
-        <dependency>
-            <groupId>com.github.samtools</groupId>
-            <artifactId>htsjdk</artifactId>
-            <version>1.141</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/log4j/log4j -->
         <dependency>
             <groupId>log4j</groupId>
@@ -143,6 +137,7 @@
                 <includes>
                     <include>**/*.xml</include>
                     <include>**/*.jpg</include>
+                    <include>**/*.properties</include>
                 </includes>
             </resource>
         </resources>
