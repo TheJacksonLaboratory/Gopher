@@ -125,11 +125,8 @@ public class EntrezGenePresenter implements Initializable {
      */
     @FXML public void validateGeneSymbols(ActionEvent e) {
         e.consume();
-        if (this.model.getSettings()==null) {
-            ErrorWindow.display("Error","Settings object was null (report to developers)");
-            return;
-        }
-        String transcriptfile=this.model.getSettings().getTranscriptsFileTo();
+
+        String transcriptfile=null;
         if (transcriptfile==null) {
             ErrorWindow.display("Error retrieving  transcript file","Generate Jannovar transcript file before loading genes");
             return;

@@ -7,6 +7,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import vpvgui.framework.Injector;
+import vpvgui.model.Model;
+import vpvgui.vpvmain.VPVMainPresenter;
 import vpvgui.vpvmain.VPVMainView;
 
 import java.io.File;
@@ -23,12 +25,18 @@ import static vpvgui.io.Platform.getVPVDir;
 public class ViewPointViewer extends Application {
 
     static Logger logger = Logger.getLogger(ViewPointViewer.class.getName());
+    /** A reference to the Model; we will write the current settings to file in
+     * the {@link #stop} method by means of a method in the Model class.
+     */
+    private Model model;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         logger.info("Starting VPV Gui");
         updateLog4jConfiguration();
         VPVMainView appView = new VPVMainView();
+        VPVMainPresenter presenter=(VPVMainPresenter)appView.getPresenter();
+        this.model=presenter.getModel();
         Scene scene = new Scene(appView.getView());
         primaryStage.setTitle("HPO Phenote");
         primaryStage.setScene(scene);
@@ -37,6 +45,7 @@ public class ViewPointViewer extends Application {
     @Override
     public void stop() throws Exception {
         logger.info("Closing VPV Gui");
+        Model.writeSettingsToFile(this.model);
         Injector.forgetAll();
     }
 

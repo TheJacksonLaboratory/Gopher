@@ -2,10 +2,13 @@ package vpvgui.model;
 
 
 import javafx.beans.property.*;
+import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
+
+import static vpvgui.io.Platform.getDefaultProjectName;
 import static vpvgui.io.Platform.getVPVDir;
 
 import java.io.*;
@@ -20,6 +23,8 @@ import java.util.Properties;
  */
 public class Model {
 
+    static Logger logger = Logger.getLogger(Model.class.getName());
+
     private DataSource datasource = null;
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
@@ -27,8 +32,6 @@ public class Model {
     private List<RestrictionEnzyme> chosenEnzymelist=null;
     private List<ViewPoint> viewpointList=null;
     private List<VPVGene> geneList=null;
-    /** Settings for the current project. */
-    private Settings settings=null;
     /** Directory to which the Genome was downloaded */
     private String genomeDirectoryPath=null;
     /** Proxy (null if not needed/not set) */
@@ -140,8 +143,7 @@ public class Model {
 
 
     public String getGenomeBasename() {
-        System.out.println("Get genome banesfrom from Model=" + settings.getGenomeFileBasename());
-        return this.settings.getGenomeFileBasename();
+        return this.genomeBasename;
     }
 
 
@@ -157,17 +159,15 @@ public class Model {
         return transcriptsBasename;
     }
 
-    public Settings getSettings() {
-        return settings;
-    }
 
-    public void setSettings(Settings s) {
-        settings = s;
-    }
 
     public Model() {
         initializeEnzymesFromFile();
-        settings = Settings.factory();    // creates empty Settings object
+        defaultInit();
+    }
+
+    private void defaultInit() {
+        setProjectName(getDefaultProjectName());
     }
 
     /**
@@ -232,9 +232,6 @@ public class Model {
             throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
         }
         this.genomeURL = datasource.getGenomeURL();
-        this.settings.setGenomeFileURL(this.genomeURL);
-        this.settings.setGenomeFileBasename(this.genomeBasename);
-        //this.transcriptsURL = datasource.getTranscriptsURL();
     }
 
 
@@ -283,6 +280,7 @@ public class Model {
     }
 
     public String getRestrictionEnzymeString() {
+        if (chosenEnzymelist==null) return "null";
         StringBuilder sb = new StringBuilder();
         boolean morethanone=false;
         for (RestrictionEnzyme re:chosenEnzymelist) {
@@ -325,27 +323,36 @@ public class Model {
     public String getProjectName() { return this.projectName; }
 
 
-    /** Write the settings included in the model to a file.
-     * The file will be in the .vpvgui directory in the user's
-     * home directory, and will be named according to the project
-     * name (default: vpvgui.vpv_settings).
-     * @param model
+    /**
+     * See the static version of this function.
+     * @return Properties object for this Model.
      */
-    public static void writeSettingsToFile(Model model) {
-        File dir=getVPVDir();
-        File settingsFile=new File(dir+File.separator+model.projectName);
+    public Properties getProperties() {
+        return getProperties(this);
+    }
+
+    /** Collect all of the important attributes of the {@link Model} object and
+     * place them into a Properties object (intended to write or show the settings).
+     * @param model
+     * @return
+     */
+    public static Properties getProperties(Model model) {
         Properties properties = new Properties();
         properties.setProperty("project_name", model.getProjectName());
         properties.setProperty("genome_build",model.getGenomeBuild());
-        properties.setProperty("path_to_downloaded_genome_directory",model.getGenomeDirectoryPath());
+        String genomePath=model.getGenomeDirectoryPath()!=null?model.getGenomeDirectoryPath():"null";
+        properties.setProperty("path_to_downloaded_genome_directory",genomePath);
         String unpacked=model.isGenomeUnpacked()?"true":"false";
         properties.setProperty("genome_unpacked",unpacked);
         String indexed=model.isGenomeIndexed()?"true":"false";
         properties.setProperty("genome_indexed",indexed);
-        properties.setProperty("transcript_url",model.getTranscriptsURL());
-        properties.setProperty("refgene_path",model.getRefGenePath());
+        String transcURL=model.getTranscriptsURL()!=null?model.getTranscriptsURL():"null";
+        properties.setProperty("transcript_url",transcURL);
+        String refgenep=model.getRefGenePath()!=null?model.getRefGenePath():"null";
+        properties.setProperty("refgene_path",refgenep);
         properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());
-        properties.setProperty("target_genes_path",model.getTargetGenesPath());
+        String tgpath=model.getTargetGenesPath()!=null?model.getTargetGenesPath():"null";
+        properties.setProperty("target_genes_path",tgpath);
         properties.setProperty("fragNumUp",String.format("%d",model.fragNumUp()));
         properties.setProperty("fragNumDown",String.format("%d",model.fragNumDown()));
         properties.setProperty("minSizeUp",String.format("%d",model.minSizeUp()));
@@ -354,6 +361,21 @@ public class Model {
         properties.setProperty("maxSizeDown",String.format("%d",model.maxSizeDown()));
         properties.setProperty("minFragSize",String.format("%d",model.minFragSize()));
         properties.setProperty("maxRepeatContent",String.format("%f",model.maxRepeatContent()));
+        return properties;
+    }
+
+
+    /** Write the settings included in the model to a file.
+     * The file will be in the .vpvgui directory in the user's
+     * home directory, and will be named according to the project
+     * name (default: vpvgui.vpv_settings).
+     * @param model
+     */
+    public static void writeSettingsToFile(Model model) {
+        File dir=getVPVDir();
+        File settingsFile=new File(dir+File.separator+model.getProjectName());
+        logger.info("Writting settings to file at "+settingsFile.getAbsolutePath());
+        Properties properties = getProperties(model);
         try {
             OutputStream output = new FileOutputStream(settingsFile.getAbsolutePath());
             properties.store(output, null);
@@ -362,22 +384,29 @@ public class Model {
         }
     }
 
-
-    public static Model initializeModelFromSettingsFile(String name) {
+    /**
+     * Initialize the Model object based on the arguments contained in the settings file
+     * @param path Absolute complete path to the settings file.
+     * @return
+     */
+    public static Model initializeModelFromSettingsFile(String path) {
+        logger.debug("Initializing Model from settings file. path="+path);
         Model model = new Model();
-        File dir=getVPVDir();
-        File settingsFile=new File(dir+File.separator+name);
+        File settingsFile=new File(path);
         if (!settingsFile.exists()) {
+            logger.error("Could not find settings file at "+settingsFile.getAbsolutePath());
             ErrorWindow.display("Could not read settings file",
                     String.format("Settings file %s did not exist",settingsFile.getAbsolutePath()));
             return model; /* empty model. */
         }
         Properties properties=null;
         try {
-            InputStream input = new FileInputStream("config.properties");
+            InputStream input = new FileInputStream(path);
             properties = new Properties();
             properties.load(input);
         } catch (IOException e) {
+            logger.error("could not read VPVgui settings file");
+            logger.error(e,e);
             ErrorWindow.display("Could not read settings file",
                     e.getMessage());
             return model; /* empty model. */
@@ -455,6 +484,7 @@ public class Model {
             Double d = Double.parseDouble(maxRepeatContent);
             model.setMaxRepeatContentProperty(d);
         }
+        logger.info("Set model from settings file at "+settingsFile.getAbsolutePath());
         return model;
     }
 

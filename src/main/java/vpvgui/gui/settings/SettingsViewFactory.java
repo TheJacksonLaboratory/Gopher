@@ -3,7 +3,9 @@ package vpvgui.gui.settings;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import vpvgui.model.Settings;
+
+
+import java.util.Properties;
 
 
 /**
@@ -12,7 +14,7 @@ import vpvgui.model.Settings;
 public class SettingsViewFactory {
 
 
-    public static void showSettings(Settings settings) {
+    public static void showSettings(Properties properties) {
         Stage window;
         String windowTitle = "VPV Settings";
         window = new Stage();
@@ -32,7 +34,7 @@ public class SettingsViewFactory {
             }
 
         });
-        String html=getHTML(settings);
+        String html=getHTML(properties);
         presenter.setData(html);
 
         window.setScene(new Scene(view.getView()));
@@ -54,16 +56,18 @@ public class SettingsViewFactory {
         return sb.toString();
     }
 
-    private static String getHTML(Settings settings) {
+    /**
+     * TODO make this nicer in terms of order, e.g., put project name at top etc.
+     * @param properties
+     * @return
+     */
+    private static String getHTML(Properties properties) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body><h3>VPV Settings</h3>");
         sb.append("<p><ul>");
-        sb.append(String.format("<li>Project name: %s</li>",settings.getProjectName()));
-        sb.append(String.format("<li>Genome file: %s</li>", settings.getGenomeFileURL()));
-        sb.append(String.format("<li>Local Genome file name: %s</li>", settings.getGenomeFileBasename()));
-        sb.append(String.format("<li>Transcript (Jannovar) file: %s</li>", settings.getTranscriptsFileTo()));
-        sb.append(String.format("<li>Restriction Enzymes: %s</li>", joinEnzymes(settings.getRestrictionEnzymesList())));
-        sb.append(String.format("<li>Target Genes: n=%d</li>", settings.getTargetGenesList().size()));
+        for (String prop: properties.stringPropertyNames()) {
+            sb.append(String.format("<li>%s: %s</li>",prop,properties.getProperty(prop)));
+        }
         sb.append("</ul></p>");
         sb.append("</body></html>");
         return sb.toString();

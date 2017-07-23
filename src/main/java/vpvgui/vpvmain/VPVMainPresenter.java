@@ -27,22 +27,22 @@ import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
-import vpvgui.model.Settings;
 import vpvgui.model.project.ViewPointFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
+
+import static vpvgui.io.Platform.getDefaultProjectPath;
 
 
 /**
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.0.2 (July 1, 2017)
+ * @version 0.0.5 (2017-07-23)
  */
 public class VPVMainPresenter implements Initializable {
 
@@ -194,23 +194,25 @@ public class VPVMainPresenter implements Initializable {
         closeWindow();
     }
 
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.trace("initialize() called");
-        this.model = new Model();
+        this.model = initializeModelFromSettingsIfPossible();
         initializeBindings();
         // initialize settings. First check if already exists
         //TODO For now we are using just one default project name. Later extend this so the
         //user can store multiple project settings file under names chosen by them.
         String defaultProjectName = "vpvsettings";
-        Settings set = null;
+        /*Settings set = null;
         try {
             set = loadSettings(defaultProjectName);
         } catch (IOException i) {
             set = new Settings();
-        }
-        set.setProjectName(defaultProjectName);
-        model.setSettings(set);
+        }*/
+        //set.setProjectName(defaultProjectName);
+        //model.setSettings(set);
 
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
@@ -231,15 +233,36 @@ public class VPVMainPresenter implements Initializable {
         // textLabel.textProperty().bind(textTextField.textProperty());*/
     }
 
+    /** Look for the settings file in the .vpvgui directory.
+     * If found, initialize the model and the GUI with the data in the settings/project
+     * file as avaiable. Otherwise return an empty {@link Model} object.
+     * @return A {@link Model} object initialized if possible from a project file
+     * TODO -- now just take the default project file. Later allow user to choose a
+     * project file from a dialog.
+     */
+    private Model initializeModelFromSettingsIfPossible() {
+        logger.debug("Initializing model...");
+        File defaultProject = getDefaultProjectPath();
+        logger.debug("Default project file: "+defaultProject);
+        if (!defaultProject.exists()) {
+            logger.debug("Default project file did not exist, returning empty Model object.");
+            return new Model(); /* return an empty Model object. */
+        }
+        Model model = Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath());
+        logger.debug("Returning model that was initialized from settings file");
+        return model;
+    }
+
     public void initStage(Stage stage) {
         primaryStage = stage;
     }
 
 
-
+    /** Add theanalysis pane to the GUI. Since we are starting out with just one additional
+     * pane, TODO this could be moved to the initialize method.
+     */
     private void createPanes() {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
-        /* todo -- analogous for other tabs/p[anes.*/
     }
 
 
@@ -276,15 +299,9 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error getting genome path",e.toString());
             return;
         }
-        /* The model directly updates the settings object to reflect
-        the genome build etc, and the following command will save the settings to disk.
-         */
-        try {
-            saveSettings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
+    public Model getModel() { return this.model; }
 
     /** This downloads the tar-gzip genome file as chosen by the user from the UCSC download site.
      * It places the compressed file into the directory chosen by the user. The path to the directory
@@ -331,6 +348,8 @@ public class VPVMainPresenter implements Initializable {
             th.setDaemon(true);
             th.start();
         }
+        this.genomeBuildLabel.setText("downloaded "+genome +" to "+ file.getAbsolutePath());
+        logger.info("downloaded "+genome +" to "+ file.getAbsolutePath());
     }
 
 
@@ -487,24 +506,15 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * Update model with new settings object that will be gradually filled in by user via gui.
+     * Todo initialize model and ask user to choose a new name.
      */
     private void startNewProject() {
-        model.setSettings(Settings.factory());
+        model=new Model();
     }
 
-    /**
-     * Parse settings file from standard location and return as {@link Settings} bean.
-     *
-     * @return Settings for specified project
-     */
-    private Settings loadSettings(String projectName) throws IOException {
-        return SettingsIO.loadSettings(projectName);
-    }
-
-
+    /** Display the settings (parameters) of the current project. */
     public void showSettingsOfCurrentProject() {
-        SettingsViewFactory.showSettings(model.getSettings());
+        SettingsViewFactory.showSettings(model.getProperties());
     }
 
     /**

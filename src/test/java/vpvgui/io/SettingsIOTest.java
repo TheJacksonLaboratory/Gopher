@@ -30,7 +30,7 @@ public class SettingsIOTest {
     @BeforeClass
     public static void init() throws Exception {
         m = new Model();
-        s = m.getSettings();
+        s = new Settings();
         s.setProjectName("SettingsIOTestProject");
         s.setGenomeFileURL("genomeFile.txt.gz");
         s.setTranscriptsJannovarName("transcriptsFile.txt.gz");

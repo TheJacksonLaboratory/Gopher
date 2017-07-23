@@ -8,7 +8,7 @@ import javafx.scene.control.Alert.AlertType;
 
 public class Platform {
 
-    private static String projectDirname = "projects";
+    private static String defaultProjectName = "vpvgui-defaultproject.settings";
 
     /**
      * Get path to directory where HRMD-gui stores global settings.
@@ -43,16 +43,15 @@ public class Platform {
      * projects. The method doesn't create a directory if it doesn't exist.
      * @return
      */
-    public static File getProjectDir() {
-        File hrmdDir = getVPVDir();
-        return new File(hrmdDir + File.separator + projectDirname);
+    public static File getDefaultProjectPath() {
+        File dir = getVPVDir();
+        return new File(dir + File.separator + defaultProjectName);
     }
 
+    public static String getDefaultProjectName() { return defaultProjectName; }
 
-    public static File getParametersFile() {
-        String parametersFileName = "parameters.yml";
-        return new File(getVPVDir() + File.separator + parametersFileName);
-    }
+
+
 
 
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */

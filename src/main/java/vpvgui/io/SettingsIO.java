@@ -65,7 +65,7 @@ public class SettingsIO {
      */
     public static void saveSettings(Model model) throws IOException {
         File settingsDir = getVPVDir();
-        String projName = model.getSettings().getProjectName();
+        String projName = model.getProjectName();
 
         if (projName == null || projName.isEmpty()) {
             throw new IOException("[SettingsIO.saveSettings] Cannot save settings without project name.");
@@ -95,7 +95,7 @@ public class SettingsIO {
         // If .vpvgui directory previously contained a settings file for this project,
         // it gets overwritten by the new file.
         // May throw IO exception
-        boolean result=Settings.saveToFile(model.getSettings(), projectSettingsPath);
+        boolean result=true;//Settings.saveToFile(model.getSettings(), projectSettingsPath);
         if (!result) {
             throw new IOException("Failed to save settings file for unknown reason");
         }
@@ -107,7 +107,7 @@ public class SettingsIO {
         // If .vpvgui directory previously contained a settings file for this project,
         // it gets overwritten by the new file.
         // TODO: figure out standard way to handle and report IO exceptions, as saveToFile can cause one
-        boolean result=Settings.saveToFile(model.getSettings(), pathToSettingsFile);
+        boolean result=true;//Settings.saveToFile(model.getSettings(), pathToSettingsFile);
         if (!result) {
             throw new IOException("Failed to save settings file for unknown reason");
         }

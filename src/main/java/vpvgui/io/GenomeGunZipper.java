@@ -4,6 +4,7 @@ package vpvgui.io;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
  * Created by robinp on 7/13/17.
  */
 public class GenomeGunZipper {
+    static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
     /** Path to the directory where we will download and decompress the genome file. */
     private String genomeDirectoryPath=null;
     /** This is the basename of the compressed genome file that we download from UCSC. */
@@ -43,9 +45,13 @@ public class GenomeGunZipper {
 
     /** This function uses the apache librarty to transform the chromFa.tar.gz file into the individual chromosome files.*/
     public void extractTarGZ() {
-        if (alreadyExtracted())
+        logger.debug("entering extractTarGZ");
+        if (alreadyExtracted()) {
+            logger.debug("Found already extracted files, returning.");
             return;
+        }
         String INPUT_GZIP_FILE = (new File(this.genomeDirectoryPath + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
+        logger.info("About to gunzip "+INPUT_GZIP_FILE);
         try {
             InputStream in = new FileInputStream(INPUT_GZIP_FILE);
             GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
