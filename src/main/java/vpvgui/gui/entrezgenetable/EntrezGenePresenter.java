@@ -1,9 +1,7 @@
 package vpvgui.gui.entrezgenetable;
 
 
-import de.charite.compbio.jannovar.reference.GenomeInterval;
-import de.charite.compbio.jannovar.reference.Strand;
-import de.charite.compbio.jannovar.reference.TranscriptModel;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,12 +11,13 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import vpvgui.framework.Signal;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.io.RefGeneParser;
 import vpvgui.model.Model;
-import vpvgui.model.project.JannovarGeneGenerator;
 import vpvgui.model.project.VPVGene;
+
 
 
 import java.io.BufferedReader;
@@ -34,8 +33,8 @@ import java.util.function.Consumer;
  * <ol>
  *     <li>Upload causes {@link #uploadGenes(ActionEvent)} to be run, which fills the set {@link #symbols}.
  *     This set can contain valid and invalid symbols</li>
- *     <li>Validate causes {@link #validateGeneSymbols(ActionEvent)} to be run, which fills the map
- *     {@link #validGenes2TranscriptsMap} that has all valid symbols (key) with their corresponding transcripts (value), whereby
+ *     <li>Validate causes {@link #validateGeneSymbols(ActionEvent)} to be run, which causes the
+ *     {@link RefGeneParser} object to store {@link VPVGene} objects for each gene/distinct TSS in the RefGene.txt.gz file.
  *     only one transcriptmodel is stored per distinct transcription start site. The function also displays lists of valid and invalid
  *     gene symbols in the dialog</li>
  *     <li>Accept causes {@link #acceptGenes()} to be run, which creates a list of {@link VPVGene} objects - one for
@@ -47,6 +46,7 @@ import java.util.function.Consumer;
  * @version 0.0.2 (2017-07-22)
  */
 public class EntrezGenePresenter implements Initializable {
+    static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
     @FXML
     private Label instructions;
 
@@ -72,12 +72,6 @@ public class EntrezGenePresenter implements Initializable {
     /** List of the symbols prior to validation, i.e., may contain invalid symbols. */
     private List<String> symbols=null;
 
-    private Map<String,List<TranscriptModel>> validGenes2TranscriptsMap=null;
-
-    private Map<String,VPVGene> validSymbol2VPVGeneMap=null;
-
-    private List<VPVGene> vpvgenelist;
-
 
     private Consumer<Signal> signal;
 
@@ -94,10 +88,6 @@ public class EntrezGenePresenter implements Initializable {
         this.signal = signal;
     }
 
-    /** This object will find the Jannovar TranscriptModel objects that correspond to all of the
-     * transcripts that correspond to a Gene symbol.
-     */
-   private JannovarGeneGenerator jgg =null;
 
     /**
      * setting the stage of this view
@@ -120,28 +110,25 @@ public class EntrezGenePresenter implements Initializable {
     }
 
     /** Transfer the genes to the model.
-     *
+     * Use the refGene.txt.gz data to validate the uploaded gene symbols.
      * @param e
      */
     @FXML public void validateGeneSymbols(ActionEvent e) {
         e.consume();
-
-        String transcriptfile=null;
-        if (transcriptfile==null) {
-            ErrorWindow.display("Error retrieving  transcript file","Generate Jannovar transcript file before loading genes");
-            return;
-        }
         String path = this.model.getRefGenePath();
         if (path==null) {
+            logger.error("attempt to validate gene symbols before refGene.txt.gz file was downloaded");
             ErrorWindow.display("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
             return;
         }
+        logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
         this.parser = new RefGeneParser(path);
         parser.checkGenes(this.symbols);
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
         List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
-        int n_transcripts = validSymbol2VPVGeneMap.size();
-        String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,validGenes2TranscriptsMap.size(), n_transcripts);
+        int n_transcripts = parser.n_totalTSSstarts();
+        int n_genes=parser.n_totalRefGenes();
+        String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, n_transcripts);
         setData(html);
         isvalidated=true;
     }
@@ -158,12 +145,11 @@ public class EntrezGenePresenter implements Initializable {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(stage);
         if (file == null) {
-            System.err.println("[ERROR] Could not open genes file -TODO throw exception");
+            logger.error("[ERROR] Could not open genes file -TODO throw exception");
             return;
         } else {
-            this.model.setRefGenePath(file.getAbsolutePath());
+            this.model.setTargetGenesPath(file.getAbsolutePath());
         }
-        StringBuilder sb = new StringBuilder();
         this.symbols = new ArrayList<>();
         try {
             BufferedReader br =new BufferedReader(new FileReader(file));
@@ -177,6 +163,7 @@ public class EntrezGenePresenter implements Initializable {
         }
         e.consume();
         setData(getInitialGeneListHTML(symbols));
+        logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));
         isvalidated=false;
     }
 

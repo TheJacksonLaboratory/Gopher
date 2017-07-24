@@ -23,6 +23,8 @@ import java.util.Properties;
  */
 public class Model {
 
+    private static final String DEFAULT_GENOME_BUILD = "hg19";
+    private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     static Logger logger = Logger.getLogger(Model.class.getName());
 
     private DataSource datasource = null;
@@ -137,8 +139,8 @@ public class Model {
         return this.genomeURL;
     }
 
-    public String genomeBasename = null;
-    /** The complete URLof the chosen transcript definition from UCSC. */
+    public String genomeBasename = DEFAULT_GENOME_BASENAME;
+    /** The complete URL of the chosen transcript definition from UCSC. */
     public String transcriptsURL = null;
 
 
@@ -168,6 +170,7 @@ public class Model {
 
     private void defaultInit() {
         setProjectName(getDefaultProjectName());
+        setGenomeBuild(DEFAULT_GENOME_BUILD);
     }
 
     /**
@@ -213,26 +216,7 @@ public class Model {
         }
     }
 
-    /**
-     * This method uses {@link DataSource} as a source for collections
-     * of paths and names that represent the sets of data we will need
-     * to analyze any one genome.
-     */
-    public void adjustGenomeDownloadPaths() throws DownloadFileNotFoundException {
-        String gb = getGenomeBuild();
-        if (gb.equals("hg19")) {
-            this.datasource = DataSource.createUCSChg19();
-        } else if (gb.equals("hg38")) {
-            this.datasource = DataSource.createUCSChg38();
-        } else if (gb.equals("mm9")) {
-            this.datasource = DataSource.createUCSCmm9();
-        } else if (gb.equals("mm10")) {
-            this.datasource = DataSource.createUCSCmm10();
-        } else {
-            throw new DownloadFileNotFoundException(String.format("Need to implement code for genome build %s.", gb));
-        }
-        this.genomeURL = datasource.getGenomeURL();
-    }
+
 
 
 

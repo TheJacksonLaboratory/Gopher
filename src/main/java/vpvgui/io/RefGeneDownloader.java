@@ -6,7 +6,7 @@ import vpvgui.exception.DownloadFileNotFoundException;
  * This class will coordinate downloading the RefSeq.txt.gz file for the
  * indicated species.
  */
-public class RefSeqDownloader {
+public class RefGeneDownloader {
     final private static String hg19="http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";
     final private static String hg38="http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz";
     final private static String mm9="http://hgdownload.soe.ucsc.edu/goldenPath/mm9/database/refGene.txt.gz";
@@ -15,7 +15,7 @@ public class RefSeqDownloader {
     private String genome=null;
 
 
-    public RefSeqDownloader(String genome) {
+    public RefGeneDownloader(String genome) {
         this.genome=genome;
     }
 

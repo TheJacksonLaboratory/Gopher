@@ -26,19 +26,18 @@ public class ViewPointViewer extends Application {
 
     static Logger logger = Logger.getLogger(ViewPointViewer.class.getName());
     /** A reference to the Model; we will write the current settings to file in
-     * the {@link #stop} method by means of a method in the Model class.
-     */
+     * the {@link #stop} method by means of a method in the Model class. */
     private Model model;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        logger.info("Starting VPV Gui");
         updateLog4jConfiguration();
+        logger.info("Starting VPV Gui");
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter=(VPVMainPresenter)appView.getPresenter();
         this.model=presenter.getModel();
         Scene scene = new Scene(appView.getView());
-        primaryStage.setTitle("HPO Phenote");
+        primaryStage.setTitle("ViewPoint Viewer");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -56,7 +55,6 @@ public class ViewPointViewer extends Application {
     /** This sets the location of the log4j log file to the user's .vpvgui directory.*/
     private void updateLog4jConfiguration() {
         File dir=getVPVDir();
-
         String logpath=(new File(dir+File.separator+"vpvgui.log")).getAbsolutePath();
         Properties props = new Properties();
         try {
@@ -64,7 +62,7 @@ public class ViewPointViewer extends Application {
             props.load(configStream);
             configStream.close();
         } catch (IOException e) {
-            System.out.println("Error: Cannot laod configuration file ");
+            System.out.println("Error: Cannot load configuration file.");
         }
         logger.info("Resetting log file location to "+logpath);
         LogManager.resetConfiguration();

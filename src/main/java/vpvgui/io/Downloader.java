@@ -41,8 +41,8 @@ public class Downloader extends Task<Void> {
     /** This is the URL of the file we want to download */
     protected String urlstring=null;
 
-    public Downloader(File path, String url, String basename) {
-        this.localDir = path;
+    public Downloader(File directoryPath, String url, String basename) {
+        this.localDir = directoryPath;
         this.urlstring=url;
         setLocalFilePath(basename);
         makeDirectoryIfNotExist();
@@ -66,9 +66,8 @@ public class Downloader extends Task<Void> {
     protected File getLocalFilePath() { return  this.localFilePath; }
 
     protected void setLocalFilePath (String bname) {
-        System.err.println("setLocalFilepath bname="+bname);
         this.localFilePath = new File(this.localDir + File.separator + bname);
-        System.err.println("setLocalFilepath localFilePath="+localFilePath);
+        logger.debug("setLocalFilepath for download to: "+localFilePath);
     }
 
 
@@ -110,7 +109,7 @@ public class Downloader extends Task<Void> {
     protected Void call()  {
         if (progress!=null)
             progress.setProgress(1.000); /* show progress as 100% */
-        System.out.println("[INFO] Downloading: \"" + urlstring + "\"");
+        logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
 
         // The error handling can be improved with Java 7.
         String err = null;

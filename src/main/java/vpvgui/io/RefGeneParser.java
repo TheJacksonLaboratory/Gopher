@@ -2,6 +2,7 @@ package vpvgui.io;
 
 import de.charite.compbio.jannovar.JannovarException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
+import org.apache.log4j.Logger;
 import vpvgui.model.project.VPVGene;
 
 import java.io.*;
@@ -32,6 +33,8 @@ import java.util.zip.GZIPInputStream;
  * @version 0.0.2 (2017-07-23)
  */
 public class RefGeneParser {
+
+    static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
      * the gene list uploaded by the user. */
     private Map<String, VPVGene> genemap=null;
@@ -91,7 +94,8 @@ public class RefGeneParser {
             }
             br.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while attempting to parse the RefGene file from UCSC:"+path);
+            logger.error(e,e);
         }
     }
 

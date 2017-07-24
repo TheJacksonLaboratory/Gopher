@@ -1,6 +1,9 @@
 package vpvgui.io;
 
 //import htsjdk.samtools.reference.FastaSequenceIndexCreator;
+import javafx.concurrent.Task;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -14,7 +17,7 @@ import java.util.Map;
  * This class is responsible for g-unzipping and untarring a downloaded genome file.
  * Created by robinp on 7/13/17.
  */
-public class GenomeGunZipper {
+public class GenomeGunZipper extends Task<Void>  {
     static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
     /** Path to the directory where we will download and decompress the genome file. */
     private String genomeDirectoryPath=null;
@@ -25,11 +28,17 @@ public class GenomeGunZipper {
     /** Size of buffer for reading the g-zip'd files.*/
     private static final int BUFFER_SIZE=1024;
 
+    private ProgressIndicator progress=null;
+
+    private Label statusLabel;
+
     /**
      * @param directoryPath Path to the direcotry where chromFa.tar.gz was downloaded.
      */
-    public GenomeGunZipper(String directoryPath) {
+    public GenomeGunZipper(String directoryPath, ProgressIndicator pi,Label label) {
+        this.progress=pi;
         this.genomeDirectoryPath=directoryPath;
+        this.statusLabel=label;
     }
 
     /**
@@ -37,19 +46,36 @@ public class GenomeGunZipper {
      * presence of chr1.fa--this will break if species without chr1 are analyzed).
      * @return true if the chromFGa.tar.gz file has been previously extracted
      */
-    public boolean alreadyExtracted() {
+    private boolean alreadyExtracted() {
         File f = new File(this.genomeDirectoryPath + File.separator + "chr1.fa");
         return f.exists();
     }
 
 
-    /** This function uses the apache librarty to transform the chromFa.tar.gz file into the individual chromosome files.*/
-    public void extractTarGZ() {
+    private void setStatusLabel(String msg) {
+        // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+        javafx.application.Platform.runLater(
+                () -> {
+                    this.statusLabel.setText(msg);
+                }
+        );
+    }
+
+
+
+    /** This function uses the apache library to transform the chromFa.tar.gz file into the individual chromosome files.
+     * It is packaged as a Task to allow concurrency*/
+    @Override
+    protected Void call() {
         logger.debug("entering extractTarGZ");
         if (alreadyExtracted()) {
             logger.debug("Found already extracted files, returning.");
-            return;
+            this.progress.setProgress(100.0);
+            setStatusLabel("extraction previously completed.");
+            return null;
         }
+        if (this.progress != null)
+            this.progress.setProgress(0.000); /* show progress as 0% */
         String INPUT_GZIP_FILE = (new File(this.genomeDirectoryPath + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
         try {
@@ -57,7 +83,11 @@ public class GenomeGunZipper {
             GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
             TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn);
             TarArchiveEntry entry;
-
+            /* For humans, there are 93 files (including all the contigs)
+            For simplicity, we will update the ProgressIndicator by 1% per file. If we get to 95, we will begin to update by 0.1% until
+            we are done.
+             */
+            double percentDone=0d;
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 /** If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway. **/
                 if (entry.isDirectory()) {
@@ -74,13 +104,25 @@ public class GenomeGunZipper {
                         }
                         dest.close();
                     }
+                    logger.trace("Unzipped "+entry.getName());
+                    if (percentDone<90)
+                        percentDone +=1.0d;
+                    else
+                        percentDone += 0.1d;
+                    progress.setProgress(percentDone);
                 }
             }
+            progress.setProgress(100.0);
             tarIn.close();
-            System.out.println("[INFO] Untar completed successfully");
+            logger.info("Untar completed successfully for "+INPUT_GZIP_FILE);
+            setStatusLabel("extraction completed.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unable to decompress "+INPUT_GZIP_FILE);
+            logger.error(e,e);
+            progress.setProgress(0.0);
+            setStatusLabel("extraction could not be completed.");
         }
+        return null;
     }
 
 }

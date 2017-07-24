@@ -45,16 +45,11 @@ import static vpvgui.io.Platform.getDefaultProjectPath;
  * @version 0.0.5 (2017-07-23)
  */
 public class VPVMainPresenter implements Initializable {
-
+    static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
     /** The Model for the entire analysis. */
     private Model model = null;
 
     private Stage primaryStage;
-
-    static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
-
-
-
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
      * obtain a reference to the primary scene, which is needed by FileChooser, etc.
@@ -62,34 +57,23 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     private Node rootNode;
 
-    /**
-     * List of genome+gene files for download. Used by genomeChoiceBox
-     */
+    /** List of genome builds. Used by genomeChoiceBox*/
     @FXML
     private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
 
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
-
-    //@FXML
-    //private ChoiceBox<String> geneDefinitionsChoiceBox;
-    /**
-     * Clicking this button downloads the genome build and unpacks it.
-     */
+    /** Clicking this button downloads the genome build and unpacks it.*/
     @FXML
     private Button downloadGenome;
     @FXML
     private Button decompressGenomeButton;
     @FXML
     private Button indexGenomeButton;
-    /**
-     * Label for the genome build we want to download.
-     */
+    /** Label for the genome build we want to download. */
     @FXML
     private Label genomeBuildLabel;
-    /**
-     * Label for the transcripts we want to download.
-     */
+    /** Label for the transcripts we want to download.*/
     @FXML
     private Label transcriptsLabel;
 
@@ -98,30 +82,18 @@ public class VPVMainPresenter implements Initializable {
      * A file chooser will appear and the user can decide where to download everything. The paths will be stored
      * in the project settings file.
      */
-    @FXML
-    private Button downloadGenomeButton;
-    /**
-     * Show progress in downloading the Genome and corresponding transcript definition file.
-     */
-    @FXML
-    private ProgressIndicator genomeDownloadPI;
-    /**
-     * Show progress in downloading the Genome and corresponding transcript definition file.
-     */
-    @FXML
-    private ProgressIndicator genomeDecompressPI;
-    @FXML
-    private ProgressIndicator genomeIndexPI;
-    /**
-     * Button to download RefSeq.tar.gz (transcript/gene definition file
-     */
-    @FXML
-    private Button downloadTranscriptsButton;
-    /**
-     * Progress indicator for downloading the transcript file
-     */
-    @FXML
-    private ProgressIndicator transcriptDownloadPI;
+    @FXML private Button downloadGenomeButton;
+    /** Show progress in downloading the Genome and corresponding transcript definition file.  */
+    /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
+    @FXML private Button downloadTranscriptsButton;
+    @FXML private ProgressIndicator genomeDownloadPI;
+    /** Show progress in downloading the Genome and corresponding transcript definition file.  */
+    @FXML private ProgressIndicator genomeDecompressPI;
+    @FXML private ProgressIndicator genomeIndexPI;
+    /** Progress indicator for downloading the transcript file */
+    @FXML private ProgressIndicator transcriptDownloadPI;
+
+
 
     @FXML private TextField fragNumUpTextField;
     @FXML private TextField fragNumDownTextField;
@@ -176,22 +148,21 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML
     private Tab analysistab;
-    /** Tab for the viewpoints (will show statistics and a table with individual viewpoints. */
-    //@FXML private Tab viewpointTableTab;
-       /**
-     * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting
-     */
-    @FXML
-    private Button chooseEnzymeButton;
 
+    /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
+    @FXML private Button chooseEnzymeButton;
 
+    /** Presenter for the second tab. */
     private VPAnalysisPresenter vpanalysispresenter;
+    /** View for the second tab. */
     private VPAnalysisView vpanalysisview;
 
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
-        closeWindow();
+        logger.info("Closing VPV Gui");
+        Model.writeSettingsToFile(this.model);
+        closeWindow(e);
     }
 
 
@@ -289,16 +260,6 @@ public class VPVMainPresenter implements Initializable {
         logger.info("Setting genome build to "+build);
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
-        //System.out.println("I am getting newValue=" + newValue);
-        //System.out.println("The model should have been set to this by binding, " + model.getGenomeBuild());
-        try {
-            this.model.adjustGenomeDownloadPaths();
-        } catch (DownloadFileNotFoundException e) {
-            logger.error("Not Able to find download URL for genome build "+build);
-            logger.error(e,e);
-            ErrorWindow.display("Error getting genome path",e.toString());
-            return;
-        }
     }
 
     public Model getModel() { return this.model; }
@@ -311,45 +272,22 @@ public class VPVMainPresenter implements Initializable {
      * is clicked in the GUI.
      */
     public void downloadGenome() {
-        String genome = this.model.getGenomeURL();
-        logger.info("About to download genome from "+genome);
-        genome = this.genomeChoiceBox.getValue();
-        try {
-            this.model.adjustGenomeDownloadPaths();
-        } catch (DownloadFileNotFoundException e) {
-            logger.error("Unable to download genome from "+genome);
-            logger.error(e,e);
-            ErrorWindow.display("Error", e.getMessage());
-            return;
-        }
-        /** The Model should now be set to hg19, hg38, mm9, or mm10 etc.*/
-
+        String build = this.model.getGenomeBuild();
+        logger.info("About to download genome for "+build +" (if necessary)");
+        GenomeDownloader gdownloader = new GenomeDownloader(build);
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
+        dirChooser.setTitle("Choose directory for " + build + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        Operation op = new GenomeDownloadOperation(file.getPath());
         if (file==null || file.getAbsolutePath()=="") {
+            logger.error("Could not set genome download path from Directory Chooser");
             ErrorWindow.display("Error","Could not get path to download genome.");
             return;
-        } else {
-            this.model.setGenomeDirectoryPath(file);
         }
-        if (model.getGenomeURL()==null || model.getGenomeURL().isEmpty()) {
-            ErrorWindow.display("Error","Genome URL (UCSC address) not initialized");
-            return;
-        }
-        if (model.getGenomeBasename()==null || model.getGenomeBasename().isEmpty()) {
-            ErrorWindow.display("Error","Genome Basename (usually chromFa.tar.gz) not initialized");
-            return;
-        }
-        Downloader downloadTask = new Downloader(file, model.getGenomeURL(), model.getGenomeBasename(), genomeDownloadPI);
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-        }
-        this.genomeBuildLabel.setText("downloaded "+genome +" to "+ file.getAbsolutePath());
-        logger.info("downloaded "+genome +" to "+ file.getAbsolutePath());
+        gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDecompressPI);
+        String status = gdownloader.getStatus();
+        this.downloadedGenomeLabel.setText(status);
+        logger.info(status);
+        genomeDownloadPI.setProgress(1.000);
     }
 
 
@@ -357,7 +295,7 @@ public class VPVMainPresenter implements Initializable {
         String genome = this.model.getGenomeURL();
         if (genome==null)
             genome=genomeChoiceBox.getValue();
-        RefSeqDownloader rsd = new RefSeqDownloader(genome);
+        RefGeneDownloader rsd = new RefGeneDownloader(genome);
         String transcriptName = rsd.getTranscriptName();
         String basename=rsd.getBaseName();
         String url=null;
@@ -374,7 +312,7 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error","Could not get path to download transcript file.");
             return;
         }
-        Operation op = new TranscriptDownloadOperation(file.getPath());
+        Operation op = new RefGeneDownloadOperation(file.getPath());
         Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);
@@ -431,8 +369,14 @@ public class VPVMainPresenter implements Initializable {
     /** ToDo wrap this in a Task! */
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
-        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath());
-        gindexer.extractTarGZ();
+        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
+                this.genomeDecompressPI,
+                this.decompressGenomeLabel);
+        Thread th = new Thread(gindexer);
+        th.setDaemon(true);
+        th.start();
+
+
         //gindexer.indexFastaFiles();
        // Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
         //model.setIndexedFastaFiles(indexedFa);
@@ -499,10 +443,13 @@ public class VPVMainPresenter implements Initializable {
         selectionModel.select(this.analysistab);
     }
 
-    public void closeWindow() {
+    public void closeWindow(ActionEvent e) {
         boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
-        if (answer)
-            System.exit(0);
+        if (answer) {
+            logger.info("Closing VPV Gui");
+            Model.writeSettingsToFile(this.model);
+        }
+        System.exit(0);
     }
 
     /**
@@ -518,11 +465,10 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * This method gets called when user chooses to close Gui. Content of
-     * {@link Settings} bean is written to platform-dependent default location.
+     * Content of {@link Model} is written to platform-dependent default location.
      */
     private void saveSettings() throws IOException {
-        SettingsIO.saveSettings(model);
+        Model.writeSettingsToFile(this.model);
     }
 
 
@@ -557,6 +503,8 @@ public class VPVMainPresenter implements Initializable {
         String proxy=presenter.getProxy();
         this.model.setHttpProxy(proxy);
         this.model.setHttpProxyPort(port);
+        logger.info("Set proxy to "+proxy);
+        logger.info("Set proxy port to "+port);
 
     }
 

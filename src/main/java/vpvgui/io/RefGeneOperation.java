@@ -6,7 +6,7 @@ import java.io.File;
  * Created by peter on 06.05.17.
  * This class checks whether we need to download RefSeq.
  */
-public class RefSeqOperation implements Operation {
+public class RefGeneOperation implements Operation {
 
     private String directoryPath = null;
 
@@ -15,7 +15,7 @@ public class RefSeqOperation implements Operation {
      *
      * @param path path to directory where we want to download.
      */
-    public RefSeqOperation(String path) {
+    public RefGeneOperation(String path) {
         this.directoryPath = path;
     }
 

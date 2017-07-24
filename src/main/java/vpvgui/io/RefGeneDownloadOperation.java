@@ -2,7 +2,7 @@ package vpvgui.io;
 
 import java.io.File;
 
-public class TranscriptDownloadOperation implements Operation {
+public class RefGeneDownloadOperation implements Operation {
 
     private String directoryPath =null;
     /** Basename of the file that we will store to disk */
@@ -12,7 +12,7 @@ public class TranscriptDownloadOperation implements Operation {
      * Download UCSC RefSeq  file to given dataDir
      * @param path path to directory where we want to download.
      */
-    public TranscriptDownloadOperation(String path) {
+    public RefGeneDownloadOperation(String path) {
         this.directoryPath =path;
     }
 
