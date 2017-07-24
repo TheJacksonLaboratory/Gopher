@@ -1,5 +1,6 @@
 package vpvgui.io;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import org.apache.log4j.Logger;
@@ -19,6 +20,8 @@ public class GenomeDownloader {
 
     private String currentStatus="uninitialized";
 
+    private boolean successful=false;
+
 
 
     public GenomeDownloader(String build) {
@@ -35,6 +38,13 @@ public class GenomeDownloader {
     public String getStatus() {
         return currentStatus;
     }
+    /** @return true if the genome was downloaded successfully or is already present.*/
+    public boolean successful() {
+        return successful;
+    }
+
+
+
 
 
     public void setDownloadDirectoryAndDownloadIfNeeded(String directory, String basename, ProgressIndicator pi) {
@@ -44,8 +54,10 @@ public class GenomeDownloader {
             Thread th = new Thread(downloadTask);
             th.setDaemon(true);
             th.start();
+
         } else {
             currentStatus=String.format("Genome %s was already downloaded",this.genomebuild);
+            this.successful=true;
         }
     }
 

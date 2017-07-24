@@ -149,10 +149,15 @@ public class RefGeneParser {
         }
     }
 
-
+    /**
+     * Iterate through all {@link VPVGene} objects and return a list of only those {@link VPVGene}s that
+     * represent valid gene symbols uploaded by the user
+     * @return List of VPVGenes representing valid uploaded gene symbols.
+     */
     public List<VPVGene> getVPVGeneList() {
         List<VPVGene> genelist=new ArrayList<>();
         for (VPVGene g: genemap.values()) {
+            if (this.validGeneSymbols.contains(g.getGeneSymbol()))
             genelist.add(g);
         }
         return genelist;

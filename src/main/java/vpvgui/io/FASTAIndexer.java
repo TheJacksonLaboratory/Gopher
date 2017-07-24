@@ -47,9 +47,6 @@ public class FASTAIndexer  {
     private long bases_per_line;
     private long bytes_per_line;
 
-
-
-
     /**
      *
      * @param path Path to the FASTA file to be indexed.

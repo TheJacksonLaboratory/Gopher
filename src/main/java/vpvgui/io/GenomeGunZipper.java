@@ -30,16 +30,21 @@ public class GenomeGunZipper extends Task<Void>  {
 
     private ProgressIndicator progress=null;
 
-    private Label statusLabel;
+    private String status=null;
+
+    private boolean OK = false;
+    public boolean OK() {return OK;}
 
     /**
      * @param directoryPath Path to the direcotry where chromFa.tar.gz was downloaded.
      */
-    public GenomeGunZipper(String directoryPath, ProgressIndicator pi,Label label) {
+    public GenomeGunZipper(String directoryPath, ProgressIndicator pi) {
         this.progress=pi;
         this.genomeDirectoryPath=directoryPath;
-        this.statusLabel=label;
     }
+
+
+    public String getStatus(){return status;}
 
     /**
      * We use this method to check if we need to g-unzip the genome files. (We only check for the
@@ -52,14 +57,6 @@ public class GenomeGunZipper extends Task<Void>  {
     }
 
 
-    private void setStatusLabel(String msg) {
-        // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-        javafx.application.Platform.runLater(
-                () -> {
-                    this.statusLabel.setText(msg);
-                }
-        );
-    }
 
 
 
@@ -71,7 +68,8 @@ public class GenomeGunZipper extends Task<Void>  {
         if (alreadyExtracted()) {
             logger.debug("Found already extracted files, returning.");
             this.progress.setProgress(100.0);
-            setStatusLabel("extraction previously completed.");
+            this.status="extraction previously completed.";
+            OK=true;
             return null;
         }
         if (this.progress != null)
@@ -113,14 +111,15 @@ public class GenomeGunZipper extends Task<Void>  {
                 }
             }
             progress.setProgress(100.0);
+            OK=true;
             tarIn.close();
             logger.info("Untar completed successfully for "+INPUT_GZIP_FILE);
-            setStatusLabel("extraction completed.");
+            this.status="chromFa.tar.gz successfully extracted.";
         } catch (IOException e) {
             logger.error("Unable to decompress "+INPUT_GZIP_FILE);
             logger.error(e,e);
             progress.setProgress(0.0);
-            setStatusLabel("extraction could not be completed.");
+            this.status="extraction could not be completed.";
         }
         return null;
     }

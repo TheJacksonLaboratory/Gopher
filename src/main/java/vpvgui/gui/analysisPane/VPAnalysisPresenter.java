@@ -22,6 +22,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.apache.log4j.Logger;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
@@ -37,7 +38,7 @@ import java.util.ResourceBundle;
  * Created by peterrobinson on 7/6/17.
  */
 public class VPAnalysisPresenter implements Initializable {
-
+    static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
     @FXML
     private WebView wview;
 
@@ -101,6 +102,7 @@ public class VPAnalysisPresenter implements Initializable {
             return;
         }
         List<ViewPoint> vpl = this.model.getViewPointList();
+        logger.trace("In showVPTable: got a total of "+vpl.size() + " VPVGenes");
         for (ViewPoint v : vpl) {
             viewpointlist.add(new VPRow(v,this.model));
         }
@@ -147,7 +149,7 @@ public class VPAnalysisPresenter implements Initializable {
                         btnWrapper.get().setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                System.out.println(String.format("Hi there from the row with Target: %s, Chromosome: %s, Genomic pos: %d ",
+                                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d ",
                                         row.getTargetName(), row.getRefseqID(), row.getGenomicPos()));
                                 addTabPane(row);
                             }
@@ -201,6 +203,7 @@ public class VPAnalysisPresenter implements Initializable {
 
     }
 
+    /** Create a new tab containing data about one {@link vpvgui.model.project.ViewPoint},*/
     private void addTabPane(VPRow row) {
         final Tab tab = new Tab("Tab " + row.getTargetName());
         tab.setClosable(true);

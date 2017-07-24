@@ -50,26 +50,7 @@ public class Model {
     private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
-
-    public void setTargetGenesPath(String path){this.targetGenesPath=path; }
-    public String getTargetGenesPath() { return this.targetGenesPath; }
-
-    /** @return array of enzyme cutting sites. */
-    public String[] getCuttingPatterns() {
-        int n = this.enzymelist.size();
-        String patterns[]=new String[n];
-        for (int i=0;i<n;i++) {
-            RestrictionEnzyme re = enzymelist.get(i);
-            patterns[i]=re.getSite();
-        }
-        return patterns;
-    }
-
-
-
-    /**
-     * The genome build chosen by theuser, e.g., hg19, GRCh38, mm10
-     */
+    /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10  */
     private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
     public String getGenomeBuild() {
         return genomeBuild.getValue();
@@ -147,7 +128,19 @@ public class Model {
     public String getGenomeBasename() {
         return this.genomeBasename;
     }
+    public void setTargetGenesPath(String path){this.targetGenesPath=path; }
+    public String getTargetGenesPath() { return this.targetGenesPath; }
 
+    /** @return array of enzyme cutting sites. */
+    public String[] getCuttingPatterns() {
+        int n = this.enzymelist.size();
+        String patterns[]=new String[n];
+        for (int i=0;i<n;i++) {
+            RestrictionEnzyme re = enzymelist.get(i);
+            patterns[i]=re.getSite();
+        }
+        return patterns;
+    }
 
 
     public String getTranscriptsURL() {
@@ -250,16 +243,26 @@ public class Model {
     }
 
     public String getIndexFastaFilePath(String contigname) {
+        logger.debug("Will attempt to retrieve indexed Fasta file for contig: \""+contigname+"\"");
+        if (this.indexedFaFiles==null){
+            logger.error("indexFaFiles is NULL");
+            return null;
+        }
         if (! this.indexedFaFiles.containsKey(contigname)) {
-            System.err.println("[ERROR]--cound not find contig");
-            //TODO Set up exception for this
+            logger.error("Coud not find indexed fasta file for contig: "+contigname);
+            logger.error("Size of indexFaFiles: "+indexedFaFiles.size());
+            for (String s:indexedFaFiles.keySet()) {
+                logger.debug("indexedFa files: "+s+">"+indexedFaFiles.get(s));
+            }
             return null;
         } else {
+            logger.info("Found indexed fasta file for contig: "+contigname);
             return this.indexedFaFiles.get(contigname);
         }
     }
 
     public void setViewPoints(List<ViewPoint> viewpointlist) {
+        logger.trace("setViewPoints: viewpointlist with size="+viewpointlist.size());
         this.viewpointList=viewpointlist;
     }
 
@@ -403,7 +406,7 @@ public class Model {
             model.setGenomeBuild(genomeBuild);
         }
         String path_to_downloaded_genome_directory = properties.getProperty("path_to_downloaded_genome_directory");
-        if (path_to_downloaded_genome_directory!=null) {
+        if (path_to_downloaded_genome_directory!=null && ! path_to_downloaded_genome_directory.equals("null")) {
             model.setGenomeDirectoryPath(path_to_downloaded_genome_directory);
         }
         String unpacked=properties.getProperty("genome_unpacked");
@@ -415,11 +418,12 @@ public class Model {
             model.setGenomeIndexed();
         }
         String transcriptURL=properties.getProperty("transcript_url");
-        if (transcriptURL!=null) {
+        if (transcriptURL!=null && ! transcriptURL.equals("null")) {
             model.setTranscriptsURL(transcriptURL);
         }
         String refgene_path=properties.getProperty("refgene_path");
-        if (refgene_path!=null) {
+        logger.trace("Setting from seeting refgene_path="+refgene_path);
+        if (refgene_path!=null && ! refgene_path.equals("null")) {
             model.setRefGenePath(refgene_path);
         }
         String restriction_enzymes = properties.getProperty("restriction_enzymes");
@@ -471,7 +475,5 @@ public class Model {
         logger.info("Set model from settings file at "+settingsFile.getAbsolutePath());
         return model;
     }
-
-
 
 }

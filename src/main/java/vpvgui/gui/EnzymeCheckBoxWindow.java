@@ -93,9 +93,7 @@ public class EnzymeCheckBoxWindow {
                String label = cb.getText();
                int index = label.indexOf(":");
                String name=label.substring(0,index);
-               System.out.println("Got name="+name);
                RestrictionEnzyme re = enzymemap.get(name);
-               System.out.println("Adding re"+re.getLabel());
                chosen.add(re);
            }
        }

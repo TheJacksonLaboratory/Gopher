@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.apache.log4j.Logger;
 import vpvgui.model.Model;
 import vpvgui.model.project.Segment;
 import vpvgui.model.project.VPVGene;
@@ -16,7 +17,7 @@ import java.util.List;
  * This class represents a ViewPoint and acts as a wrapper to put ViewPoint objects into the Table.
  */
 public class VPRow {
-
+    static Logger logger = Logger.getLogger(VPRow.class.getName());
     private ViewPoint viewpoint;
     /** The target is the target of a viewpoint, often a gene. Note that multiple viewpoints
      * can have the same target, e.g., if the same gene has multiple transcription start sites.*/
@@ -70,6 +71,7 @@ public class VPRow {
     private String getHighlightRegions(String db,String chrom) {
         StringBuilder sb = new StringBuilder();
         List<Segment> seglst = this.viewpoint.getActiveSegments();
+        logger.trace("getHighlightRegions: got number Of Active segments "+seglst.size());
         sb.append("highlight=");
         int i=0;
        // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>

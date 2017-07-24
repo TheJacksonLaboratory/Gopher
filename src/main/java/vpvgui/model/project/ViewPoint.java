@@ -2,6 +2,7 @@ package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.log4j.Logger;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
@@ -25,9 +26,10 @@ import java.util.*;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.0.3 (2017-07-22)
+ * @version 0.0.4 (2017-07-24)
  */
 public class ViewPoint {
+    static Logger logger = Logger.getLogger(ViewPoint.class.getName());
     /** "Home" of the viewpoint, usually a chromosome */
     private String referenceSequenceID;
     /** Name of the target of the viewpoint (often a gene).*/
@@ -41,16 +43,16 @@ public class ViewPoint {
     private Integer startPos;
     /** end position of the viewpoint */
     private Integer endPos;
-    /* derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
+    /** Derivation approach, either combined (CA), Andrey et al. 2016 (AEA), or manually (M) */
     private String derivationApproach;
     /** TODO define me */
     private boolean resolved;
     /** Number of fragments withint the viewpoint that are selected for generatingcapture hi-c probes. */
     private Integer numOfSelectedFrags;
-    /** data structure for storing cutting site position relative to 'genomicPos' */
+    /** Data structure for storing cutting site position relative to 'genomicPos' */
     private CuttingPositionMap cuttingPositionMap;
-    /* list of restriction 'Fragment' objects that are within the viewpoint */
-    private HashMap<String, ArrayList<Fragment>> restFragListMap;
+    /* List of restriction 'Fragment' objects that are within the viewpoint */
+    //private HashMap<String, ArrayList<Fragment>> restFragListMap;
     private HashMap<String, ArrayList<Segment>> restSegListMap;
     /** Reference to the indexed FASTA file that corresponds to {@link #referenceSequenceID}.*/
     private IndexedFastaSequenceFile fastaReader;
@@ -106,6 +108,8 @@ public class ViewPoint {
                      Integer maxDistToGenomicPosDown,
                      String[] cuttingPatterns,
                      IndexedFastaSequenceFile fastaReader) {
+        logger.trace(String.format("Entering ViewPoint constructor. referenceSequenceID=%s, genomicPos=%d, maxDistToGenomicPosUp=%d",referenceSequenceID,genomicPos,maxDistToGenomicPosUp));
+        logger.trace(String.format(" maxDistToGenomicPosDown=%d, fastaReader=%s",maxDistToGenomicPosDown,genomicPos,fastaReader.toString()));
         /* Set fields */
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
@@ -129,21 +133,21 @@ public class ViewPoint {
      * It will set ONLY SOME of fields create an <i>CuttingPositionMap</i> object. We need
      * to subsequently add the restriction enzyme and IndexedFastaSequence and do the actual cutting.
      *
-     * @param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>.
-     * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
-     * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
-     * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
-     */
+     * param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>.
+     * param genomicPos              central position of the region for which the CuttingPositionMap is created.
+     * param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
+     * param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
+
     public ViewPoint(String referenceSequenceID, Integer genomicPos, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown) {
 
-        /* Set fields */
+
 
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
         setStartPos(genomicPos - maxDistToGenomicPosUp);
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
-    }
+    } */
 
     /*
      * TODO -- need to execute this to finish initializing ViewPoint objects made from GUI
@@ -181,7 +185,10 @@ public class ViewPoint {
 
         for (int i = 0; i < this.cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(this.cuttingPatterns[i]).size() - 1; j++) {
-                Segment restFrag = new Segment(referenceSequenceID, relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1), relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)+1),false);
+                Segment restFrag = new Segment(referenceSequenceID,
+                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1),
+                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)+1),
+                        false);
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }
@@ -285,9 +292,9 @@ public class ViewPoint {
         return cuttingPositionMap;
     }
 
-    public final HashMap<String, ArrayList<Fragment>> getRestFragListMap() {
+    /*public final HashMap<String, ArrayList<Fragment>> getRestFragListMap() {
         return restFragListMap;
-    }
+    }*/
 
     public final HashMap<String, ArrayList<Segment>> getRestSegListMap() {
         return restSegListMap;
@@ -459,9 +466,19 @@ public class ViewPoint {
      * @param maxRepFrag  threshold for repetitive content of the margins of the fragments (e.g. 0.4). The fragment is deselected, if one of the margins have a higher repetitive content.
      * @param marginSize  size of the margins of fragments. Only for these will later be used for probe selection.
      */
-    public void generateViewpointLupianez(Integer fragNumUp, Integer fragNumDown, String motif, Integer minSizeUp, Integer maxSizeUp, Integer minSizeDown, Integer maxSizeDown, Integer minFragSize, double maxRepFrag, Integer marginSize) {
+    public void generateViewpointLupianez(Integer fragNumUp,
+                                          Integer fragNumDown,
+                                          String motif,
+                                          Integer minSizeUp,
+                                          Integer maxSizeUp,
+                                          Integer minSizeDown,
+                                          Integer maxSizeDown,
+                                          Integer minFragSize,
+                                          double maxRepFrag,
+                                          Integer marginSize) {
 
         boolean resolved = true;
+        logger.trace("entering generateViewpointLupianez for motif="+motif);
 
         // iterate over all fragments of the viewpoint and set them to true
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
@@ -479,7 +496,7 @@ public class ViewPoint {
             }
         }
         if (genomicPosFragIdx == -1) {
-            System.out.println("ERROR: At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
+            logger.error("ERROR: At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
             resolved = false;
         }
 

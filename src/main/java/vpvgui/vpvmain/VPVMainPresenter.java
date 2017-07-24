@@ -2,6 +2,7 @@ package vpvgui.vpvmain;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,6 +26,7 @@ import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
+import vpvgui.model.Initializer;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.project.ViewPointFactory;
@@ -48,6 +50,8 @@ public class VPVMainPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
     /** The Model for the entire analysis. */
     private Model model = null;
+    /** Convenience class that knows about the required order of operations and dependencies.*/
+    private Initializer initializer=null;
 
     private Stage primaryStage;
     /**
@@ -171,25 +175,14 @@ public class VPVMainPresenter implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         logger.trace("initialize() called");
         this.model = initializeModelFromSettingsIfPossible();
+        this.initializer=new Initializer(model);
         initializeBindings();
-        // initialize settings. First check if already exists
-        //TODO For now we are using just one default project name. Later extend this so the
-        //user can store multiple project settings file under names chosen by them.
-        String defaultProjectName = "vpvsettings";
-        /*Settings set = null;
-        try {
-            set = loadSettings(defaultProjectName);
-        } catch (IOException i) {
-            set = new Settings();
-        }*/
-        //set.setProjectName(defaultProjectName);
-        //model.setSettings(set);
-
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
             setGenomeBuild(newValue);
         }));
+
 
 
         this.vpanalysisview = new VPAnalysisView();
@@ -198,10 +191,27 @@ public class VPVMainPresenter implements Initializable {
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
 
         createPanes();
+        setInitializedValuesInGUI();
 
 
         // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
         // textLabel.textProperty().bind(textTextField.textProperty());*/
+    }
+
+    private void setInitializedValuesInGUI() {
+        String genomebuild=model.getGenomeBuild();
+        if (genomebuild!=null)
+            this.genomeBuildLabel.setText(genomebuild);
+        String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
+        if (path_to_downloaded_genome_directory!= null) {
+            this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
+            this.genomeDownloadPI.setProgress(1.00);
+        }
+        String refGenePath=this.model.getRefGenePath();
+        if (refGenePath!=null) {
+            this.downloadedTranscriptsLabel.setText(refGenePath);
+            this.transcriptDownloadPI.setProgress(1.0);
+        }
     }
 
     /** Look for the settings file in the .vpvgui directory.
@@ -252,8 +262,6 @@ public class VPVMainPresenter implements Initializable {
         this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
         this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
         this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
-
-
     }
 
     private void setGenomeBuild(String build) {
@@ -283,11 +291,12 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error","Could not get path to download genome.");
             return;
         }
+        logger.info("Got back as download dir "+file.getAbsolutePath());
         gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDecompressPI);
-        String status = gdownloader.getStatus();
-        this.downloadedGenomeLabel.setText(status);
-        logger.info(status);
-        genomeDownloadPI.setProgress(1.000);
+        model.setGenomeDirectoryPath(file.getAbsolutePath());
+        this.downloadedGenomeLabel.setText(file.getAbsolutePath());
+
+
     }
 
 
@@ -314,12 +323,15 @@ public class VPVMainPresenter implements Initializable {
         }
         Operation op = new RefGeneDownloadOperation(file.getPath());
         Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
+        // TODO make this setOnSucceeded and then set model and GUI.
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);
             th.setDaemon(true);
             th.start();
+        } else {
+            this.transcriptDownloadPI.setProgress(1.0);
         }
-        /* ToDo-check for completion of download before setting this variable. */
+        /* ToDo-put this in setOnsucceeded. */
        String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
        this.model.setRefGenePath(abspath);
        this.downloadedTranscriptsLabel.setText(transcriptName);
@@ -331,8 +343,12 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
-                this.genomeDecompressPI,
-                this.decompressGenomeLabel);
+                this.genomeDecompressPI);
+        gindexer.setOnSucceeded( event -> {
+            decompressGenomeLabel.setText(gindexer.getStatus());
+            if (gindexer.OK())
+                model.setGenomeUnpacked();;
+        });
         Thread th = new Thread(gindexer);
         th.setDaemon(true);
         th.start();
@@ -348,15 +364,17 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
         logger.trace("About to index genome files");
-        FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI,this.indexGenomeLabel);
+        FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI);
+        manager.setOnSucceeded(event ->{
+            indexGenomeLabel.setText("FASTA files successfully indexed.");
+            logger.debug("Number of Fa files retireved> "+manager.getIndexedFastaFiles().size());
+            model.setIndexedFastaFiles(manager.getIndexedFastaFiles());
+            model.setGenomeIndexed();
+        } );
         Thread th = new Thread(manager);
         th.setDaemon(true);
         th.start();
-        /*GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath());
-        gindexer.extractTarGZ();
-        gindexer.indexFastaFiles();
-        Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
-        model.setIndexedFastaFiles(indexedFa);*/
+
 
     }
 
@@ -387,7 +405,7 @@ public class VPVMainPresenter implements Initializable {
         /** The following command is just for debugging. We now have all VPVGenes, but still need to
          * add information about the restriction enzymes and the indexed FASTA file.
          */
-        this.model.debugPrintVPVGenes();
+        //this.model.debugPrintVPVGenes();
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
         e.consume();
     }
@@ -400,8 +418,10 @@ public class VPVMainPresenter implements Initializable {
      * {@link VPAnalysisPresenter} Tab.
      */
     public void createCaptureProbes() {
+        logger.trace("Entering createCaptureProbes");
         ViewPointFactory factory = new ViewPointFactory(model);
         factory.createViewPoints();
+        logger.trace("Finished factory.createViewPoints()");
         /* The above puts the created viewpoints into the model. */
         SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
         this.vpanalysispresenter.setModel(this.model);

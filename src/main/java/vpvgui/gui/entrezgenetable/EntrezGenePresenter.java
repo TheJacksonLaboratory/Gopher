@@ -145,9 +145,10 @@ public class EntrezGenePresenter implements Initializable {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(stage);
         if (file == null) {
-            logger.error("[ERROR] Could not open genes file -TODO throw exception");
+            logger.error("Could not open genes file -TODO throw exception");
             return;
         } else {
+            logger.info("Uploading target genes from "+file.getAbsolutePath());
             this.model.setTargetGenesPath(file.getAbsolutePath());
         }
         this.symbols = new ArrayList<>();
@@ -155,11 +156,11 @@ public class EntrezGenePresenter implements Initializable {
             BufferedReader br =new BufferedReader(new FileReader(file));
             String line =null;
             while ((line=br.readLine())!=null) {
-                //System.out.println(line);
                 symbols.add(line.trim());
             }
         } catch (IOException err) {
-            err.printStackTrace();
+            logger.error("I/O Error reading file with target genes");
+            logger.error(err,err);
         }
         e.consume();
         setData(getInitialGeneListHTML(symbols));
@@ -222,11 +223,6 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
-    /** Use the Jannovar Gene Generator object to get the correct chromosome string, e.g., chrX */
-   // private String getChromosomeString(int c) {
-    //     return this.jgg.chromosomeId2Name(c);
-    //}
-
     @FXML public void acceptGenes() {
         if (!isvalidated) {
             ErrorWindow.display("Error","Please validate genes for accepting them!");
@@ -237,8 +233,7 @@ public class EntrezGenePresenter implements Initializable {
             return;
         }
         this.model.setVPVGenes(this.parser.getVPVGeneList());
-
-       // System.out.println("[INFO] EntrezGenePresenter: added "+ this.parser.getVPVGeneList().size() + " vpv genes");
+        logger.debug("Accepting genes and passing VPVGene list to parser. n="+parser.getVPVGeneList().size());
         signal.accept(Signal.DONE);
     }
 
