@@ -327,46 +327,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
-    /**
-     * TODO delete this, replaced by parsing RefGene.txt.gz (check it works first)
-     * Use {@link JannovarTranscriptFileBuilder} to download the transcript file definitions.
-
-    @FXML public void downloadTranscripts(ActionEvent event) {
-        event.consume();
-        String genome = this.genomeChoiceBox.getValue();
-        try {
-            this.model.adjustGenomeDownloadPaths();
-        } catch (DownloadFileNotFoundException e) {
-            ErrorWindow.display("Error", e.getMessage());
-            return;
-        }
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for transcripts file for " + genome + " (will be created by Jannovar if not found).");
-        File destinationdirectory = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (destinationdirectory == null) {
-            return; // assume the user clicked the cancel button, we do not need to show an error message
-        }
-        JannovarTranscriptFileBuilder builder = new JannovarTranscriptFileBuilder(genome, destinationdirectory);
-        if (model.needsProxy()){
-            builder.setProxy(model.getHttpProxy(),model.getHttpProxyPort());
-        }
-        try {
-            builder.runJannovar();
-        } catch (Exception e) {
-            ErrorWindow.display("Error downloading Jannovar transcript file",
-                    String.format("Could not download Jannovar transcript file. Are you online?\n%s ",e.toString()));
-            return;
-        }
-        String jannovarSerializedFilePath = builder.getSerializedFilePath();
-        this.model.getSettings().setTranscriptsFileTo(jannovarSerializedFilePath);
-        try {
-            saveSettings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    } */
-
-    /** ToDo wrap this in a Task! */
+    /** G-unzip and un-tar the downloaded chromFa.tar.gz file.*/
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
@@ -386,6 +347,11 @@ public class VPVMainPresenter implements Initializable {
     /** ToDo wrap this in a Task! */
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
+        logger.trace("About to index genome files");
+        FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI,this.indexGenomeLabel);
+        Thread th = new Thread(manager);
+        th.setDaemon(true);
+        th.start();
         /*GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath());
         gindexer.extractTarGZ();
         gindexer.indexFastaFiles();

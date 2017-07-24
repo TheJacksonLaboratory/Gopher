@@ -1,6 +1,15 @@
 package vpvgui.io;
 
+import htsjdk.samtools.reference.FastaSequenceIndex;
+import javafx.concurrent.Task;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import org.apache.log4j.Logger;
+import  htsjdk.samtools.reference.FastaSequenceIndexCreator;
+
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,29 +33,35 @@ import java.util.Map;
  * central. We can later use their implementation if this changes. The class should create a fasta index equivalent to
  * what would be produced by <pre>$ samtools faidx test.fa</pre>.
  * @author Peter Robinson
- * @version 0.0.1 (7/22/17).
+ * @version 0.0.2 (2017-07-24).
  */
-public class FASTAIndexer {
-
+public class FASTAIndexer  {
+    static Logger logger = Logger.getLogger(FASTAIndexer.class.getName());
     /** Path to the directory where we will download and decompress the genome file. */
-    private String genomeDirectoryPath=null;
+    private String fastaPath=null;
+    private String fastaFaiPath=null;
+    private String contigname;
 
-    private String path=null;
-
-    private String contigname=null;
     private long n_bases;
     private long byte_index;
     private long bases_per_line;
     private long bytes_per_line;
-    /** Key: name of chromosome or contig; value-absolute path to the corresponding
-     * FASTA file on disk. */
-    private Map<String,String> indexedFastaFiles;
 
 
-    public String getContigname() {
-        return contigname;
+
+
+    /**
+     *
+     * @param path Path to the FASTA file to be indexed.
+     */
+    public FASTAIndexer(String path) {
+        this.fastaPath=path;
+        this.fastaFaiPath=String.format("%s.fai",path);
+        logger.trace("Indexing fasta file at directory "+path);
     }
 
+
+    public String getContigname(){return contigname;}
     public long getN_bases() {
         return n_bases;
     }
@@ -63,37 +78,18 @@ public class FASTAIndexer {
         return bytes_per_line;
     }
 
-    public String getPath() { return path; }
-    public Map<String,String> getIndexedFastaFiles() { return this.indexedFastaFiles; }
 
     /**
-     *
-     * @param path Path to the FASTA file to be indexed.
-     */
-    public FASTAIndexer(String path){
-        this.path=path;
-        this.indexedFastaFiles=new HashMap<>();
-    }
-
-
-    public void writeFASTAIndex()  throws IOException{
-            String outname=String.format("%s%s.fai",path, File.separator);
-            BufferedWriter bw = new BufferedWriter(new FileWriter(outname));
-            bw.write(String.format("%s\t%d\t%d\t%d\t%d",contigname,n_bases,byte_index,bases_per_line,bytes_per_line));
-            bw.close();
-    }
-
-
-    /**
-    * Extract data for a FASTA index from the file passed to the constructor that is stored
-     * in {@link #path}.
+    * Extract data for a FASTA index from the file passed to the function
+     * We return the contig name under the assumption that the contig name
+     * matches the file name exactly except for the .fa suffix.
      */
     public void createFASTAindex() throws IOException {
-        RandomAccessFile file = new RandomAccessFile(this.path, "r");
+        RandomAccessFile file = new RandomAccessFile(this.fastaPath, "r");
         file.seek(0);
         String header = file.readLine();
         if (!header.startsWith(">")) {
-            System.err.println("[ERROR] FASTA header line did not start with >: " + header);
+            logger.error("FASTA header line did not start with >: " + header);
             return;
         }
         this.contigname = header.substring(1);
@@ -109,34 +105,11 @@ public class FASTAIndexer {
         file.close();
     }
 
-    /** Create FAI indices for all FASTA files in {@link #genomeDirectoryPath} (only if needed). */
-    public void indexFastaFiles() {
-        final File genomeDirectory = new File(this.genomeDirectoryPath);
-        for (final File fileEntry : genomeDirectory.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                continue;
-            } else if (!fileEntry.getPath().endsWith(".fa")) {
-                continue;
-            } else if (fastaFAIalreadyExists(fileEntry.getAbsolutePath())) {
-                continue;
-            } else {
-                    /* if we get here, we have a FASTA file ending with ".fa" that has not yet been indexed */
-                FASTAIndexer faidx = new FASTAIndexer((fileEntry.getAbsolutePath()));
-                try {
-                    faidx.createFASTAindex();
-                    faidx.writeFASTAIndex();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String name=faidx.getContigname();
-                this.indexedFastaFiles.put(name,fileEntry.getAbsolutePath());
-            }
-        }
+    public void writeFASTAIndex()  throws IOException{
+        BufferedWriter bw = new BufferedWriter(new FileWriter(this.fastaFaiPath));
+        bw.write(String.format("%s\t%d\t%d\t%d\t%d",contigname,n_bases,byte_index,bases_per_line,bytes_per_line));
+        bw.close();
     }
 
-    private boolean fastaFAIalreadyExists(String path) {
-        File f=new File(String.format("%s.fai",path));
-        return f.exists();
-    }
 
 }

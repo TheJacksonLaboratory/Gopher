@@ -1,5 +1,4 @@
 package vpvgui.io;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -8,7 +7,7 @@ import vpvgui.model.project.FragmentTest;
 
 /**
  * Test that we get this information for chr4_ctg9_hap1.fa:
- * <pre>chr4_ctg9_hap1	590426	16	50	51</pre>
+ * <pre>chr4_ctg9_hap1 590426 16 50 51</pre>
  * Created by peterrobinson on 7/22/17.
  */
 public class FASTAIndexerTest {
