@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@vpvmain.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.vpvmain.VPVMainPresenter">
+<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@vpvmain.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.vpvmain.VPVMainPresenter">
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -60,87 +60,102 @@
       </VBox>
    </top>
    <center>
-      <TabPane fx:id="tabpane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+      <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0">
         <tabs>
-          <Tab fx:id="setuptab" text="Set up">
+          <Tab fx:id="setuptab" closable="false" text="Set up">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
-                        <VBox prefHeight="260.0" prefWidth="800.0">
+                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <HBox prefHeight="100.0" prefWidth="200.0" />
-                              <GridPane hgap="8.0" prefHeight="160.0" prefWidth="636.0" styleClass="grid" vgap="8.0">
+                              <GridPane hgap="8.0" styleClass="grid" vgap="8.0" VBox.vgrow="NEVER">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="275.0" minWidth="176.0" prefWidth="176.0" />
-                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="195.0" minWidth="74.0" prefWidth="86.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.0" minWidth="0.0" prefWidth="56.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="371.0" minWidth="10.0" prefWidth="371.0" />
+                                  <ColumnConstraints hgrow="NEVER" maxWidth="275.0" minWidth="176.0" prefWidth="200.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="195.0" minWidth="65.0" prefWidth="181.0" />
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="169.0" minWidth="0.0" />
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="371.0" minWidth="10.0" prefWidth="300.0" />
                                 </columnConstraints>
                                 <rowConstraints>
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="20.0" />
+                                    <RowConstraints minHeight="20.0" />
+                                    <RowConstraints minHeight="20.0" />
+                                  <RowConstraints minHeight="20.0" />
+                                  <RowConstraints minHeight="-Infinity" />
+                                    <RowConstraints minHeight="20.0" />
+                                    <RowConstraints minHeight="20.0" />
+                                    <RowConstraints minHeight="20.0" />
                                 </rowConstraints>
                                  <children>
                                     <Label prefHeight="16.0" prefWidth="121.0" text="Genome" GridPane.rowIndex="2">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                    <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="140.0" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </Button>
+                                    <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" prefHeight="30.0" prefWidth="140.0" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </Button>
                                     <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                     <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                     <Label prefHeight="18.0" prefWidth="228.0" text="Decompress genome" GridPane.rowIndex="3">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" prefHeight="30.0" prefWidth="140.0" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </Button>
                                     <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                     <Label text="Restriction enzyme(s)" GridPane.rowIndex="6">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                        <tooltip>
                                           <Tooltip text="Empty Tooltip" />
                                        </tooltip>
                                     </Label>
-                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="140.0" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
                                        <GridPane.margin>
-                                          <Insets />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
                                     <Label text="Target genes" GridPane.rowIndex="7">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="140.0" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
                                        <GridPane.margin>
-                                          <Insets />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
                                     <Label fx:id="downloadedGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                     <Label text="Genome build" GridPane.rowIndex="1">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <ChoiceBox fx:id="genomeChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="140.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </ChoiceBox>
                                     <Label text="Approach">
                                        <padding>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </padding>
                                     </Label>
                                     <Label text="Todo-menu with approaches " GridPane.columnIndex="3" />
@@ -150,10 +165,14 @@
                                     <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5" />
                                     <Label text="Index Genome FASTA" GridPane.rowIndex="4">
                                        <GridPane.margin>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="140.0" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </Button>
                                     <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                     <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4" />
                                     <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
@@ -162,53 +181,48 @@
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </padding>
                               </GridPane>
+                              <GridPane styleClass="grid" VBox.vgrow="NEVER">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                                  <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                                  <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" />
+                                  <RowConstraints minHeight="10.0" />
+                                  <RowConstraints minHeight="10.0" />
+                                    <RowConstraints minHeight="10.0" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="# Fragments upstream" />
+                                    <TextField fx:id="fragNumUpTextField" promptText="4" GridPane.columnIndex="1" />
+                                    <Label text="# Fragments downstream" GridPane.columnIndex="2" />
+                                    <Label text="Minimum size upstream" GridPane.rowIndex="1" />
+                                    <Label text="Maximum size upstream" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Label text="Minimum size downstream" GridPane.rowIndex="2" />
+                                    <Label text="Maximum size downstream" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <Label text="Minimum fragment size" GridPane.rowIndex="3" />
+                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                    <TextField fx:id="minSizeUpTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="minSizeDownTextField" text="1500" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <TextField fx:id="minFragSizeTextField" text="130" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <TextField fx:id="fragNumDownTextField" promptText="4" GridPane.columnIndex="3" />
+                                    <TextField fx:id="maxSizeUpTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                    <TextField fx:id="maxSizeDownTextField" text="5000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                 </children>
+                              </GridPane>
                            </children>
                         </VBox>
-                        <GridPane layoutX="106.0" layoutY="269.0">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" />
-                            <ColumnConstraints hgrow="SOMETIMES" />
-                          </columnConstraints>
-                        </GridPane>
-                        <Button fx:id="createCaptureProbesButton" layoutX="196.0" layoutY="426.0" mnemonicParsing="false" onAction="#createCaptureProbes" text="Create Capture Probes!" />
-                        <GridPane layoutY="283.0" prefHeight="130.0" prefWidth="800.0" styleClass="grid">
-                          <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="# Fragments upstream" />
-                              <TextField fx:id="fragNumUpTextField" promptText="4" GridPane.columnIndex="1" />
-                              <Label text="# Fragments downstream" GridPane.columnIndex="2" />
-                              <Label text="Minimum size upstream" GridPane.rowIndex="1" />
-                              <Label text="Maximum size upstream" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Label text="Minimum size downstream" GridPane.rowIndex="2" />
-                              <Label text="Maximum size downstream" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <Label text="Minimum fragment size" GridPane.rowIndex="3" />
-                              <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                              <TextField fx:id="minSizeUpTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <TextField fx:id="minSizeDownTextField" text="1500" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <TextField fx:id="minFragSizeTextField" text="130" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField fx:id="fragNumDownTextField" promptText="4" GridPane.columnIndex="3" />
-                              <TextField fx:id="maxSizeUpTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <TextField fx:id="maxSizeDownTextField" text="5000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                              <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                           </children>
-                        </GridPane>
-                     </children></AnchorPane>
+                        <Button fx:id="createCaptureProbesButton" layoutX="287.0" layoutY="420.0" mnemonicParsing="false" onAction="#createCaptureProbes" text="Create Capture Probes!" AnchorPane.topAnchor="590.0" />
+                     </children>
+                  </AnchorPane>
             </content>
           </Tab>
-          <Tab fx:id="analysistab" text="Analysis">
+          <Tab fx:id="analysistab" closable="false" text="Analysis">
             <content>
-              <AnchorPane fx:id="analysisPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane fx:id="analysisPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" snapToPixel="false" />
             </content>
           </Tab>
         </tabs>

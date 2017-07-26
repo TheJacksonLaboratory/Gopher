@@ -2,24 +2,24 @@
 
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0"
-           prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
-    <children>
-      <VBox prefHeight="200.0" prefWidth="100.0">
-         <children>
-            <WebView fx:id="wview" prefHeight="400.0" prefWidth="600.0" />
-            <TableView fx:id="tview" prefHeight="400.0" prefWidth="600.0" />
+<VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
+   <children>
+      <WebView fx:id="contentWebView" minHeight="300.0" minWidth="900.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+      <TableView fx:id="viewPointTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0">
+         <columns>
+            <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" />
+            <TableColumn fx:id="targetTableColumn" editable="false" minWidth="60.0" prefWidth="180.0" text="Target name" />
+            <TableColumn fx:id="refSeqIdTableColumn" editable="false" minWidth="60.0" prefWidth="180.0" text="RefSeq ID" />
+            <TableColumn fx:id="genPositionTableColumn" editable="false" prefWidth="180.0" text="Genomic Position" />
+         </columns>
+      </TableView>
 
-                       <!-- maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" minWidth="-Infinity"
-                       prefHeight="-1.0" prefWidth="-1.0" >
+                 <!-- maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" minWidth="-Infinity"
+                 prefHeight="-1.0" prefWidth="-1.0" >
             </TableView>-->
-         </children>
-      </VBox>
    </children>
-</StackPane>
+</VBox>

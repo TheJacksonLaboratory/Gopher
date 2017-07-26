@@ -9,44 +9,59 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
-import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 /**
+ * TODO - do we need to update entries in the TableView? Are they read-only?
  * Created by peterrobinson on 7/6/17.
  */
 public class VPAnalysisPresenter implements Initializable {
+
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
-    @FXML
-    private WebView wview;
+
+    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
+            "initialize analysis using the Set Up Tab.</p></body></html>";
+
+    private static final String UPDATE_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Number of viewpoints:" +
+            " %d.</p></body></html>";
+
+
 
     @FXML
-    private TableView tview;
+    private WebView contentWebView;
+
+    private WebEngine contentWebEngine;
 
     @FXML
-    private AnchorPane pane;
+    private TableView<ViewPoint> viewPointTableView;
+
+    @FXML
+    private TableColumn<ViewPoint, Button> actionTableColumn;
+
+    @FXML
+    private TableColumn<ViewPoint, String> targetTableColumn;
+
+    @FXML
+    private TableColumn<ViewPoint, String> refSeqIdTableColumn;
+
+    @FXML
+    private TableColumn<ViewPoint, String> genPositionTableColumn;
+
+
 
     private BooleanProperty editingStarted;
 
@@ -59,26 +74,75 @@ public class VPAnalysisPresenter implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setInitialWebView();
-        /* The following line is needed to avoid a SSL handshake alert
-         * when opening the UCSC Browser.
-         */
         System.setProperty("jsse.enableSNIExtension", "false");
+        contentWebEngine = contentWebView.getEngine();
+        contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
+
         initTable();
     }
 
-    public void setInitialWebView() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        sb.append("<h3>View Point Viewer</h3>");
-        sb.append("<p>Please set up and initialize analysis using the Set Up Tab.</p>");
-        sb.append("</body></html>");
-        setData(sb.toString());
+
+    /**
+     * Set up the table that will show the ViewPoints.
+     */
+    private void initTable() {
+        // The first column with buttons that open new tab for the ViewPoint
+        actionTableColumn.setSortable(false);
+        actionTableColumn.setCellValueFactory((cdf -> {
+            ViewPoint vp = cdf.getValue();
+            // create Button here & set the action
+            Button btn = new Button("Show viewpoint");
+            btn.setOnAction(e -> {
+                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d ",
+                        vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos()));
+                openViewPointInTab(vp);
+            });
+            // wrap it so it can be displayed in the TableView
+            return new ReadOnlyObjectWrapper<>(btn);
+        }));
+
+        // the second column
+        targetTableColumn.setSortable(false);
+        // TODO - do we need editable table?
+        targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
+        targetTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
+                .setTargetName(e.getNewValue()));
+
+        // the third column
+        refSeqIdTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getReferenceID()));
+        refSeqIdTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
+                .setReferenceID(e.getNewValue()));
+
+        // the fourth column
+        genPositionTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
+                .getGenomicPos())));
+        genPositionTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
+                .setGenomicPos(Integer.parseInt(e.getNewValue())));
     }
 
-    public void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
+
+    /**
+     * This method creates a new {@link Tab} populated with
+     */
+    private void openViewPointInTab(ViewPoint vp) {
+        final Tab tab = new Tab("Tab " + vp.getTargetName());
+        tab.setClosable(true);
+        tab.setOnClosed(event -> {
+            if (tabpane.getTabs()
+                    .size() == 2) {
+                event.consume();
+            }
+        });
+
+        ViewPointView view = new ViewPointView();
+        ViewPointPresenter presenter = (ViewPointPresenter) view.getPresenter();
+        presenter.setModel(this.model);
+        presenter.setTab(tab);
+        presenter.setViewPoint(vp);
+        tab.setContent(presenter.getPane());
+
+        this.tabpane.getTabs().add(tab);
+        this.tabpane.getSelectionModel().select(tab);
     }
 
     public void setModel(Model m) { this.model=m; }
@@ -87,15 +151,16 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane=tabp;
     }
 
-   // public AnchorPane getPane() { return this.pane; }
-
 
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
             System.out.println("[View Points not initialized");
             return;
         }
-        updateWebview();
+
+        // update WebView with N loaded ViewPoints
+        contentWebEngine.loadContent(String.format(UPDATE_HTML_CONTENT, model.getViewPointList().size()));
+
         ObservableList<VPRow> viewpointlist = FXCollections.observableArrayList();
         if (model==null) {
             System.err.println("[ERROR] VPAnalysisPresenter -- model null, should never happen" );
@@ -106,128 +171,8 @@ public class VPAnalysisPresenter implements Initializable {
         for (ViewPoint v : vpl) {
             viewpointlist.add(new VPRow(v,this.model));
         }
-        tview.setItems(viewpointlist);
-        tview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    }
-
-    private void updateWebview() {
-        List<ViewPoint> vplist=this.model.getViewPointList();
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        sb.append("<h3>View Point Viewer</h3>");
-        sb.append(String.format("<p>Number of viewpoints: %d.</p>",vplist.size()));
-        sb.append("</body></html>");
-        setData(sb.toString());
-    }
-
-    /**
-     * Set up the table that will show the ViewPoints. Note that tview is constructed by fxml, do not call new.
-     */
-    private void initTable() {
-
-        ObservableList columns = tview.getColumns();
-        tview.setEditable(false);
-        TableColumn<VPRow,Button> actionCol = new TableColumn<>("View");
-        actionCol.setSortable(false);
-        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        // this CellValueFactory generates a Button in column of the TableView
-        actionCol.setCellValueFactory(
-                new Callback<TableColumn.CellDataFeatures<VPRow, Button>, ObservableValue<Button>>() {
-                    @Override
-                    public ObservableValue<Button> call(TableColumn.CellDataFeatures<VPRow, Button> features) {
-
-                        // access the properties of the row where the Button is placed
-                        VPRow row = features.getValue();
-
-                        // access the properties of the column where the Button is placed
-                        TableColumn<VPRow, Button> column = features.getTableColumn();
-
-                        // Turn Button (or any other object) into ObservableValue that must be returned by this Callback
-                        ReadOnlyObjectProperty<Button> btnWrapper = new ReadOnlyObjectWrapper<>(new Button("Hey ya!"));
-
-                        // set action, e.g. creating a new tab
-                        btnWrapper.get().setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent event) {
-                                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d ",
-                                        row.getTargetName(), row.getRefseqID(), row.getGenomicPos()));
-                                addTabPane(row);
-                            }
-                        });
-                        return btnWrapper;
-                    }
-                }
-        );
-
-        // create a cell value factory with an add button for each row in the table.
-
-
-
-        columns.add(actionCol);
-        final TableColumn<VPRow,String> targetnamecol = createTextColumn("targetName", "Target");
-        targetnamecol.setMinWidth(60);
-        targetnamecol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<VPRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<VPRow, String> event) {
-                        ((VPRow) event.getTableView().getItems().get(event.getTablePosition().getRow())).setTargetName(event.getNewValue());
-                    }
-                }
-        );
-        columns.add(targetnamecol);
-        final TableColumn<VPRow,String> refseqcol = createTextColumn("refseqID", "Chromosome");
-        refseqcol.setMinWidth(60);
-        refseqcol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<VPRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<VPRow, String> event) {
-                        ((VPRow) event.getTableView().getItems().get(event.getTablePosition().getRow())).setRefseqID(event.getNewValue());
-                    }
-                }
-        );
-        columns.add(refseqcol);
-        final TableColumn<VPRow,Integer> genomicposcol = new TableColumn<>("Genomic Position");
-        genomicposcol.setMinWidth(60);
-        genomicposcol.setCellValueFactory(new PropertyValueFactory<VPRow,Integer>("genomicPos"));
-        //?? genomicposcol.setCellFactory(TextFieldTableCell.forTableColumn());
-        genomicposcol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<VPRow, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<VPRow, Integer> event) {
-                        Integer val = event.getNewValue();
-                        ((VPRow) event.getTableView().getItems().get(event.getTablePosition().getRow())).setGenomicPos(val);
-                    }
-                }
-        );
-        columns.add(genomicposcol);
-
-    }
-
-    /** Create a new tab containing data about one {@link vpvgui.model.project.ViewPoint},*/
-    private void addTabPane(VPRow row) {
-        final Tab tab = new Tab("Tab " + row.getTargetName());
-        tab.setClosable(true);
-        tab.setOnClosed(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                if (tabpane.getTabs()
-                        .size() == 2) {
-                    event.consume();
-                }
-            }
-        });
-
-        ViewPointView vpv = new ViewPointView();
-        ViewPointPresenter vpp= (ViewPointPresenter) vpv.getPresenter();
-        vpp.setModel(this.model);
-        //vpp.setTabPaneRef(this.tabpane);
-        vpp.setVPRow(row);
-        vpp.sendToUCSC();
-        tab.setContent(vpp.getPane());
-
-
-        this.tabpane.getTabs().add(tab);
-        this.tabpane.getSelectionModel().select(tab);
+        viewPointTableView.getItems().addAll(vpl);
+        viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
 
