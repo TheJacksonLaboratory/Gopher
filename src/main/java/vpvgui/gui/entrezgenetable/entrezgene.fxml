@@ -6,28 +6,25 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="471.0"
-      prefWidth="354.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="vpvgui.gui.entrezgenetable.EntrezGenePresenter">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.entrezgenetable.EntrezGenePresenter">
     <children>
-        <HBox alignment="CENTER" style="-fx-background-color: #e1c1c1;">
+        <HBox alignment="CENTER" style="-fx-background-color: #e1c1c1;" VBox.vgrow="SOMETIMES">
             <children>
-            <WebView fx:id="wview" prefHeight="410.0" prefWidth="315.0" />
+            <WebView fx:id="wview" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
             </children>
         </HBox>
-        <HBox alignment="CENTER" />
-        <HBox alignment="CENTER">
+        <HBox alignment="CENTER" VBox.vgrow="NEVER">
             <children>
-            <Button fx:id="uploadGenesButton" mnemonicParsing="false" onAction="#uploadGenes" text="Upload">
+            <Button fx:id="uploadGenesButton" minWidth="75.0" mnemonicParsing="false" onAction="#uploadGenes" text="Upload">
                <HBox.margin>
-                  <Insets right="20.0" />
+                  <Insets right="30.0" />
                </HBox.margin>
             </Button>
-                <Button mnemonicParsing="false" onAction="#validateGeneSymbols" text="Validate">
+                <Button minWidth="75.0" mnemonicParsing="false" onAction="#validateGeneSymbols" text="Validate">
                <HBox.margin>
-                  <Insets right="20.0" />
+                  <Insets right="30.0" />
                </HBox.margin></Button>
-            <Button alignment="CENTER" mnemonicParsing="false" onAction="#acceptGenes" text="Accept" />
+            <Button alignment="CENTER" minWidth="75.0" mnemonicParsing="false" onAction="#acceptGenes" text="Accept" />
             </children>
         </HBox>
     </children>
