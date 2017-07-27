@@ -27,7 +27,9 @@ public class ViewPointFactory {
     private  int maxDistToGenomicPosUp;
     /** Maximum distance from central position (e.g., transcription start site) of the downstream boundary of the viewpoint.*/
     private  int maxDistToGenomicPosDown;
-    //private  File fasta;
+
+    private int minDistToGenomicPosDown;
+
     private  IndexedFastaSequenceFile fastaReader;
 
     /* declare viewpoint parameters as requested by Darío */
@@ -36,9 +38,8 @@ public class ViewPointFactory {
     private  Integer fragNumDown;
     //private  String cuttingMotif;
     private  Integer minSizeUp;
-    private  Integer maxSizeUp;
-    private  Integer minSizeDown;
-    private  Integer maxSizeDown;
+
+
     private  Integer minFragSize;
     private  double maxRepContent;
 
@@ -50,20 +51,28 @@ public class ViewPointFactory {
         init_parameters();
     }
 
+
+
+
+
     private void init_parameters() {
         this.vpvGeneList=model.getVPVGeneList();
         this.fragNumUp=model.fragNumUp();
         this.fragNumDown=model.fragNumDown();
         this.minSizeUp=model.minSizeUp();
-        this.minSizeDown=model.minSizeDown();
-        this.maxSizeUp=model.maxSizeUp();
-        this.maxSizeDown=model.maxSizeDown();
+        this.minDistToGenomicPosDown=model.minSizeDown();
+        this.maxDistToGenomicPosUp=model.maxSizeUp();
+        this.maxDistToGenomicPosDown=model.maxSizeDown();
         this.minFragSize=model.minFragSize();
         this.maxRepContent=model.maxRepeatContent();
         //this.cuttingPatterns=model.getCuttingPatterns();
         //TODO Get the cuttings patterns from GUI!
         this.cuttingPatterns=  new String[]{"GATC"};
     }
+
+
+
+
 
     public  List<VPVGene> getViewPoints(){ return vpvGeneList;}
 
@@ -88,7 +97,7 @@ public class ViewPointFactory {
                     ViewPoint vp = new ViewPoint(referenceSequenceID, gPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown,
                             cuttingPatterns, fastaReader);
                     vp.setTargetName(vpvgene.getGeneSymbol());
-                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
+                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif, minSizeUp, maxDistToGenomicPosUp, minDistToGenomicPosDown, maxDistToGenomicPosDown,
                             minFragSize, maxRepContent, marginSize);
                     viewpointlist.add(vp);
                     logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));

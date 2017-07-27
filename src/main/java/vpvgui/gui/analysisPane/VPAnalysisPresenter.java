@@ -102,7 +102,7 @@ public class VPAnalysisPresenter implements Initializable {
         }));
 
         // the second column
-        targetTableColumn.setSortable(false);
+        targetTableColumn.setSortable(true);
         // TODO - do we need editable table?
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
         targetTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
@@ -125,7 +125,7 @@ public class VPAnalysisPresenter implements Initializable {
      * This method creates a new {@link Tab} populated with
      */
     private void openViewPointInTab(ViewPoint vp) {
-        final Tab tab = new Tab("Tab " + vp.getTargetName());
+        final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
         tab.setClosable(true);
         tab.setOnClosed(event -> {
             if (tabpane.getTabs()
