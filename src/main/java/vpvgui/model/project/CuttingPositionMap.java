@@ -1,6 +1,7 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import org.apache.log4j.Logger;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 import java.util.*;
@@ -18,13 +19,13 @@ import java.util.regex.Pattern;
  * @author Peter Hansen
  */
 public class CuttingPositionMap {
-
-    /* fields */
-
+    static Logger logger = Logger.getLogger(CuttingPositionMap.class.getName());
+    /** The central, anchor position of the viewpoint */
     private Integer genomicPos;
     private Integer maxDistToGenomicPosUp;
     private Integer maxDistToGenomicPosDown;
     private static HashMap<String,ArrayList<Integer>> cuttingPositionMap;
+    /** This map will store the position of the "^", which indicates the cutting site.. */
     private static HashMap<String,Integer> cuttingPositionMapOffsets;
 
 
@@ -45,7 +46,12 @@ public class CuttingPositionMap {
      * @param fastaReader indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
      * @param cuttingPatterns array of cutting motifs, e.g. <i>A^AGCTT</i> for the resrtiction enzyme <i>HindIII</i>. The '^' indicates the cutting position within the motif.
      */
-    public CuttingPositionMap(String referenceSequenceID, Integer genomicPos, IndexedFastaSequenceFile fastaReader, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown, String[] cuttingPatterns) {
+    public CuttingPositionMap(String referenceSequenceID,
+                              Integer genomicPos,
+                              IndexedFastaSequenceFile fastaReader,
+                              Integer maxDistToGenomicPosUp,
+                              Integer maxDistToGenomicPosDown,
+                              String[] cuttingPatterns) {
 
         /* set fields */
 

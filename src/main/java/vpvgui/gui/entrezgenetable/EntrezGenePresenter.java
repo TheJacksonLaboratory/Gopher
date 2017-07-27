@@ -209,7 +209,7 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
-
+    /** @return list of all uploaded genes prior to validation. */
     private String getInitialGeneListHTML(List<String> genes) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body><h3>Uploaded gene list</h3>");
@@ -223,6 +223,7 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
+    /** This function closes the dialog for entering genes, and passes the VPVGene list to the model. */
     @FXML public void acceptGenes() {
         if (!isvalidated) {
             ErrorWindow.display("Error","Please validate genes for accepting them!");

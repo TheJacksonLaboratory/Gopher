@@ -364,7 +364,7 @@ public class VPVMainPresenter implements Initializable {
     /** ToDo wrap this in a Task! */
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
-        logger.trace("About to index genome files");
+        logger.trace("Indexing genome files...");
         FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI);
         manager.setOnSucceeded(event ->{
             indexGenomeLabel.setText("FASTA files successfully indexed.");
