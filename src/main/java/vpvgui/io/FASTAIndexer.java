@@ -104,7 +104,7 @@ public class FASTAIndexer  {
 
     public void writeFASTAIndex()  throws IOException{
         BufferedWriter bw = new BufferedWriter(new FileWriter(this.fastaFaiPath));
-        bw.write(String.format("%s\t%d\t%d\t%d\t%d",contigname,n_bases,byte_index,bases_per_line,bytes_per_line));
+        bw.write(String.format("%s\t%d\t%d\t%d\t%d\n",contigname,n_bases,byte_index,bases_per_line,bytes_per_line));
         bw.close();
     }
 

@@ -376,15 +376,14 @@ public class Model {
      * @param path Absolute complete path to the settings file.
      * @return
      */
-    public static Model initializeModelFromSettingsFile(String path) {
+    public static void initializeModelFromSettingsFile(String path, Model model) {
         logger.debug("Initializing Model from settings file. path="+path);
-        Model model = new Model();
         File settingsFile=new File(path);
         if (!settingsFile.exists()) {
             logger.error("Could not find settings file at "+settingsFile.getAbsolutePath());
             ErrorWindow.display("Could not read settings file",
                     String.format("Settings file %s did not exist",settingsFile.getAbsolutePath()));
-            return model; /* empty model. */
+            return; /* empty model. */
         }
         Properties properties=null;
         try {
@@ -396,7 +395,7 @@ public class Model {
             logger.error(e,e);
             ErrorWindow.display("Could not read settings file",
                     e.getMessage());
-            return model; /* empty model. */
+            return; /* empty model. */
         }
         String projectName = properties.getProperty("project_name");
         if (projectName!=null)
@@ -473,7 +472,7 @@ public class Model {
             model.setMaxRepeatContentProperty(d);
         }
         logger.info("Set model from settings file at "+settingsFile.getAbsolutePath());
-        return model;
+        return;
     }
 
 }

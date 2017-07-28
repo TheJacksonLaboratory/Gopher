@@ -175,14 +175,17 @@ public class VPVMainPresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.trace("initialize() called");
-        this.model = initializeModelFromSettingsIfPossible();
-        this.initializer=new Initializer(model);
-        initializeBindings();
+        this.model=new Model();
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
             setGenomeBuild(newValue);
         }));
+        initializeBindings();
+        initializePromptTextsToDefaultValues();
+        initializeModelFromSettingsIfPossible();
+        this.initializer=new Initializer(model);
+
 
 
 
@@ -222,17 +225,17 @@ public class VPVMainPresenter implements Initializable {
      * TODO -- now just take the default project file. Later allow user to choose a
      * project file from a dialog.
      */
-    private Model initializeModelFromSettingsIfPossible() {
+    private void initializeModelFromSettingsIfPossible() {
         logger.debug("Initializing model...");
         File defaultProject = getDefaultProjectPath();
         logger.debug("Default project file: "+defaultProject);
         if (!defaultProject.exists()) {
             logger.debug("Default project file did not exist, returning empty Model object.");
-            return new Model(); /* return an empty Model object. */
+            return; /* return an empty Model object. */
+        } else if (this.model==null){
+            this.model=new Model();
         }
-        Model model = Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath());
-        logger.debug("Returning model that was initialized from settings file");
-        return model;
+        Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath(), model);
     }
 
     public void initStage(Stage stage) {
@@ -265,6 +268,13 @@ public class VPVMainPresenter implements Initializable {
         this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
     }
 
+
+    private void initializePromptTextsToDefaultValues() {
+        this.fragNumUpTextField.setPromptText("4");
+    }
+
+
+
     private void setGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
         this.genomeBuildLabel.setText(build);
@@ -293,7 +303,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         logger.info("Got back as download dir "+file.getAbsolutePath());
-        gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDecompressPI);
+        gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDownloadPI);
         model.setGenomeDirectoryPath(file.getAbsolutePath());
         this.downloadedGenomeLabel.setText(file.getAbsolutePath());
 
