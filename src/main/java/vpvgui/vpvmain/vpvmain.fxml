@@ -205,11 +205,11 @@
                                     <Label text="Minimum fragment size" GridPane.rowIndex="3" />
                                     <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                     <TextField fx:id="minSizeUpTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <TextField fx:id="minSizeDownTextField" text="1500" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <TextField fx:id="minFragSizeTextField" text="130" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <TextField fx:id="minSizeDownTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <TextField fx:id="minFragSizeTextField" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                     <TextField fx:id="fragNumDownTextField" promptText="4" GridPane.columnIndex="3" />
                                     <TextField fx:id="maxSizeUpTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <TextField fx:id="maxSizeDownTextField" text="5000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    <TextField fx:id="maxSizeDownTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                     <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                                  </children>
                               </GridPane>
