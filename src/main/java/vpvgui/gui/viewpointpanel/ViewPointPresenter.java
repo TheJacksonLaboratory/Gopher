@@ -30,10 +30,7 @@ public class ViewPointPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
             "Browser to visualized view point...</i></p></body></html>";
 
-    /* Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int offset = 200;
 
-    final private static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F"};
 
     /**
      * This is the top-level Pane which contains all other graphical elements of this controller.
@@ -55,7 +52,7 @@ public class ViewPointPresenter implements Initializable {
     /**
      * Observable list of ViewPoints (entries of {@link #viewPointsTableView}), the backend behind the TableView.
      */
-    private ObservableList<ViewPoint> viewPoints;
+    //private ObservableList<ViewPoint> viewPoints;
 
     /**
      * The features of {@link ViewPoint} are presented in this TableView.
@@ -87,7 +84,6 @@ public class ViewPointPresenter implements Initializable {
      */
     private ViewPoint vp;
 
-    private int coloridx = 0;
 
     @FXML
     void closeButtonAction() {
@@ -106,7 +102,7 @@ public class ViewPointPresenter implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        viewPoints = FXCollections.observableArrayList();
+        //viewPoints = FXCollections.observableArrayList();
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
         /* The following line is needed to avoid a SSL handshake alert
@@ -154,57 +150,15 @@ public class ViewPointPresenter implements Initializable {
         return this.contentScrollPane;
     }
 
-    /**
-     * TODO needs more customization!
-     *
-     * @return
-     */
+
     private String generateURL() {
         String genome = this.model.getGenomeBuild();
-        if (genome.startsWith("UCSC-"))
-            genome = genome.substring(5);
-        int posFrom, posTo;
-        posFrom = vp.getStartPos() - offset;
-        posTo = vp.getEndPos() + offset;
-        String chrom = vp.getReferenceID();
-        if (!chrom.startsWith("chr"))
-            chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
-        String targetItem = vp.getTargetName();
-        String highlights = getHighlightRegions(genome, chrom);
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/hgRenderTracks?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=1400", genome, chrom, posFrom, posTo, targetItem, highlights);
+        URLMaker urlmaker=new URLMaker(genome);
+        String url = urlmaker.getURL(this.vp);
         System.out.println(url);
         return url;
     }
 
 
-    /** @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR> for the active fragments. */
-    private String getHighlightRegions(String db, String chrom) {
-        StringBuilder sb = new StringBuilder();
-        List<Segment> seglst = this.vp.getActiveSegments();
-        logger.trace("getHighlightRegions: got number Of Active segments " + seglst.size());
-        sb.append("highlight=");
-        int i = 0;
-        // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
-        for (Segment s : seglst) {
-            Integer start = s.getStartPos();
-            Integer end = s.getEndPos();
-            String color = getNextColor();
-            String part = String.format("%s.%s%%3A%d-%d%s", db, chrom, start, end, color);
-            if (i > 0) {
-                sb.append("%7C");
-            } else {
-                i = 1;
-            }
-            sb.append(part);
-        }
 
-        return sb.toString();
-    }
-
-    /** @return a rotating list of colors for the fragment highlights */
-    private String getNextColor() {
-        String color = colors[this.coloridx];
-        this.coloridx = (this.coloridx + 1) % (colors.length);
-        return String.format("%%23%s", color);
-    }
 }

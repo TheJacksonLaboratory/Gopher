@@ -61,6 +61,9 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> genPositionTableColumn;
 
+    @FXML
+    private TableColumn<ViewPoint, String> nSelectedTableColumn;
+
 
 
     private BooleanProperty editingStarted;
@@ -93,8 +96,8 @@ public class VPAnalysisPresenter implements Initializable {
             // create Button here & set the action
             Button btn = new Button("Show viewpoint");
             btn.setOnAction(e -> {
-                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d ",
-                        vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos()));
+                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
+                        vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(),vp.getActiveSegments().size()));
                 openViewPointInTab(vp);
             });
             // wrap it so it can be displayed in the TableView
@@ -118,6 +121,11 @@ public class VPAnalysisPresenter implements Initializable {
                 .getGenomicPos())));
         genPositionTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
                 .setGenomicPos(Integer.parseInt(e.getNewValue())));
+
+        // fifth column--number of selected fragments
+        nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
+        nSelectedTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
+                .setReferenceID(e.getNewValue()));
     }
 
 

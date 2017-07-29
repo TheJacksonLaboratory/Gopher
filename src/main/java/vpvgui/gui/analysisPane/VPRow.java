@@ -25,6 +25,7 @@ public class VPRow {
     private StringProperty targetName = new SimpleStringProperty("");
     private StringProperty refseqID = new SimpleStringProperty("");
     private IntegerProperty genomicPos = new SimpleIntegerProperty();
+    private IntegerProperty nSelected=new SimpleIntegerProperty();
     private Model model;
 
 
@@ -63,6 +64,14 @@ public class VPRow {
     public void setTargetName(String name) {
         this.targetName.set(name);
         this.viewpoint.setTargetName(name);
+    }
+
+    public Integer getNSelected() {
+        return nSelected.get();
+    }
+    public void setnSelected(Integer n) {
+        this.nSelected.set(n);
+        //TODO this.viewpoint.setGenomicPos(n);
     }
 
 }
