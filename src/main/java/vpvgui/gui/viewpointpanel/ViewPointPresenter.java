@@ -1,14 +1,10 @@
 package vpvgui.gui.viewpointpanel;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
@@ -19,6 +15,7 @@ import vpvgui.model.project.ViewPoint;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * This class acts as a controller of the TabPanes which display individual ViewPoints. Created by peter on 16.07.17.
@@ -31,9 +28,12 @@ public class ViewPointPresenter implements Initializable {
             "Browser to visualized view point...</i></p></body></html>";
 
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int offset = 200;
+    private static final int OFFSET = 200;
 
-    final private static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F"};
+    private static final int UCSC_WIDTH = 1600;
+
+    private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F", "8D230F", "A1D6E2",
+            "EC96A4", "E6DF44", "E4EA8C"};
 
     /**
      * This is the top-level Pane which contains all other graphical elements of this controller.
@@ -53,27 +53,25 @@ public class ViewPointPresenter implements Initializable {
     private WebEngine ucscWebEngine;
 
     /**
-     * Observable list of ViewPoints (entries of {@link #viewPointsTableView}), the backend behind the TableView.
-     */
-    private ObservableList<ViewPoint> viewPoints;
-
-    /**
-     * The features of {@link ViewPoint} are presented in this TableView.
+     * Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.
      */
     @FXML
-    private TableView<ViewPoint> viewPointsTableView;
+    private TableView<ColoredSegment> segmentsTableView;
 
     @FXML
-    private TableColumn<ViewPoint, CheckBoxTableCell<Boolean, ViewPoint>> isSelectedTableColumn;
+    private TableColumn<ColoredSegment, String> colorTableColumn;
 
     @FXML
-    private TableColumn<ViewPoint, String> refSeqIdTableColumn;
+    private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
 
     @FXML
-    private TableColumn<ViewPoint, String> targetIdTableColumn;
+    private TableColumn<ColoredSegment, String> startTableColumn;
 
     @FXML
-    private TableColumn<ViewPoint, String> genomicPosTableColumn;
+    private TableColumn<ColoredSegment, String> endTableColumn;
+
+    @FXML
+    private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
 
     /**
      * Reference to the {@link Tab} where this content is placed.
@@ -89,6 +87,7 @@ public class ViewPointPresenter implements Initializable {
 
     private int coloridx = 0;
 
+
     @FXML
     void closeButtonAction() {
         tab.getTabPane().getTabs().remove(tab);
@@ -101,12 +100,18 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML
     void saveButtonAction() {
+        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
+                .filter(ColoredSegment::isSelected)
+                .collect(Collectors
+                        .toList());
+
+        System.err.println(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
+                (Collectors.joining(","))));
 //        TODO - save action here
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        viewPoints = FXCollections.observableArrayList();
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
         /* The following line is needed to avoid a SSL handshake alert
@@ -114,7 +119,25 @@ public class ViewPointPresenter implements Initializable {
          */
         System.setProperty("jsse.enableSNIExtension", "false");
 
+        // This is a hack when by using dummy column a color for the cell's TableRow is set.
+        colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
+                }
+            }
+        });
 
+        colorTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getColor()));
+        isSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()));
+        startTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
+                .getStartPos())));
+        endTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
+                .getEndPos())));
+        inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
+                .getSegment().getRepetitiveContent())));
     }
 
     public void setModel(Model m) {
@@ -122,12 +145,39 @@ public class ViewPointPresenter implements Initializable {
     }
 
     /**
-     * Set the ViewPoint that will be presented. Loads UCSC view.
+     * Set the ViewPoint that will be presented. Load UCSC view and populate tableview with ViewPoint segments.
+     *
      * @param vp {@link ViewPoint} which will be presented.
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-        setURL(generateURL());
+
+        // generate Colored segments - Segment paired with some color.
+        segmentsTableView.getItems().addAll(vp.getActiveSegments().stream()
+                .map(s -> new ColoredSegment(s, getNextColor()))
+                .collect(Collectors.toList()));
+
+        // prepare url parts
+        String genome = this.model.getGenomeBuild();
+        if (genome.startsWith("UCSC-"))
+            genome = genome.substring(5);
+
+        int start, end;
+        start = vp.getStartPos() - OFFSET;
+        end = vp.getEndPos() + OFFSET;
+
+        /* TODO MAKE THIS ROBUST! */
+        String chrom = (vp.getReferenceID().startsWith("chr")) ? vp.getReferenceID() : "chr" + vp.getReferenceID();
+
+        String highlights = getHighlightRegions(segmentsTableView.getItems(), genome, chrom);
+
+        // create url & load content from UCSC
+        String url = String.format("http://genome.ucsc.edu/cgi-bin/hgRenderTracks?" +
+                        "db=%s&" + // genome
+                        "position=%s%%3A%d-%d&" + // chrom, start, end
+                        "hgFind.matches=%s&%s&pix=%d", // target, highlights
+                genome, chrom, start, end, vp.getTargetName(), highlights, UCSC_WIDTH);
+        ucscWebEngine.load(url);
 
     }
 
@@ -154,57 +204,64 @@ public class ViewPointPresenter implements Initializable {
         return this.contentScrollPane;
     }
 
-    /**
-     * TODO needs more customization!
-     *
-     * @return
-     */
-    private String generateURL() {
-        String genome = this.model.getGenomeBuild();
-        if (genome.startsWith("UCSC-"))
-            genome = genome.substring(5);
-        int posFrom, posTo;
-        posFrom = vp.getStartPos() - offset;
-        posTo = vp.getEndPos() + offset;
-        String chrom = vp.getReferenceID();
-        if (!chrom.startsWith("chr"))
-            chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
-        String targetItem = vp.getTargetName();
-        String highlights = getHighlightRegions(genome, chrom);
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/hgRenderTracks?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=1400", genome, chrom, posFrom, posTo, targetItem, highlights);
-        System.out.println(url);
-        return url;
-    }
-
 
     /** @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR> for the active fragments. */
-    private String getHighlightRegions(String db, String chrom) {
-        StringBuilder sb = new StringBuilder();
-        List<Segment> seglst = this.vp.getActiveSegments();
-        logger.trace("getHighlightRegions: got number Of Active segments " + seglst.size());
-        sb.append("highlight=");
-        int i = 0;
-        // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
-        for (Segment s : seglst) {
-            Integer start = s.getStartPos();
-            Integer end = s.getEndPos();
-            String color = getNextColor();
-            String part = String.format("%s.%s%%3A%d-%d%s", db, chrom, start, end, color);
-            if (i > 0) {
-                sb.append("%7C");
-            } else {
-                i = 1;
-            }
-            sb.append(part);
-        }
+    private String getHighlightRegions(List<ColoredSegment> segments, String db, String chrom) {
+        logger.trace("getHighlightRegions: got number Of Active segments " + segments.size());
 
-        return sb.toString();
+        return "highlight=" + segments.stream().map(seg -> String.format("%s.%s%%3A%d-%d%s", db, chrom, seg.getSegment()
+                .getStartPos(), seg.getSegment().getEndPos(), seg.getColor())).collect(Collectors.joining("%7C"));
     }
+
 
     /** @return a rotating list of colors for the fragment highlights */
     private String getNextColor() {
         String color = colors[this.coloridx];
         this.coloridx = (this.coloridx + 1) % (colors.length);
         return String.format("%%23%s", color);
+    }
+
+
+    /**
+     * Container for binding Segment
+     */
+    private class ColoredSegment {
+
+        private String color;
+
+        private Segment segment;
+
+        private CheckBox checkBox;
+
+        ColoredSegment(Segment segment, String color) {
+            this.segment = segment;
+            this.color = color;
+            this.checkBox = new CheckBox();
+        }
+
+        public CheckBox getCheckBox() {
+            return checkBox;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public Segment getSegment() {
+            return segment;
+        }
+
+        public boolean isSelected() {
+            return checkBox.isSelected();
+        }
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("ColoredSegment{");
+            sb.append("color='").append(color).append('\'');
+            sb.append(", segment=").append(segment);
+            sb.append('}');
+            return sb.toString();
+        }
     }
 }

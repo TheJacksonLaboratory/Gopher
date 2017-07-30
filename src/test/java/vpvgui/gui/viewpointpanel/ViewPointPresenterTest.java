@@ -2,13 +2,10 @@ package vpvgui.gui.viewpointpanel;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.junit.Ignore;
+import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import vpvgui.gui.analysisPane.VPRow;
 import vpvgui.model.Model;
 import vpvgui.model.project.ViewPoint;
 
@@ -23,82 +20,49 @@ public class ViewPointPresenterTest extends ApplicationTest {
 
     private Model model;
 
-
-    @BeforeMethod
-    public void setUp() throws Exception {
-        presenter = new ViewPointPresenter();
-
-        FXMLLoader loader  = new FXMLLoader(getClass().getResource("/fxml/viewpoint.fxml"));
-        loader.setControllerFactory(param -> presenter);
-        Parent p = loader.load();
-        model = new Model();
-        presenter.setModel(model);
-        presenter.setViewPoint(getViewPoint());
-
-    }
-
-    @Test
-    public void testCloseButtonAction() throws Exception {
-//        TODO
-    }
-
-    @Test
-    public void testRefreshUCSCButtonAction() throws Exception {
-//        TODO
-    }
-
-    @Test
-    public void testSaveButtonAction() throws Exception {
-//        TODO
+    /**
+     * This method initializes one {@link ViewPoint} object with real-life data.
+     *
+     * @return
+     * @throws Exception
+     */
+    private static ViewPoint getViewPoint4Display() throws Exception {
+        String testReferenceSequenceID = "chr11";
+        int testGenomicPos = 10000;
+        int testMaxUpstreamGenomicPos = 100;
+        int testMaxDownstreamPos = 100;
+        String[] testCuttingPatterns = new String[]{"TCCG", "CA", "AAA"};
+        IndexedFastaSequenceFile fai = new IndexedFastaSequenceFile(
+                new File(ViewPointPresenterTest.class.getResource("/smallgenome/chr11:0-600000.fa").toURI()));
+        ViewPoint vp = new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos,
+                testMaxDownstreamPos, testCuttingPatterns, fai);
+        vp.setTargetName("HRAS");
+        // TODO - return real-life ViewPoint from here. This one has no Segments at the moment.
+        return vp;
     }
 
     /**
      * Test that the controller was properly initialized. E.g. that it contains model, ViewPoint, etc.
+     *
      * @throws Exception
      */
     @Test
     public void testInitialization() throws Exception {
-
+        Thread.sleep(4000); // just show the screen for now.
     }
 
-    //    TODO
-    @Test
-    @Ignore("Don't know how to test it at the moment")
-    public void testSetURL() throws Exception {
-    }
-
-    @Test
-    public void testGetPane() throws Exception {
-//
-    }
-
-    @Test
-    public void testSendToUCSC() throws Exception {
-    }
-
-    /**
-     * Create {@link ViewPoint} instance similarly as in {@link vpvgui.model.project.ViewPointTest}.
-     * @return new {@link ViewPoint} object
-     * @throws Exception
-     */
-    private static ViewPoint getViewPoint() throws Exception {
-        String testReferenceSequenceID = "chr4_ctg9_hap1";
-        int testGenomicPos = 10000;
-        int testMaxUpstreamGenomicPos = 100; // replace initial radius with two separate max values for up and
-        // downstream. This is more flexible.
-        int testMaxDownstreamPos = 100;
-        int testStartPos = testGenomicPos - testMaxUpstreamGenomicPos;
-        int testEndPos = testGenomicPos + testMaxDownstreamPos;
-        String testDerivationApproach = "INITIAL";
-        String[] testCuttingPatterns = new String[]{"TCCG", "CA", "AAA"};
-        IndexedFastaSequenceFile fai = new IndexedFastaSequenceFile(
-                new File(ViewPointPresenterTest.class.getResource("/smallgenome/chr4_ctg9_hap1.fa").toURI()));
-        return new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos,
-                testMaxDownstreamPos, testCuttingPatterns, fai);
-    }
 
     @Override
     public void start(Stage stage) throws Exception {
+        presenter = new ViewPointPresenter();
 
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/viewpoint.fxml"));
+        loader.setControllerFactory(param -> presenter);
+
+        stage.setScene(new Scene(loader.load()));
+        model = new Model();
+        presenter.setModel(model);
+        presenter.setViewPoint(getViewPoint4Display());
+        stage.show();
     }
 }

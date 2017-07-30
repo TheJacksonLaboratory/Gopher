@@ -244,7 +244,7 @@
                 <configuration>
                     <forkCount>4</forkCount>
                     <systemPropertyVariables>
-                        <log4j.configuration>file:${basedir}/resources/log/log4j.silent.xml</log4j.configuration>
+                        <log4j.configuration>${project.build.testOutputDirectory}/log/log4j.silent.properties</log4j.configuration>
                     </systemPropertyVariables>
                 </configuration>
                 <dependencies>
