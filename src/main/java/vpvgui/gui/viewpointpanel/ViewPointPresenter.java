@@ -87,7 +87,6 @@ public class ViewPointPresenter implements Initializable {
 
     private int coloridx = 0;
 
-
     @FXML
     void closeButtonAction() {
         tab.getTabPane().getTabs().remove(tab);
@@ -98,8 +97,10 @@ public class ViewPointPresenter implements Initializable {
 //        TODO - refresh UCSC action here
     }
 
+//  TODO - save action here
     @FXML
     void saveButtonAction() {
+        // choose Segments that were selected by user.
         List<ColoredSegment> ss = segmentsTableView.getItems().stream()
                 .filter(ColoredSegment::isSelected)
                 .collect(Collectors
@@ -107,7 +108,6 @@ public class ViewPointPresenter implements Initializable {
 
         System.err.println(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
                 (Collectors.joining(","))));
-//        TODO - save action here
     }
 
     @Override

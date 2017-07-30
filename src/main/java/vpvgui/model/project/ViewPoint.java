@@ -128,30 +128,7 @@ public class ViewPoint {
         initRestrictionFragments();
     }
 
-    /**
-     * This is the contructor of this class that is called from the input genes window.
-     * It will set ONLY SOME of fields create an <i>CuttingPositionMap</i> object. We need
-     * to subsequently add the restriction enzyme and IndexedFastaSequence and do the actual cutting.
-     *
-     * param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>.
-     * param genomicPos              central position of the region for which the CuttingPositionMap is created.
-     * param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
-     * param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
 
-    public ViewPoint(String referenceSequenceID, Integer genomicPos, Integer maxDistToGenomicPosUp, Integer maxDistToGenomicPosDown) {
-
-
-
-        setReferenceID(referenceSequenceID);
-        setGenomicPos(genomicPos);
-        setStartPos(genomicPos - maxDistToGenomicPosUp);
-        setEndPos(genomicPos + maxDistToGenomicPosDown);
-        setDerivationApproach("INITIAL");
-    } */
-
-    /*
-     * TODO -- need to execute this to finish initializing ViewPoint objects made from GUI
-     */
     public void initCuttingPositionMap() {
         // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
         // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.
