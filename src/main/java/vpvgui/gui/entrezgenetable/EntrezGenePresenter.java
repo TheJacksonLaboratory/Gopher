@@ -152,6 +152,11 @@ public class EntrezGenePresenter implements Initializable {
             logger.info("Uploading target genes from "+file.getAbsolutePath());
             this.model.setTargetGenesPath(file.getAbsolutePath());
         }
+        uploadGenesFromFile(file);
+        e.consume();
+    }
+
+    public void uploadGenesFromFile(File file) {
         this.symbols = new ArrayList<>();
         try {
             BufferedReader br =new BufferedReader(new FileReader(file));
@@ -163,7 +168,6 @@ public class EntrezGenePresenter implements Initializable {
             logger.error("I/O Error reading file with target genes");
             logger.error(err,err);
         }
-        e.consume();
         setData(getInitialGeneListHTML(symbols));
         logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));
         isvalidated=false;

@@ -149,6 +149,10 @@ public class VPVMainPresenter implements Initializable {
     MenuItem showSettingsCurrentProject;
 
     @FXML MenuItem helpMenuItem;
+    @FXML MenuItem openHumanGeneWindow;
+    @FXML MenuItem openMouseGeneWindow;
+    @FXML MenuItem openRatGeneWindow;
+    @FXML MenuItem openFlyGeneWindow;
 
 
     @FXML
@@ -503,6 +507,40 @@ public class VPVMainPresenter implements Initializable {
         logger.info("Set proxy to "+proxy);
         logger.info("Set proxy port to "+port);
 
+    }
+
+
+    @FXML public void openGeneWindowWithExampleHumanGenes() {
+        File file = new File(getClass().getClassLoader().getResource("humangenesymbols.txt").getFile());
+        if (file==null) {
+            ErrorWindow.display("Could not open example human gene list","Please report to developers");
+            return;
+        }
+        EntrezGeneViewFactory.displayFromFile(this.model,file);
+    }
+    @FXML public void openGeneWindowWithExampleFlyGenes() {
+        File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
+        if (file==null) {
+            ErrorWindow.display("Could not open example fly gene list","Please report to developers");
+            return;
+        }
+        EntrezGeneViewFactory.displayFromFile(this.model,file);
+    }
+    @FXML public void openGeneWindowWithExampleMouseGenes() {
+        File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
+        if (file==null) {
+            ErrorWindow.display("Could not open example mouse gene list","Please report to developers");
+            return;
+        }
+        EntrezGeneViewFactory.displayFromFile(this.model,file);
+    }
+    @FXML public void openGeneWindowWithExampleRatGenes() {
+        File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
+        if (file==null) {
+            ErrorWindow.display("Could not open example rat gene list","Please report to developers");
+            return;
+        }
+        EntrezGeneViewFactory.displayFromFile(this.model,file);
     }
 
 

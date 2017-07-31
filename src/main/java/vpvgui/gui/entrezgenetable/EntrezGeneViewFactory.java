@@ -4,12 +4,43 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import vpvgui.model.Model;
 
+import java.io.File;
+
 /**
  * Created by peter on 01.07.17.
  */
 public class EntrezGeneViewFactory {
 
+    /** This is intended to be used to display example sets of genes chosen from the Help menu. */
+    public static void displayFromFile(Model model, File file){
+        Stage window;
+        String windowTitle = "Enter Gene List";
+        window = new Stage();
+        window.setOnCloseRequest( event -> {window.close();} );
+        window.setTitle(windowTitle);
 
+        EntrezGeneView view = new EntrezGeneView();
+        EntrezGenePresenter presenter = (EntrezGenePresenter) view.getPresenter();
+        presenter.setModel(model);
+        presenter.uploadGenesFromFile(file);
+        presenter.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+
+
+        window.setScene(new Scene(view.getView()));
+        window.showAndWait();
+    }
+
+    /** This causes the gene upload window to be displayed with an introductory text. */
     public static void display(Model model) {
         Stage window;
         String windowTitle = "Enter Gene List";
@@ -33,7 +64,6 @@ public class EntrezGeneViewFactory {
         });
         String html=getHTML();
         presenter.setData(html);
-
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
     }
