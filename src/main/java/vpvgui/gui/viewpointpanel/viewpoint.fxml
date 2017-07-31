@@ -2,36 +2,38 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
 <ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="800.0" pannable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
    <content>
-      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
-         <children>
-            <WebView fx:id="ucscContentWebView" maxWidth="1600.0" minHeight="500.0" minWidth="800.0" prefHeight="500.0" prefWidth="1600.0" VBox.vgrow="SOMETIMES" />
-            <Separator prefWidth="1200.0" />
-            <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" VBox.vgrow="ALWAYS">
-              <columns>
-                  <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="10.0" prefWidth="10.0" resizable="false" />
-                <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
-                  <TableColumn fx:id="startTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
-                  <TableColumn fx:id="endTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="209.0" text="End" />
-                  <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="355.0" text="In repetitive region" />
-              </columns>
-            </TableView>
-            <AnchorPane VBox.vgrow="NEVER">
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="110.0" text="Refresh UCSC" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                  <Button layoutX="140.0" layoutY="10.0" mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="30.0" prefWidth="110.0" text="Save" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="10.0" />
-                  <Button layoutX="270.0" layoutY="10.0" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="110.0" text="Close" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                  <WebView fx:id="ucscContentWebView" maxWidth="1600.0" minHeight="500.0" minWidth="800.0" prefHeight="500.0" prefWidth="1600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-         </children>
-      </VBox>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="110.0" text="Close" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
+                  <Button mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="110.0" text="Refresh UCSC" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" />
+                  <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columns>
+                        <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="10.0" prefWidth="10.0" resizable="false" />
+                      <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
+                        <TableColumn fx:id="startTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
+                        <TableColumn fx:id="endTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="209.0" text="End" />
+                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="355.0" text="In repetitive region" />
+                    </columns>
+                  </TableView>
+                  <Button mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="30.0" prefWidth="110.0" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="130.0" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
    </content>
 </ScrollPane>

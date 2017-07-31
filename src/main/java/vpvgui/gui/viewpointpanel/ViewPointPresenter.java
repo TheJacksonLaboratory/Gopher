@@ -162,23 +162,9 @@ public class ViewPointPresenter implements Initializable {
         if (genome.startsWith("UCSC-"))
             genome = genome.substring(5);
 
-        int start, end;
-        start = vp.getStartPos() - OFFSET;
-        end = vp.getEndPos() + OFFSET;
-
-        /* TODO MAKE THIS ROBUST! */
-        String chrom = (vp.getReferenceID().startsWith("chr")) ? vp.getReferenceID() : "chr" + vp.getReferenceID();
-
-        String highlights = getHighlightRegions(segmentsTableView.getItems(), genome, chrom);
-
         // create url & load content from UCSC
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/hgRenderTracks?" +
-                        "db=%s&" + // genome
-                        "position=%s%%3A%d-%d&" + // chrom, start, end
-                        "hgFind.matches=%s&%s&pix=%d", // target, highlights
-                genome, chrom, start, end, vp.getTargetName(), highlights, UCSC_WIDTH);
         URLMaker maker = new URLMaker(genome);
-        url= maker.getURL(vp);
+        String url= maker.getURL(vp);
         ucscWebEngine.load(url);
 
     }
@@ -204,15 +190,6 @@ public class ViewPointPresenter implements Initializable {
      */
     public ScrollPane getPane() {
         return this.contentScrollPane;
-    }
-
-
-    /** @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR> for the active fragments. */
-    private String getHighlightRegions(List<ColoredSegment> segments, String db, String chrom) {
-        logger.trace("getHighlightRegions: got number Of Active segments " + segments.size());
-
-        return "highlight=" + segments.stream().map(seg -> String.format("%s.%s%%3A%d-%d%s", db, chrom, seg.getSegment()
-                .getStartPos(), seg.getSegment().getEndPos(), seg.getColor())).collect(Collectors.joining("%7C"));
     }
 
 
