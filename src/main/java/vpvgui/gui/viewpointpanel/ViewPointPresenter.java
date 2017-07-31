@@ -177,6 +177,8 @@ public class ViewPointPresenter implements Initializable {
                         "position=%s%%3A%d-%d&" + // chrom, start, end
                         "hgFind.matches=%s&%s&pix=%d", // target, highlights
                 genome, chrom, start, end, vp.getTargetName(), highlights, UCSC_WIDTH);
+        URLMaker maker = new URLMaker(genome);
+        url= maker.getURL(vp);
         ucscWebEngine.load(url);
 
     }
