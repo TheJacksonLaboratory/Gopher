@@ -440,8 +440,6 @@ public class VPVMainPresenter implements Initializable {
         CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
         pbpresent.initBindings(task,sp);
 
-
-
         Stage window;
         String windowTitle = "Viewpoint creation";
         window = new Stage();
@@ -470,7 +468,6 @@ public class VPVMainPresenter implements Initializable {
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
-
     }
 
     public void closeWindow(ActionEvent e) {

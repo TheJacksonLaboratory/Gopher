@@ -89,7 +89,7 @@ public class ViewPointCreationTask extends Task {
         return n;
     }
 
-    public  List<VPVGene> getViewPoints(){ return vpvGeneList;}
+   // public  List<VPVGene> getViewPoints(){ return vpvGeneList;}
 
     /** This is the method that will create the viewpoints.
      * We have placed it in a task because it takes a while.

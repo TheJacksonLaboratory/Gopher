@@ -36,8 +36,7 @@ public class VPAnalysisPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
             "initialize analysis using the Set Up Tab.</p></body></html>";
 
-    private static final String UPDATE_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Number of viewpoints:" +
-            " %d.</p></body></html>";
+
 
 
 
@@ -130,7 +129,7 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     /**
-     * This method creates a new {@link Tab} populated with
+     * This method creates a new {@link Tab} populated with a viewpoint!
      */
     private void openViewPointInTab(ViewPoint vp) {
         final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
@@ -159,7 +158,10 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane=tabp;
     }
 
-
+    /** This method gets called right after the user has created a set of Viewpoints. It should
+     * show the table and also present a summary of the quality of the set of viewpoints in the
+     * upper half of the tab.
+     */
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
             System.out.println("[View Points not initialized");
@@ -167,7 +169,8 @@ public class VPAnalysisPresenter implements Initializable {
         }
 
         // update WebView with N loaded ViewPoints
-        contentWebEngine.loadContent(String.format(UPDATE_HTML_CONTENT, model.getViewPointList().size()));
+        ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
+        contentWebEngine.loadContent(htmlgen.getHTML());
 
         ObservableList<VPRow> viewpointlist = FXCollections.observableArrayList();
         if (model==null) {

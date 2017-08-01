@@ -14,6 +14,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+/**
+ * Presenter for the Viewpoint creation progress bar.
+ */
 public class CreateViewpointPBPresenter implements Initializable {
     static Logger logger = Logger.getLogger(CreateViewpointPBPresenter.class.getName());
 
