@@ -1,5 +1,7 @@
 package vpvgui.vpvmain;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -16,11 +18,14 @@ import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
+import vpvgui.framework.Signal;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
+import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
+import vpvgui.gui.createviewpointpb.CreateViewpointPBView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
@@ -30,13 +35,14 @@ import vpvgui.io.*;
 import vpvgui.model.Initializer;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
-import vpvgui.model.project.ViewPointFactory;
+import vpvgui.model.project.ViewPointCreationTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import static vpvgui.io.Platform.getDefaultProjectPath;
 
@@ -367,12 +373,6 @@ public class VPVMainPresenter implements Initializable {
         Thread th = new Thread(gindexer);
         th.setDaemon(true);
         th.start();
-
-
-        //gindexer.indexFastaFiles();
-       // Map<String,String> indexedFa=gindexer.getIndexedFastaFiles();
-        //model.setIndexedFastaFiles(indexedFa);
-
     }
 
     /** ToDo wrap this in a Task! */
@@ -434,14 +434,43 @@ public class VPVMainPresenter implements Initializable {
      */
     public void createCaptureProbes() {
         logger.trace("Entering createCaptureProbes");
-        ViewPointFactory factory = new ViewPointFactory(model);
-        factory.createViewPoints();
-        logger.trace("Finished factory.createViewPoints()");
-        /* The above puts the created viewpoints into the model. */
-        SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
-        this.vpanalysispresenter.setModel(this.model);
-        this.vpanalysispresenter.showVPTable();
-        selectionModel.select(this.analysistab);
+        StringProperty sp=new SimpleStringProperty();
+        ViewPointCreationTask task = new ViewPointCreationTask(model,sp);
+        CreateViewpointPBView pbview = new CreateViewpointPBView();
+        CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
+        pbpresent.initBindings(task,sp);
+
+
+
+        Stage window;
+        String windowTitle = "Viewpoint creation";
+        window = new Stage();
+        window.setOnCloseRequest( event -> {window.close();} );
+        window.setTitle(windowTitle);
+        pbpresent.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+
+        task.setOnSucceeded(event -> {
+            SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
+            this.vpanalysispresenter.setModel(this.model);
+            this.vpanalysispresenter.showVPTable();
+            selectionModel.select(this.analysistab);
+            logger.trace("Finished factory.createViewPoints()");
+            pbpresent.closeWindow();
+        });
+        new Thread(task).start();
+        window.setScene(new Scene(pbview.getView()));
+        window.showAndWait();
+
     }
 
     public void closeWindow(ActionEvent e) {

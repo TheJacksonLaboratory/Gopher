@@ -118,16 +118,16 @@ public class TestViewPointCreation {
             return;
         }
 
-        JannovarGeneGenerator jgg = new JannovarGeneGenerator(transcriptFile);
+        //JannovarGeneGenerator jgg = new JannovarGeneGenerator(transcriptFile);
         /* key is a gene symbol,and value is a listof corresponding transcripts. */
-        validGenes2TranscriptsMap = jgg.checkGenes(symbols);
-        List<String> validGeneSymbols = jgg.getValidGeneSymbols();
-        List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
+        //validGenes2TranscriptsMap = jgg.checkGenes(symbols);
+        //List<String> validGeneSymbols = jgg.getValidGeneSymbols();
+        //List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
         int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
 
 
-        /* print invalid gene symbols to file */
-
+        /* print invalid gene symbols to file
+        TODO Ich musste dies hier auskommentieren, Jannovar gibt es in dieser App nicht mehr!
         String fileName = outPrefix + "_invalid_symbols.txt";
         PrintStream out_invalid_symbols = new PrintStream(new FileOutputStream(outPath+fileName));
 
@@ -138,7 +138,7 @@ public class TestViewPointCreation {
         System.out.println("Number of invalid gene symbols: " + invalidGeneSymbols.size());
         System.out.println("Number of valid gene symbols: " + validGeneSymbols.size());
         System.out.println("validGenes2TranscriptsMap.size(): " + validGenes2TranscriptsMap.size());
-
+        */
 
         /* read refSeq.txt to map of TSS lists */
 

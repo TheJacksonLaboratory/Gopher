@@ -1,6 +1,9 @@
 package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
 
@@ -12,8 +15,8 @@ import java.util.List;
 /**
  * Created by peterrobinson on 7/22/17.
  */
-public class ViewPointFactory {
-    static Logger logger = Logger.getLogger(ViewPointFactory.class.getName());
+public class ViewPointCreationTask extends Task {
+    static Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
     Model model=null;
 
     /* List of VPVGenes representing User's gene list. */
@@ -39,15 +42,18 @@ public class ViewPointFactory {
     //private  String cuttingMotif;
     private  Integer minSizeUp;
 
+    private StringProperty currentVP=null;
+
 
     private  Integer minFragSize;
     private  double maxRepContent;
 
     private  Integer marginSize=200; /* ToDo -- allow this to be set via the menu */
 
-    public ViewPointFactory(Model model){
+    public ViewPointCreationTask(Model model, StringProperty currentVPproperty){
         this.model=model;
         this.viewpointlist=new ArrayList<>();
+        this.currentVP=currentVPproperty;
         init_parameters();
     }
 
@@ -71,20 +77,35 @@ public class ViewPointFactory {
     }
 
 
-
-
+    /** Get the total number of viewpoints we will create.This is needed in order
+     * to get the progress indicator to be accurate.
+     * @return
+     */
+    private int getTotalViewpoints() {
+        int n=0;
+        for (VPVGene vpvgene:this.vpvGeneList) {
+            n += vpvgene.n_viewpointstarts();
+        }
+        return n;
+    }
 
     public  List<VPVGene> getViewPoints(){ return vpvGeneList;}
 
-
-    public void createViewPoints() {
+    /** This is the method that will create the viewpoints.
+     * We have placed it in a task because it takes a while.
+     * @return
+     * @throws Exception
+     */
+    protected Object call() throws Exception {
         String cuttingMotif=this.cuttingPatterns[0];/* TODO -- Why do we need this instead of taking cutting patterns? */
         logger.trace("Creating viewpoints for cuting pattern: "+cuttingMotif);
-        int max=10;
+
+        int total=getTotalViewpoints();
         int i=0;
+
         for (VPVGene vpvgene:this.vpvGeneList) {
             String referenceSequenceID = vpvgene.getContigID();/* Usually a chromosome */
-            logger.trace("Retrieving indexed fasta file for contig: "+referenceSequenceID);
+            //logger.trace("Retrieving indexed fasta file for contig: "+referenceSequenceID);
             String path=this.model.getIndexFastaFilePath(referenceSequenceID);
             if (path==null) {
                 logger.error("Could not retrieve faidx file for "+referenceSequenceID);
@@ -97,6 +118,8 @@ public class ViewPointFactory {
                     ViewPoint vp = new ViewPoint(referenceSequenceID, gPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown,
                             cuttingPatterns, fastaReader);
                     vp.setTargetName(vpvgene.getGeneSymbol());
+                    updateProgress(i++,total); /* this will update the progress bar */
+                    updateLabelText(this.currentVP,vpvgene.getGeneSymbol());
                     vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif, minSizeUp, maxDistToGenomicPosUp, minDistToGenomicPosDown, maxDistToGenomicPosDown,
                             minFragSize, maxRepContent, marginSize);
                     viewpointlist.add(vp);
@@ -109,6 +132,17 @@ public class ViewPointFactory {
             }
         }
         this.model.setViewPoints(viewpointlist);
+        return true;
+    }
+
+
+    private void updateLabelText(StringProperty sb,String msg) {
+        Platform.runLater(new Runnable(){
+            @Override
+            public void run() {
+                sb.setValue(String.format("Creating view point for %s",msg));
+            }
+        });
     }
 
 
