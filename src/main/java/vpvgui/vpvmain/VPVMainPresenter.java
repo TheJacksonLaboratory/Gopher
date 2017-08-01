@@ -532,6 +532,12 @@ public class VPVMainPresenter implements Initializable {
         this.model.setHttpProxyPort(port);
         logger.info("Set proxy to "+proxy);
         logger.info("Set proxy port to "+port);
+        System.setProperty("http.proxyHost",proxy);
+        System.setProperty("http.proxyPort",String.format("%d",port ));
+        System.setProperty("https.proxyHost",proxy);
+        System.setProperty("https.proxyPort",String.format("%d",port ));
+
+
 
     }
 
