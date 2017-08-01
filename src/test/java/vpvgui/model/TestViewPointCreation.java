@@ -57,15 +57,15 @@ public class TestViewPointCreation {
 
         /* set parameters for gene and TSS extraction */
 
-        transcriptFile= "/Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser
-        geneFile="/Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"
+        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2_test.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
 
         /* set initial viewpoint patrameters */
 
         cuttingPatterns = new String[]{"GATC"};
         maxDistToGenomicPosUp = 10000;
         maxDistToGenomicPosDown = 10000;
-        fasta = new File("/Users/hansep/IdeaProjects/VPV/mm9_fasta/mm9.fa");
+        fasta = new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_fasta/mm9.fa"); // /Users/hansep/IdeaProjects/VPV/mm9_fasta/mm9.fa
         fastaReader = new IndexedFastaSequenceFile(fasta);
 
         /* set viewpoint parameters as requested by Darío */
@@ -83,7 +83,7 @@ public class TestViewPointCreation {
 
         /* set other parameters */
 
-        outPath = "/Users/hansep/IdeaProjects/VPV/";
+        outPath = "/home/peter/IdeaProjects/git_vpv_workspace/VPV/";
         outPrefix = "gonad_RC06";
     }
 
@@ -123,7 +123,7 @@ public class TestViewPointCreation {
         //validGenes2TranscriptsMap = jgg.checkGenes(symbols);
         //List<String> validGeneSymbols = jgg.getValidGeneSymbols();
         //List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
-        int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
+        //int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
 
 
         /* print invalid gene symbols to file
@@ -145,7 +145,7 @@ public class TestViewPointCreation {
         HashMap<String,String> geneMapOfTss = new HashMap<>();
         HashMap<String,String> geneMapOfTssHelp = new HashMap<>();
         Integer countSymbolsWithTssOnDifferentChromosomes = 0;
-        File file = new File("/Users/hansep/IdeaProjects/VPV/mm9_fasta/refGene.txt");
+        File file = new File("/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_fasta/refGene.txt"); // /Users/hansep/IdeaProjects/VPV/mm9_fasta/refGene.txt
         Scanner refGeneFile = new Scanner(file);
         while (refGeneFile.hasNextLine()) {
             String[] line = refGeneFile.nextLine().split("\t");
@@ -237,6 +237,7 @@ public class TestViewPointCreation {
                         minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
+                System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
              }
             vpvGeneList.add(vpvgene);
         }
@@ -359,7 +360,8 @@ public class TestViewPointCreation {
                     viewPointScore=1;
                 }
                 viewPointScore=vpvGeneList.get(i).getviewPointList().get(j).getNumOfSelectedFrags();
-                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
+                double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
+                        out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
