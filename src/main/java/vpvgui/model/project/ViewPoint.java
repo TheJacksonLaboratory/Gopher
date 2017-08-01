@@ -597,6 +597,7 @@ public class ViewPoint {
 
         /* iterate over all selected fragments */
 
+        Integer posCnt=0;
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
             double repCont = 0;
             double positionScoreSumFragment = 0;
@@ -610,7 +611,7 @@ public class ViewPoint {
                     SegMargins.get(j).setRepetitiveContent(fastaReader);
                     repCont = repCont + SegMargins.get(j).getRepetitiveContent();
                 }
-                System.out.println(repCont);
+                //System.out.println(repCont);
 
                 /* get position distance score for each position of the fragment */
 
@@ -622,10 +623,11 @@ public class ViewPoint {
                     } else {
                         positionScoreSumFragment = positionScoreSumFragment + getViewpointPositionDistanceScore(dist, maxDistToGenomicPosDown);
                     }
+                    posCnt++;
                 }
             }
             score = score + (1 - repCont) * positionScoreSumFragment;
         }
-        return score;
+        return score/posCnt;
     }
 }
