@@ -498,7 +498,7 @@ public class ViewPoint {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
-            // change this to: set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
+            // set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
             ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
             for (int j = 0; j < SegMargins.size(); j++) {
                 SegMargins.get(j).setRepetitiveContent(fastaReader);
@@ -538,7 +538,7 @@ public class ViewPoint {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
-            // change this to: set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
+            // set fragment to false, if one of the margins have a repetitive content is higher than a given threshold
             ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
             for (int j = 0; j < SegMargins.size(); j++) {
                 SegMargins.get(j).setRepetitiveContent(fastaReader);

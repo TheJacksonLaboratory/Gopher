@@ -89,6 +89,34 @@ public class Segment {
         this.repetitiveContent = ((double) lowerCase / (lowerCase + (double) upperCase));
     }
 
+    /**
+     *
+     * @param fastaReader
+     * @param marginSize
+     */
+    public void setRepetitiveContentMargins(IndexedFastaSequenceFile fastaReader, Integer marginSize) {
+
+        /* generate Segment objects for margins */
+
+        ArrayList<Segment> margins = getSegmentMargins(marginSize);
+
+        /* set repetitive content of margins */
+
+        for(int i=0; i<margins.size();i++){
+            margins.get(i).setRepetitiveContent(fastaReader);
+        }
+
+        /* set fields repetitiveContentUp and repetitiveContentDown */
+
+        this.repetitiveContentUp = margins.get(0).getRepetitiveContent();
+        if(1<margins.size()){ // If the Segment is larger than twice the margin size only one Segment object is returned by function 'getSegmentMargins'.
+            this.repetitiveContentDown = margins.get(0).getRepetitiveContent(); // In such cases, assign repetitiveContentUp and repetitiveContentDown the same values.
+        } else {
+            this.repetitiveContentDown = margins.get(1).getRepetitiveContent();
+        }
+
+    }
+
 
     /**
      * This function returns the repetitive content calculated by the function <i>setRepetitiveContent</i>.
