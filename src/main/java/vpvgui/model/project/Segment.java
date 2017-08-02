@@ -19,7 +19,7 @@ public class Segment {
     private double repetitiveContentUp;
     private double repetitiveContentDown;
     private Integer genomicPos;
-    IndexedFastaSequenceFile fastaReader;
+    private IndexedFastaSequenceFile fastaReader;
 
 
     /* constructor */
@@ -38,8 +38,14 @@ public class Segment {
 
     /* getter and setter methods */
 
+    public void setStartPos(Integer startPos) { this.startPos=startPos; }
+
     public Integer getStartPos() {
         return startPos;
+    }
+
+    public void setEndPos(Integer endPos) {
+        this.startPos=endPos;
     }
 
     public Integer getEndPos() {
