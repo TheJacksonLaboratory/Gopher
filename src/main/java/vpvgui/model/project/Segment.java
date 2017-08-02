@@ -127,6 +127,15 @@ public class Segment {
         return repetitiveContent;
     }
 
+    public double getRepetitiveContentMarginUp() {
+        return repetitiveContentUp;
+    }
+
+    public double getRepetitiveContentMarginDown() {
+        return repetitiveContentDown;
+    }
+
+
 
     /**
      * This function creates either a list with one new object of the class <i>Segment</i>,
