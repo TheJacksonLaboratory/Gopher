@@ -70,11 +70,11 @@ public class ViewPoint {
             int len=this.getEndPos()-this.startPos;
             int fakestart=this.startPos + len/10;
             int fakeend=this.startPos+ len/5;
-            Segment fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
+            Segment fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true, fastaReader); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
             segs.add(fake);
             fakestart=this.startPos + 3*len/10;
             fakeend=this.startPos+ 4*len/10;
-            fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
+            fake = new Segment(this.referenceSequenceID,fakestart,fakeend,true, fastaReader); //(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected)
             segs.add(fake);
             return segs;
         }
@@ -165,7 +165,7 @@ public class ViewPoint {
                 Segment restFrag = new Segment(referenceSequenceID,
                         relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1),
                         relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)+1),
-                        false);
+                        false, fastaReader);
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
         }

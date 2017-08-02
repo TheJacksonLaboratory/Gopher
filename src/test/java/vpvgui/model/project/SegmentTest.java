@@ -31,9 +31,9 @@ public class SegmentTest {
 
         /* create Segment objects for testing */
 
-        segment_1 = new Segment(referenceSequenceID,21,44,false);
-        segment_2 = new Segment(referenceSequenceID,69,92,false);
-        segment_3 = new Segment(referenceSequenceID,93,112,false);
+        segment_1 = new Segment(referenceSequenceID,21,44,false, FastaReader);
+        segment_2 = new Segment(referenceSequenceID,69,92,false, FastaReader);
+        segment_3 = new Segment(referenceSequenceID,93,112,false, FastaReader);
     }
 
 

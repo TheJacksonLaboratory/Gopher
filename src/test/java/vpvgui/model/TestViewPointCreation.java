@@ -57,8 +57,8 @@ public class TestViewPointCreation {
 
         /* set parameters for gene and TSS extraction */
 
-        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2_test.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
+        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/genelistsample.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
 
         /* set initial viewpoint patrameters */
 

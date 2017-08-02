@@ -16,18 +16,23 @@ public class Segment {
     private Integer endPos;
     private boolean selected;
     private double repetitiveContent;
+    private double repetitiveContentUp;
+    private double repetitiveContentDown;
     private Integer genomicPos;
+    IndexedFastaSequenceFile fastaReader;
 
 
     /* constructor */
 
-    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected) {
+    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected, IndexedFastaSequenceFile fastaReader) {
 
         this.referenceSequenceID = referenceSequenceID;
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
         setSelected(selected);
         this.genomicPos = genomicPos;
+        this.fastaReader = fastaReader;
+        setRepetitiveContent(fastaReader);
     }
 
 
@@ -106,14 +111,14 @@ public class Segment {
 
         if (2 * marginSize < length()) { // return a pair of Segment objects
 
-            upStreamFrag = new Segment(referenceSequenceID, startPos, startPos + marginSize - 1, true);
+            upStreamFrag = new Segment(referenceSequenceID, startPos, startPos + marginSize - 1, true, fastaReader);
             marginList.add(upStreamFrag);
-            downStreamFrag = new Segment(referenceSequenceID, endPos - marginSize + 1, endPos, true);
+            downStreamFrag = new Segment(referenceSequenceID, endPos - marginSize + 1, endPos, true, fastaReader);
             marginList.add(downStreamFrag);
 
         } else { // return a single Segment object with odentical coordinates as the original Segment object
 
-            upStreamFrag = new Segment(referenceSequenceID, startPos, endPos, true);
+            upStreamFrag = new Segment(referenceSequenceID, startPos, endPos, true, fastaReader);
             marginList.add(upStreamFrag);
         }
         return marginList;
