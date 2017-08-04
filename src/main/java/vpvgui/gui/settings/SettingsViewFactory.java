@@ -1,9 +1,7 @@
 package vpvgui.gui.settings;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 
 import java.util.Properties;
 
@@ -42,8 +40,7 @@ public class SettingsViewFactory {
     }
 
     /*
-        * Formats the list properties in human-readable format, checking for an empty list.
-        */
+     * Formats the list properties in human-readable format, checking for an empty list.
     private static String joinEnzymes(ObservableList<String> lst) {
         if (lst==null || lst.isEmpty()) {
             return (String.format("not initialized"));
@@ -55,23 +52,51 @@ public class SettingsViewFactory {
         }
         return sb.toString();
     }
+    */
 
     /**
-     * TODO make this nicer in terms of order, e.g., put project name at top etc.
      * @param properties
-     * @return
+     * @return String containing HTML to display in WebView pane
      */
     private static String getHTML(Properties properties) {
+        String[] nonNumericProps = new String[] {
+                "genome_build",  "path_to_downloaded_genome_directory", "genome_unpacked",
+                "genome_indexed", "transcript_url", "target_genes_path", "refgene_path"
+        };
+        String[] nonNumericPropNames = new String[] {
+                "Genome build", "Path to downloaded genome", "Genome decompressed",
+                "Genome indexed", "Transcripts", "Path to target genes file",
+                "Path to reference gene"
+        };
+        String[] numericProps = new String[] {
+                "fragNumUp", "fragNumDown", "minSizeUp", "maxSizeUp", "minSizeDown",
+                "maxSizeDown", "minFragSize", "maxRepeatContent"
+        };
+        String[] numericPropNames = new String[] {
+                "# Fragments upstream", "# Fragments downstream", "Minimum size upstream",
+                "Maximum size upstream", "Minimum size downstream", "Maximum size downstream",
+                "Minimum fragment size", "Maximum repeat content"
+        };
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><body><h3>VPV Settings</h3>");
-        sb.append("<p><ul>");
-        for (String prop: properties.stringPropertyNames()) {
-            sb.append(String.format("<li>%s: %s</li>",prop,properties.getProperty(prop)));
+        sb.append("<html><body><h3>");
+        sb.append(properties.getProperty("project_name"));
+        sb.append("</h3><p><ul style=\"list-style: none;\">");
+        for (int i = 0; i < nonNumericProps.length; i++) {
+            sb.append(String.format("<li>%s: %s</li>", nonNumericPropNames[i],
+                    properties.getProperty(nonNumericProps[i])));
         }
+        sb.append(String.format("<li>%s: %s</li>", "Restriction enzymes",
+                properties.getProperty("restriction_enzymes")));
+        for (int i = 0; i < numericProps.length; i++) {
+            sb.append(String.format("<li>%s: %s</li>",numericPropNames[i],
+                    properties.getProperty(numericProps[i])));
+        }
+//        for (String prop: properties.stringPropertyNames()) {
+//            sb.append(String.format("<li>%s: %s</li>",prop,properties.getProperty(prop)));
+//        }
         sb.append("</ul></p>");
         sb.append("</body></html>");
         return sb.toString();
-
     }
 
 
