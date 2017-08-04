@@ -61,6 +61,8 @@ public class ViewPoint {
 
     private String warnings;
 
+    private double score;
+
     /**
      * Note -- currently a FAKE method for testing the GUI. TODO revise this
      * @return a list of Segments of a viewpoint that are active and will be displayed on the UCSC Browser. */
@@ -212,6 +214,15 @@ public class ViewPoint {
     }
 
 
+    public final void setScore(double score) {
+        this.score = score;
+    }
+
+    public final double getScore() {
+        return score;
+    }
+
+
     public final void setStartPos(Integer startPos) {
         this.startPos = startPos;
     }
@@ -286,6 +297,7 @@ public class ViewPoint {
         }
         return selectedRestSegList;
     }
+
 
 
     /* ------------------------ */
@@ -529,7 +541,8 @@ public class ViewPoint {
 
             // set fragments to 'false' that are not entirely within the allowed range
             Integer downLen = genomicPos - restSegListMap.get(motif).get(i).getEndPos();
-            if (maxSizeDown < downLen) {
+            if (maxSizeDown < -downLen) {
+
                 restSegListMap.get(motif).get(i).setSelected(false);
             }
 
@@ -628,6 +641,10 @@ public class ViewPoint {
             }
             score = score + (1 - repCont) * positionScoreSumFragment;
         }
-        return score/posCnt;
+        if(posCnt==0) {
+            return 0.0;
+        } else {
+            return score/posCnt;
+        }
     }
 }
