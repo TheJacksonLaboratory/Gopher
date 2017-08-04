@@ -61,7 +61,7 @@ public class ViewPoint {
 
     private String warnings;
 
-    private double score;
+    private Double score;
 
     /**
      * Note -- currently a FAKE method for testing the GUI. TODO revise this
@@ -120,6 +120,7 @@ public class ViewPoint {
         setDerivationApproach("INITIAL");
         setResolved(false);
         warnings="";
+        setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
         this.fastaReader=fastaReader;
@@ -592,10 +593,18 @@ public class ViewPoint {
         /* set derivation approach */
 
         setDerivationApproach("LUPIANEZ");
+        setViewpointScore(motif,marginSize);
         setResolved(resolved);
     }
 
 
+    /**
+     * Helper function for the calculation of the viewpoint score.
+     *
+     * @param dist
+     * @param maxDistToGenomicPos
+     * @return
+     */
     public double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
         double sd = maxDistToGenomicPos/6;
         double mean = -3*sd;
@@ -604,16 +613,25 @@ public class ViewPoint {
         return score;
     }
 
-    public double getViewpointScore(String motif, Integer marginSize) {
+    /**
+     * This function calculates the viewpoint score and sets the field 'score' of this class.
+     * The function is also intended to update the score.
+     *
+     * @param motif
+     * @param marginSize
+     */
+    public void setViewpointScore(String motif, Integer marginSize) {
 
-        double score = 0.0;
+        Double score = 0.0;
 
         /* iterate over all selected fragments */
 
-        Integer posCnt=0;
+        Integer posCnt = 0;
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
+
             double repCont = 0;
             double positionScoreSumFragment = 0;
+
             if (restSegListMap.get(motif).get(i).isSelected() == true) {
 
                 /* get repetitive content of the fragment margins */
@@ -624,7 +642,6 @@ public class ViewPoint {
                     SegMargins.get(j).setRepetitiveContent(fastaReader);
                     repCont = repCont + SegMargins.get(j).getRepetitiveContent();
                 }
-                //System.out.println(repCont);
 
                 /* get position distance score for each position of the fragment */
 
@@ -641,10 +658,14 @@ public class ViewPoint {
             }
             score = score + (1 - repCont) * positionScoreSumFragment;
         }
-        if(posCnt==0) {
-            return 0.0;
+        if (posCnt == 0) {
+            this.score = 0.0;
         } else {
-            return score/posCnt;
+            this.score = score / posCnt;
         }
+    }
+
+    public Double getViewpointScore() {
+        return score;
     }
 }
