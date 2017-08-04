@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -19,18 +20,21 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="110.0" text="Close" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
-                  <Button mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="110.0" text="Refresh UCSC" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" />
-                  <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Label fx:id="viewpointScoreLabel" styleClass="mylabel" text="." AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="5.0" />
+                  <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="110.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                  <Button mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="110.0" text="Refresh UCSC" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                  <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                     <columns>
                         <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="10.0" prefWidth="10.0" resizable="false" />
                       <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
                         <TableColumn fx:id="startTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
                         <TableColumn fx:id="endTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="209.0" text="End" />
-                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="355.0" text="In repetitive region" />
+                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="155.0" text="Repeat content" />
+                        <TableColumn fx:id="repeatContentUp" prefWidth="75.0" text="Repeat content (up)" />
+                        <TableColumn fx:id="repeatContentDown" prefWidth="75.0" text="Repeat content (down)" />
                     </columns>
                   </TableView>
-                  <Button mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="30.0" prefWidth="110.0" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="130.0" />
+                  <Button mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="30.0" prefWidth="110.0" text="Save" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
         </items>

@@ -2,6 +2,8 @@ package vpvgui.gui.viewpointpanel;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -47,6 +49,10 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     private WebView ucscContentWebView;
 
+    @FXML private Label viewpointScoreLabel;
+
+    private StringProperty vpScoreProperty;
+
     /**
      * The backend behind the UCSC browser content. The non-visual object capable of managing one Web page at a time.
      */
@@ -72,6 +78,8 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML
     private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
+    @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
+    @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
 
     /**
      * Reference to the {@link Tab} where this content is placed.
@@ -131,13 +139,26 @@ public class ViewPointPresenter implements Initializable {
         });
 
         colorTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getColor()));
-        isSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()));
+        isSelectedTableColumn.setCellValueFactory(cdf -> {
+            Segment segment = cdf.getValue().getSegment();
+            CheckBox checkBox = cdf.getValue().getCheckBox();
+            if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly
+                checkBox.setSelected(true);
+            return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
+        });
+
         startTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getStartPos())));
         endTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getEndPos())));
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepetitiveContent())));
+        repeatContentUp.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+                getSegment().getRepeatContentMarginUp())));
+        repeatContentDown.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+                getSegment().getRepeatContentMarginDown())));
+        vpScoreProperty=new SimpleStringProperty();
+        viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
     }
 
     public void setModel(Model m) {
@@ -151,7 +172,7 @@ public class ViewPointPresenter implements Initializable {
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-
+        this.vpScoreProperty.setValue(String.format("%S - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
         // generate Colored segments - Segment paired with some color.
         segmentsTableView.getItems().addAll(vp.getActiveSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))

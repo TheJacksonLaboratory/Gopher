@@ -30,15 +30,12 @@ import java.util.ResourceBundle;
  * Created by peterrobinson on 7/6/17.
  */
 public class VPAnalysisPresenter implements Initializable {
-
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
-
+    /** This is the message users will see if they open the analysis tab before they have entered the genes
+     * and started the analysis of the viewpoints.
+     */
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
             "initialize analysis using the Set Up Tab.</p></body></html>";
-
-
-
-
 
     @FXML
     private WebView contentWebView;
@@ -63,14 +60,14 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> nSelectedTableColumn;
 
+    @FXML private TableColumn<ViewPoint,String> viewpointScoreColumn;
 
 
     private BooleanProperty editingStarted;
 
     private Model model;
     /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
-     * UCSC browser.
-     */
+     * UCSC browser.*/
     private TabPane tabpane;
 
 
@@ -79,7 +76,6 @@ public class VPAnalysisPresenter implements Initializable {
         System.setProperty("jsse.enableSNIExtension", "false");
         contentWebEngine = contentWebView.getEngine();
         contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
-
         initTable();
     }
 
@@ -125,6 +121,10 @@ public class VPAnalysisPresenter implements Initializable {
         nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
         nSelectedTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
                 .setReferenceID(e.getNewValue()));
+
+        // sixth column--score of fragments.
+        viewpointScoreColumn.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScore())));
+        viewpointScoreColumn.setOnEditCommit(e->e.getTableView().getItems().get(e.getTablePosition().getRow()));
     }
 
 
@@ -172,7 +172,7 @@ public class VPAnalysisPresenter implements Initializable {
         ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
         contentWebEngine.loadContent(htmlgen.getHTML());
 
-        ObservableList<VPRow> viewpointlist = FXCollections.observableArrayList();
+        ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList();
         if (model==null) {
             System.err.println("[ERROR] VPAnalysisPresenter -- model null, should never happen" );
             return;
@@ -180,7 +180,7 @@ public class VPAnalysisPresenter implements Initializable {
         List<ViewPoint> vpl = this.model.getViewPointList();
         logger.trace("In showVPTable: got a total of "+vpl.size() + " VPVGenes");
         for (ViewPoint v : vpl) {
-            viewpointlist.add(new VPRow(v,this.model));
+            viewpointlist.add(v);
         }
         viewPointTableView.getItems().addAll(vpl);
         viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -190,7 +190,7 @@ public class VPAnalysisPresenter implements Initializable {
     private TableColumn createTextColumn(String name, String caption) {
         TableColumn column = new TableColumn(caption);
         appendEditListeners(column);
-        column.setCellValueFactory(new PropertyValueFactory<VPRow, String>(name));
+        column.setCellValueFactory(new PropertyValueFactory<ViewPoint, String>(name));
         column.setCellFactory(TextFieldTableCell.forTableColumn());
         return column;
     }

@@ -556,6 +556,8 @@ public class ViewPoint {
             ArrayList<Segment> SegMargins = restSegListMap.get(motif).get(i).getSegmentMargins(marginSize);
             for (int j = 0; j < SegMargins.size(); j++) {
                 SegMargins.get(j).setRepetitiveContent(fastaReader);
+                /* TODO NEW IS THIS CORRECT? PNR DOES NOT TERMINATE????? */
+                //SegMargins.get(j).setRepetitiveContentMargins(fastaReader,marginSize);
                 if (maxRepFrag < SegMargins.get(j).getRepetitiveContent() && restSegListMap.get(motif).get(i).isSelected()) {
                     restSegListMap.get(motif).get(i).setSelected(false);
                 }
@@ -665,7 +667,4 @@ public class ViewPoint {
         }
     }
 
-    public Double getViewpointScore() {
-        return score;
-    }
 }

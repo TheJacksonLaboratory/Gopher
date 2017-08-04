@@ -51,7 +51,7 @@ public class Segment {
     public Integer getEndPos() {
         return endPos;
     }
-
+    /** @param selected true if the segment is to be included in the sequences for the probes for this viewpoint.*/
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
@@ -59,7 +59,7 @@ public class Segment {
     public boolean isSelected() {
         return selected;
     }
-
+    /** Length of the entire segment in nucleotides. */
     public Integer length() {
         return endPos - startPos + 1;
     }
@@ -72,14 +72,10 @@ public class Segment {
      * @param fastaReader IndexedFastaSequenceFile
      */
     public void setRepetitiveContent(IndexedFastaSequenceFile fastaReader) {
-
         /* get dna string */
-
         String s = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
 
-
-        /* determine repetitive content */
-
+        /* determine repeat content */
         Integer lowerCase = 0, upperCase = 0;
         for (int i = 0; i < s.length(); i++) {
             if (Character.isLowerCase(s.charAt(i))) lowerCase++;
@@ -97,11 +93,9 @@ public class Segment {
     public void setRepetitiveContentMargins(IndexedFastaSequenceFile fastaReader, Integer marginSize) {
 
         /* generate Segment objects for margins */
-
         ArrayList<Segment> margins = getSegmentMargins(marginSize);
 
         /* set repetitive content of margins */
-
         for(int i=0; i<margins.size();i++){
             margins.get(i).setRepetitiveContent(fastaReader);
         }
@@ -127,11 +121,11 @@ public class Segment {
         return repetitiveContent;
     }
 
-    public double getRepetitiveContentMarginUp() {
+    public double getRepeatContentMarginUp() {
         return repetitiveContentUp;
     }
 
-    public double getRepetitiveContentMarginDown() {
+    public double getRepeatContentMarginDown() {
         return repetitiveContentDown;
     }
 

@@ -237,7 +237,7 @@ public class TestViewPointCreation {
                         minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
-                System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
+               // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
              }
             vpvGeneList.add(vpvgene);
         }
@@ -360,7 +360,7 @@ public class TestViewPointCreation {
                     viewPointScore=1;
                 }
                 viewPointScore=vpvGeneList.get(i).getviewPointList().get(j).getNumOfSelectedFrags();
-                double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
+                //double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
                         out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
@@ -406,7 +406,7 @@ public class TestViewPointCreation {
      }
 
 
-    /** TODO -- stimmt nicht fuer Maus */
+    /** TODO -- stimmt nicht fuer Maus
     private String getChromosomeString(int c) {
         if (c>0 && c<23) {
             return String.format("chr%d",c);
@@ -433,7 +433,7 @@ public class TestViewPointCreation {
         } else {
             return "???(Could not parse chromosome)";
         }
-    }
+    }*/
 
 
     private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {

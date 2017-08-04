@@ -15,6 +15,7 @@
             <TableColumn fx:id="refSeqIdTableColumn" editable="false" minWidth="60.0" prefWidth="180.0" text="RefSeq ID" />
             <TableColumn fx:id="genPositionTableColumn" editable="false" prefWidth="180.0" text="Genomic Position" />
             <TableColumn fx:id="nSelectedTableColumn" prefWidth="75.0" text="# Selected" />
+            <TableColumn fx:id="viewpointScoreColumn" prefWidth="75.0" text="Score" />
          </columns>
       </TableView>
 
