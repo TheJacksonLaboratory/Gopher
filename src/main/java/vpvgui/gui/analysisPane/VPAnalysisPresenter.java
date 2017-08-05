@@ -32,8 +32,7 @@ import java.util.ResourceBundle;
 public class VPAnalysisPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
     /** This is the message users will see if they open the analysis tab before they have entered the genes
-     * and started the analysis of the viewpoints.
-     */
+     * and started the analysis of the viewpoints. */
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
             "initialize analysis using the Set Up Tab.</p></body></html>";
 

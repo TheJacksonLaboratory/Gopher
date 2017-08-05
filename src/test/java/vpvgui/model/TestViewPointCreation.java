@@ -118,28 +118,6 @@ public class TestViewPointCreation {
             return;
         }
 
-        //JannovarGeneGenerator jgg = new JannovarGeneGenerator(transcriptFile);
-        /* key is a gene symbol,and value is a listof corresponding transcripts. */
-        //validGenes2TranscriptsMap = jgg.checkGenes(symbols);
-        //List<String> validGeneSymbols = jgg.getValidGeneSymbols();
-        //List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
-        //int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
-
-
-        /* print invalid gene symbols to file
-        TODO Ich musste dies hier auskommentieren, Jannovar gibt es in dieser App nicht mehr!
-        String fileName = outPrefix + "_invalid_symbols.txt";
-        PrintStream out_invalid_symbols = new PrintStream(new FileOutputStream(outPath+fileName));
-
-        for(int i = 0; i < invalidGeneSymbols.size(); i++) {
-            out_invalid_symbols.println(invalidGeneSymbols.get(i));
-        }
-        out_invalid_symbols.close();
-        System.out.println("Number of invalid gene symbols: " + invalidGeneSymbols.size());
-        System.out.println("Number of valid gene symbols: " + validGeneSymbols.size());
-        System.out.println("validGenes2TranscriptsMap.size(): " + validGenes2TranscriptsMap.size());
-        */
-
         /* read refSeq.txt to map of TSS lists */
 
         HashMap<String,String> geneMapOfTss = new HashMap<>();
@@ -232,9 +210,23 @@ public class TestViewPointCreation {
             for (int i=0;i<geneMapOfTssLists.get(symbol).size();i++) {
                 String referenceSequenceID = geneMapOfTssLists.get(symbol).get(i).getReferenceSequenceID();
                 Integer gPos = geneMapOfTssLists.get(symbol).get(i).getPos();
-                ViewPoint vp = new ViewPoint(referenceSequenceID,gPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
-                        minFragSize, maxRepFrag,marginSize);
+
+                /** @PeterH: ich habe den Constructor verändert, s. Email! */
+                ViewPoint vp= new ViewPoint.Builder(referenceSequenceID,gPos).
+                        maxDistToGenomicPosUp(maxDistToGenomicPosUp).
+                        maxDistToGenomicPosDown(maxDistToGenomicPosDown).
+                        cuttingPatterns(cuttingPatterns).
+                        fastaReader(fastaReader).
+                        minimumSizeUp(minSizeUp).
+                        maximumSizeUp(maxSizeUp).
+                        maximumSizeDown(maxSizeDown).
+                        minimumSizeDown(minSizeDown).
+                        minimumFragmentSize(minFragSize).
+                        maximumRepeatContent(maxRepFrag).
+                        marginSize(marginSize).
+                        build();
+
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
                // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
@@ -374,9 +366,9 @@ public class TestViewPointCreation {
                     out_fragments.println(getReferenceSequenceID + "\t" + rsStaPos + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k);
 
                     // print margins of selected fragments
-                    for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins(marginSize).size(); l++) {
-                        Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getStartPos();
-                        Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getEndPos();
+                    for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins().size(); l++) {
+                        Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getStartPos();
+                        Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getEndPos();
                         out_fragment_margins.println(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
                         uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol);
                     }

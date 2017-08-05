@@ -27,9 +27,9 @@ public class ViewPointCreationTask extends Task {
     /** Restriction enzyme cuttings patterns (must have at least one) */
     private  String[] cuttingPatterns;
     /** Maximum distance from central position (e.g., transcription start site) of the upstream boundary of the viewpoint.*/
-    private  int maxDistToGenomicPosUp;
+    private  int maxDistanceUp;
     /** Maximum distance from central position (e.g., transcription start site) of the downstream boundary of the viewpoint.*/
-    private  int maxDistToGenomicPosDown;
+    private  int maxDistanceDown;
 
     private int minDistToGenomicPosDown;
 
@@ -67,8 +67,8 @@ public class ViewPointCreationTask extends Task {
         this.fragNumDown=model.fragNumDown();
         this.minSizeUp=model.minSizeUp();
         this.minDistToGenomicPosDown=model.minSizeDown();
-        this.maxDistToGenomicPosUp=model.maxSizeUp();
-        this.maxDistToGenomicPosDown=model.maxSizeDown();
+        this.maxDistanceUp =model.maxSizeUp();
+        this.maxDistanceDown =model.maxSizeDown();
         this.minFragSize=model.minFragSize();
         this.maxRepContent=model.maxRepeatContent();
         //this.cuttingPatterns=model.getCuttingPatterns();
@@ -115,13 +115,23 @@ public class ViewPointCreationTask extends Task {
                 this.fastaReader = new IndexedFastaSequenceFile(new File(path));
                 List<Integer> gPosList = vpvgene.getTSSlist();
                 for (Integer gPos : gPosList) {
-                    ViewPoint vp = new ViewPoint(referenceSequenceID, gPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown,
-                            cuttingPatterns, fastaReader);
-                    vp.setTargetName(vpvgene.getGeneSymbol());
+                    ViewPoint vp = new ViewPoint.Builder(referenceSequenceID,gPos).
+                            targetName(vpvgene.getGeneSymbol()).
+                            maxDistToGenomicPosUp(maxDistanceUp).
+                            maxDistToGenomicPosDown(maxDistanceDown).
+                            cuttingPatterns(this.cuttingPatterns).
+                            fastaReader(this.fastaReader).
+                            minimumSizeUp(minSizeUp).
+                            maximumSizeUp(maxDistanceUp).
+                            minimumSizeDown(minDistToGenomicPosDown).
+                            maximumSizeDown(maxDistanceDown).
+                            minimumFragmentSize(minFragSize).
+                            maximumRepeatContent(maxRepContent).
+                            marginSize(marginSize).
+                            build();
                     updateProgress(i++,total); /* this will update the progress bar */
-                    updateLabelText(this.currentVP,vpvgene.getGeneSymbol());
-                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif, minSizeUp, maxDistToGenomicPosUp, minDistToGenomicPosDown, maxDistToGenomicPosDown,
-                            minFragSize, maxRepContent, marginSize);
+                    updateLabelText(this.currentVP,vpvgene.toString());
+                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif);
                     viewpointlist.add(vp);
                     logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));
                 }

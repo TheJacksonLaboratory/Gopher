@@ -2,6 +2,7 @@ package vpvgui.model.project;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.Test;
+import vpvgui.model.IntPair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -255,7 +256,37 @@ public class ViewPointTest {
 
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
-        ViewPoint testViewpointLupianez = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
+        //ViewPoint testViewpointLupianez = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
+        //        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
+        Integer fragNumUp = 1;
+        Integer fragNumDown = 1;
+        String motif = "GATC";
+        Integer minSizeUp = 20;
+        Integer maxSizeUp = 95;
+        Integer minSizeDown = 20;
+        Integer maxSizeDown = 95;
+        Integer minFragSize = 22;
+        double minRepFrag = 0.4; /* TODO Shouldn't this be maximumAllowableRepeatContent */
+
+        ViewPoint testViewpointLupianez = new ViewPoint.Builder(referenceSequenceID, genomicPos).
+                maxDistToGenomicPosUp(maxDistToGenomicPosUp).
+                maxDistToGenomicPosDown(maxDistToGenomicPosDown).
+                cuttingPatterns(testCuttingPatterns).
+                fastaReader(FastaReader).
+                minimumSizeUp(minSizeUp).
+                minimumSizeDown(minSizeDown).
+                maximumSizeUp(maxSizeUp).
+                maximumSizeDown(maxSizeDown).
+                minimumFragmentSize(minFragSize).
+                maximumRepeatContent(minRepFrag).
+                marginSize(marginSize).
+                build();
+
+        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif);
+
+
+
+
         String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
 
         System.out.println();
@@ -280,17 +311,6 @@ public class ViewPointTest {
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(), testViewpointLupianez.getEndPos());
         printViewPointSegments(testViewpointLupianez, "GATC");
-
-        Integer fragNumUp = 1;
-        Integer fragNumDown = 1;
-        String motif = "GATC";
-        Integer minSizeUp = 20;
-        Integer maxSizeUp = 95;
-        Integer minSizeDown = 20;
-        Integer maxSizeDown = 95;
-        Integer minFragSize = 22;
-        double minRepFrag = 0.4;
-        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
@@ -357,22 +377,38 @@ public class ViewPointTest {
             boolean selected = vp.getRestSegListMap().get(motif).get(i).isSelected();
 
             if (selected) {
-                printSegement(vp.getRestSegListMap().get(motif).get(i), 'T');
+                printSegment(vp.getRestSegListMap().get(motif).get(i), 'T');
             } else {
-                printSegement(vp.getRestSegListMap().get(motif).get(i), 'F');
+                printSegment(vp.getRestSegListMap().get(motif).get(i), 'F');
 
             }
 
-            ArrayList<Segment> marginSegments = vp.getRestSegListMap().get(motif).get(i).getSegmentMargins(3);
+            ArrayList<IntPair> marginSegments = vp.getRestSegListMap().get(motif).get(i).getSegmentMargins();
 
             if (marginSegments.size() == 2) {
-                printSegement(marginSegments.get(0), '>');
-                printSegement(marginSegments.get(1), '<');
+                printIntPair(marginSegments.get(0), '>');
+                printIntPair(marginSegments.get(1), '<');
             }
             if (marginSegments.size() == 1) {
-                printSegement(marginSegments.get(0), '>');
+                printIntPair(marginSegments.get(0), '>');
             }
         }
+    }
+
+    /**
+     * I added this as a replacement for printSegment because of refactoring the code.
+     * @param segment
+     * @param symbol
+     */
+    private void printIntPair(IntPair segment, char symbol) {
+        String s = new String("");
+        for (int i = 0; i < segment.getStartPos(); i++) {
+            s += " ";
+        }
+        for (int i = 0; i < segment.length(); i++) {
+            s += symbol;
+        }
+        System.out.println(s);
     }
 
 
@@ -422,7 +458,7 @@ public class ViewPointTest {
         System.out.println(s);
     }
 
-    private void printSegement(Segment segment, char symbol) {
+    private void printSegment(Segment segment, char symbol) {
 
         String s = new String("");
 

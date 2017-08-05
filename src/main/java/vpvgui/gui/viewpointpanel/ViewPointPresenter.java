@@ -1,9 +1,12 @@
 package vpvgui.gui.viewpointpanel;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -103,6 +106,9 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     void refreshUCSCButtonAction() {
 //        TODO - refresh UCSC action here
+        URLMaker urlmaker = new URLMaker(this.vp.getReferenceID());
+        String url= urlmaker.getURL(vp);
+        this.ucscWebEngine.load(url);
     }
 
 //  TODO - save action here
@@ -144,6 +150,18 @@ public class ViewPointPresenter implements Initializable {
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly
                 checkBox.setSelected(true);
+            checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                public void changed(ObservableValue<? extends Boolean> ov,
+                                    Boolean old_val, Boolean new_val) {
+                    cdf.getValue().getSegment().setSelected(new_val); /* changes the selected value of the Segment */
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            updateScore();
+                        }
+                    });
+
+                }
+            });
             return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
         });
 
@@ -152,13 +170,21 @@ public class ViewPointPresenter implements Initializable {
         endTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getEndPos())));
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
-                .getSegment().getRepetitiveContent())));
+                .getSegment().getRepeatContentAsPercent())));
         repeatContentUp.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginUp())));
         repeatContentDown.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginDown())));
         vpScoreProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
+    }
+
+    private void updateScore() {
+        logger.trace(String.format("***************** TODO updating score for %s",vp.getTargetName()));
+        logger.trace(String.format("***************** OLD score for %.3f",vp.getScore()));
+        this.vp.calculateViewpointScore();
+        logger.trace(String.format("***************** NEW score for %.3f",vp.getScore()));
+        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
     }
 
     public void setModel(Model m) {
@@ -172,7 +198,7 @@ public class ViewPointPresenter implements Initializable {
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-        this.vpScoreProperty.setValue(String.format("%S - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
+        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
         // generate Colored segments - Segment paired with some color.
         segmentsTableView.getItems().addAll(vp.getActiveSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
