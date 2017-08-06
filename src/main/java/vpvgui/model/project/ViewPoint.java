@@ -113,7 +113,6 @@ public class ViewPoint {
                      Integer maxDistToGenomicPosDown,
                      String[] cuttingPatterns,
                      IndexedFastaSequenceFile fastaReader) {
-        logger.trace(String.format("Entering ViewPoint constructor for %s",getTargetName()));
         /* Set fields */
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
@@ -592,7 +591,6 @@ public class ViewPoint {
             logger.error("ERROR: At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
             resolved = false;
         }
-        logger.trace(String.format("found genomicPosFragIdx=%d",genomicPosFragIdx));
         // originating from the centralized fragment containing 'genomicPos' (included) go fragment-wise in UPSTREAM direction
         Integer fragCountUp = 0;
         for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream

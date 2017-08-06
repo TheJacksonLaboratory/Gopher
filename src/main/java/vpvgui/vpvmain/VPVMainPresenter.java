@@ -546,6 +546,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
         File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
@@ -554,6 +555,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
         File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
@@ -562,6 +564,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
         File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
@@ -570,6 +573,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
 
 

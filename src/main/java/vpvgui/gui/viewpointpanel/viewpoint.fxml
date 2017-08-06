@@ -22,19 +22,19 @@
                <children>
                   <Label fx:id="viewpointScoreLabel" styleClass="mylabel" text="." AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="5.0" />
                   <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="110.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
-                  <Button mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="110.0" text="Refresh UCSC" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                  <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="130.0" text="Refresh UCSC" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
                   <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                     <columns>
-                        <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="10.0" prefWidth="10.0" resizable="false" />
                       <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
-                        <TableColumn fx:id="startTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
-                        <TableColumn fx:id="endTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="209.0" text="End" />
-                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="155.0" text="Repeat content" />
-                        <TableColumn fx:id="repeatContentUp" prefWidth="75.0" text="Repeat content (up)" />
-                        <TableColumn fx:id="repeatContentDown" prefWidth="75.0" text="Repeat content (down)" />
+                        <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="220.0" text="Location" />
+                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Repeat content" />
+                        <TableColumn fx:id="repeatContentUp" prefWidth="175.0" text="Repeat content (up)" />
+                        <TableColumn fx:id="repeatContentDown" prefWidth="200.0" text="Repeat content (down)" />
+                        <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
                     </columns>
                   </TableView>
-                  <Button mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="30.0" prefWidth="110.0" text="Save" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="copyToClipboardButton" layoutX="452.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="deleteButton" layoutX="303.0" layoutY="8.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" prefWidth="130.0" text="Delete" AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
         </items>

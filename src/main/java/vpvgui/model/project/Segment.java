@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.IntPair;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +28,7 @@ public class Segment {
     //private Integer genomicPos;
     private IndexedFastaSequenceFile fastaReader;
     private Integer marginSize;
+    private static DecimalFormat formatter = new DecimalFormat("#,###");
 
 
     /* constructor -- we will move to the builder. */
@@ -192,14 +194,20 @@ public class Segment {
     public double getRepeatContentMarginUp() {
         return repeatContentUp;
     }
+    public String getRepeatContentMarginUpAsPercent() { return String.format("%.2f%%",100*repeatContentUp);}
 
     public double getRepeatContentMarginDown() {
         return repeatContentDown;
     }
-
+    public String getRepeatContentMarginDownAsPercent() { return String.format("%.2f%%",100*repeatContentDown);}
 
     public double getMeanMarginRepeatContent() { return 0.5*(repeatContentUp+repeatContentDown);}
 
+    public String getChromosomalPositionString() {
+        String s=formatter.format(startPos);
+        String e=formatter.format(endPos);
+        return String.format("%s:%s-%s",referenceSequenceID,s,e);
+    }
 
 
     /**

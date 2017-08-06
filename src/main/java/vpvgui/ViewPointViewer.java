@@ -38,6 +38,8 @@ public class ViewPointViewer extends Application {
         this.model=presenter.getModel();
         Scene scene = new Scene(appView.getView());
         primaryStage.setTitle("ViewPoint Viewer");
+        primaryStage.setMinWidth(1000);
+        primaryStage.setWidth(1600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

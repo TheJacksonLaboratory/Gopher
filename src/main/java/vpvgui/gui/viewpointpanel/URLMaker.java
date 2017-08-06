@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import vpvgui.model.project.Segment;
 import vpvgui.model.project.ViewPoint;
 
+import javax.swing.text.View;
 import java.util.List;
 
 /**
@@ -25,11 +26,24 @@ public class URLMaker {
 
     public URLMaker(String genome){
         this.genomebuild=genome;
+        logger.trace(String.format("setting genomebuild to %s",genomebuild));
+    }
+
+
+    public String getImageURL(ViewPoint vp) {
+        final String trackType="hgRenderTracks";
+        String url = getDefaultURL(vp,trackType);
+        if (this.genomebuild.equals("hg19")){
+            url=String.format("%s&snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full",url);
+        }
+        return url;
+
     }
 
 
     public String getURL(ViewPoint vp) {
-        String url = getDefaultURL(vp);
+        final String trackType="hgTracks";
+        String url = getDefaultURL(vp,trackType);
         if (this.genomebuild.equals("hg19")){
             url=String.format("%s&snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full",url);
         }
@@ -50,10 +64,11 @@ public class URLMaker {
      *     <li>repeats</li>
      * </ol>
      * This is how: hideTracks=1&<trackName>=full|dense|pack|hide
-     *
+     * @param vp The {@link ViewPoint} object to be displayed on the UCSC browser
+     * @param trackType either "hgTracks" (interactive browser) or "hgRenderTracks" (static image)
      * @return
      */
-    public String getDefaultURL(ViewPoint vp) {
+    public String getDefaultURL(ViewPoint vp, String trackType) {
         int posFrom, posTo;
         posFrom = vp.getStartPos() - offset;
         posTo = vp.getEndPos() + offset;
@@ -62,8 +77,8 @@ public class URLMaker {
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
         String targetItem = vp.getTargetName();
         String highlights = getHighlightRegions(vp,this.genomebuild, chrom);
-        // TODO do we prefer hgRenderTracks ???
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/hgTracks?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=1800", genomebuild, chrom, posFrom, posTo, targetItem, highlights);
+        String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=1800",
+                trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights);
         return url;
     }
 
@@ -71,7 +86,6 @@ public class URLMaker {
     private String getHighlightRegions(ViewPoint vpt, String db, String chrom) {
         StringBuilder sb = new StringBuilder();
         List<Segment> seglst = vpt.getActiveSegments();
-        logger.trace("getHighlightRegions: got number Of Active segments " + seglst.size());
         sb.append("highlight=");
         int i = 0;
         // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
@@ -87,7 +101,6 @@ public class URLMaker {
             }
             sb.append(part);
         }
-
         return sb.toString();
     }
 

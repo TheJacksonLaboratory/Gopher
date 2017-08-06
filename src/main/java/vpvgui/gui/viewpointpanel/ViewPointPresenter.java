@@ -7,9 +7,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
@@ -18,6 +21,7 @@ import vpvgui.model.project.Segment;
 import vpvgui.model.project.ViewPoint;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -74,15 +78,15 @@ public class ViewPointPresenter implements Initializable {
     private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
 
     @FXML
-    private TableColumn<ColoredSegment, String> startTableColumn;
-
-    @FXML
-    private TableColumn<ColoredSegment, String> endTableColumn;
+    private TableColumn<ColoredSegment, String> locationTableColumn;
 
     @FXML
     private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
     @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
     @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
+
+    @FXML private Button deleteButton;
+    @FXML private Button copyToClipboardButton;
 
     /**
      * Reference to the {@link Tab} where this content is placed.
@@ -103,11 +107,29 @@ public class ViewPointPresenter implements Initializable {
         tab.getTabPane().getTabs().remove(tab);
     }
 
+    @FXML private void copyToClipboard(Event e) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
+        String url= urlmaker.getURL(vp);
+        content.putString(url);
+        clipboard.setContent(content);
+        e.consume();
+    }
+
+    @FXML private void deleteThisViewPoint(Event e) {
+        logger.trace("TODO CODE TO DELETE THIS VIEWPOINT GO BACK TO MODEL");
+       // e.g., this.model.deleteThisViewPoint(this.vp);
+        // e.g., analysisTab->refreshTable()
+        // e.g., close this viewpoint Tab
+
+    }
+
     @FXML
     void refreshUCSCButtonAction() {
-//        TODO - refresh UCSC action here
-        URLMaker urlmaker = new URLMaker(this.vp.getReferenceID());
-        String url= urlmaker.getURL(vp);
+        URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
+        String url= urlmaker.getImageURL(vp);
+        logger.trace(String.format("Refresh: %s",url));
         this.ucscWebEngine.load(url);
     }
 
@@ -124,11 +146,59 @@ public class ViewPointPresenter implements Initializable {
                 (Collectors.joining(","))));
     }
 
+
+    class FormattedChromosomeComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            Integer i1 = null;
+            Integer i2 = null;
+            try {
+                int x1 = s1.indexOf(":") + 1;
+                int y1 = s1.indexOf("-");
+                s1 = s1.substring(x1, y1);
+                s1=s1.replaceAll(",", "");
+                int x2 = s2.indexOf(":") + 1;
+                int y2 = s2.indexOf("-");
+                s2 = s2.substring(x2, y2);
+                s2=s2.replaceAll(",", "");
+                i1 = Integer.parseInt(s1);
+                i2 = Integer.parseInt(s2);
+                return i1.compareTo(i2);
+            } catch (Exception e) {
+                logger.error(String.format("Error while sorting chromosome strings s1=%s s2=%s ", s1, s2));
+                logger.error(e,e);
+                return 0;
+            }
+        }
+    }
+
+    /** Class for sorting items like 2.3% and 34.5% */
+    class PercentComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            int i=s1.indexOf("%");
+            if (i>0)
+                s1=s1.substring(0,i);
+            i=s2.indexOf("%");
+            if (i>0)
+                s2=s2.substring(0,i);
+            try {
+                Double d1 = Double.parseDouble(s1);
+                Double d2=Double.parseDouble(s2);
+                return d1.compareTo(d2);
+            } catch (Exception e) {
+                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
+                logger.error(e,e);
+                return 0;
+            }
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
-        /* The following line is needed to avoid a SSL handshake alert
+        /* The following line is needed to avoid an SSL handshake alert
          * when opening the UCSC Browser.
          */
         System.setProperty("jsse.enableSNIExtension", "false");
@@ -165,25 +235,28 @@ public class ViewPointPresenter implements Initializable {
             return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
         });
 
-        startTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
-                .getStartPos())));
-        endTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
-                .getEndPos())));
+        locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
+                .getChromosomalPositionString())));
+        locationTableColumn.setComparator(new FormattedChromosomeComparator());
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepeatContentAsPercent())));
+        inRepetitiveTableColumn.setComparator(new PercentComparator());
+
+
+
+
         repeatContentUp.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getRepeatContentMarginUp())));
+                getSegment().getRepeatContentMarginUpAsPercent())));
+        repeatContentUp.setComparator(new PercentComparator());
         repeatContentDown.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getRepeatContentMarginDown())));
+                getSegment().getRepeatContentMarginDownAsPercent())));
+        repeatContentDown.setComparator(new PercentComparator());
         vpScoreProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
     }
 
     private void updateScore() {
-        logger.trace(String.format("***************** TODO updating score for %s",vp.getTargetName()));
-        logger.trace(String.format("***************** OLD score for %.3f",vp.getScore()));
         this.vp.calculateViewpointScore();
-        logger.trace(String.format("***************** NEW score for %.3f",vp.getScore()));
         this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
     }
 
@@ -211,7 +284,8 @@ public class ViewPointPresenter implements Initializable {
 
         // create url & load content from UCSC
         URLMaker maker = new URLMaker(genome);
-        String url= maker.getURL(vp);
+        String url= maker.getImageURL(vp);
+        logger.trace(String.format("INITIAL: %s",url));
         ucscWebEngine.load(url);
 
     }
