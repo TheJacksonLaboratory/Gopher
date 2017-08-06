@@ -11,11 +11,10 @@
       <TableView fx:id="viewPointTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0">
          <columns>
             <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" />
-            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="60.0" prefWidth="100.0" text="Target" />
-            <TableColumn fx:id="refSeqIdTableColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="120.0" text="Chromosome" />
-            <TableColumn fx:id="genPositionTableColumn" editable="false" prefWidth="180.0" text="Genomic Position" />
-            <TableColumn fx:id="nSelectedTableColumn" prefWidth="75.0" text="# Selected" />
-            <TableColumn fx:id="viewpointScoreColumn" prefWidth="75.0" text="Score" />
+            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
+            <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
+            <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
+            <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
          </columns>
       </TableView>
 

@@ -312,6 +312,8 @@ public class ViewPoint {
         return genomicPos;
     }
 
+    public String getGenomicLocationString() { return String.format("%s:%d",referenceSequenceID,genomicPos);}
+
 
     public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) {
         this.maxDistToGenomicPosUp = maxDistToGenomicPosUp;
@@ -338,6 +340,7 @@ public class ViewPoint {
     public final double getScore() {
         return score;
     }
+    public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
 
     public final void setStartPos(Integer startPos) {

@@ -398,35 +398,6 @@ public class TestViewPointCreation {
      }
 
 
-    /** TODO -- stimmt nicht fuer Maus
-    private String getChromosomeString(int c) {
-        if (c>0 && c<23) {
-            return String.format("chr%d",c);
-        } else if (c==23) {
-            return "chrX";
-        } else if (c==24) {
-            return "chrY";
-        } else if (c==25) {
-            return "chrM";
-        } else {
-            return "???(Could not parse chromosome)";
-        }
-    }
-
-    private String getChromosomeStringMouse(int c) {
-        if (c>0 && c<20) {
-            return String.format("chr%d",c);
-        } else if (c==20) {
-            return "chrX";
-        } else if (c==21) {
-            return "chrY";
-        } else if (c==22) {
-            return "chrM";
-        } else {
-            return "???(Could not parse chromosome)";
-        }
-    }*/
-
 
     private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {
         int n=0;
