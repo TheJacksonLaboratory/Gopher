@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -57,8 +58,8 @@ public class TestViewPointCreation {
 
         /* set parameters for gene and TSS extraction */
 
-        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/genelistsample.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
+        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
 
         /* set initial viewpoint patrameters */
 
@@ -78,13 +79,13 @@ public class TestViewPointCreation {
         minSizeDown = 1500;
         maxSizeDown = 5000;
         minFragSize = 130;
-        maxRepFrag = 0.6;
+        maxRepFrag = 0.4;
         marginSize = 250;
 
         /* set other parameters */
 
         outPath = "/home/peter/IdeaProjects/git_vpv_workspace/VPV/";
-        outPrefix = "gonad_RC06";
+        outPrefix = "gonad_RC04";
     }
 
 
@@ -237,7 +238,7 @@ public class TestViewPointCreation {
                         minFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
-                System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
+                vp.setViewpointScore("GATC",marginSize);
              }
             vpvGeneList.add(vpvgene);
         }
@@ -355,13 +356,17 @@ public class TestViewPointCreation {
                 Integer vpEndPos = vpvGeneList.get(i).getviewPointList().get(j).getEndPos();
                 Integer vpGenomicPos = vpvGeneList.get(i).getviewPointList().get(j).getGenomicPos();
                 String geneSymbol = vpvGeneList.get(i).getGeneSymbol();
-                Integer viewPointScore=0;
+                Integer viewPointScore = 0;
                 if(vpvGeneList.get(i).getviewPointList().get(j).getResolved()) {
                     viewPointScore=1;
                 }
                 viewPointScore=vpvGeneList.get(i).getviewPointList().get(j).getNumOfSelectedFrags();
-                double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
-                        out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
+                vpvGeneList.get(i).getviewPointList().get(j).setViewpointScore("GATC",marginSize);
+                Double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore();
+                DecimalFormat df2 = new DecimalFormat("#.##");
+                viewPointScore2 = Double.valueOf(df2.format(viewPointScore2));
+                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "|" + vpGenomicPos + "|" + viewPointScore + "\t" + viewPointScore2);
+
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
