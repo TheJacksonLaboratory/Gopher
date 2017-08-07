@@ -1,12 +1,8 @@
 package vpvgui.gui.analysisPane;
 
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,7 +10,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
@@ -22,6 +17,7 @@ import vpvgui.model.Model;
 import vpvgui.model.project.ViewPoint;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -30,15 +26,11 @@ import java.util.ResourceBundle;
  * Created by peterrobinson on 7/6/17.
  */
 public class VPAnalysisPresenter implements Initializable {
-
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
-
+    /** This is the message users will see if they open the analysis tab before they have entered the genes
+     * and started the analysis of the viewpoints. */
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
             "initialize analysis using the Set Up Tab.</p></body></html>";
-
-
-
-
 
     @FXML
     private WebView contentWebView;
@@ -55,7 +47,7 @@ public class VPAnalysisPresenter implements Initializable {
     private TableColumn<ViewPoint, String> targetTableColumn;
 
     @FXML
-    private TableColumn<ViewPoint, String> refSeqIdTableColumn;
+    private TableColumn<ViewPoint, String> genomicLocationColumn;
 
     @FXML
     private TableColumn<ViewPoint, String> genPositionTableColumn;
@@ -63,14 +55,14 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> nSelectedTableColumn;
 
+    @FXML private TableColumn<ViewPoint,String> viewpointScoreColumn;
 
 
     private BooleanProperty editingStarted;
 
     private Model model;
     /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
-     * UCSC browser.
-     */
+     * UCSC browser.*/
     private TabPane tabpane;
 
 
@@ -79,10 +71,93 @@ public class VPAnalysisPresenter implements Initializable {
         System.setProperty("jsse.enableSNIExtension", "false");
         contentWebEngine = contentWebView.getEngine();
         contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
-
         initTable();
     }
 
+
+    /** Class for sorting items like 2.3% and 34.5% */
+    class PercentComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            int i=s1.indexOf("%");
+            if (i>0)
+                s1=s1.substring(0,i);
+            i=s2.indexOf("%");
+            if (i>0)
+                s2=s2.substring(0,i);
+            try {
+                Double d1 = Double.parseDouble(s1);
+                Double d2=Double.parseDouble(s2);
+                return d1.compareTo(d2);
+            } catch (Exception e) {
+                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
+                logger.error(e,e);
+                return 0;
+            }
+        }
+    }
+    /**
+     * Class for sorting items like chr3:4325 and chrY:762
+     */
+    class GenomicLocationComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            if (!s1.startsWith("chr"))
+                return 0;
+            if (!s2.startsWith("chr"))
+                return 0; /* should never happen */
+            logger.trace("s1 before=" + s1);
+            s1 = s1.substring(3);
+            s2 = s2.substring(3);
+            logger.trace("s1 after=" + s1);
+            String chromStr1, chromStr2;
+            Integer chr1, chr2;
+            Integer pos1, pos2;
+            try {
+                int i = s1.indexOf(":");
+                if (i > 0) {
+                    chromStr1 = s1.substring(0, i);
+                    pos1=Integer.parseInt(s1.substring(1+i));
+                    if (chromStr1.equals("X")){
+                        chr1=100;
+                    } else if (chromStr1.equals("Y")) {
+                        chr1 = 101;
+                    } else if (chromStr1.startsWith("M")){
+                        chr1=102;
+                    } else {
+                        chr1=Integer.parseInt(chromStr1);
+                    }
+                } else {
+                    return 0;
+                }
+                i = s2.indexOf(":");
+                if (i > 0) {
+                    chromStr2 = s2.substring(0, i);
+                    pos2=Integer.parseInt(s2.substring(1+i));
+                    if (chromStr2.equals("X")){
+                        chr2=100;
+                    } else if (chromStr2.equals("Y")) {
+                        chr2 = 101;
+                    } else if (chromStr2.startsWith("M")){
+                        chr2=102;
+                    } else {
+                        chr2=Integer.parseInt(chromStr2);
+                    }
+                } else {
+                    return 0;
+                }
+                if (! chr1.equals(chr2)) {
+                    return chr1.compareTo(chr2);
+                } else {
+                    return pos1.compareTo(pos2);
+                }
+            } catch (Exception e) {
+                logger.error(String.format("Error encounted while sorting chromosome locations %s and %s", s1, s2));
+                logger.error(e, e);
+                return 0;
+            }
+        }
+    }
 
     /**
      * Set up the table that will show the ViewPoints.
@@ -105,26 +180,23 @@ public class VPAnalysisPresenter implements Initializable {
 
         // the second column
         targetTableColumn.setSortable(true);
+        targetTableColumn.setEditable(false);
         // TODO - do we need editable table?
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
-        targetTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
-                .setTargetName(e.getNewValue()));
 
-        // the third column
-        refSeqIdTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getReferenceID()));
-        refSeqIdTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
-                .setReferenceID(e.getNewValue()));
 
-        // the fourth column
-        genPositionTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
-                .getGenomicPos())));
-        genPositionTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
-                .setGenomicPos(Integer.parseInt(e.getNewValue())));
+        // the third column--position, e.g.,chr4:622712
+        genomicLocationColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGenomicLocationString()));
+        genomicLocationColumn.setComparator(new GenomicLocationComparator());
 
-        // fifth column--number of selected fragments
+
+        // fourth column--number of selected fragments
         nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
-        nSelectedTableColumn.setOnEditCommit(e -> e.getTableView().getItems().get(e.getTablePosition().getRow())
-                .setReferenceID(e.getNewValue()));
+
+
+        // fifth column--score of fragments.
+        viewpointScoreColumn.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScoreAsPercentString())));
+        viewpointScoreColumn.setComparator(new PercentComparator());
     }
 
 
@@ -172,7 +244,7 @@ public class VPAnalysisPresenter implements Initializable {
         ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
         contentWebEngine.loadContent(htmlgen.getHTML());
 
-        ObservableList<VPRow> viewpointlist = FXCollections.observableArrayList();
+        ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
         if (model==null) {
             System.err.println("[ERROR] VPAnalysisPresenter -- model null, should never happen" );
             return;
@@ -180,7 +252,7 @@ public class VPAnalysisPresenter implements Initializable {
         List<ViewPoint> vpl = this.model.getViewPointList();
         logger.trace("In showVPTable: got a total of "+vpl.size() + " VPVGenes");
         for (ViewPoint v : vpl) {
-            viewpointlist.add(new VPRow(v,this.model));
+            viewpointlist.add(v);
         }
         viewPointTableView.getItems().addAll(vpl);
         viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -189,12 +261,12 @@ public class VPAnalysisPresenter implements Initializable {
 
     private TableColumn createTextColumn(String name, String caption) {
         TableColumn column = new TableColumn(caption);
-        appendEditListeners(column);
-        column.setCellValueFactory(new PropertyValueFactory<VPRow, String>(name));
+        //appendEditListeners(column);
+        column.setCellValueFactory(new PropertyValueFactory<ViewPoint, String>(name));
         column.setCellFactory(TextFieldTableCell.forTableColumn());
         return column;
     }
-
+/*
     private void appendEditListeners(TableColumn column) {
         column.setOnEditStart(new EventHandler() {
             @Override
@@ -209,5 +281,5 @@ public class VPAnalysisPresenter implements Initializable {
             }
         });
 
-    }
+    }*/
 }

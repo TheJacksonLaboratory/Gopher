@@ -58,8 +58,8 @@ public class TestViewPointCreation {
 
         /* set parameters for gene and TSS extraction */
 
-        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/mm9_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
-        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
+        transcriptFile= "/home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser"; // /home/peter/IdeaProjects/git_vpv_workspace/VPV/hg19_ucsc.ser // /Users/hansep/IdeaProjects/VPV/mm9_ucsc.ser
+        geneFile="/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/genelistsample.txt"; // "/home/peter/IdeaProjects/git_vpv_workspace/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt" /Users/hansep/IdeaProjects/VPV/src/test/resources/CaptureC_gonad_gene_list_edit2.txt
 
         /* set initial viewpoint patrameters */
 
@@ -79,13 +79,13 @@ public class TestViewPointCreation {
         minSizeDown = 1500;
         maxSizeDown = 5000;
         minFragSize = 130;
-        maxRepFrag = 0.4;
+        maxRepFrag = 0.6;
         marginSize = 250;
 
         /* set other parameters */
 
         outPath = "/home/peter/IdeaProjects/git_vpv_workspace/VPV/";
-        outPrefix = "gonad_RC04";
+        outPrefix = "gonad_RC06";
     }
 
 
@@ -118,28 +118,6 @@ public class TestViewPointCreation {
             ErrorWindow.display("Error retrieving Jannovar transcript file","Generate Jannovar transcript file before loading genes.");
             return;
         }
-
-        //JannovarGeneGenerator jgg = new JannovarGeneGenerator(transcriptFile);
-        /* key is a gene symbol,and value is a listof corresponding transcripts. */
-        //validGenes2TranscriptsMap = jgg.checkGenes(symbols);
-        //List<String> validGeneSymbols = jgg.getValidGeneSymbols();
-        //List<String> invalidGeneSymbols= jgg.getInvalidGeneSymbols();
-        //int n_transcripts = getNTranscripts(validGenes2TranscriptsMap);
-
-
-        /* print invalid gene symbols to file
-        TODO Ich musste dies hier auskommentieren, Jannovar gibt es in dieser App nicht mehr!
-        String fileName = outPrefix + "_invalid_symbols.txt";
-        PrintStream out_invalid_symbols = new PrintStream(new FileOutputStream(outPath+fileName));
-
-        for(int i = 0; i < invalidGeneSymbols.size(); i++) {
-            out_invalid_symbols.println(invalidGeneSymbols.get(i));
-        }
-        out_invalid_symbols.close();
-        System.out.println("Number of invalid gene symbols: " + invalidGeneSymbols.size());
-        System.out.println("Number of valid gene symbols: " + validGeneSymbols.size());
-        System.out.println("validGenes2TranscriptsMap.size(): " + validGenes2TranscriptsMap.size());
-        */
 
         /* read refSeq.txt to map of TSS lists */
 
@@ -233,12 +211,26 @@ public class TestViewPointCreation {
             for (int i=0;i<geneMapOfTssLists.get(symbol).size();i++) {
                 String referenceSequenceID = geneMapOfTssLists.get(symbol).get(i).getReferenceSequenceID();
                 Integer gPos = geneMapOfTssLists.get(symbol).get(i).getPos();
-                ViewPoint vp = new ViewPoint(referenceSequenceID,gPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
-                        minFragSize, maxRepFrag,marginSize);
+
+                /** @PeterH: ich habe den Constructor verändert, s. Email! */
+                ViewPoint vp= new ViewPoint.Builder(referenceSequenceID,gPos).
+                        maxDistToGenomicPosUp(maxDistToGenomicPosUp).
+                        maxDistToGenomicPosDown(maxDistToGenomicPosDown).
+                        cuttingPatterns(cuttingPatterns).
+                        fastaReader(fastaReader).
+                        minimumSizeUp(minSizeUp).
+                        maximumSizeUp(maxSizeUp).
+                        maximumSizeDown(maxSizeDown).
+                        minimumSizeDown(minSizeDown).
+                        minimumFragmentSize(minFragSize).
+                        maximumRepeatContent(maxRepFrag).
+                        marginSize(marginSize).
+                        build();
+
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
-                vp.setViewpointScore("GATC",marginSize);
+               // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
              }
             vpvGeneList.add(vpvgene);
         }
@@ -361,12 +353,8 @@ public class TestViewPointCreation {
                     viewPointScore=1;
                 }
                 viewPointScore=vpvGeneList.get(i).getviewPointList().get(j).getNumOfSelectedFrags();
-                vpvGeneList.get(i).getviewPointList().get(j).setViewpointScore("GATC",marginSize);
-                Double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore();
-                DecimalFormat df2 = new DecimalFormat("#.##");
-                viewPointScore2 = Double.valueOf(df2.format(viewPointScore2));
-                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "|" + vpGenomicPos + "|" + viewPointScore + "\t" + viewPointScore2);
-
+                //double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
+                        out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
@@ -379,9 +367,9 @@ public class TestViewPointCreation {
                     out_fragments.println(getReferenceSequenceID + "\t" + rsStaPos + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k);
 
                     // print margins of selected fragments
-                    for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins(marginSize).size(); l++) {
-                        Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getStartPos();
-                        Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins(marginSize).get(l).getEndPos();
+                    for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins().size(); l++) {
+                        Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getStartPos();
+                        Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getEndPos();
                         out_fragment_margins.println(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
                         uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol);
                     }
@@ -410,35 +398,6 @@ public class TestViewPointCreation {
         System.out.println("totalLengthOfMargins: " + totalLengthOfMargins);
      }
 
-
-    /** TODO -- stimmt nicht fuer Maus */
-    private String getChromosomeString(int c) {
-        if (c>0 && c<23) {
-            return String.format("chr%d",c);
-        } else if (c==23) {
-            return "chrX";
-        } else if (c==24) {
-            return "chrY";
-        } else if (c==25) {
-            return "chrM";
-        } else {
-            return "???(Could not parse chromosome)";
-        }
-    }
-
-    private String getChromosomeStringMouse(int c) {
-        if (c>0 && c<20) {
-            return String.format("chr%d",c);
-        } else if (c==20) {
-            return "chrX";
-        } else if (c==21) {
-            return "chrY";
-        } else if (c==22) {
-            return "chrM";
-        } else {
-            return "???(Could not parse chromosome)";
-        }
-    }
 
 
     private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {

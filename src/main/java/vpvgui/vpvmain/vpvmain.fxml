@@ -32,6 +32,7 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                               <MenuItem mnemonicParsing="false" text="New" />
+                              <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
@@ -39,9 +40,13 @@
                         <items>
                           <MenuItem mnemonicParsing="false" text="Delete" />
                               <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
-                              <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
                         </items>
                       </Menu>
+                        <Menu mnemonicParsing="false" text="Proxy">
+                          <items>
+                              <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                   <Region prefHeight="30.0" prefWidth="399.0" HBox.hgrow="SOMETIMES" />

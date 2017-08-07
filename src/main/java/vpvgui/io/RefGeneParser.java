@@ -102,7 +102,7 @@ public class RefGeneParser {
 
 
 
-    /** @return A list of those symbols uploaded by the user that could NOT be found in the Jannovar serialized file.*/
+    /** @return A sorted list of those symbols uploaded by the user that could NOT be found in the {@code refGene.txt.gz} file.*/
     public List<String> getInvalidGeneSymbols() {
         List<String> lst = new ArrayList<>();
         lst.addAll(invalidGeneSymbols);
@@ -110,7 +110,7 @@ public class RefGeneParser {
         return lst;
     }
 
-    /** @return A list of those symbols uploaded by the user that could be found in the Jannovar serialized file.*/
+    /** @return A sorted list of those symbols uploaded by the user that could be found in the {@code refGene.txt.gz} file.*/
     public List<String> getValidGeneSymbols() {
         List<String> lst = new ArrayList<>();
         lst.addAll(validGeneSymbols);
@@ -119,18 +119,16 @@ public class RefGeneParser {
     }
 
     /** The user uploads a list of gene symbols. This function checks this list against the gene symbols that
-     * are contained in the corresponding Jannovar serialized file. For each symbol, if it is found in the
-     * jannovar serilaized file, the symbol is placed in a {@code Map<String,VPVGene>} as the key,
-     * and the corresponding {@link VPVGene} object is placed as the value (thelatter has all the transcript start sites).
-     * This map is returned for all valid (found) gene symbols. The valid gene symbols
-     * (those found in the refGene.txt.gz file) are also placed in the Set {@link #validGeneSymbols},
+     * are contained in the corresponding {@code refGene.txt.gz} file. Each uploaded symbol that is found in the
+     * {@code refGene.txt.gz}  file is placed in a {@code Map<String,VPVGene>} as the key,
+     * and the corresponding {@link VPVGene} object is placed in the Set {@link #validGeneSymbols},
      * and all uploaded gene symbols that are not found there are placed in the Set {@link #invalidGeneSymbols}.
      * @param genelst List of gene symbols uploaded by the user.
      * @return map of valid symbols and  {@link VPVGene} objects
      */
     public void checkGenes(List<String> genelst) {
         if (genelst==null) {
-            System.err.println("[ERROR] First initialize the gene list and then runm this test");
+            logger.error("[ERROR] First initialize the gene list and then runm this test");
             System.exit(1); /* todo add exception here. */
         }
         this.invalidGeneSymbols = new HashSet<>();
@@ -138,11 +136,11 @@ public class RefGeneParser {
         Set<String> geneset = new HashSet<>();
         for (String s:genelst) {geneset.add(s);}
         /** key: gene symbol, value: list of corresponding transcripts. */
-        Map<String,VPVGene> transcriptmap =new HashMap<>();
+        //Map<String,VPVGene> transcriptmap =new HashMap<>();
         for (String sym:genelst) {
             if (this.genemap.containsKey(sym)) {
                 validGeneSymbols.add(sym);
-                transcriptmap.put(sym, this.genemap.get(sym));
+                //transcriptmap.put(sym, this.genemap.get(sym));
             } else {
                 invalidGeneSymbols.add(sym);
             }

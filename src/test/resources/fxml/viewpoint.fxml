@@ -19,7 +19,7 @@
               <columns>
                   <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="10.0" prefWidth="10.0" resizable="false" />
                 <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
-                  <TableColumn fx:id="startTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
+                  <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="131.0" text="Start" />
                   <TableColumn fx:id="endTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="209.0" text="End" />
                   <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="355.0" text="In repetitive region" />
               </columns>

@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
@@ -35,6 +33,7 @@ import vpvgui.io.*;
 import vpvgui.model.Initializer;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
+import vpvgui.model.project.ViewPoint;
 import vpvgui.model.project.ViewPointCreationTask;
 
 import java.io.File;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 import static vpvgui.io.Platform.getDefaultProjectPath;
 
@@ -159,6 +157,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML MenuItem openMouseGeneWindow;
     @FXML MenuItem openRatGeneWindow;
     @FXML MenuItem openFlyGeneWindow;
+    @FXML MenuItem exportBEDFilesMenuItem;
 
 
     @FXML
@@ -528,6 +527,10 @@ public class VPVMainPresenter implements Initializable {
         window.showAndWait();
         int port=presenter.getPort();
         String proxy=presenter.getProxy();
+        if (proxy==null) {
+            ErrorWindow.display("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
+            return;
+        }
         this.model.setHttpProxy(proxy);
         this.model.setHttpProxyPort(port);
         logger.info("Set proxy to "+proxy);
@@ -549,6 +552,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
         File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
@@ -557,6 +561,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
         File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
@@ -565,6 +570,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
         File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
@@ -573,6 +579,30 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+    }
+
+    @FXML public void exportBEDFiles(ActionEvent e) {
+        List<ViewPoint> vplist=this.model.getViewPointList();
+        if (vplist==null || vplist.isEmpty()) {
+            ErrorWindow.display("Attempt to export empty BED files","Complete generation and analysis of ViewPoints before exporting to BED!");
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for exporting BED files.");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath()=="") {
+            ErrorWindow.display("Error","Could not get path to export BED files.");
+            return;
+        }
+        String prefix="testprefix";
+        BEDFileExporter exporter = new BEDFileExporter(file.getAbsolutePath(),prefix);
+        try {
+            exporter.printRestFragsToBed(this.model.getViewPointList());
+        } catch (Exception exc) {
+            ErrorWindow.displayException("Could not save data to BED files", exc.getMessage(),exc);
+        }
+        e.consume();
     }
 
 

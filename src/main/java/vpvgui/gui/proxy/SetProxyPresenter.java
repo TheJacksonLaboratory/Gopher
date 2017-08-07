@@ -11,7 +11,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.util.converter.NumberStringConverter;
 import vpvgui.framework.Signal;
 
@@ -29,6 +31,9 @@ public class SetProxyPresenter implements Initializable {
     private TextField proxyTextField;
     @FXML private TextField portTextField;
     private Consumer<Signal> signal;
+    @FXML private Label proxyLabel;
+
+    private Tooltip ttip;
 
     private IntegerProperty portProperty= new SimpleIntegerProperty();
     public IntegerProperty portProperty() { return portProperty;  }
@@ -47,8 +52,7 @@ public class SetProxyPresenter implements Initializable {
                 String oldValue, String newValue) {
             validateInteger(portTextField);
         }
-
-    });
+        });
 
         this.proxyTextField.textProperty().bindBidirectional(proxyProperty);
         this.proxyTextField.textProperty().addListener(new ChangeListener<String>(){
@@ -58,6 +62,11 @@ public class SetProxyPresenter implements Initializable {
             }
 
         });
+        this.ttip= new Tooltip();
+        ttip.setText("Do not enter \"http://\" or \"https://\" here");
+        this.proxyLabel.setTooltip(ttip);
+        this.proxyTextField.setTooltip(ttip);
+
     }
 
     /** This function adds a red border to the Port text field if the user enters something
@@ -91,7 +100,7 @@ public class SetProxyPresenter implements Initializable {
         boolean invalidUrl=false;
         String url=tf.getText().trim();
         int i=url.indexOf("http://");
-        if (i<0)
+        if (i>=0)
             invalidUrl=true;
         /* now look for at least one "." in the URL */
         i=url.indexOf(".",i+1);

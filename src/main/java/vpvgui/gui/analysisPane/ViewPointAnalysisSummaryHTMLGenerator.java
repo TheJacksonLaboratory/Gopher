@@ -26,20 +26,22 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         int ngenes=model.getVPVGeneList().size();
         long total_size=0;
         long total_active_frags=0;
+        double total_score=0d;
         for (ViewPoint vp:vplist) {
             total_size += vp.getEndPos()-vp.getStartPos();
             total_active_frags += vp.getNumOfSelectedFrags();
+            total_score += vp.getScore();
             /* todo -- other quality parameters!! */
         }
         double avg_n_frag=(double)total_active_frags/nviewpoints;
         double avg_size=(double)total_size/nviewpoints;
+        double avg_score=(double)100*total_score/nviewpoints;
         String lst=String.format("<ul><li>Number of genes: %d</li>"+
         "<li>Number of viewpoints: %d</li>"+
         "<li>Average number of active fragments per viewpoint: %.1f</li>"+
+         "<li>Average viewpoint score: %.2f%%</li>"+
         "<li>Average viewpoint size: %.1f nucleotides</li></ul>",
-                ngenes,nviewpoints,avg_n_frag,avg_size);
-
-
+                ngenes,nviewpoints,avg_n_frag,avg_score,avg_size);
         return String.format("%s\n%s\n%s\n",HTML_HEADER,lst,HTML_FOOTER);
     }
 

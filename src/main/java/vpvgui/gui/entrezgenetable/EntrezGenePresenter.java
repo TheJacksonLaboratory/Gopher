@@ -123,8 +123,13 @@ public class EntrezGenePresenter implements Initializable {
             return;
         }
         logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
-        this.parser = new RefGeneParser(path);
-        parser.checkGenes(this.symbols);
+        try {
+            this.parser = new RefGeneParser(path);
+            parser.checkGenes(this.symbols);
+        } catch (Exception exc) {
+            ErrorWindow.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
         List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
         int n_transcripts = parser.n_totalTSSstarts();
