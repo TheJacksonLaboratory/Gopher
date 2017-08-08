@@ -57,7 +57,7 @@ public class URLMaker {
     }
     /** These are the things to hide and show to get a nice hg19 image. */
     public String getURLFragmentHg19() {
-        return "snp147Common=hide&amp;gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+        return "snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     public String getURLFragmentMm9() {

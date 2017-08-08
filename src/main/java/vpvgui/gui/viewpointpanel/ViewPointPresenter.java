@@ -7,24 +7,31 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
 import vpvgui.model.project.Segment;
 import vpvgui.model.project.ViewPoint;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import static vpvgui.util.Utils.join;
 
 /**
  * This class acts as a controller of the TabPanes which display individual ViewPoints. Created by peter on 16.07.17.
@@ -124,9 +131,40 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
+        for (ColoredSegment cseg : coloredsegments) {
+            logger.trace("Color segment for " + cseg.segment.toString() +", which is selected?="+cseg.segment.isSelected());
+        }
         String url= urlmaker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("Refresh: %s",url));
+
+        StackPane sproot = new StackPane();
+        final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
+        this.ucscWebEngine = ucscContentWebView.getEngine();
         this.ucscWebEngine.load(url);
+
+        // updating progress bar using binding
+        //progress.progressProperty().bind(this.ucscWebEngine.getLoadWorker().progressProperty()); TODO not working
+        progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        sproot.getChildren().addAll(progress);
+
+        Scene scene = new Scene(sproot, 75, 75);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.show();
+
+        this.ucscWebEngine.getLoadWorker().stateProperty().addListener(
+                new ChangeListener<Worker.State>() {
+                    @Override
+                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
+                        if (newState == Worker.State.SUCCEEDED) {
+                            // hide progress bar then page is ready
+                            progress.setVisible(false);
+                            stage.close();
+                        }
+                    }
+                });
+
+
     }
 
 //  TODO - save action here
@@ -329,29 +367,21 @@ public class ViewPointPresenter implements Initializable {
      * @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>.
      * . */
     private String getHighlightRegions() {
-        StringBuilder sb = new StringBuilder();
-        //List<Segment> seglst = vpt.getActiveSegments();
-        sb.append("highlight=");
         String genome = this.model.getGenomeBuild();
         String chromosome=this.vp.getReferenceID();
-        int i = 0;
+        List<String> colorsegmentlist=new ArrayList<>();
         for (ColoredSegment cseg: coloredsegments) {
            Segment s=cseg.segment;
             Integer start = s.getStartPos();
             Integer end = s.getEndPos();
-            String color = cseg.color;
-            if (i > 0) {
-                sb.append("%7C"); /* add a separator after the first color */
-            }
+            String color = cseg.getColor();
             // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
             if (color!=null) { /* Not able to get UCSC to show light gray */
                 String part = String.format("%s.%s%%3A%d-%d%s", genome, chromosome, start, end, color);
-                sb.append(part);
-                i++; /* a flag to indicate we have already appended one color. */
+                colorsegmentlist.add(part);
             }
-
         }
-        return sb.toString();
+        return String.format("highlight=%s", join(colorsegmentlist,"%7C"));
     }
 
     /**
