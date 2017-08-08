@@ -91,6 +91,12 @@ public class ViewPointPresenter implements Initializable {
     private ViewPoint vp;
 
     private int coloridx = 0;
+    /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
+     * well as in the table.
+     */
+    private List<ColoredSegment> coloredsegments;
+
+
 
     @FXML
     void closeButtonAction() {
@@ -101,7 +107,7 @@ public class ViewPointPresenter implements Initializable {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
-        String url= urlmaker.getURL(vp);
+        String url= urlmaker.getURL(vp,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
         e.consume();
@@ -118,7 +124,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
-        String url= urlmaker.getImageURL(vp);
+        String url= urlmaker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("Refresh: %s",url));
         this.ucscWebEngine.load(url);
     }
@@ -242,6 +248,8 @@ public class ViewPointPresenter implements Initializable {
         repeatContentDown.setComparator(new PercentComparator());
         vpScoreProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
+        /* the following will start us off with a different color each time. */
+        this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }
 
     private void updateScore() {
@@ -262,9 +270,10 @@ public class ViewPointPresenter implements Initializable {
         this.vp = vp;
         this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
         // generate Colored segments - Segment paired with some color.
-        segmentsTableView.getItems().addAll(vp.getActiveSegments().stream()
+        this.coloredsegments = vp.getActiveSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        segmentsTableView.getItems().addAll(coloredsegments);
 
         // prepare url parts
         String genome = this.model.getGenomeBuild();
@@ -273,7 +282,9 @@ public class ViewPointPresenter implements Initializable {
 
         // create url & load content from UCSC
         URLMaker maker = new URLMaker(genome);
-        String url= maker.getImageURL(vp);
+        String re=this.model.getRestrictionEnzymeString().replaceAll("^","");
+        maker.setEnzyme(re);
+        String url= maker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("INITIAL: %s",url));
         ucscWebEngine.load(url);
 
@@ -311,12 +322,46 @@ public class ViewPointPresenter implements Initializable {
     }
 
 
+
+
+    /**
+     * Creates a string to show highlights. Nonselected regions are highlighted in very light grey.
+     * @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>.
+     * . */
+    private String getHighlightRegions() {
+        StringBuilder sb = new StringBuilder();
+        //List<Segment> seglst = vpt.getActiveSegments();
+        sb.append("highlight=");
+        String genome = this.model.getGenomeBuild();
+        String chromosome=this.vp.getReferenceID();
+        int i = 0;
+        for (ColoredSegment cseg: coloredsegments) {
+           Segment s=cseg.segment;
+            Integer start = s.getStartPos();
+            Integer end = s.getEndPos();
+            String color = cseg.color;
+            if (i > 0) {
+                sb.append("%7C"); /* add a separator after the first color */
+            }
+            // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
+            if (color!=null) { /* Not able to get UCSC to show light gray */
+                String part = String.format("%s.%s%%3A%d-%d%s", genome, chromosome, start, end, color);
+                sb.append(part);
+                i++; /* a flag to indicate we have already appended one color. */
+            }
+
+        }
+        return sb.toString();
+    }
+
     /**
      * Container for binding Segment
      */
     private class ColoredSegment {
 
         private String color;
+
+        private final static String VERYLIGHTGREY="E8E8EE";
 
         private Segment segment;
 
@@ -333,7 +378,11 @@ public class ViewPointPresenter implements Initializable {
         }
 
         public String getColor() {
-            return color;
+            if (this.segment.isSelected())
+                return color;
+            else
+                return null;
+
         }
 
         public Segment getSegment() {
