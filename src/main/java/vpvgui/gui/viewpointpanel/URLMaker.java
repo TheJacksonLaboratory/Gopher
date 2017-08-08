@@ -34,7 +34,9 @@ public class URLMaker {
         final String trackType="hgRenderTracks";
         String url = getDefaultURL(vp,trackType);
         if (this.genomebuild.equals("hg19")){
-            url=String.format("%s&snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full",url);
+            url=String.format("%s&%s",url,getURLFragmentHg19());
+        } else if (this.genomebuild.equals("mm9")) {
+            url = String.format("%s&%s",url,getURLFragmentMm9());
         }
         return url;
 
@@ -45,9 +47,19 @@ public class URLMaker {
         final String trackType="hgTracks";
         String url = getDefaultURL(vp,trackType);
         if (this.genomebuild.equals("hg19")){
-            url=String.format("%s&snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full",url);
+            url=String.format("%s&%s",url,getURLFragmentHg19());
+        }  else if (this.genomebuild.equals("mm9")) {
+            url = String.format("%s&%s",url,getURLFragmentMm9());
         }
         return url;
+    }
+    /** These are the things to hide and show to get a nice hg19 image. */
+    public String getURLFragmentHg19() {
+        return "snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+    }
+    /** These are the things to hide and show to get a nice mm9 image. */
+    public String getURLFragmentMm9() {
+        return "&knownGene=hide&refGene=full&stsMapMouseNew=hide&hgFind.matches=Slc12a1&pix=1400&xenoRefGene=hide&blastHg18KG=hide&ensGene=hide&pubs=hide&intronEST=hide&snp128=hide&oreganno=full";
     }
 
 

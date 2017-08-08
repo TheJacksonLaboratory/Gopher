@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
-import vpvgui.framework.Signal;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
@@ -188,7 +187,7 @@ public class VPVMainPresenter implements Initializable {
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
-            setGenomeBuild(newValue);
+            resetGenomeBuild(newValue);
         }));
         initializeBindings();
         initializePromptTextsToDefaultValues();
@@ -283,11 +282,18 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
-
-    private void setGenomeBuild(String build) {
+    /** This gets called when the user chooses a new genome build. They need to do download, uncompression, indexing and
+     * also get the corresponding transcript file.
+     * @param build
+     */
+    private void resetGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
+        this.transcriptDownloadPI.setProgress(0.0);
+        this.genomeDownloadPI.setProgress(0.0);
+        this.genomeIndexPI.setProgress(0.0);
+        this.genomeDecompressPI.setProgress(0.0);
     }
 
     public Model getModel() { return this.model; }
