@@ -103,6 +103,9 @@ public class ViewPointCreationTask extends Task {
         int total=getTotalViewpoints();
         int i=0;
 
+        int maxSizeUp=1500;
+        int maxSizeDown=1500;
+
         for (VPVGene vpvgene:this.vpvGeneList) {
             String referenceSequenceID = vpvgene.getContigID();/* Usually a chromosome */
             //logger.trace("Retrieving indexed fasta file for contig: "+referenceSequenceID);
@@ -131,7 +134,7 @@ public class ViewPointCreationTask extends Task {
                             build();
                     updateProgress(i++,total); /* this will update the progress bar */
                     updateLabelText(this.currentVP,vpvgene.toString());
-                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif);
+                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,maxSizeUp,maxSizeDown);
                     viewpointlist.add(vp);
                     logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));
                 }

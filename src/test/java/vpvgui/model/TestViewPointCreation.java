@@ -227,7 +227,7 @@ public class TestViewPointCreation {
                         marginSize(marginSize).
                         build();
 
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif);
+                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,maxSizeUp,maxSizeDown);
                 vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
                // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;

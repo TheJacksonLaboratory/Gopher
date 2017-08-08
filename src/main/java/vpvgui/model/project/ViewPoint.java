@@ -41,9 +41,9 @@ public class ViewPoint {
     private String targetName;
     /** central genomic coordinate of the viewpoint, usually a trancription start site */
     private Integer genomicPos;
-    /** The viewpoint must be located within the interval [{@link #maxDistToGenomicPosUp},{@link #maxDistToGenomicPosDown}] with respect to {@link #startPos}. */
+    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosUp;
-    /** The viewpoint must be located within the interval [{@link #maxDistToGenomicPosUp},{@link #maxDistToGenomicPosDown}] with respect to {@link #startPos}*/
+    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosDown;
     /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}. */
     private Integer minDistToGenomicPosUp;
@@ -570,7 +570,9 @@ public class ViewPoint {
      */
     public void generateViewpointLupianez(Integer fragNumUp,
                                           Integer fragNumDown,
-                                          String motif) {
+                                          String motif,
+                                          Integer maxSizeUp,
+                                          Integer maxSizeDown) {
 
         boolean resolved = true;
         logger.trace("entering generateViewpointLupianez for motif="+motif);
@@ -606,7 +608,7 @@ public class ViewPoint {
 
             // set fragments to 'false' that are not entirely within the allowed range
             Integer upLen = genomicPos - segment.getStartPos();
-            if (this.maxDistToGenomicPosUp < upLen) {
+            if (maxSizeUp < upLen) { /* am 8. August korrigiert TODO ueberpruefen! */
                 segment.setSelected(false);
             }
 
@@ -654,7 +656,7 @@ public class ViewPoint {
 
             // set fragments to 'false' that are not entirely within the allowed range
             Integer downLen = genomicPos - segment.getEndPos();
-            if (this.maxDistToGenomicPosDown < -downLen) {
+            if (maxSizeDown < -downLen) { /* am 8. August korrigiert TODO ueberpruefen! */
                 segment.setSelected(false);
             }
 

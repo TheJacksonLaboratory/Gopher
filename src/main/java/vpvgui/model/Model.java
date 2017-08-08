@@ -33,6 +33,7 @@ public class Model {
     /** The enzymes chosen by the user for ViewPoint production. */
     private List<RestrictionEnzyme> chosenEnzymelist=null;
     private List<ViewPoint> viewpointList=null;
+    /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
     /** Directory to which the Genome was downloaded */
     private String genomeDirectoryPath=null;
