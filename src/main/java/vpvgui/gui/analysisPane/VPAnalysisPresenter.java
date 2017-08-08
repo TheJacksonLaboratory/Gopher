@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * TODO - do we need to update entries in the TableView? Are they read-only?
+ *
  * Created by peterrobinson on 7/6/17.
  */
 public class VPAnalysisPresenter implements Initializable {
@@ -49,8 +49,8 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> genomicLocationColumn;
 
-    @FXML
-    private TableColumn<ViewPoint, String> genPositionTableColumn;
+    //@FXML
+    //private TableColumn<ViewPoint, String> genPositionTableColumn;
 
     @FXML
     private TableColumn<ViewPoint, String> nSelectedTableColumn;
@@ -181,7 +181,7 @@ public class VPAnalysisPresenter implements Initializable {
         // the second column
         targetTableColumn.setSortable(true);
         targetTableColumn.setEditable(false);
-        // TODO - do we need editable table?
+
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
 
 

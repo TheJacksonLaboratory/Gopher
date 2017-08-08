@@ -37,37 +37,27 @@ public class ViewPointPresenter implements Initializable {
             "Browser to visualized view point...</i></p></body></html>";
 
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int OFFSET = 200;
+    private static final int OFFSET = 250;
 
     private static final int UCSC_WIDTH = 1600;
 
     private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F", "8D230F", "A1D6E2",
             "EC96A4", "E6DF44", "E4EA8C"};
 
-    /**
-     * This is the top-level Pane which contains all other graphical elements of this controller.
-     */
+    /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
     private ScrollPane contentScrollPane;
 
-    /**
-     * The graphical element where the UCSC browser content is displayed.
-     */
+    /** The graphical element where the UCSC browser content is displayed.*/
     @FXML
     private WebView ucscContentWebView;
-
+    /** This will be dynamically set to the name of the gene and the score of the viewpoint. TODO also set name of promoter */
     @FXML private Label viewpointScoreLabel;
-
+    /** This is use to mediate between {@link #viewpointScoreLabel} and the ViewPoint object and score . */
     private StringProperty vpScoreProperty;
-
-    /**
-     * The backend behind the UCSC browser content. The non-visual object capable of managing one Web page at a time.
-     */
+    /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
-
-    /**
-     * Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.
-     */
+    /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     @FXML
     private TableView<ColoredSegment> segmentsTableView;
 
@@ -141,8 +131,7 @@ public class ViewPointPresenter implements Initializable {
                 .filter(ColoredSegment::isSelected)
                 .collect(Collectors
                         .toList());
-
-        System.err.println(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
+        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
                 (Collectors.joining(","))));
     }
 
