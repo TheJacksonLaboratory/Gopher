@@ -3,7 +3,6 @@ package vpvgui.model;
 
 import javafx.beans.property.*;
 import org.apache.log4j.Logger;
-import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
@@ -104,6 +103,23 @@ public class Model {
     public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
+
+
+    private IntegerProperty probeLengthProperty=new SimpleIntegerProperty();
+    public IntegerProperty getProbeLengthProperty() { return probeLengthProperty;}
+    public int getProbeLength() { return probeLengthProperty.intValue(); }
+
+    private int totalNumberOfProbeNucleotides;
+    public void setTotalNumberOfProbeNucleotides(int n) { this.totalNumberOfProbeNucleotides=n;}
+    public int getTotalNumberOfProbeNucleotides() {return this.totalNumberOfProbeNucleotides;}
+
+    private DoubleProperty tilingFactorProperty =new SimpleDoubleProperty();
+    public DoubleProperty getTilingFactorProperty() { return tilingFactorProperty;    }
+    public double getTilingFactor(){return tilingFactorProperty.doubleValue(); }
+
+    public IntegerProperty maximumAllowedRepeatOverlapProperty=new SimpleIntegerProperty();
+    public IntegerProperty getMaximumAllowedRepeatOverlapProperty() { return maximumAllowedRepeatOverlapProperty;}
+    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlapProperty.intValue();}
 
     private Map<String, String> indexedFaFiles=null;
 

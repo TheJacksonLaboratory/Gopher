@@ -40,8 +40,10 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         "<li>Number of viewpoints: %d</li>"+
         "<li>Average number of active fragments per viewpoint: %.1f</li>"+
          "<li>Average viewpoint score: %.2f%%</li>"+
-        "<li>Average viewpoint size: %.1f nucleotides</li></ul>",
-                ngenes,nviewpoints,avg_n_frag,avg_score,avg_size);
+        "<li>Average viewpoint size: %.1f nucleotides</li>"+
+                "<li>Total number of probe nucleotides: %d</li></ul>",
+                ngenes,nviewpoints,avg_n_frag,avg_score,avg_size,this.model.getTotalNumberOfProbeNucleotides());
+
         return String.format("%s\n%s\n%s\n",HTML_HEADER,lst,HTML_FOOTER);
     }
 

@@ -266,20 +266,5 @@ public class VPAnalysisPresenter implements Initializable {
         column.setCellFactory(TextFieldTableCell.forTableColumn());
         return column;
     }
-/*
-    private void appendEditListeners(TableColumn column) {
-        column.setOnEditStart(new EventHandler() {
-            @Override
-            public void handle(Event t) {
-                editingStarted.set(true);
-            }
-        });
-        column.setOnEditCancel(new EventHandler() {
-            @Override
-            public void handle(Event t) {
-                editingStarted.set(false);
-            }
-        });
 
-    }*/
 }

@@ -41,6 +41,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static vpvgui.gui.Popups.getDoubleFromUser;
+import static vpvgui.gui.Popups.getIntegerFromUser;
 import static vpvgui.io.Platform.getDefaultProjectPath;
 
 
@@ -609,6 +611,37 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.displayException("Could not save data to BED files", exc.getMessage(),exc);
         }
         e.consume();
+    }
+
+    @FXML public void setProbeLength(ActionEvent e) {
+        Integer len = getIntegerFromUser("Enter Probe Length","probe length","Enter probe length:");
+       if (len==null) {
+           ErrorWindow.display("Could not get probe length","enter an integer value!");
+           return;
+       }
+        this.model.getProbeLengthProperty().setValue(len);
+       logger.trace(String.format("We just set probe length to %d",model.getProbeLength() ));
+    }
+
+    @FXML public void setTilingFactor(ActionEvent e) {
+        Double factor = getDoubleFromUser("Enter Probe Length","probe length","Enter probe length:");
+        if (factor==null) {
+            ErrorWindow.display("Could not get probe length","enter an integer value!");
+            return;
+        }
+        this.model.getTilingFactorProperty().setValue(factor);
+        logger.trace(String.format("We just set setTilingFactorto %f",model.getTilingFactor() ));
+    }
+
+
+    @FXML public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
+        Integer len = getIntegerFromUser("Enter Maximum allowed repeat overlap","overlap (in nt)","Maximum allowed repeat overlap:");
+        if (len==null) {
+            ErrorWindow.display("Could not get probe length","enter an integer value!");
+            return;
+        }
+        this.model.getMaximumAllowedRepeatOverlapProperty().setValue(len);
+        logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d",model.getMaximumAllowedRepeatOverlap() ));
     }
 
 

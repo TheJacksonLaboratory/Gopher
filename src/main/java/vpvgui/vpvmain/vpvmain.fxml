@@ -42,6 +42,13 @@
                               <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
                         </items>
                       </Menu>
+                        <Menu mnemonicParsing="false" text="Design parameters">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length" />
+                              <MenuItem mnemonicParsing="false" onAction="#setTilingFactor" text="Set tiling factor" />
+                              <MenuItem mnemonicParsing="false" onAction="#setMaximumAllowedRepeatOverlap" text="Set maximum allowed repeat overlap" />
+                          </items>
+                        </Menu>
                         <Menu mnemonicParsing="false" text="Proxy">
                           <items>
                               <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
@@ -49,7 +56,10 @@
                         </Menu>
                     </menus>
                   </MenuBar>
-                  <Region prefHeight="30.0" prefWidth="399.0" HBox.hgrow="SOMETIMES" />
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="399.0" styleClass="modena" HBox.hgrow="SOMETIMES">
+                     <padding>
+                        <Insets left="0.666667" right="0.666667" />
+                     </padding></Region>
                   <MenuBar nodeOrientation="RIGHT_TO_LEFT">
                     <menus>
                       <Menu mnemonicParsing="false" text="Help">
