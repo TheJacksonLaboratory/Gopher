@@ -108,6 +108,8 @@ public class Model {
     private IntegerProperty probeLengthProperty=new SimpleIntegerProperty();
     public IntegerProperty getProbeLengthProperty() { return probeLengthProperty;}
     public int getProbeLength() { return probeLengthProperty.intValue(); }
+    public void setProbeLength(Integer probeLength) {this.probeLengthProperty.set(probeLength); }
+
 
     private int totalNumberOfProbeNucleotides;
     public void setTotalNumberOfProbeNucleotides(int n) { this.totalNumberOfProbeNucleotides=n;}
@@ -116,10 +118,12 @@ public class Model {
     private DoubleProperty tilingFactorProperty =new SimpleDoubleProperty();
     public DoubleProperty getTilingFactorProperty() { return tilingFactorProperty;    }
     public double getTilingFactor(){return tilingFactorProperty.doubleValue(); }
+    public void setTilingFactor(Double tilingFactor) {this.tilingFactorProperty.set(tilingFactor); }
 
     public IntegerProperty maximumAllowedRepeatOverlapProperty=new SimpleIntegerProperty();
     public IntegerProperty getMaximumAllowedRepeatOverlapProperty() { return maximumAllowedRepeatOverlapProperty;}
     public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlapProperty.intValue();}
+    public void setMaximumAllowedRepeatOverlapProperty(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlapProperty.set(maximumAllowedRepeatOverlap); }
 
     private Map<String, String> indexedFaFiles=null;
 
