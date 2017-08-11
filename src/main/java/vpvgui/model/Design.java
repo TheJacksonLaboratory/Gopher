@@ -25,9 +25,13 @@ public class Design {
         int probelength=model.getProbeLength();
         int maximumAllowedOverlap=model.getMaximumAllowedRepeatOverlap();
         double tilingFactor=model.getTilingFactor();
-        /* TODO calculate total number of nucleotides in model
 
-         */
+        /* TODO calculate total number of nucleotides in model */
+
+        for (ViewPoint vp : viewpointlist) {
+
+        }
+
         int n=42;
         model.setTotalNumberOfProbeNucleotides(n);
         return n;
