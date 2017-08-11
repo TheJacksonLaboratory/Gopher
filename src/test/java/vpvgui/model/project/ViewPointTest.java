@@ -252,7 +252,7 @@ public class ViewPointTest {
         Integer maxDistToGenomicPosDown = 115;
         String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
         String testFastaFile = "src/test/resources/testgenome/test_genome.fa";
-        Integer marginSize = 250;
+        Integer marginSize = 10;
 
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
