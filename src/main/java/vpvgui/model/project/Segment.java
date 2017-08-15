@@ -16,18 +16,23 @@ public class Segment {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
     /** The id of the larger sequence where this Segment is located (usually a chromosome).*/
     private String referenceSequenceID;
-    /** The most 5' position of this Segment on the {@link #referenceSequenceID}*/
+    /** The most 5' position of this Segment on the {@link #referenceSequenceID}. */
     private Integer startPos;
-    /** The most 3' position of this Segment on the {@link #referenceSequenceID}*/
+    /** The most 3' position of this Segment on the {@link #referenceSequenceID}. */
     private Integer endPos;
-    /** The value of this variable is true if this Segment is selected (and will thus be used for Capture HiC probe production).*/
+    /** The value of this variable is true if this Segment is selected (and will thus be used for Capture HiC probe production). */
     private boolean selected;
+    /** The repetitive content of an object of class Segment. */
     private double repeatContent;
+    /** The repetitive content of the margin in upstream direction of this object of class Segment. */
     private double repeatContentUp;
+    /** The repetitive content of the margin in downstream direction of this object of class Segment. */
     private double repeatContentDown;
-    //private Integer genomicPos;
+    /** Object for reading a given FASTA file (HTSJDK). */
     private IndexedFastaSequenceFile fastaReader;
+    /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
+    /** Used to return {@link #startPos} and {@link #endPos} in String format. */
     private static DecimalFormat formatter = new DecimalFormat("#,###");
 
 
@@ -38,7 +43,6 @@ public class Segment {
         this.referenceSequenceID = referenceSequenceID;
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
-       // this.genomicPos = genomicPos;
         this.fastaReader = fastaReader;
         setSelected(selected);
         calculateRepeatContent();
@@ -51,7 +55,6 @@ public class Segment {
         this.referenceSequenceID=builder.referenceSequenceID;
         this.startPos=builder.startPos;
         this.endPos=builder.endPos;
-        //this.genomicPos=builder.genomicPos;
         this.fastaReader=builder.fastaReader;
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
@@ -90,34 +93,62 @@ public class Segment {
 
     }
 
-
-
-
-
     /* getter and setter methods */
 
+    /**
+     * Set the absolute coordinate of the starting position of the Segment.
+     *
+     * @param startPos absolute coordinate of the starting position of the Segment.
+     */
     public void setStartPos(Integer startPos) { this.startPos=startPos; }
 
+    /**
+     * Returns starting position of the Segment.
+     * @return Starting position of the Segment.
+     */
     public Integer getStartPos() {
         return startPos;
     }
 
+    /**
+     * Set the absolute coordinate of the end position of the Segment.
+     *
+     * @param endPos absolute coordinate of the end position of the Segment.
+     */
     public void setEndPos(Integer endPos) {
         this.startPos=endPos;
     }
 
+    /**
+     * Returns end position of the Segment.
+     * @return End position of the Segment.
+     */
     public Integer getEndPos() {
         return endPos;
     }
-    /** @param selected true if the segment is to be included in the sequences for the probes for this viewpoint.*/
+
+    /**
+     *
+     * @param selected true if the segment is to be included in a viewpoint.
+     */
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
+    /**
+     * Returns true, if the Segment is selected, otherwise false.
+     * @return true, if the Segment is selected, otherwise false.
+     */
     public boolean isSelected() {
         return selected;
     }
-    /** Length of the entire segment in nucleotides. */
+
+
+    /**
+     * Returns length of the segment:
+     *
+     * @return Length of the segment.
+     */
     public Integer length() {
         return endPos - startPos + 1;
     }
@@ -127,10 +158,12 @@ public class Segment {
      * This function calculates the {@link #repeatContent} of this segment by counting lower and uppercase.
      */
     private void calculateRepeatContent() {
+
         /* get dna string */
         String s = this.fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
 
         /* determine repeat content */
+
         Integer lowerCase = 0, upperCase = 0;
         for (int i = 0; i < s.length(); i++) {
             if (Character.isLowerCase(s.charAt(i))) lowerCase++;
@@ -141,29 +174,32 @@ public class Segment {
     }
 
     /**
-     * Calculates the repat content on the margins of the segment (if the segment is too small, we take the
+     * Calculates the repetitive content on the margins of the segment (if the segment is too small, we take the
      * repeat content of the entire segment to be the margin repeat content).
      */
     private void calculateRepeatContentMargins() {
+
         /* generate Segment objects for margins */
+
         ArrayList<IntPair> margins = getSegmentMargins();
-        if (margins.size()==1) {
-            /* this means there is not enough space to have two margins, because the fragment is too small.
-            * We therefore just use the overall repeat content for the up/downstream values.
-             */
-            this.repeatContentDown=this.repeatContent;
+
+        if (margins.size()==1) { // not enough space to have two margins, because the fragment is too small
+            this.repeatContentDown=this.repeatContent; // we therefore just use the overall repeat content for the up/downstream values
             this.repeatContentUp=this.repeatContent;
             return;
         } else if (margins.size()>2 || margins.size()==0) {
             ErrorWindow.display("Error in Segment Class","Number of margin segments was neither 1 nor 2 (report to developers)");
             return;
         }
+
         /* If we get here, then we have two IntPair segments, for Up and Downstream */
+
          for(int i=0;i<margins.size();++i) {
             IntPair seg =margins.get(i);
             int start=seg.getStartPos();
             int end=seg.getEndPos();
             String s = this.fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
+
             /* determine repeat content */
             Integer lowerCase = 0, upperCase = 0;
             for (int j = 0; j < s.length(); j++) {
