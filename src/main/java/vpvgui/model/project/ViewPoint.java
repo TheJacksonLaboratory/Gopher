@@ -264,10 +264,12 @@ public class ViewPoint {
      * cuttingPatterns.
      */
     private void initRestrictionFragments() {
+
          /* Retrieve all restriction fragments within the viewpoint */
+
         this.restSegListMap = new HashMap<String, ArrayList<Segment>>();
         for (int i = 0; i < this.cuttingPatterns.length; i++) {
-            ArrayList arrList = new ArrayList<Fragment>();
+            ArrayList arrList = new ArrayList<Segment>();
             restSegListMap.put(cuttingPatterns[i], arrList);
         }
 
