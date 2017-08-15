@@ -99,86 +99,6 @@ public class ViewPointTest {
     /* test utility and wrapper functions */
 
     @Test
-    public void testExtendFragmentWise() throws Exception {
-
-        System.out.println("=========================================================================================");
-        System.out.println("Test function 'testExtendFragmentWise' prints to the screen ");
-        System.out.println("=========================================================================================");
-
-
-        /* create viewpoint for testing */
-
-        String referenceSequenceID = "chr_t1_GATC";
-        Integer genomicPos = 80;
-        Integer maxDistToGenomicPosUp = 75;
-        Integer maxDistToGenomicPosDown = 75;
-        String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
-        String testFastaFile = "src/test/resources/testgenome/test_genome.fa";
-
-        File fasta = new File(testFastaFile);
-        IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
-        ViewPoint testViewpointGATC = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
-        String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
-
-
-        /* print to screen */
-
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Complete genomic sequence with 'genomicPos' (|) and cutting sites (^) and initial start and end positions (> sta, < end) of the viewpoint");
-        printLabledPos(testViewpointGATC.getGenomicPos(), "genomicPos", true);
-        System.out.println(referenceSequence);
-        printCuttingSites(testViewpointGATC, "GATC");
-        printStaEndString(testViewpointGATC.getStartPos(), testViewpointGATC.getEndPos());
-
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Set new start and end positions near 'genomicPos'");
-        testViewpointGATC.setStartPos(testViewpointGATC.getGenomicPos() - 4);
-        testViewpointGATC.setEndPos(testViewpointGATC.getGenomicPos() + 4);
-        printLabledPos(testViewpointGATC.getGenomicPos(), "genomicPos", true);
-        System.out.println(referenceSequence);
-        printCuttingSites(testViewpointGATC, "GATC");
-        printStaEndString(testViewpointGATC.getStartPos(), testViewpointGATC.getEndPos());
-
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Apply function '' to position in upstream directio of the viewpoint");
-        Integer upstream_pos = -6;
-        System.out.println("Position upstream is: " + upstream_pos);
-        testViewpointGATC.extendFragmentWise(upstream_pos);
-        printLabledPos(testViewpointGATC.getGenomicPos(), "genomicPos", true);
-        System.out.println(referenceSequence);
-        printCuttingSites(testViewpointGATC, "GATC");
-        printLabledPos(testViewpointGATC.relToAbsPos(upstream_pos), "position upstream", true);
-        printStaEndString(testViewpointGATC.getStartPos(), testViewpointGATC.getEndPos());
-
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Apply function '' to position in downstream direction of the viewpoint");
-        Integer downstream_pos = 30;
-        System.out.println("Position downstream is: " + downstream_pos);
-        testViewpointGATC.extendFragmentWise(downstream_pos);
-        printLabledPos(testViewpointGATC.getGenomicPos(), "genomicPos", true);
-        System.out.println(referenceSequence);
-        printCuttingSites(testViewpointGATC, "GATC");
-        printLabledPos(testViewpointGATC.relToAbsPos(downstream_pos), "position downstream", true);
-        printStaEndString(testViewpointGATC.getStartPos(), testViewpointGATC.getEndPos());
-
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Apply function '' to position in upstream direction of the viewpoint");
-        upstream_pos = -40;
-        System.out.println("Position upstream is: " + upstream_pos + " (X)");
-        testViewpointGATC.extendFragmentWise(upstream_pos);
-        printLabledPos(testViewpointGATC.getGenomicPos(), "genomicPos", true);
-        System.out.println(referenceSequence);
-        printCuttingSites(testViewpointGATC, "GATC");
-        printLabledPos(testViewpointGATC.relToAbsPos(upstream_pos), "position upstream", true);
-        printStaEndString(testViewpointGATC.getStartPos(), testViewpointGATC.getEndPos());
-
-        System.out.println("=========================================================================================");
-        System.out.println("Test function 'testExtendFragmentWise' END");
-        System.out.println("=========================================================================================");
-    }
-
-
-    @Test
     public void testFragmentListMap() throws Exception {
 
         System.out.println("=========================================================================================");
@@ -234,7 +154,7 @@ public class ViewPointTest {
      * This function creates a small especially contructed viewpoints and applies the function <i>generateViewpointLupianez()</i> to it.
      * Reference sequence, <i>genomicPos</i>, fragments and fragment margins are printed to the screen before and after application of the function.
      *
-     * @throws Exception
+     * @throws FileNotFoundException
      */
     @Test
     public void testGenerateViewpointLupianez() throws Exception {
@@ -397,8 +317,11 @@ public class ViewPointTest {
 
     /**
      * I added this as a replacement for printSegment because of refactoring the code.
-     * @param segment
-     * @param symbol
+     *
+     * TODO: Find a less intuitive name!
+     *
+     * @param segment an object of class Segment (or IntPair?)
+     * @param symbol a symbol the is printed for each position of of the segment
      */
     private void printIntPair(IntPair segment, char symbol) {
         String s = new String("");
