@@ -123,11 +123,12 @@ public class ViewPointTest {
         System.out.println(referenceSequence);
         printCuttingSites(tvp, "GATC");
         printViewPointSegments(tvp, "GATC");
-        //printCuttingSites(tvp, "AAGCTT");
-        //printViewPointSegments(tvp, "AAGCTT");
-        //printCuttingSites(tvp, "ALL");
-        //printViewPointSegments(tvp, "ALL");
+        printCuttingSites(tvp, "AAGCTT");
+        printViewPointSegments(tvp, "AAGCTT");
+        printCuttingSites(tvp, "ALL");
+        printViewPointSegments(tvp, "ALL");
 
+        System.out.println("Start and end coordinates directly taken from getRestSegListMap:");
         for (String key : tvp.getRestSegListMap().keySet()) {
             System.out.println(key);
             for(Segment segment: tvp.getRestSegListMap().get(key)){
