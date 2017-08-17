@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -97,6 +98,43 @@ public class ViewPointTest {
 
 
     /* test utility and wrapper functions */
+
+    @Test
+    public void printInitRestrictionFragments() throws Exception {
+
+        /* create viewpoint for testing */
+
+        String referenceSequenceID = "chr_t3_GATC_AAGCTT";
+        Integer genomicPos = 80;
+        Integer maxDistToGenomicPosUp = 75;
+        Integer maxDistToGenomicPosDown = 75;
+        String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
+        String testFastaFile = "src/test/resources/testgenome/test_genome.fa";
+
+        File fasta = new File(testFastaFile);
+        IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
+        ViewPoint tvp = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
+        String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
+
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Complete genomic sequence with 'genomicPos' (|) and cutting sites (^) and initial start and end positions (> sta, < end) of the viewpoint");
+        System.out.println("and print all restriction fragments of the viewpoint. 'T' means selected and 'F' not selected.");
+        printLabledPos(tvp.getGenomicPos(), "genomicPos", true);
+        System.out.println(referenceSequence);
+        printCuttingSites(tvp, "GATC");
+        printViewPointSegments(tvp, "GATC");
+        //printCuttingSites(tvp, "AAGCTT");
+        //printViewPointSegments(tvp, "AAGCTT");
+        //printCuttingSites(tvp, "ALL");
+        //printViewPointSegments(tvp, "ALL");
+
+        for (String key : tvp.getRestSegListMap().keySet()) {
+            System.out.println(key);
+            for(Segment segment: tvp.getRestSegListMap().get(key)){
+                System.out.println(segment.getStartPos() + "\t" + segment.getEndPos());
+            }
+        }
+    }
 
     @Test
     public void testFragmentListMap() throws Exception {
@@ -385,7 +423,7 @@ public class ViewPointTest {
 
         String s = new String("");
 
-        for (int i = 0; i < segment.getStartPos(); i++) {
+        for (int i = 1; i < segment.getStartPos(); i++) {
             s += " ";
         }
         for (int i = 0; i < segment.length(); i++) {

@@ -260,27 +260,37 @@ public class ViewPoint {
 
 
     /**
-     * Initializes {@link #restSegListMap} with the information in
-     * cuttingPatterns.
+     * This function uses the information about cutting position sites from the {@link #cuttingPositionMap}
+     * to init a hash ({@link #restSegListMap}), in which the keys are the cutting motifs and the values are lists of objects of class
+     * Segments.
      */
     private void initRestrictionFragments() {
-
-         /* Retrieve all restriction fragments within the viewpoint */
 
         this.restSegListMap = new HashMap<String, ArrayList<Segment>>();
         for (int i = 0; i < this.cuttingPatterns.length; i++) {
             ArrayList arrList = new ArrayList<Segment>();
             restSegListMap.put(cuttingPatterns[i], arrList);
         }
+        ArrayList arrList = new ArrayList<Segment>();
+        restSegListMap.put("ALL", arrList);
 
         for (int i = 0; i < this.cuttingPatterns.length; i++) {
             for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(this.cuttingPatterns[i]).size() - 1; j++) {
                 Segment restFrag=new Segment.Builder(referenceSequenceID,
                         relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1),
-                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1)+1)).
+                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1))).
                         fastaReader(fastaReader).marginSize(marginSize).build();
                 restSegListMap.get(cuttingPatterns[i]).add(restFrag);
             }
+        }
+
+        /* finally add the segments for the key 'ALL', the combination of cutting sites derived from all motifs */
+        for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get("ALL").size() - 1; j++) {
+            Segment restFrag=new Segment.Builder(referenceSequenceID,
+                    relToAbsPos(cuttingPositionMap.getHashMapOnly().get("ALL").get(j)+1),
+                    relToAbsPos(cuttingPositionMap.getHashMapOnly().get("ALL").get(j + 1))).
+                    fastaReader(fastaReader).marginSize(marginSize).build();
+            restSegListMap.get("ALL").add(restFrag);
         }
     }
 
