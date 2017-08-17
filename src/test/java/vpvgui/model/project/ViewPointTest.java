@@ -97,7 +97,9 @@ public class ViewPointTest {
     }
 
 
+
     /* test utility and wrapper functions */
+
 
     @Test
     public void printInitRestrictionFragments() throws Exception {
@@ -136,6 +138,7 @@ public class ViewPointTest {
             }
         }
     }
+
 
     @Test
     public void testFragmentListMap() throws Exception {
@@ -209,7 +212,7 @@ public class ViewPointTest {
         Integer genomicPos = 125;
         Integer maxDistToGenomicPosUp = 115;
         Integer maxDistToGenomicPosDown = 115;
-        String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
+        String[] testCuttingPatterns = new String[]{"^GATC", "^ACAT"};
         String testFastaFile = "src/test/resources/testgenome/test_genome.fa";
         Integer marginSize = 10;
 
@@ -219,7 +222,7 @@ public class ViewPointTest {
         //        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
         Integer fragNumUp = 1;
         Integer fragNumDown = 1;
-        String motif = "GATC";
+        String motif = "ALL";
         Integer minSizeUp = 20;
         Integer maxSizeUp = 95;
         Integer minSizeDown = 20;
@@ -269,7 +272,7 @@ public class ViewPointTest {
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(), testViewpointLupianez.getEndPos());
-        printViewPointSegments(testViewpointLupianez, "GATC");
+        printViewPointSegments(testViewpointLupianez, "ALL");
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
@@ -290,7 +293,7 @@ public class ViewPointTest {
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(), testViewpointLupianez.getEndPos());
-        printViewPointSegments(testViewpointLupianez, "GATC");
+        printViewPointSegments(testViewpointLupianez, "ALL");
 
         System.out.println("=========================================================================================");
         System.out.println("Test function 'testGenerateViewpointLupianez' END");
@@ -364,7 +367,7 @@ public class ViewPointTest {
      */
     private void printIntPair(IntPair segment, char symbol) {
         String s = new String("");
-        for (int i = 0; i < segment.getStartPos(); i++) {
+        for (int i = 1; i < segment.getStartPos(); i++) {
             s += " ";
         }
         for (int i = 0; i < segment.length(); i++) {
