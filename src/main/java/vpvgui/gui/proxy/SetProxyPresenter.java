@@ -14,8 +14,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.AnchorPane;
 import javafx.util.converter.NumberStringConverter;
 import vpvgui.framework.Signal;
+import vpvgui.io.Platform;
 
 
 import java.net.URL;
@@ -32,6 +34,7 @@ public class SetProxyPresenter implements Initializable {
     @FXML private TextField portTextField;
     private Consumer<Signal> signal;
     @FXML private Label proxyLabel;
+    @FXML private AnchorPane proxyAnchorPane;
 
     private Tooltip ttip;
 
@@ -47,6 +50,7 @@ public class SetProxyPresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.portTextField.textProperty().bindBidirectional(portProperty,new NumberStringConverter());
+        this.portTextField.setText("");
         this.portTextField.textProperty().addListener(new ChangeListener<String>(){
             @Override public void changed(ObservableValue<? extends String> observable,
                 String oldValue, String newValue) {
@@ -66,6 +70,8 @@ public class SetProxyPresenter implements Initializable {
         ttip.setText("Do not enter \"http://\" or \"https://\" here");
         this.proxyLabel.setTooltip(ttip);
         this.proxyTextField.setTooltip(ttip);
+        /* In the following, I put the focus to a label so that bth textfields sbow the prompt text! */
+        javafx.application.Platform.runLater(() -> proxyLabel.requestFocus());
 
     }
 
@@ -74,6 +80,7 @@ public class SetProxyPresenter implements Initializable {
      * @param tf
      */
     private void validateInteger(TextField tf) {
+        if (tf.getText().isEmpty()) return; /* Allow empty */
         ObservableList<String> styleClass = tf.getStyleClass();
         boolean invalidInteger=false;
         try {

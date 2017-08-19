@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 
 import static vpvgui.gui.Popups.getDoubleFromUser;
 import static vpvgui.gui.Popups.getIntegerFromUser;
+import static vpvgui.gui.Popups.getIntegerFromUser2;
 import static vpvgui.io.Platform.getDefaultProjectPath;
 
 
@@ -382,7 +383,7 @@ public class VPVMainPresenter implements Initializable {
         th.start();
     }
 
-    /** ToDo wrap this in a Task! */
+    /** Create fai (fasta index files) */
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
         logger.trace("Indexing genome files...");
@@ -396,8 +397,6 @@ public class VPVMainPresenter implements Initializable {
         Thread th = new Thread(manager);
         th.setDaemon(true);
         th.start();
-
-
     }
 
 
@@ -614,7 +613,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML public void setProbeLength(ActionEvent e) {
-        Integer len = getIntegerFromUser("Enter Probe Length","probe length","Enter probe length:");
+        Integer len = getIntegerFromUser2("Enter Probe Length","120","Enter probe length:");
        if (len==null) {
            ErrorWindow.display("Could not get probe length","enter an integer value!");
            return;
@@ -624,20 +623,20 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML public void setTilingFactor(ActionEvent e) {
-        Double factor = getDoubleFromUser("Enter Probe Length","probe length","Enter probe length:");
+        Double factor = getDoubleFromUser("Enter Tiling Factor","2.0","Tiling factor:");
         if (factor==null) {
-            ErrorWindow.display("Could not get probe length","enter an integer value!");
+            ErrorWindow.display("Could not get tiling factor","enter a numeric value!");
             return;
         }
         this.model.getTilingFactorProperty().setValue(factor);
-        logger.trace(String.format("We just set setTilingFactorto %f",model.getTilingFactor() ));
+        logger.trace(String.format("We just set set TilingFactor to %f",model.getTilingFactor() ));
     }
 
 
     @FXML public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
-        Integer len = getIntegerFromUser("Enter Maximum allowed repeat overlap","overlap (in nt)","Maximum allowed repeat overlap:");
+        Integer len = getIntegerFromUser2("Enter Maximum allowed repeat overlap","20","Maximum allowed repeat overlap:");
         if (len==null) {
-            ErrorWindow.display("Could not get probe length","enter an integer value!");
+            ErrorWindow.display("Could not get Maximum allowed repeat length","enter an integer value!");
             return;
         }
         this.model.getMaximumAllowedRepeatOverlapProperty().setValue(len);
