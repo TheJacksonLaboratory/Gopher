@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="120.0" prefWidth="305.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.proxy.SetProxyPresenter">
+<AnchorPane fx:id="proxyAnchorPane" prefHeight="120.0" prefWidth="305.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.proxy.SetProxyPresenter">
    <children>
       <VBox layoutX="2.0" prefHeight="136.0" prefWidth="298.0" styleClass="hbox2">
          <children>

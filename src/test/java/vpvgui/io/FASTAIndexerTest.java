@@ -2,8 +2,6 @@ package vpvgui.io;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.project.Fragment;
-import vpvgui.model.project.FragmentTest;
 
 /**
  * Test that we get this information for chr4_ctg9_hap1.fa:
@@ -16,7 +14,7 @@ public class FASTAIndexerTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        ClassLoader classLoader = FragmentTest.class.getClassLoader();
+        ClassLoader classLoader = FASTAIndexerTest.class.getClassLoader();
         String fasta = classLoader.getResource("smallgenome/chr4_ctg9_hap1.fa").getFile();
         faidx = new FASTAIndexer(fasta);
         faidx.createFASTAindex();
