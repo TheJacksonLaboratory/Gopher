@@ -1,9 +1,12 @@
 package vpvgui.model;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by robinp on 5/11/17.
  */
 public class RestrictionEnzyme {
+    static Logger logger = Logger.getLogger(RestrictionEnzyme.class.getName());
     /** A name of a restirction enzyme, something like HindIII */
     private String name;
     /** A representation of the cutting site of the enzyme, whereby "^" stands for cut here.
@@ -14,6 +17,7 @@ public class RestrictionEnzyme {
     public RestrictionEnzyme(String n, String s) {
         name=n;
         site=s;
+        logger.trace(String.format("CTOR: \"%s\", \"%s\"",name,site));
     }
 
     public String getName() {

@@ -220,7 +220,7 @@ public class Model {
                 //System.err.println(line);
                 if (line.startsWith("#"))
                     continue; /* skip header*/
-                String a[] = line.split("\\s");
+                String a[] = line.split("\\s+");
                 RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 enzymelist.add(re);
             }

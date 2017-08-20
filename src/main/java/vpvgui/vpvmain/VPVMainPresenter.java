@@ -17,13 +17,13 @@ import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
-import vpvgui.gui.EnzymeCheckBoxWindow;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
+import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static vpvgui.gui.Popups.getDoubleFromUser;
-import static vpvgui.gui.Popups.getIntegerFromUser;
 import static vpvgui.gui.Popups.getIntegerFromUser2;
 import static vpvgui.io.Platform.getDefaultProjectPath;
 
@@ -404,7 +403,12 @@ public class VPVMainPresenter implements Initializable {
      * objects to the {@link Model}.*/
     public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
-        List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
+        //List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
+        List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(enzymes);
+        //EnzymeBoxView view = new EnzymeBoxView();
+        //EnzymeBoxPresenter presenter = (EnzymeBoxPresenter) view.getPresenter();
+
+
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
         this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }
