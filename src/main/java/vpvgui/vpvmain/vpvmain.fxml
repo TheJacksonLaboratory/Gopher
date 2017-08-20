@@ -31,7 +31,7 @@
                     <menus>
                       <Menu mnemonicParsing="false" text="File">
                         <items>
-                              <MenuItem mnemonicParsing="false" text="New" />
+                              <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New" />
                               <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
@@ -85,7 +85,7 @@
    <center>
       <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0">
         <tabs>
-          <Tab fx:id="setuptab" closable="false" text="Set up">
+          <Tab id="setuptab" fx:id="setuptab" closable="false" text="Set up">
             <content>
               <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
@@ -243,7 +243,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab fx:id="analysistab" closable="false" text="Analysis">
+          <Tab id="analysistab" fx:id="analysistab" closable="false" text="Analysis">
             <content>
               <AnchorPane fx:id="analysisPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" snapToPixel="false" />
             </content>

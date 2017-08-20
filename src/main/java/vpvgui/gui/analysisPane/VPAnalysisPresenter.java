@@ -69,9 +69,15 @@ public class VPAnalysisPresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.setProperty("jsse.enableSNIExtension", "false");
-        contentWebEngine = contentWebView.getEngine();
-        contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
+        init();
+    }
+
+
+    public void init() {
+        this.contentWebEngine = contentWebView.getEngine();
+        this.contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
         initTable();
+
     }
 
 
@@ -205,6 +211,7 @@ public class VPAnalysisPresenter implements Initializable {
      */
     private void openViewPointInTab(ViewPoint vp) {
         final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
+        tab.setId(vp.getTargetName());
         tab.setClosable(true);
         tab.setOnClosed(event -> {
             if (tabpane.getTabs()

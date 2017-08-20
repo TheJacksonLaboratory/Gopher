@@ -38,6 +38,7 @@ import vpvgui.model.project.ViewPointCreationTask;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -196,9 +197,6 @@ public class VPVMainPresenter implements Initializable {
         initializePromptTextsToDefaultValues();
         initializeModelFromSettingsIfPossible();
         this.initializer=new Initializer(model);
-
-
-
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
@@ -488,8 +486,30 @@ public class VPVMainPresenter implements Initializable {
     /**
      * Todo initialize model and ask user to choose a new name.
      */
-    private void startNewProject() {
+    @FXML public void startNewProject(ActionEvent e) {
+        logger.trace("Start new project");
+        ObservableList<Tab> panes = this.tabpane.getTabs();
+        /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
+        List<Tab> tabsToBeRemoved=new ArrayList<>();
+        /* close all tabs except setup and analysis. */
+        for (Tab tab : panes) {
+            String id=tab.getId();
+            if (id != null && (id.equals("analysistab") || id.equals("setuptab") )) { continue; }
+            logger.trace("Closing tab "+id);
+            tabsToBeRemoved.add(tab);
+        }
+        this.tabpane.getTabs().removeAll(tabsToBeRemoved);
         model=new Model();
+        this.vpanalysisview = new VPAnalysisView();
+        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+
+        createPanes();
+        setInitializedValuesInGUI();
+        e.consume();
+        /* TODO */
+        logger.trace("TODO -- also re-initialize first tab");
     }
 
     /** Display the settings (parameters) of the current project. */
