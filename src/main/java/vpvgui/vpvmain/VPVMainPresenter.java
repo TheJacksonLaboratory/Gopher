@@ -443,6 +443,12 @@ public class VPVMainPresenter implements Initializable {
      */
     public void createCaptureProbes() {
         logger.trace("Entering createCaptureProbes");
+        if (this.model.getViewPointList()==null || this.model.getViewPointList().size()==0) {
+            ErrorWindow.display("Error","Viewpoints cannot be created before a gene list has been chosen."+
+            "\nPlease enter a gene list and try again.");
+            return;
+        }
+
         StringProperty sp=new SimpleStringProperty();
         ViewPointCreationTask task = new ViewPointCreationTask(model,sp);
         CreateViewpointPBView pbview = new CreateViewpointPBView();
