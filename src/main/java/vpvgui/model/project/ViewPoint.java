@@ -672,6 +672,7 @@ public class ViewPoint {
     /**
      * Helper function for the calculation of the viewpoint score.
      * It calculates a score for a given distance based on the cumulative normal distribution function.
+     * <p>
      * The distance of 0 receives a score of almost one.
      * Greater distances receive a lower score.
      * The distance maxDistToGenomicPos receives a score of almost 0.
@@ -681,8 +682,8 @@ public class ViewPoint {
      * @return position distance score between 0 and 1 (see maunscript).
      */
     public double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
-        double sd = maxDistToGenomicPos/6;
-        double mean = -3*sd;
+        double sd = maxDistToGenomicPos/6; // the factor 1/6 was chosen by eye
+        double mean = -3*sd; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
         NormalDistribution nD = new NormalDistribution(mean,sd);
         double score = nD.cumulativeProbability(-dist);
         return score;
@@ -692,6 +693,13 @@ public class ViewPoint {
     /**
      * This function calculates the viewpoint score and sets the field 'score' of this class.
      * The function is also intended to update the score.
+     * <p>
+     * The function iterates over all restriction segments of the viewpoint.
+     * For selected segments a <i>position distance score</i> is calculated for each position.
+     * The scores for all positions are summed up and in the end divided by the total number of positions for which
+     * <i>position distance scores</i> were calculated.
+     * <p>
+     * The overall score for the viewpoint is again between 0 and 1.
      *
      * @param motif The restriction fragment used to cut this viewpoint.
      */
