@@ -11,9 +11,9 @@
 
 <AnchorPane fx:id="proxyAnchorPane" prefHeight="120.0" prefWidth="305.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.proxy.SetProxyPresenter">
    <children>
-      <VBox layoutX="2.0" prefHeight="136.0" prefWidth="298.0" styleClass="hbox2">
+      <VBox layoutX="2.0" prefHeight="136.0" prefWidth="298.0" styleClass="hbox2" stylesheets="@setproxy.css" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <Label text="Enter proxy information" />
+            <Label styleClass="popup-label" stylesheets="@setproxy.css" text="Enter proxy information" />
             <GridPane>
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -24,8 +24,8 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label fx:id="proxyLabel" text="HTTP Proxy" />
-                  <Label text="HTTP Port" GridPane.rowIndex="1" />
+                  <Label fx:id="proxyLabel" styleClass="popup-label-small" stylesheets="@setproxy.css" text="HTTP Proxy" />
+                  <Label styleClass="popup-label-small" stylesheets="@setproxy.css" text="HTTP Port" GridPane.rowIndex="1" />
                   <TextField fx:id="proxyTextField" promptText="proxy.example.edu" GridPane.columnIndex="1" />
                   <TextField fx:id="portTextField" promptText="8080" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>

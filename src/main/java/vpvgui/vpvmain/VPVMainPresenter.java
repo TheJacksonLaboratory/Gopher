@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
 import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.Popups;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
@@ -637,7 +638,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML public void setProbeLength(ActionEvent e) {
-        Integer len = getIntegerFromUser2("Enter Probe Length","120","Enter probe length:");
+        Integer len = Popups.getIntegerFromUser2("Enter Probe Length","120","Enter probe length:");
        if (len==null) {
            ErrorWindow.display("Could not get probe length","enter an integer value!");
            return;
@@ -647,7 +648,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML public void setTilingFactor(ActionEvent e) {
-        Double factor = getDoubleFromUser("Enter Tiling Factor","2.0","Tiling factor:");
+        Double factor = Popups.getDoubleFromUser("Enter Tiling Factor","2.0","Tiling factor:");
         if (factor==null) {
             ErrorWindow.display("Could not get tiling factor","enter a numeric value!");
             return;
@@ -658,7 +659,7 @@ public class VPVMainPresenter implements Initializable {
 
 
     @FXML public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
-        Integer len = getIntegerFromUser2("Enter Maximum allowed repeat overlap","20","Maximum allowed repeat overlap:");
+        Integer len = Popups.getIntegerFromUser2("Enter Maximum allowed repeat overlap","20","Maximum allowed repeat overlap:");
         if (len==null) {
             ErrorWindow.display("Could not get Maximum allowed repeat length","enter an integer value!");
             return;

@@ -1,5 +1,6 @@
 package vpvgui.gui;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 
 /**
  * Created by peter on 06.05.17.
+ * This is a convenience class that creates windows to report errors of various kinds.
  */
 public class ErrorWindow {
 
@@ -22,9 +24,20 @@ public class ErrorWindow {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);
+
         window.setMinWidth(250);
         Label label = new Label();
         label.setText(message);
+        label.setStyle(
+                "-fx-border-color: lightblue; "
+                        + "-fx-font-size: 14;"
+                        + "-fx-border-insets: -5; "
+                        + "-fx-border-radius: 5;"
+                        + "-fx-border-style: dotted;"
+                        + "-fx-border-width: 2;"
+                        + "-fx-alignment: top-left;"
+                        + "-fx-text-fill: red;"
+        );
 
         Button button = new Button("OK");
 
@@ -34,6 +47,7 @@ public class ErrorWindow {
 
 
         VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10, 50, 50, 50));
 
         layout.getChildren().addAll(label, button);
         layout.setAlignment(Pos.CENTER);

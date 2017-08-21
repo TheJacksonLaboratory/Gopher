@@ -5,11 +5,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import org.apache.log4j.Logger;
 
 import java.util.Optional;
 
 public class Popups {
-
+    static Logger logger = Logger.getLogger(Popups.class.getName());
 
 
     /**
@@ -77,14 +78,10 @@ public class Popups {
         dialog.setTitle(windowTitle);
         dialog.setHeaderText(null);
 
-// Set the icon (must be included in the project).
-        // dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
-
-// Set the button types.
         ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-// Create the username and password labels and fields.
+
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -105,13 +102,16 @@ public class Popups {
 // Do some validation (using the Java 8 lambda syntax).
         username.textProperty().addListener((observable, oldValue, newValue) -> {
             loginButton.setDisable(newValue.trim().isEmpty());
+            logger.trace(String.format("Got new value %s",newValue));
         });
 
         dialog.getDialogPane().setContent(grid);
 
-// Request focus on the username field by default.
+        // Request focus on the button field by default.
+        // So that text field shows prompt.
         Platform.runLater(() -> loginButton.requestFocus());
-        dialog.setResultConverter(dialogButton -> {
+
+       /* dialog.setResultConverter(dialogButton -> {
             Integer i=null;
             if (dialogButton == loginButtonType) {
                 try {
@@ -121,9 +121,12 @@ public class Popups {
                 }
             }
             return null;
-        });
-        dialog.showAndWait();
-        return null;
+        });*/
+        Optional<Integer> i = dialog.showAndWait();
+        if (i.isPresent())
+            return i.get();
+        else
+            return null;
     }
 
 
