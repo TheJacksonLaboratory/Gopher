@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import vpvgui.framework.Injector;
 import vpvgui.model.Model;
@@ -30,7 +29,9 @@ public class ViewPointViewer extends Application {
      * the {@link #stop} method by means of a method in the Model class. */
     private Model model;
 
-    public static final String APPLICATION_ICON ="vpvicon.png";
+    public static final String APPLICATION_ICON = "img/vpvicon.png";
+
+    private boolean isSplashScreenShowing=false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -38,7 +39,7 @@ public class ViewPointViewer extends Application {
         //logger.info("Starting VPV Gui");
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter=(VPVMainPresenter)appView.getPresenter();
-        Image image  = new Image(ViewPointViewer.class.getResourceAsStream("/vpvicon.png"));
+        Image image  = new Image(ViewPointViewer.class.getResourceAsStream("/img/vpvicon.png"));
         this.model=presenter.getModel();
         Scene scene = new Scene(appView.getView());
         primaryStage.setTitle("ViewPoint Viewer");
