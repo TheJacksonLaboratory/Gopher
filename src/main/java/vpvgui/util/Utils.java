@@ -1,20 +1,18 @@
 package vpvgui.util;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 public class Utils {
 
 
 
     public static String join(List<String> lst, String delim) {
-        if (lst==null || lst.isEmpty())
-            return "";
-        StringBuilder sb = new StringBuilder();
-        sb.append(lst.get(0));
-        for (int i=1;i<lst.size();i++) {
-            sb.append(String.format("%s%s",delim,lst.get(i)));
+        StringJoiner stringJoiner = new StringJoiner(delim);
+        for (String item:lst) {
+            stringJoiner.add(item);
         }
-        return sb.toString();
+        return  stringJoiner.toString();
     }
 
 

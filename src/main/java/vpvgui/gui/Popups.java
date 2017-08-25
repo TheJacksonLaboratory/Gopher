@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 import org.apache.log4j.Logger;
 
 import java.awt.event.ActionEvent;
@@ -73,7 +74,7 @@ public class Popups {
      * @param labelText   - Text of your request
      * @return String with user input
      */
-    public static Integer getIntegerFromUser(String windowTitle, String promptText, String labelText) {
+    public static Integer getIntegerFromUserOLD(String windowTitle, String promptText, String labelText) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle(windowTitle);
         dialog.setHeaderText(null);
@@ -99,53 +100,127 @@ public class Popups {
      * Request a String from user.
      *
      * @param windowTitle - Title of PopUp window
-     * @param promptText  - Prompt of Text field (suggestion for user)
+     * @param promptValue  - Prompt of Text field (suggestion for user)
      * @param labelText   - Text of your request
      * @return String with user input
      */
 
-    public static Integer getIntegerFromUser2(String windowTitle, String promptText, String labelText) {
+    public static Integer getIntegerFromUser(String windowTitle, Integer promptValue, String labelText) {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle(windowTitle);
         dialog.setHeaderText(null);
-
-        ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        TextField username = new TextField();
-        username.setPromptText(promptText);
+        TextField userdata = new TextField();
+        userdata.setPromptText(String.format("%d",promptValue));
 
 
         grid.add(new Label(labelText), 0, 0);
-        grid.add(username, 1, 0);
+        grid.add(userdata, 1, 0);
+
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(buttonTypeOk,buttonTypeCancel);
 
 
-// Enable/Disable login button depending on whether a username was entered.
-        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-        loginButton.setDisable(true);
-
-// Do some validation (using the Java 8 lambda syntax).
-        username.textProperty().addListener((observable, oldValue, newValue) -> {
-            loginButton.setDisable(newValue.trim().isEmpty());
-            logger.trace(String.format("Got new value %s",newValue));
+        // Enable/Disable OK button depending only after a valid integer has been entered
+        Node okButton = dialog.getDialogPane().lookupButton(buttonTypeOk);
+        okButton.setDisable(true);
+        userdata.textProperty().addListener((observable, oldValue, newValue) -> {
+            boolean invalid=true;
+            try {
+                Integer dummy = Integer.parseInt(userdata.getText());
+                invalid=false; /* We will only reach this line if the userdata can be parsed as an Integer. */
+            } catch (NumberFormatException e) {
+                /* do nothing */
+            }
+            okButton.setDisable(invalid);
         });
 
         dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(new Callback<ButtonType, Integer>() {
+            @Override
+            public Integer call(ButtonType b) {
+                if (b == buttonTypeOk) {
+                    return Integer.parseInt(userdata.getText());
+                }
+                return null;
+            }
+        });
 
         // Request focus on the button field by default.
         // So that text field shows prompt.
-        Platform.runLater(() -> loginButton.requestFocus());
+        Platform.runLater(() -> okButton.requestFocus());
         Optional<Integer> i = dialog.showAndWait();
-        if (i.isPresent())
-            return i.get();
-        else
-            return null;
+        return i.orElseGet(null);
+    }
+
+
+    /**
+     * Request a String from user.
+     *
+     * @param windowTitle - Title of PopUp window
+     * @param promptValue  - Prompt of Text field (suggestion for user)
+     * @param labelText   - Text of your request
+     * @return String with user input
+     */
+
+    public static Double getDoubleFromUser(String windowTitle, Double promptValue, String labelText) {
+        Dialog<Double> dialog = new Dialog<>();
+        dialog.setTitle(windowTitle);
+        dialog.setHeaderText(null);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField userdata = new TextField();
+        userdata.setPromptText(String.format("%.1f",promptValue));
+
+
+        grid.add(new Label(labelText), 0, 0);
+        grid.add(userdata, 1, 0);
+
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(buttonTypeOk,buttonTypeCancel);
+
+
+        // Enable/Disable OK button depending only after a valid integer has been entered
+        Node okButton = dialog.getDialogPane().lookupButton(buttonTypeOk);
+        okButton.setDisable(true);
+        userdata.textProperty().addListener((observable, oldValue, newValue) -> {
+            boolean invalid=true;
+            try {
+                Double dummy = Double.parseDouble(userdata.getText());
+                invalid=false; /* We will only reach this line if the userdata can be parsed as an Integer. */
+            } catch (NumberFormatException e) {
+                /* do nothing */
+            }
+            okButton.setDisable(invalid);
+        });
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(new Callback<ButtonType, Double>() {
+            @Override
+            public Double call(ButtonType b) {
+                if (b == buttonTypeOk) {
+                    return Double.parseDouble(userdata.getText());
+                }
+                return null;
+            }
+        });
+
+        // Request focus on the button field by default.
+        // So that text field shows prompt.
+        Platform.runLater(() -> okButton.requestFocus());
+        Optional<Double> i = dialog.showAndWait();
+        return i.orElseGet(null);
     }
 
 
@@ -154,17 +229,17 @@ public class Popups {
      * Request a String from user.
      *
      * @param windowTitle - Title of PopUp window
-     * @param promptText  - Prompt of Text field (suggestion for user)
+     * @param promptValue  - Prompt of Text field (suggestion for user)
      * @param labelText   - Text of your request
      * @return String with user input
      */
-    public static Double getDoubleFromUser(String windowTitle, String promptText, String labelText) {
+    public static Double getDoubleFromUserOLD(String windowTitle, Double promptValue, String labelText) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.getEditor().setPromptText(promptText);
+        dialog.getEditor().setPromptText(String.format("%.1f",promptValue));
         dialog.setTitle(windowTitle);
         dialog.setHeaderText(null);
         dialog.setContentText(labelText);
-
+        /*Platform.runLater(() -> okButton.requestFocus());*/
         Optional<String> result = dialog.showAndWait();
         String r=result.orElse(null);
         if (r==null) return null;

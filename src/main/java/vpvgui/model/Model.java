@@ -110,6 +110,10 @@ public class Model implements Serializable {
     public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
     public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }
 
+    public Integer marginSize =null;
+    public int getMarginSize(){return marginSize;}
+    public void setMarginSize(Integer s) {this.marginSize=s; }
+
     private Map<String, String> indexedFaFiles=null;
 
     public List<VPVGene> getVPVGeneList() { return this.geneList; }
@@ -171,6 +175,31 @@ public class Model implements Serializable {
         setProjectName(getDefaultProjectName());
         setGenomeBuild(DEFAULT_GENOME_BUILD);
     }
+
+    /** This method should be called when we create a new Model and want to use default settings.
+     */
+    public void setDefaultValues() {
+        setFragNumUp(Default.NUMBER_OF_FRAGMENTS_UPSTREAM);
+        setFragNumDown(Default.NUMBER_OF_FRAGMENTS_DOWNSTREAM);
+        setMinSizeUp(Default.MINIMUM_SIZE_UPSTREAM);
+        setMinSizeDown(Default.MINIMUM_SIZE_DOWNSTREAM);
+        setMaxSizeUp(Default.MAXIMUM_SIZE_UPSTREAM);
+        setMaxSizeDown(Default.MAXIMUM_SIZE_DOWNSTREAM);
+        setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
+        setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
+        setProbeLength(Default.PROBE_LENGTH);
+        setTilingFactor(Default.TILING_FACTOR);
+        setMaximumAllowedRepeatOverlap(Default.MAXIMUM_ALLOWED_REPEAT_OVERLAP);
+        setMarginSize(Default.MARGIN_SIZE);
+
+    }
+
+
+
+
+
+
+
 
     /**
      * @return List of enzymes for the user to choose from.

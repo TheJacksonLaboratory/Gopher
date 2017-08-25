@@ -30,6 +30,7 @@ import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
+import vpvgui.model.Default;
 import vpvgui.model.Initializer;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
@@ -527,7 +528,8 @@ public class VPVMainPresenter implements Initializable {
             tabsToBeRemoved.add(tab);
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
-        model=new Model();
+        this.model=new Model();
+        this.model.setDefaultValues();
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
@@ -660,35 +662,57 @@ public class VPVMainPresenter implements Initializable {
         e.consume();
     }
 
-    @FXML public void setProbeLength(ActionEvent e) {
-        Integer len = Popups.getIntegerFromUser2("Enter Probe Length","120","Enter probe length:");
-       if (len==null) {
-           ErrorWindow.display("Could not get probe length","enter an integer value!");
-           return;
-       }
+    @FXML
+    public void setProbeLength(ActionEvent e) {
+        Integer len = Popups.getIntegerFromUser("Enter Probe Length",
+                Default.PROBE_LENGTH,
+                "Enter probe length:");
+        if (len == null) {
+            ErrorWindow.display("Could not get probe length", "enter an integer value!");
+            return;
+        }
         this.model.setProbeLength(len);
-       logger.trace(String.format("We just set probe length to %d",model.getProbeLength() ));
+        logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
     }
 
-    @FXML public void setTilingFactor(ActionEvent e) {
-        Double factor = Popups.getDoubleFromUser("Enter Tiling Factor","2.0","Tiling factor:");
-        if (factor==null) {
-            ErrorWindow.display("Could not get tiling factor","enter a numeric value!");
+    @FXML
+    public void setTilingFactor(ActionEvent e) {
+        Double factor = Popups.getDoubleFromUser("Enter Tiling Factor",
+                (double)Default.TILING_FACTOR,
+                "Tiling factor:");
+        if (factor == null) {
+            ErrorWindow.display("Could not get tiling factor", "enter a numeric value!");
             return;
         }
         this.model.setTilingFactor(factor);
-        logger.trace(String.format("We just set set TilingFactor to %f",model.getTilingFactor() ));
+        logger.trace(String.format("We just set set TilingFactor to %f", model.getTilingFactor()));
     }
 
 
-    @FXML public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
-        Integer len = Popups.getIntegerFromUser2("Enter Maximum allowed repeat overlap","20","Maximum allowed repeat overlap:");
-        if (len==null) {
-            ErrorWindow.display("Could not get Maximum allowed repeat length","enter an integer value!");
+    @FXML
+    public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
+        Integer len = Popups.getIntegerFromUser("Enter Maximum allowed repeat overlap",
+                Default.MAXIMUM_ALLOWED_REPEAT_OVERLAP,
+                "Maximum allowed repeat overlap:");
+        if (len == null) {
+            ErrorWindow.display("Could not get Maximum allowed repeat length", "enter an integer value!");
             return;
         }
         this.model.setMaximumAllowedRepeatOverlap(len);
-        logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d",model.getMaximumAllowedRepeatOverlap() ));
+        logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d", model.getMaximumAllowedRepeatOverlap()));
+    }
+
+    @FXML
+    public void setMarginSize(ActionEvent e) {
+        Integer msize = Popups.getIntegerFromUser("Enter margin size",
+                Default.MARGIN_SIZE,
+                "Margin size for calculating repeat content");
+        if (msize==null) {
+            ErrorWindow.display("Could not get Margin size", "enter an integer value!");
+            return;
+        }
+        this.model.setMarginSize(msize);
+        logger.trace(String.format("We just set MarginSize to %d", model.getMarginSize()));
     }
 
 

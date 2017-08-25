@@ -46,6 +46,7 @@
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length" />
                               <MenuItem mnemonicParsing="false" onAction="#setTilingFactor" text="Set tiling factor" />
+                              <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
                               <MenuItem mnemonicParsing="false" onAction="#setMaximumAllowedRepeatOverlap" text="Set maximum allowed repeat overlap" />
                           </items>
                         </Menu>
