@@ -1,6 +1,5 @@
 package vpvgui.model;
 
-import de.charite.compbio.jannovar.reference.TranscriptModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -109,9 +108,7 @@ public class TestViewPointCreation {
         System.out.println("Number of entered gene symbols:" + symbols.size());
 
 
-        /* get Jannovar annotation and create ViewPoint objects */
 
-        Map<String,List<TranscriptModel>> validGenes2TranscriptsMap=null;
         List<VPVGene> vpvGeneList;
 
         if (transcriptFile==null) {
@@ -400,14 +397,7 @@ public class TestViewPointCreation {
 
 
 
-    private int getNTranscripts( Map<String,List<TranscriptModel>> mp) {
-        int n=0;
-        for (String s : mp.keySet()) {
-            List<TranscriptModel> lst = mp.get(s);
-            n += lst.size();
-        }
-        return n;
-    }
+
 
 
 }

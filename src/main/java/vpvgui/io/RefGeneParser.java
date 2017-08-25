@@ -1,7 +1,6 @@
 package vpvgui.io;
 
-import de.charite.compbio.jannovar.JannovarException;
-import de.charite.compbio.jannovar.reference.TranscriptModel;
+
 import org.apache.log4j.Logger;
 import vpvgui.model.project.VPVGene;
 

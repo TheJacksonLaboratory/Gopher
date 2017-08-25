@@ -560,7 +560,7 @@ public class ViewPoint {
             resolved = false;
         }
 
-        // originating from the centralized fragment containing 'genomicPos' (included) go fragment-wise in UPSTREAM direction
+        // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
 
         Integer fragCountUp = 0;
         for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
@@ -602,7 +602,7 @@ public class ViewPoint {
             resolved = false;
         }
 
-        // originating from the centralized fragment containing 'genomicPos' (excluded) go fragment-wise in DOWNSTREAM direction
+        // originating from the centralized fragment containing 'genomicPos' (excluded) openExistingProject fragment-wise in DOWNSTREAM direction
 
         Integer fragCountDown = 0;
         for (int i = genomicPosFragIdx + 1; i < restSegListMap.get(motif).size(); i++) { // downstream

@@ -1,7 +1,8 @@
 package vpvgui.model.project;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.testng.Assert;
+
 
 /**
  * Created by peterrobinson on 7/11/17.

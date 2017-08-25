@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import org.apache.log4j.Logger;
 
+import java.awt.event.ActionEvent;
 import java.util.Optional;
 
 public class Popups {
@@ -26,10 +27,40 @@ public class Popups {
         dialog.setTitle(windowTitle);
         dialog.setHeaderText(null);
         dialog.setContentText(labelText);
+        /*Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle(windowTitle);
+        dialog.setHeaderText(null);
+        String  result=null;
 
+       // ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        // dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        Button okButton=new Button("OK");
+        Button cancelButton=new Button("Cancel");
+        TextField userstringField = new TextField();
+        userstringField.setPromptText(promptText);
+
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        grid.add(new Label(labelText), 0, 0);
+        grid.add(userstringField, 1, 0);
+        grid.add(cancelButton,0,1);
+        grid.add(okButton,1,1);
+
+        dialog.getDialogPane().setContent(grid);
+        okButton.setOnAction(e -> {final String s=userstringField.getText();result=s;} );
+
+
+        Platform.runLater(() -> okButton.requestFocus());*/
         Optional<String> result = dialog.showAndWait();
-        return result.orElse(null);
-
+        logger.trace(String.format("We got name=%s",result));
+        if (result.isPresent())
+            return result.get();
+        else
+            return null;
     }
 
 
@@ -110,18 +141,6 @@ public class Popups {
         // Request focus on the button field by default.
         // So that text field shows prompt.
         Platform.runLater(() -> loginButton.requestFocus());
-
-       /* dialog.setResultConverter(dialogButton -> {
-            Integer i=null;
-            if (dialogButton == loginButtonType) {
-                try {
-                    return Integer.parseInt(username.getText());
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-            }
-            return null;
-        });*/
         Optional<Integer> i = dialog.showAndWait();
         if (i.isPresent())
             return i.get();

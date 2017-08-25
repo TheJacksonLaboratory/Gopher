@@ -458,7 +458,9 @@ public class VPVMainPresenter implements Initializable {
         Stage window;
         String windowTitle = "Viewpoint creation";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> {
+            window.close();
+        } );
         window.setTitle(windowTitle);
         pbpresent.setSignal(signal -> {
             switch (signal) {
