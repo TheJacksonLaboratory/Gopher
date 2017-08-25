@@ -44,10 +44,5 @@ public class htsjdk_snippets {
         return fastaReader;
     }
 
-    // find pattern in given FASTA file
-    public static void FindPattern() {
-
-    }
-
 }
 

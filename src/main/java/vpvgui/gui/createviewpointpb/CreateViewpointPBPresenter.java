@@ -2,7 +2,6 @@ package vpvgui.gui.createviewpointpb;
 
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

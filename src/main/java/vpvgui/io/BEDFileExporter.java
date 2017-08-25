@@ -1,7 +1,6 @@
 package vpvgui.io;
 
 import vpvgui.model.project.Segment;
-import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
 
 import java.io.File;

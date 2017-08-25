@@ -1,17 +1,8 @@
 package vpvgui.io;
 
-import htsjdk.samtools.reference.FastaSequenceIndex;
-import javafx.concurrent.Task;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
-import  htsjdk.samtools.reference.FastaSequenceIndexCreator;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class creates a FASTA index for the FASTA file passed to the constructor.

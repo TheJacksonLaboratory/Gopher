@@ -3,12 +3,9 @@ package vpvgui.gui.enzymebox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import vpvgui.gui.settings.SettingsPresenter;
-import vpvgui.gui.settings.SettingsView;
 import vpvgui.model.RestrictionEnzyme;
 
 import java.util.List;
-import java.util.Properties;
 
 public class EnzymeViewFactory {
     static Logger logger = Logger.getLogger(EnzymeViewFactory.class.getName());

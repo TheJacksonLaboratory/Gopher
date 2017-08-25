@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
@@ -45,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static vpvgui.io.Platform.getDefaultProjectPath;
 import static vpvgui.io.Platform.getVPVDir;
 
 
@@ -73,9 +71,13 @@ public class VPVMainPresenter implements Initializable {
     /** List of genome builds. Used by genomeChoiceBox*/
     @FXML
     private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
-
+    /** List of genome builds. Used by genomeChoiceBox*/
+    @FXML
+    private ObservableList<String> approachList = FXCollections.observableArrayList("Custom Panel", "Promoterome");
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
+    @FXML
+    private ChoiceBox<String> approachChoiceBox;
     /** Clicking this button downloads the genome build and unpacks it.*/
     @FXML
     private Button downloadGenome;
@@ -89,6 +91,8 @@ public class VPVMainPresenter implements Initializable {
     /** Label for the transcripts we want to download.*/
     @FXML
     private Label transcriptsLabel;
+    /** Show which design approach */
+    @FXML private Label approachLabel;
 
     /**
      * Clicking this button will download some combination of genome and (compatible) gene definition files.
@@ -212,12 +216,17 @@ public class VPVMainPresenter implements Initializable {
         this.model=new Model();
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
-        genomeChoiceBox.valueProperty().addListener(((observable, oldValue, newValue) -> {
+        genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             resetGenomeBuild(newValue);
-        }));
+        });
+        approachChoiceBox.setItems(approachList);
+        approachChoiceBox.getSelectionModel().selectFirst();
+        approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            this.approachLabel.setText(newValue);
+        });
+        this.approachLabel.setText(approachChoiceBox.getValue());
         initializeBindings();
         initializePromptTextsToDefaultValues();
-        initializeModelFromSettingsIfPossible();
         this.initializer=new Initializer(model);
 
         this.vpanalysisview = new VPAnalysisView();
@@ -249,21 +258,22 @@ public class VPVMainPresenter implements Initializable {
      * If found, initialize the model and the GUI with the data in the settings/project
      * file as avaiable. Otherwise return an empty {@link Model} object.
      * @return A {@link Model} object initialized if possible from a project file
-     * TODO -- now just take the default project file. Later allow user to choose a
-     * project file from a dialog.
-     */
+
     private void initializeModelFromSettingsIfPossible() {
         logger.debug("Initializing model...");
         File defaultProject = getDefaultProjectPath();
         logger.debug("Default project file: "+defaultProject);
         if (!defaultProject.exists()) {
             logger.debug("Default project file did not exist, returning empty Model object.");
-            return; /* return an empty Model object. */
+            return;
         } else if (this.model==null){
             this.model=new Model();
         }
         Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath(), model);
-    }
+    } */
+
+
+    public void setModel(Model mod) { this.model=mod;}
 
     public void initStage(Stage stage) {
         primaryStage = stage;
@@ -341,6 +351,7 @@ public class VPVMainPresenter implements Initializable {
         gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDownloadPI);
         model.setGenomeDirectoryPath(file.getAbsolutePath());
         this.downloadedGenomeLabel.setText(file.getAbsolutePath());
+        this.genomeDownloadPI.setProgress(1.0);
 
 
     }
@@ -393,7 +404,7 @@ public class VPVMainPresenter implements Initializable {
         gindexer.setOnSucceeded( event -> {
             decompressGenomeLabel.setText(gindexer.getStatus());
             if (gindexer.OK())
-                model.setGenomeUnpacked();;
+                model.setGenomeUnpacked();
         });
         Thread th = new Thread(gindexer);
         th.setDaemon(true);
@@ -578,11 +589,17 @@ public class VPVMainPresenter implements Initializable {
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
-
         });
+        if (model.getHttpProxy()!=null) {
+            presenter.setProxyProperty(model.getHttpProxy());
+        }
+        if (model.getHttpProxyPort()!=null) {
+            logger.trace(String.format("http proxy prot get: %s",model.getHttpProxyPort()));
+            presenter.setPort(model.getHttpProxyPort());
+        }
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
-        int port=presenter.getPort();
+        String port=presenter.getPort();
         String proxy=presenter.getProxy();
         if (proxy==null) {
             ErrorWindow.display("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
@@ -593,12 +610,9 @@ public class VPVMainPresenter implements Initializable {
         logger.info("Set proxy to "+proxy);
         logger.info("Set proxy port to "+port);
         System.setProperty("http.proxyHost",proxy);
-        System.setProperty("http.proxyPort",String.format("%d",port ));
+        System.setProperty("http.proxyPort",port);
         System.setProperty("https.proxyHost",proxy);
-        System.setProperty("https.proxyPort",String.format("%d",port ));
-
-
-
+        System.setProperty("https.proxyPort",port);
     }
 
 

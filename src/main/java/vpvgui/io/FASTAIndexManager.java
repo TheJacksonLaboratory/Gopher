@@ -1,7 +1,6 @@
 package vpvgui.io;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 

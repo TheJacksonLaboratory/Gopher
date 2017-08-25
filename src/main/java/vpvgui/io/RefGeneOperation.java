@@ -42,10 +42,7 @@ public class RefGeneOperation implements Operation {
             return false;
         }
         f = new File(getLocalFilePath() + File.separator + "refGene.txt");
-        if (f.exists() && !f.isDirectory()) {
-            return false;
-        }
-        return true;
+        return !f.exists() || f.isDirectory();
     }
 
 }

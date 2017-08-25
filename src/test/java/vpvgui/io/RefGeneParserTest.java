@@ -7,10 +7,8 @@ import org.junit.Test;
 import vpvgui.model.project.VPVGene;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * We are using an excerpt of the entire refGenefile for hg19 with 25 lines corresponding to the

@@ -13,8 +13,6 @@ import vpvgui.gui.splash.SplashPresenter;
 import vpvgui.gui.splash.SplashView;
 import vpvgui.gui.splash.SwitchScreens;
 import vpvgui.model.Model;
-import vpvgui.vpvmain.VPVMainPresenter;
-import vpvgui.vpvmain.VPVMainView;
 
 import java.io.File;
 import java.io.IOException;

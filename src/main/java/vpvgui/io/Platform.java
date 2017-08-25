@@ -6,9 +6,11 @@ import java.io.File;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * This is used to figure out where VPVGui will store the project files. For instance, with linux
+ * this would be /home/username/.vpvgui/...
+ */
 public class Platform {
-
-    private static String defaultProjectName = "vpvgui-defaultproject.settings";
 
     /**
      * Get path to directory where HRMD-gui stores global settings.
@@ -39,20 +41,14 @@ public class Platform {
     }
 
     /**
-     * Get path to directory whrere HRMD-gui stores XML files describing
-     * projects. The method doesn't create a directory if it doesn't exist.
-     * @return
+     * Get the absolute path to the project file, which is a serialized Java file (suffix {@code .ser}).
+     * @param basename The plain project name, e.g., human37cd4
+     * @return the absolute path,e.g., /home/user/data/immunology/human37cd4.ser
      */
-    public static File getDefaultProjectPath() {
+    public static String getAbsoluteProjectPath(String basename) {
         File dir = getVPVDir();
-        return new File(dir + File.separator + defaultProjectName);
+        return new String(dir + File.separator + basename + ".ser");
     }
-
-    public static String getDefaultProjectName() { return defaultProjectName; }
-
-
-
-
 
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */
     private static CurrentPlatform figureOutPlatform() {
@@ -71,7 +67,6 @@ public class Platform {
 
 
     private enum CurrentPlatform {
-
         LINUX("Linux"),
         WINDOWS("Windows"),
         OSX("Os X"),
@@ -79,12 +74,10 @@ public class Platform {
 
         private String name;
 
-        private CurrentPlatform(String n) {this.name = n; }
+        CurrentPlatform(String n) {this.name = n; }
 
         @Override
         public String toString() { return this.name; }
     }
-
-
 
 }

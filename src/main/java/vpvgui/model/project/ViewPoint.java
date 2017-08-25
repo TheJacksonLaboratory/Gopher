@@ -3,8 +3,6 @@ package vpvgui.model.project;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
-import vpvgui.exception.IntegerOutOfRangeException;
-import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
 import java.io.Serializable;
 import java.util.*;
@@ -415,7 +413,7 @@ public class ViewPoint implements Serializable {
     public final ArrayList<Segment> getSelectedRestSegList(String cuttingMotif) {
         ArrayList<Segment> selectedRestSegList = new ArrayList<Segment>();
         for(Segment seg : restSegListMap.get(cuttingMotif)) {
-            if(seg.isSelected()==true) {
+            if(seg.isSelected()) {
                 selectedRestSegList.add(seg);
             }
         }
@@ -595,7 +593,7 @@ public class ViewPoint implements Serializable {
             }
 
             // if after all this the fragment is still selected, increase count
-            if (segment.isSelected() == true) {
+            if (segment.isSelected()) {
                 fragCountUp++;
             }
         }
@@ -636,7 +634,7 @@ public class ViewPoint implements Serializable {
             }
 
             // if after all this the fragment is still selected, increase count
-            if (segment.isSelected() == true) {
+            if (segment.isSelected()) {
                 fragCountDown++;
             }
         }
@@ -651,7 +649,7 @@ public class ViewPoint implements Serializable {
 
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
         for (Segment segment : restSegListMap.get(motif)) {
-            if (segment.isSelected() == true) {
+            if (segment.isSelected()) {
                 setStartPos(segment.getStartPos());
                 break;
             }
@@ -660,7 +658,7 @@ public class ViewPoint implements Serializable {
         // set end position of the viewpoint to end position of the most downstream fragment
         for (int i = restSegListMap.get(motif).size() - 1; --i >= 0;) {
             Segment segment = restSegListMap.get(motif).get(i);
-            if (segment.isSelected() == true) {
+            if (segment.isSelected()) {
                 setEndPos(segment.getEndPos());
                 break;
             }
@@ -719,7 +717,7 @@ public class ViewPoint implements Serializable {
             double repCont = 0;
             double positionScoreSumFragment = 0;
 
-            if (currentSegment.isSelected() == true) {
+            if (currentSegment.isSelected()) {
 
                 repCont=currentSegment.getMeanMarginRepeatContent();
 

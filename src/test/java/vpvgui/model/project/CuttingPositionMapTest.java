@@ -21,8 +21,8 @@ public class CuttingPositionMapTest {
 
     /* test fields */
 
-    String testReferenceSequenceID="chr4_ctg9_hap1";;
-    Integer testGenomicPos=20000;;
+    String testReferenceSequenceID="chr4_ctg9_hap1";
+    Integer testGenomicPos=20000;
     Integer testMaxDistToGenomicPosUp=150;
     Integer testMaxDistToGenomicPosDown=50;
 

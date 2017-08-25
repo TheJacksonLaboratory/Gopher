@@ -1,15 +1,9 @@
 package vpvgui.io;
 
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.stage.DirectoryChooser;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
-import vpvgui.gui.ErrorWindow;
 import vpvgui.model.DataSource;
-
-
-import java.io.File;
 
 public class GenomeDownloader {
     static Logger logger = Logger.getLogger(GenomeDownloader.class.getName());

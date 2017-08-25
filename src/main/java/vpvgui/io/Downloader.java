@@ -147,7 +147,7 @@ public class Downloader extends Task<Void> {
                     threshold += block;
                 }
             }
-            logger.info("Successful download from "+urlstring+": " + (new Integer(totalBytesRead).toString()) + "(" + size + ") bytes read.");
+            logger.info("Successful download from "+urlstring+": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
             err = String.format("Could not interpret url: \"%s\"\n%s", urlstring, e.toString());

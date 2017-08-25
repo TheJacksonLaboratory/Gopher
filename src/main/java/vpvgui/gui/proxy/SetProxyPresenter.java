@@ -16,8 +16,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.converter.NumberStringConverter;
+import org.apache.log4j.Logger;
 import vpvgui.framework.Signal;
-import vpvgui.io.Platform;
 
 
 import java.net.URL;
@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class SetProxyPresenter implements Initializable {
-
+    static Logger logger = Logger.getLogger(SetProxyPresenter.class.getName());
     @FXML
     private Button acceptButton;
     @FXML
@@ -38,10 +38,11 @@ public class SetProxyPresenter implements Initializable {
 
     private Tooltip ttip;
 
-    private IntegerProperty portProperty= new SimpleIntegerProperty();
-    public IntegerProperty portProperty() { return portProperty;  }
-    public int getPort() {return portProperty.get();}
-    public void setPort(Integer i) { this.portProperty.setValue(i);}
+    private StringProperty portProperty= new SimpleStringProperty();
+    /** Note we return a String but it has been validated as a valid integer! */
+    public String getPort() {return portProperty.get();}
+    public void setPort(String i) {
+        this.portProperty.setValue(i);}
     private StringProperty proxyProperty = new SimpleStringProperty(this,"proxyProperty");
     public StringProperty proxyProperty() {  return proxyProperty;  }
     public String getProxy() { return proxyProperty.getValue();}
@@ -49,7 +50,7 @@ public class SetProxyPresenter implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.portTextField.textProperty().bindBidirectional(portProperty,new NumberStringConverter());
+        this.portTextField.textProperty().bindBidirectional(portProperty);
         this.portTextField.setText("");
         this.portTextField.textProperty().addListener(new ChangeListener<String>(){
             @Override public void changed(ObservableValue<? extends String> observable,
@@ -57,6 +58,7 @@ public class SetProxyPresenter implements Initializable {
             validateInteger(portTextField);
         }
         });
+        logger.trace("initialized port to "+portTextField.getText());
 
         this.proxyTextField.textProperty().bindBidirectional(proxyProperty);
         this.proxyTextField.textProperty().addListener(new ChangeListener<String>(){
@@ -133,7 +135,7 @@ public class SetProxyPresenter implements Initializable {
 
 
     @FXML public void acceptProxy(ActionEvent e) {
-        System.out.println("proxy" + getProxy()+ ", port="+getPort());
+        logger.trace("proxy" + getProxy()+ ", port="+getPort());
         signal.accept(Signal.DONE);
     }
 }

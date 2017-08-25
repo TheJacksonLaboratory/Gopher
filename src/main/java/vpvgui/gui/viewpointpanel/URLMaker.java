@@ -2,11 +2,7 @@ package vpvgui.gui.viewpointpanel;
 
 
 import org.apache.log4j.Logger;
-import vpvgui.model.project.Segment;
 import vpvgui.model.project.ViewPoint;
-
-import javax.swing.text.View;
-import java.util.List;
 
 /**
  * This class makes URLs for displaying the viewpoints.

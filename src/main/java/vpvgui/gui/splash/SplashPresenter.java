@@ -1,7 +1,5 @@
 package vpvgui.gui.splash;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -56,15 +53,13 @@ public class SplashPresenter implements Initializable {
         projectBox.getSelectionModel().selectFirst();
 
         /*
-        .getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-      @Override
-         */
         projectBox.getSelectionModel().
                 selectedItemProperty().
                 addListener((observable,  oldValue,  newValue)
                         -> {
                     System.out.println(newValue);
                 });
+                 */
         Image newFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/newFileIcon.png"));
         Image openFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/openFileIcon.png"));
         this.openFileView.setImage(openFileImage);
@@ -96,8 +91,7 @@ public class SplashPresenter implements Initializable {
        File[] files = dir.listFiles(new FileFilter() {
            @Override
            public boolean accept(File pathname) {
-               if (pathname.getAbsolutePath().endsWith(".settings")) return true;
-               return false;
+               return pathname.getAbsolutePath().endsWith(".settings");
            }
        });
         ObservableList<String> lst = FXCollections.observableArrayList();

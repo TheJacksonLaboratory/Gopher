@@ -10,9 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.text.DecimalFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by peterrobinson on 7/11/17.

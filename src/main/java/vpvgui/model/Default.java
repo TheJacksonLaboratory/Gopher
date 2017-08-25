@@ -21,13 +21,15 @@ public class Default {
 
     public final static int MAXIMUM_SIZE_DOWNSTREAM = 5000;
 
-    public final static double TILING_FACTOR = 1.0;
+    public final static double TILING_FACTOR = 2.0;
 
     public final static int MINIMUM_FRAGMENT_SIZE = 120;
 
     public final static double MAXIMUM_REPEAT_CONTENT = 0.6;
 
     public final static int MARGIN_SIZE = 250;
+
+    public final static String GENOME_BUILD = "hg19";
 
 
 

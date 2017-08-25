@@ -45,10 +45,7 @@ public class GenomeDownloadOperation implements Operation {
             return false;
         }
         f = new File(getLocalFilePath() + File.separator + "chr1.fa");
-        if(f.exists() && !f.isDirectory()) {
-             return false;
-        }
-        return true;
+        return !f.exists() || f.isDirectory();
     }
 
 }

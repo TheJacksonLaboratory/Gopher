@@ -2,8 +2,6 @@ package vpvgui.gui.enzymebox;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -12,8 +10,6 @@ import org.apache.log4j.Logger;
 import vpvgui.framework.Signal;
 import vpvgui.model.RestrictionEnzyme;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;

@@ -2,7 +2,6 @@ package vpvgui.io;
 
 //import htsjdk.samtools.reference.FastaSequenceIndexCreator;
 import javafx.concurrent.Task;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -10,8 +9,6 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is responsible for g-unzipping and untarring a downloaded genome file.

@@ -8,7 +8,6 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import org.apache.log4j.Logger;
 
-import java.awt.event.ActionEvent;
 import java.util.Optional;
 
 public class Popups {
@@ -58,10 +57,7 @@ public class Popups {
         Platform.runLater(() -> okButton.requestFocus());*/
         Optional<String> result = dialog.showAndWait();
         logger.trace(String.format("We got name=%s",result));
-        if (result.isPresent())
-            return result.get();
-        else
-            return null;
+        return result.orElse(null);
     }
 
 

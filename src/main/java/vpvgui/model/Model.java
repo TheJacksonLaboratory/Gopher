@@ -5,8 +5,6 @@ import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.VPVGene;
 import vpvgui.model.project.ViewPoint;
-
-import static vpvgui.io.Platform.getDefaultProjectName;
 import static vpvgui.io.Platform.getVPVDir;
 
 import java.io.*;
@@ -23,7 +21,7 @@ import java.util.Properties;
  */
 public class Model implements Serializable {
 
-    private static final String DEFAULT_GENOME_BUILD = "hg19";
+
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     private static final Logger logger = Logger.getLogger(Model.class.getName());
 
@@ -38,10 +36,10 @@ public class Model implements Serializable {
     private String genomeDirectoryPath=null;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
-    /** Proxy port (null if not set) */
-    private Integer httpPort=null;
+    /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
+    private String httpPort=null;
     /** the name of the project that will be used to write the settings file (default: vpvgui). */
-    private String projectName="vpvgui";
+    private String projectName=null;
     /** This suffix is appended to the project name to get the name of the file for storing project settings. */
     public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
     /** HAs the UCSC Genome build been unpacked yet? :*/
@@ -159,7 +157,6 @@ public class Model implements Serializable {
     public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
 
     public String transcriptsBasename = null;
-
     public String getTranscriptsBasename() {
         return transcriptsBasename;
     }
@@ -168,13 +165,9 @@ public class Model implements Serializable {
 
     public Model() {
         initializeEnzymesFromFile();
-        defaultInit();
     }
 
-    private void defaultInit() {
-        setProjectName(getDefaultProjectName());
-        setGenomeBuild(DEFAULT_GENOME_BUILD);
-    }
+
 
     /** This method should be called when we create a new Model and want to use default settings.
      */
@@ -191,7 +184,7 @@ public class Model implements Serializable {
         setTilingFactor(Default.TILING_FACTOR);
         setMaximumAllowedRepeatOverlap(Default.MAXIMUM_ALLOWED_REPEAT_OVERLAP);
         setMarginSize(Default.MARGIN_SIZE);
-
+        setGenomeBuild(Default.GENOME_BUILD);
     }
 
 
@@ -317,8 +310,8 @@ public class Model implements Serializable {
         this.chosenEnzymelist = chosenEnzymes;
     }
 
-    public void setHttpProxyPort(int port) {this.httpPort=port; }
-    public Integer getHttpProxyPort() { return this.httpPort; }
+    public void setHttpProxyPort(String port) {this.httpPort=port; }
+    public String getHttpProxyPort() { return this.httpPort; }
     public String getHttpProxy() { return this.httpProxy; }
     public void setHttpProxy(String proxy) {this.httpProxy=proxy; }
     public boolean needsProxy() { return (httpProxy!=null && httpPort!=null); }
