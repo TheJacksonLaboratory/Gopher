@@ -1,7 +1,6 @@
 package vpvgui.model;
 
 
-import javafx.beans.property.*;
 import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.project.VPVGene;
@@ -17,16 +16,17 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by peter on 05.05.17.
- * Modified by blauh on 06.12.17 to add Settings instance variable to Model constructor.
+ * This class stores all of the data related to a project, including the list of genes and the viewpoint objects.
+ * @author Peter Robinson
+ * @author Hannah Blau
+ * @version 0.2
  */
-public class Model {
+public class Model implements Serializable {
 
     private static final String DEFAULT_GENOME_BUILD = "hg19";
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
-    static Logger logger = Logger.getLogger(Model.class.getName());
+    private static final Logger logger = Logger.getLogger(Model.class.getName());
 
-    private DataSource datasource = null;
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -51,79 +51,64 @@ public class Model {
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
     /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10  */
-    private StringProperty genomeBuild = new SimpleStringProperty(this, "genomeBuild");
+    private String genomeBuild = null;
     public String getGenomeBuild() {
-        return genomeBuild.getValue();
-    }
-    public void setGenomeBuild(String newDatabase) {
-        genomeBuild.set(newDatabase);
-    }
-    public StringProperty genomeBuildProperty() {
         return genomeBuild;
     }
+    public void setGenomeBuild(String newDatabase) { genomeBuild=newDatabase; }
     /** Minimum size upstream of the view point. */
-    final private IntegerProperty minSizeUpProperty = new SimpleIntegerProperty();
-    public IntegerProperty minSizeUpProperty() { return minSizeUpProperty;  }
-    public int minSizeUp() {return minSizeUpProperty.getValue();}
-    public void setMinSizeUpProperty(Integer i) { this.minSizeUpProperty.setValue(i);}
+    private Integer minSizeUp = null;
+    public int getMinSizeUp() {return minSizeUp;}
+    public void setMinSizeUp(Integer i) { this.minSizeUp=i;}
 
-    final private IntegerProperty minSizeDownProperty = new SimpleIntegerProperty();
-    public IntegerProperty minSizeDownProperty() { return minSizeDownProperty;  }
-    public int minSizeDown() {return minSizeDownProperty.getValue();}
-    public void setMinSizeDownProperty(Integer i) { this.minSizeDownProperty.setValue(i);}
+    private Integer minSizeDown=null;
+    public int getMinSizeDown() {return minSizeDown;}
+    public void setMinSizeDown(Integer i) { this.minSizeDown=i;}
 
-    final private IntegerProperty maxSizeUpProperty = new SimpleIntegerProperty();
-    public IntegerProperty maxSizeUpProperty() { return maxSizeUpProperty;  }
-    public int maxSizeUp() {return maxSizeUpProperty.getValue();}
-    public void setMaxSizeUpProperty(Integer i) { this.maxSizeUpProperty.setValue(i);}
+    private Integer maxSizeUp=null;
+    public int getMaxSizeUp() {return maxSizeUp;}
+    public void setMaxSizeUp(Integer i) { this.maxSizeUp=i;}
 
-    final private IntegerProperty maxSizeDownProperty = new SimpleIntegerProperty();
-    public IntegerProperty maxSizeDownProperty() { return maxSizeDownProperty;  }
-    public int maxSizeDown() {return maxSizeDownProperty.getValue();}
-    public void setMaxSizeDownProperty(Integer i) { this.maxSizeDownProperty.setValue(i);}
+    private Integer maxSizeDown = null;
+    public int getMaxSizeDown() {return maxSizeDown;}
+    public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
 
-    final private IntegerProperty minFragSizeProperty = new SimpleIntegerProperty();
-    public IntegerProperty minFragSizeProperty() { return minFragSizeProperty;  }
-    public int minFragSize() { return minFragSizeProperty.getValue(); }
-    public void setMinFragSizeProperty(Integer i) { this.minFragSizeProperty.setValue(i);}
+    private Integer minFragSize = null;
+    public int getMinFragSize() { return minFragSize; }
+    public void setMinFragSize(Integer i) { this.minFragSize=i;}
 
-    final private IntegerProperty fragNumUpProperty = new SimpleIntegerProperty();
-    public IntegerProperty fragNumUpProperty() { return fragNumUpProperty;  }
-    public int fragNumUp() { return fragNumUpProperty.getValue(); }
-    public void setFragNumUpProperty(Integer i) { this.fragNumUpProperty.setValue(i);}
+    private Integer fragNumUp = null;
+    public int getFragNumUp() { return fragNumUp; }
+    public void setFragNumUp(Integer i) { this.fragNumUp=i;}
 
-    final private IntegerProperty fragNumDownProperty = new SimpleIntegerProperty();
-    public IntegerProperty fragNumDownProperty() { return fragNumDownProperty;  }
-    public int fragNumDown() { return fragNumDownProperty.getValue(); }
-    public void setFragNumDownProperty(Integer i) { this.fragNumDownProperty.setValue(i);}
+    private Integer fragNumDown = null;
+    public int fragNumDown() { return fragNumDown; }
+    public void setFragNumDown(Integer i) { this.fragNumDown=i;}
 
-    final private DoubleProperty maxRepeatContentProperty = new SimpleDoubleProperty();
-    public DoubleProperty maxRepeatContentProperty() {return maxRepeatContentProperty; }
-    public double maxRepeatContent() {return maxRepeatContentProperty.getValue();}
-    public void setMaxRepeatContentProperty(double r) { this.maxRepeatContentProperty.setValue(r);}
+    private Double maxRepeatContent = null;
+    public double getMaxRepeatContent() {return maxRepeatContent;}
+    public void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
+
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
 
 
-    private IntegerProperty probeLengthProperty=new SimpleIntegerProperty();
-    public IntegerProperty getProbeLengthProperty() { return probeLengthProperty;}
-    public int getProbeLength() { return probeLengthProperty.intValue(); }
-    public void setProbeLength(Integer probeLength) {this.probeLengthProperty.set(probeLength); }
+    private Integer probeLength =null;
+    public int getProbeLength() { return probeLength; }
+    public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
 
 
     private int totalNumberOfProbeNucleotides;
     public void setTotalNumberOfProbeNucleotides(int n) { this.totalNumberOfProbeNucleotides=n;}
     public int getTotalNumberOfProbeNucleotides() {return this.totalNumberOfProbeNucleotides;}
 
-    private DoubleProperty tilingFactorProperty =new SimpleDoubleProperty();
-    public DoubleProperty getTilingFactorProperty() { return tilingFactorProperty;    }
-    public double getTilingFactor(){return tilingFactorProperty.doubleValue(); }
-    public void setTilingFactor(Double tilingFactor) {this.tilingFactorProperty.set(tilingFactor); }
+    private Double tilingFactor =null;
+    public double getTilingFactor(){return tilingFactor; }
+    public void setTilingFactor(Double tilingFactor) {this.tilingFactor=tilingFactor; }
 
-    public IntegerProperty maximumAllowedRepeatOverlapProperty=new SimpleIntegerProperty();
-    public IntegerProperty getMaximumAllowedRepeatOverlapProperty() { return maximumAllowedRepeatOverlapProperty;}
-    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlapProperty.intValue();}
-    public void setMaximumAllowedRepeatOverlapProperty(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlapProperty.set(maximumAllowedRepeatOverlap); }
+    public Integer maximumAllowedRepeatOverlap =null;
+    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
+    public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }
 
     private Map<String, String> indexedFaFiles=null;
 
@@ -361,14 +346,14 @@ public class Model {
         properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());
         String tgpath=model.getTargetGenesPath()!=null?model.getTargetGenesPath():"null";
         properties.setProperty("target_genes_path",tgpath);
-        properties.setProperty("fragNumUp",String.format("%d",model.fragNumUp()));
+        properties.setProperty("getFragNumUp",String.format("%d",model.getFragNumUp()));
         properties.setProperty("fragNumDown",String.format("%d",model.fragNumDown()));
-        properties.setProperty("minSizeUp",String.format("%d",model.minSizeUp()));
-        properties.setProperty("minSizeDown",String.format("%d",model.minSizeDown()));
-        properties.setProperty("maxSizeUp",String.format("%d",model.maxSizeUp()));
-        properties.setProperty("maxSizeDown",String.format("%d",model.maxSizeDown()));
-        properties.setProperty("minFragSize",String.format("%d",model.minFragSize()));
-        properties.setProperty("maxRepeatContent",String.format("%f",model.maxRepeatContent()));
+        properties.setProperty("getMinSizeUp",String.format("%d",model.getMinSizeUp()));
+        properties.setProperty("getMinSizeDown",String.format("%d",model.getMinSizeDown()));
+        properties.setProperty("getMaxSizeUp",String.format("%d",model.getMaxSizeUp()));
+        properties.setProperty("getMaxSizeDown",String.format("%d",model.getMaxSizeDown()));
+        properties.setProperty("getMinFragSize",String.format("%d",model.getMinFragSize()));
+        properties.setProperty("maxRepeatContent",String.format("%f",model.getMaxRepeatContent()));
         return properties;
     }
 
@@ -452,45 +437,45 @@ public class Model {
         if (target_genes_path!=null) {
             model.setTargetGenesPath(target_genes_path);
         }
-        String fragNumUp = properties.getProperty("fragNumUp");
+        String fragNumUp = properties.getProperty("getFragNumUp");
         if (fragNumUp!=null) {
             Integer i = Integer.parseInt(fragNumUp);
-            model.setFragNumUpProperty(i);
+            model.setFragNumUp(i);
         }
         String fragNumDown = properties.getProperty("fragNumDown");
         if (fragNumDown!=null) {
             Integer i = Integer.parseInt(fragNumDown);
-            model.setFragNumDownProperty(i);
+            model.setFragNumDown(i);
         }
-        String minSizeUp = properties.getProperty("minSizeUp");
+        String minSizeUp = properties.getProperty("getMinSizeUp");
         if (minSizeUp!=null) {
             Integer i = Integer.parseInt(minSizeUp);
-            model.setMinSizeUpProperty(i);
+            model.setMinSizeUp(i);
         }
-        String minSizeDown = properties.getProperty("minSizeDown");
+        String minSizeDown = properties.getProperty("getMinSizeDown");
         if (minSizeDown!=null) {
             Integer i = Integer.parseInt(minSizeDown);
-            model.setMinSizeDownProperty(i);
+            model.setMinSizeDown(i);
         }
-        String maxSizeUp = properties.getProperty("maxSizeUp");
+        String maxSizeUp = properties.getProperty("getMaxSizeUp");
         if (maxSizeUp!=null) {
             Integer i = Integer.parseInt(maxSizeUp);
-            model.setMaxSizeUpProperty(i);
+            model.setMaxSizeUp(i);
         }
-        String maxSizeDown = properties.getProperty("maxSizeDown");
+        String maxSizeDown = properties.getProperty("getMaxSizeDown");
         if (maxSizeDown!=null) {
             Integer i = Integer.parseInt(maxSizeDown);
-            model.setMaxSizeDownProperty(i);
+            model.setMaxSizeDown(i);
         }
-        String minFragSize = properties.getProperty("minFragSize");
+        String minFragSize = properties.getProperty("getMinFragSize");
         if (minFragSize!=null) {
             Integer i = Integer.parseInt(minFragSize);
-            model.setMinFragSizeProperty(i);
+            model.setMinFragSize(i);
         }
         String maxRepeatContent = properties.getProperty("maxRepeatContent");
         if (maxRepeatContent!=null) {
             Double d = Double.parseDouble(maxRepeatContent);
-            model.setMaxRepeatContentProperty(d);
+            model.setMaxRepeatContent(d);
         }
         logger.info("Set model from settings file at "+settingsFile.getAbsolutePath());
         return;

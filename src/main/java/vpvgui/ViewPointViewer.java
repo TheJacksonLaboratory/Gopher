@@ -57,7 +57,7 @@ public class ViewPointViewer extends Application {
     @Override
     public void stop() throws Exception {
         //logger.info("Closing VPV Gui");
-
+        System.err.println("CLOSING STYOP()");
         Injector.forgetAll();
     }
 

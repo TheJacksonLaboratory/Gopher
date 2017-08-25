@@ -48,7 +48,7 @@ public class DesignTest {
         // create a model for testing
         testModel = new Model();
         testModel.setProbeLength(120);
-        testModel.setMaximumAllowedRepeatOverlapProperty(20);
+        testModel.setMaximumAllowedRepeatOverlap(20);
         testModel.setTilingFactor(2.0);
 
         // add a list of two overlapping viewpoints to the model

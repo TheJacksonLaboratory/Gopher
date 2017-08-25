@@ -35,6 +35,7 @@ import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.project.ViewPoint;
 import vpvgui.model.project.ViewPointCreationTask;
+import vpvgui.util.SerializationManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,9 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static vpvgui.gui.Popups.getDoubleFromUser;
-import static vpvgui.gui.Popups.getIntegerFromUser2;
 import static vpvgui.io.Platform.getDefaultProjectPath;
+import static vpvgui.io.Platform.getVPVDir;
 
 
 /**
@@ -178,9 +178,30 @@ public class VPVMainPresenter implements Initializable {
     void exitButtonClicked(ActionEvent e) {
         e.consume();
         logger.info("Closing VPV Gui");
-        Model.writeSettingsToFile(this.model);
-        closeWindow(e);
+        serialize();
+        //Model.writeSettingsToFile(this.model);
+        //closeWindow(e);
+        javafx.application.Platform.exit();
     }
+
+
+    public void serialize() {
+        String projectname=this.model.getProjectName();
+        if (projectname==null) {
+            ErrorWindow.display("Error","Could not get project name (should never happen). Will save with default");
+            projectname="default";
+        }
+        File dir=getVPVDir();
+        String savepath=new String(dir+File.separator+projectname);
+        try {
+            SerializationManager.serializeModel(this.model, savepath);
+        } catch (IOException e) {
+            ErrorWindow.displayException("Error","Unable to serialize VPV project",e);
+        }
+        logger.trace("Serialization successful to file "+savepath);
+    }
+
+
 
 
 
@@ -205,10 +226,6 @@ public class VPVMainPresenter implements Initializable {
 
         createPanes();
         setInitializedValuesInGUI();
-
-
-        // this.genomeChoiceBox.getItems().addAll(genomeTranscriptomeList);
-        // textLabel.textProperty().bind(textTextField.textProperty());*/
     }
 
     private void setInitializedValuesInGUI() {
@@ -266,15 +283,16 @@ public class VPVMainPresenter implements Initializable {
      * the GUI elements.
      */
     private void initializeBindings() {
-        genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
-        this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
+       // genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
+        /*this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
         this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
         this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-        this.maxSizeUpTextField.textProperty().bindBidirectional(model.maxSizeUpProperty(),new NumberStringConverter());
+        this.maxSizeUpTextField.textProperty().bindBidirectional(model.getMaxSizeUp(),new NumberStringConverter());
         this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
         this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
         this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
         this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
+        */
     }
 
 
@@ -306,7 +324,7 @@ public class VPVMainPresenter implements Initializable {
      * {@link #decompressGenome(ActionEvent)} which is called after the corresponding button
      * is clicked in the GUI.
      */
-    public void downloadGenome() {
+    @FXML public void downloadGenome() {
         String build = this.model.getGenomeBuild();
         logger.info("About to download genome for "+build +" (if necessary)");
         GenomeDownloader gdownloader = new GenomeDownloader(build);
@@ -402,14 +420,9 @@ public class VPVMainPresenter implements Initializable {
     /** This function is called after the user has chosen restriction enzymes in the
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
      * objects to the {@link Model}.*/
-    public void chooseEnzymes() {
+    @FXML public void chooseEnzymes() {
         List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
-        //List<RestrictionEnzyme> chosenEnzymes = EnzymeCheckBoxWindow.display(enzymes);
         List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(enzymes);
-        //EnzymeBoxView view = new EnzymeBoxView();
-        //EnzymeBoxPresenter presenter = (EnzymeBoxPresenter) view.getPresenter();
-
-
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
         this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }
@@ -491,8 +504,10 @@ public class VPVMainPresenter implements Initializable {
         boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
         if (answer) {
             logger.info("Closing VPV Gui");
-            Model.writeSettingsToFile(this.model);
+            //Model.writeSettingsToFile(this.model);
+            serialize();
         }
+
         System.exit(0);
     }
 
@@ -651,7 +666,7 @@ public class VPVMainPresenter implements Initializable {
            ErrorWindow.display("Could not get probe length","enter an integer value!");
            return;
        }
-        this.model.getProbeLengthProperty().setValue(len);
+        this.model.setProbeLength(len);
        logger.trace(String.format("We just set probe length to %d",model.getProbeLength() ));
     }
 
@@ -661,7 +676,7 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Could not get tiling factor","enter a numeric value!");
             return;
         }
-        this.model.getTilingFactorProperty().setValue(factor);
+        this.model.setTilingFactor(factor);
         logger.trace(String.format("We just set set TilingFactor to %f",model.getTilingFactor() ));
     }
 
@@ -672,7 +687,7 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Could not get Maximum allowed repeat length","enter an integer value!");
             return;
         }
-        this.model.getMaximumAllowedRepeatOverlapProperty().setValue(len);
+        this.model.setMaximumAllowedRepeatOverlap(len);
         logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d",model.getMaximumAllowedRepeatOverlap() ));
     }
 

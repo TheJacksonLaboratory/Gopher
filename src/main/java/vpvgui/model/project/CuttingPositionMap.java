@@ -4,6 +4,8 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
+
+import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,8 +20,10 @@ import java.util.regex.Pattern;
  * In addition to the usual getter and setter function, the class provides a functions that allow to query the <i>HashMap</i>.
  * @author Peter Hansen
  */
-public class CuttingPositionMap {
-    static Logger logger = Logger.getLogger(CuttingPositionMap.class.getName());
+public class CuttingPositionMap implements Serializable {
+    private static final Logger logger = Logger.getLogger(CuttingPositionMap.class.getName());
+    /** serialization version ID */
+    static final long serialVersionUID = 1L;
     /** The central, anchor position of the viewpoint */
     private Integer genomicPos;
     private Integer maxDistToGenomicPosUp;
@@ -27,9 +31,6 @@ public class CuttingPositionMap {
     private static HashMap<String,ArrayList<Integer>> cuttingPositionMap;
     /** This map will store the position of the "^", which indicates the cutting site.. */
     private static HashMap<String,Integer> cuttingPositionMapOffsets;
-
-
-    /* constructor */
 
     /**
      * The constructor will set all fields of this class and create the actual <i>HashMap</i> for cutting positions,

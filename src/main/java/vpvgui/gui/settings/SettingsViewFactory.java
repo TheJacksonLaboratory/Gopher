@@ -69,8 +69,8 @@ public class SettingsViewFactory {
                 "Path to reference gene"
         };
         String[] numericProps = new String[] {
-                "fragNumUp", "fragNumDown", "minSizeUp", "maxSizeUp", "minSizeDown",
-                "maxSizeDown", "minFragSize", "maxRepeatContent"
+                "getFragNumUp", "fragNumDown", "getMinSizeUp", "getMaxSizeUp", "getMinSizeDown",
+                "getMaxSizeDown", "getMinFragSize", "maxRepeatContent"
         };
         String[] numericPropNames = new String[] {
                 "# Fragments upstream", "# Fragments downstream", "Minimum size upstream",

@@ -16,7 +16,7 @@ import java.util.List;
  * Created by peterrobinson on 7/22/17.
  */
 public class ViewPointCreationTask extends Task {
-    static Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
+    private static final Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
     Model model=null;
 
     /* List of VPVGenes representing User's gene list. */
@@ -33,7 +33,6 @@ public class ViewPointCreationTask extends Task {
 
     private int minDistToGenomicPosDown;
 
-    private  IndexedFastaSequenceFile fastaReader;
 
     /* declare viewpoint parameters as requested by Darío */
 
@@ -63,14 +62,14 @@ public class ViewPointCreationTask extends Task {
 
     private void init_parameters() {
         this.vpvGeneList=model.getVPVGeneList();
-        this.fragNumUp=model.fragNumUp();
+        this.fragNumUp=model.getFragNumUp();
         this.fragNumDown=model.fragNumDown();
-        this.minSizeUp=model.minSizeUp();
-        this.minDistToGenomicPosDown=model.minSizeDown();
-        this.maxDistanceUp =model.maxSizeUp();
-        this.maxDistanceDown =model.maxSizeDown();
-        this.minFragSize=model.minFragSize();
-        this.maxRepContent=model.maxRepeatContent();
+        this.minSizeUp=model.getMinSizeUp();
+        this.minDistToGenomicPosDown=model.getMinSizeDown();
+        this.maxDistanceUp =model.getMaxSizeUp();
+        this.maxDistanceDown =model.getMaxSizeDown();
+        this.minFragSize=model.getMinFragSize();
+        this.maxRepContent=model.getMaxRepeatContent();
         //this.cuttingPatterns=model.getCuttingPatterns();
         //TODO Get the cuttings patterns from GUI!
         this.cuttingPatterns=  new String[]{"GATC"};
@@ -115,7 +114,7 @@ public class ViewPointCreationTask extends Task {
                 continue;
             }
             try {
-                this.fastaReader = new IndexedFastaSequenceFile(new File(path));
+                IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
                 List<Integer> gPosList = vpvgene.getTSSlist();
                 for (Integer gPos : gPosList) {
                     ViewPoint vp = new ViewPoint.Builder(referenceSequenceID,gPos).
@@ -123,7 +122,7 @@ public class ViewPointCreationTask extends Task {
                             maxDistToGenomicPosUp(maxDistanceUp).
                             maxDistToGenomicPosDown(maxDistanceDown).
                             cuttingPatterns(this.cuttingPatterns).
-                            fastaReader(this.fastaReader).
+                            fastaReader(fastaReader).
                             minimumSizeUp(minSizeUp).
                             maximumSizeUp(maxDistanceUp).
                             minimumSizeDown(minDistToGenomicPosDown).

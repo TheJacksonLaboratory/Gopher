@@ -219,7 +219,7 @@ public class ViewPointTest {
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
         //ViewPoint testViewpointLupianez = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
-        //        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
+        //        testViewpointLupianez.generateViewpointLupianez(getFragNumUp, fragNumDown, motif, getMinSizeUp, getMaxSizeUp, getMinSizeDown, getMaxSizeDown, getMinFragSize, minRepFrag, marginSize);
         Integer fragNumUp = 1;
         Integer fragNumDown = 1;
         String motif = "ALL";
@@ -277,14 +277,14 @@ public class ViewPointTest {
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
         System.out.println("Arguments used to call the function 'generateViewpointLupianez':");
-        System.out.println("\t" + "fragNumUp = " + fragNumUp);
+        System.out.println("\t" + "getFragNumUp = " + fragNumUp);
         System.out.println("\t" + "fragNumDown = " + fragNumDown);
         System.out.println("\t" + "motif = " + motif);
-        System.out.println("\t" + "minSizeUp = " + minSizeUp);
-        System.out.println("\t" + "maxSizeUp = " + maxSizeUp);
-        System.out.println("\t" + "minSizeDown = " + minSizeDown);
-        System.out.println("\t" + "maxSizeDown = " + maxSizeDown);
-        System.out.println("\t" + "minFragSize = " + minFragSize);
+        System.out.println("\t" + "getMinSizeUp = " + minSizeUp);
+        System.out.println("\t" + "getMaxSizeUp = " + maxSizeUp);
+        System.out.println("\t" + "getMinSizeDown = " + minSizeDown);
+        System.out.println("\t" + "getMaxSizeDown = " + maxSizeDown);
+        System.out.println("\t" + "getMinFragSize = " + minFragSize);
         System.out.println();
 
         System.out.println("-----------------------------------------------------------------------------------------");

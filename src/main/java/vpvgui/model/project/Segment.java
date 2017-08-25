@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.IntPair;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -12,8 +13,10 @@ import java.util.ArrayList;
  * This class is a temporary substitute fot the class <i>Fragment</i>, because there was consensus about the concept of the class fragment.
  * The class represents a restriction fragment that is a member of a viewpoint.
  */
-public class Segment {
+public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
+    /** serialization version ID */
+    static final long serialVersionUID = 1L;
     /** The id of the larger sequence where this Segment is located (usually a chromosome).*/
     private String referenceSequenceID;
     /** The most 5' position of this Segment on the {@link #referenceSequenceID}. */
@@ -46,7 +49,7 @@ public class Segment {
         this.fastaReader = fastaReader;
         setSelected(selected);
         calculateRepeatContent();
-        this.marginSize=150; /* todo--depreacted */
+        this.marginSize=150; /* todo--deprecated */
         calculateRepeatContentMargins();
     }
 

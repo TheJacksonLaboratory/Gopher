@@ -1,12 +1,18 @@
 package vpvgui.model.project;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * This class will represent Genes according to the way we are analyzing them in VPV.
- * One of the target genes for which we want to design capture C probes
+ * The main purpose of the class is to keep track of the gene symbols and all of the
+ * independent transcription start sites that are dervied from the UCSC RefGenes file.
+ * @author Peter Robinson
+ * @version 0.2
  */
-public class VPVGene {
+public class VPVGene implements Serializable {
+    /** serialization version ID */
+    static final long serialVersionUID = 1L;
     /** An NCBI RefSeq id such as NM_001353311. */
     private String refSeqID =null;
     /** A gene symbolsuch as IGSF11 */
@@ -20,15 +26,11 @@ public class VPVGene {
      * The set then has all TSS (unique)
      */
     private Set<Integer> positions;
-    /** Remove this, we do not need it followiing refactor. */
-   @Deprecated  private List<ViewPoint> viewPointList;
-
 
 
     public VPVGene(String geneid, String symbol) {
         this.refSeqID =geneid;
         this.geneSymbol=symbol;
-        this.viewPointList=new ArrayList<>();
         this.positions =new HashSet<>();
     }
     /** @return a sorted list of TSS. */
@@ -53,15 +55,6 @@ public class VPVGene {
     /** Set this VPVGene to be on the reverse strand */
     public void setReverseStrand() {
         this.forward=false;
-    }
-    /** Ich würde gern diese Funktion rausnehmen und die ViewPoints anders erzeugen! */
-    @Deprecated
-    public void addViewPoint(ViewPoint vp) {
-        if (this.positions.contains(vp.getGenomicPos())) {
-            return;
-        }
-        this.positions.add(vp.getGenomicPos());
-        this.viewPointList.add(vp);
     }
 
     /** This function adds a position (such as a transcription start site) that is the
@@ -89,10 +82,6 @@ public class VPVGene {
         }
         sb.append("\n");
         return sb.toString();
-    }
-
-    public List<ViewPoint> getviewPointList(){
-        return viewPointList;
     }
     
     public String getContigID() {

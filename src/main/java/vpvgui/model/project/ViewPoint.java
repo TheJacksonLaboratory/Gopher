@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -27,8 +28,10 @@ import java.util.*;
  * @author Peter Hansen
  * @version 0.0.4 (2017-07-24)
  */
-public class ViewPoint {
-    static Logger logger = Logger.getLogger(ViewPoint.class.getName());
+public class ViewPoint implements Serializable {
+    private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
+    /** serialization version ID */
+    static final long serialVersionUID = 1L;
     /** Size of the "borders" at the edges of a fragment that are especially important because we sequence there. */
     private int marginSize;
     /** Maximum allowable repeat content for a fragment to be included. A fragment will be deselected
@@ -66,7 +69,7 @@ public class ViewPoint {
     /* List of restriction 'Fragment' objects that are within the viewpoint */
     private HashMap<String, ArrayList<Segment>> restSegListMap;
     /** Reference to the indexed FASTA file that corresponds to {@link #referenceSequenceID}.*/
-    private IndexedFastaSequenceFile fastaReader;
+    private IndexedFastaSequenceFile fastaReader; /* TODO this should not be a class member variable */
     /** Array of restriction enzyme patterns. */
     private String[] cuttingPatterns;
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
@@ -567,7 +570,7 @@ public class ViewPoint {
 
             Segment segment = restSegListMap.get(motif).get(i);
 
-            // set fragment to 'false', if it is shorter than 'minFragSize'
+            // set fragment to 'false', if it is shorter than 'getMinFragSize'
             Integer len = segment.length();
             if (len < this.minFragSize) {
                 restSegListMap.get(motif).get(i).setSelected(false);
@@ -609,7 +612,7 @@ public class ViewPoint {
 
             Segment segment = restSegListMap.get(motif).get(i);
 
-            // set fragment to 'false', if it is shorter than 'minFragSize'
+            // set fragment to 'false', if it is shorter than 'getMinFragSize'
             if (segment.length() < minFragSize) {
                 restSegListMap.get(motif).get(i).setSelected(false);
             }

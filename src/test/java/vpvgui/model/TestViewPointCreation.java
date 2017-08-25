@@ -225,7 +225,7 @@ public class TestViewPointCreation {
                         build();
 
                 vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,maxSizeUp,maxSizeDown);
-                vpvgene.addViewPoint(vp);
+                //vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
                // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
              }
@@ -268,8 +268,8 @@ public class TestViewPointCreation {
                     genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,  minSizeUp, maxSizeUp, minSizeDown, maxSizeDown,
-                        minFragSize, maxRepFrag,marginSize);
+                vp.generateViewpointLupianez(getFragNumUp, fragNumDown, cuttingMotif,  getMinSizeUp, getMaxSizeUp, getMinSizeDown, getMaxSizeDown,
+                        getMinFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
             }
             vpvGeneList.add(vpvgene);
@@ -285,6 +285,7 @@ public class TestViewPointCreation {
 
         Integer numberOfResolvedViewpoints = 0;
         Integer numberOfUnresolvedViewpoints = 0;
+        /* August 25--Umbau, VPVGenes haben keine ViewPoints mehr.
         for (int i = 0; i < vpvGeneList.size(); i++) {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
                 if(vpvGeneList.get(i).getviewPointList().get(j).getResolved()) {
@@ -294,7 +295,7 @@ public class TestViewPointCreation {
                     String geneSymbol = vpvGeneList.get(i).getGeneSymbol();
                 }
             }
-         }
+         }*/
          System.out.println("numberOfResolvedViewpoints: " + numberOfResolvedViewpoints);
          System.out.println("numberOfUnresolvedViewpoints: " + numberOfUnresolvedViewpoints);
     }
@@ -335,7 +336,7 @@ public class TestViewPointCreation {
         out_fragment_margins_unique.println("track name='" + description + "' description='" + description + "'");
 
         Set<String> uniqueFragmentMargins = new HashSet<String>();
-
+    /* Aug 25, UMBAU VPVGenes haben keine ViewPoints mehr
         for (int i = 0; i < vpvGeneList.size(); i++) {
             for (int j = 0; j < vpvGeneList.get(i).getviewPointList().size(); j++) {
 
@@ -375,6 +376,7 @@ public class TestViewPointCreation {
             }
 
         }
+        */
         out_viewpoints.close();
         out_genomic_positions.close();
         out_fragments.close();
