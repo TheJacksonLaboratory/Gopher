@@ -28,8 +28,10 @@ import java.util.zip.GZIPInputStream;
  *     <li>cdsEndStat</li>
  *     <li>exonFrames</li>
  * </ol>
+ * <p>Note that we skip all gene models located on random chromosomes because we do not want to create probes for
+ * random chromosome contigs at this time.</p>
  * @author Peter Robinson
- * @version 0.0.2 (2017-07-23)
+ * @version 0.0.3 (2017-08-26)
  */
 public class RefGeneParser {
 
@@ -64,6 +66,7 @@ public class RefGeneParser {
                 String A[]=line.split("\t");
                 String accession=A[1];
                 String chrom=A[2];
+                if (chrom.contains("random")) { continue; } /* do not take gene models on random contigs. */
                 String strand=A[3];
                 Integer gPos;
                 if (strand.equals("+")) {

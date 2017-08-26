@@ -58,6 +58,8 @@ public class FASTAIndexManager extends Task<Void> {
             String contigname=null;
             if (fileEntry.isDirectory()) {
                 continue;
+            } else if (fileEntry.getName().contains("random")) {
+                continue; /* skip random contigs! */
             } else if (!fileEntry.getPath().endsWith(".fa")) {
                 continue;
             } else if (fastaFAIalreadyExists(fileEntry.getAbsolutePath())) {

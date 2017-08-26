@@ -41,8 +41,8 @@ public class Model implements Serializable {
     /** the name of the project that will be used to write the settings file (default: vpvgui). */
     private String projectName=null;
     /** This suffix is appended to the project name to get the name of the file for storing project settings. */
-    public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
-    /** HAs the UCSC Genome build been unpacked yet? :*/
+    //public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
+    /** Has the UCSC Genome build been unpacked yet? :*/
     private boolean genomeUnpacked=false;
     /** Has the downloaded genome been FASTA indexed yet? */
     private boolean genomeIndexed=false;
