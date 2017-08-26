@@ -23,11 +23,14 @@ public class FASTAIndexManager extends Task<Void> {
         this.genomeDirectoryPath=path;
         this.progress=pi;
         this.indexedFastaFiles=new HashMap<>();
+        this.contigLengths=new HashMap<>();
     }
 
     /** Key: name of chromosome or contig; value-absolute path to the corresponding
      * FASTA file on disk. */
     private Map<String,String> indexedFastaFiles;
+    /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
+    private Map<String,Integer> contigLengths;
     /** The progress indicator on the GUI that will show progress of indexing. */
     private ProgressIndicator progress=null;
     /** The label on the GUI that will show the status/result of the indexing operation. */
@@ -76,6 +79,8 @@ public class FASTAIndexManager extends Task<Void> {
                     indexer.createFASTAindex();
                     indexer.writeFASTAIndex();
                     contigname=indexer.getContigname();
+                    long len=indexer.getN_bases();
+                    this.contigLengths.put(contigname,(int)len);
                     totalprogress+=blocksize;
                     progress.setProgress(totalprogress);
                 } catch (IOException e) {
@@ -89,6 +94,9 @@ public class FASTAIndexManager extends Task<Void> {
         progress.setProgress(1.0);
         return null;
     }
+
+
+    public Map<String,Integer> getContigLengths () { return this.contigLengths; }
 
 
 

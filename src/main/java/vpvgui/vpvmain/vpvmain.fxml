@@ -207,7 +207,7 @@
                                     <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                     <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4" />
                                     <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <ChoiceBox fx:id="approachChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" />
+                                    <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="140.0" GridPane.columnIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />

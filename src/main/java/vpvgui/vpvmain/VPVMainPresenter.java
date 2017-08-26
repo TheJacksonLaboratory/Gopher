@@ -411,9 +411,10 @@ public class VPVMainPresenter implements Initializable {
         FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI);
         manager.setOnSucceeded(event ->{
             indexGenomeLabel.setText("FASTA files successfully indexed.");
-            logger.debug("Number of Fa files retrieved> "+manager.getIndexedFastaFiles().size());
+            logger.debug("Number of FASTA files retrieved> "+manager.getIndexedFastaFiles().size());
             model.setIndexedFastaFiles(manager.getIndexedFastaFiles());
             model.setGenomeIndexed();
+            model.setContigLengths(manager.getContigLengths());
         } );
         Thread th = new Thread(manager);
         th.setDaemon(true);

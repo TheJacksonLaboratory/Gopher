@@ -32,6 +32,8 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
+    /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
+    private Map<String,Integer> contigLengths;
     /** Directory to which the Genome was downloaded */
     private String genomeDirectoryPath=null;
     /** Proxy (null if not needed/not set) */
@@ -115,6 +117,8 @@ public class Model implements Serializable {
     public boolean isGenomeIndexed() { return genomeIndexed; }
     public void setGenomeUnpacked() { this.genomeUnpacked=true;}
     public void setGenomeIndexed() { this.genomeIndexed=true;}
+
+    public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
 
 
     public String genomeURL = null;
