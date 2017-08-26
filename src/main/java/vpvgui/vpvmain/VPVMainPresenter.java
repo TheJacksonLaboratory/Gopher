@@ -250,24 +250,6 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
-    /** Look for the settings file in the .vpvgui directory.
-     * If found, initialize the model and the GUI with the data in the settings/project
-     * file as avaiable. Otherwise return an empty {@link Model} object.
-     * @return A {@link Model} object initialized if possible from a project file
-
-    private void initializeModelFromSettingsIfPossible() {
-        logger.debug("Initializing model...");
-        File defaultProject = getDefaultProjectPath();
-        logger.debug("Default project file: "+defaultProject);
-        if (!defaultProject.exists()) {
-            logger.debug("Default project file did not exist, returning empty Model object.");
-            return;
-        } else if (this.model==null){
-            this.model=new Model();
-        }
-        Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath(), model);
-    } */
-
     /**
      * This allows a caller to set the {@link Model} object for this presenter (for instance, a default
      * {@link Model} object is set if the user chooses a new project. If the user chooses to open a previous
