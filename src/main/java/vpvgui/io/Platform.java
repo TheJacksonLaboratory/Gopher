@@ -50,6 +50,15 @@ public class Platform {
         return new String(dir + File.separator + basename + ".ser");
     }
 
+    /**
+     * Get the absolute path to the log file.
+     * @return the absolute path,e.g., /home/user/.vpvgui/vpvgui.log
+     */
+    public static String getAbsoluteLogPath() {
+        File dir = getVPVDir();
+        return new String(dir + File.separator +  "vpvgui.log");
+    }
+
     /* Based on this post: http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/ */
     private static CurrentPlatform figureOutPlatform() {
         String osName = System.getProperty("os.name").toLowerCase();

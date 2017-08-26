@@ -12,7 +12,8 @@ import java.io.*;
 
 /**
  * This class is responsible for g-unzipping and untarring a downloaded genome file.
- * Created by robinp on 7/13/17.
+ * @author Peter Robinson
+ * @version 0.0.2 (25 August, 2017)
  */
 public class GenomeGunZipper extends Task<Void>  {
     static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
@@ -91,7 +92,7 @@ public class GenomeGunZipper extends Task<Void>  {
                     int count;
                     byte data[] = new byte[BUFFER_SIZE];
                     File outfile = new File(this.genomeDirectoryPath + File.separator +entry.getName());
-                    System.out.println("[INFO] ungzip'ping "+ entry.getName());
+                    logger.trace("ungzip'ping "+ entry.getName());
                     FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
                     try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE)) {
                         while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
@@ -104,10 +105,10 @@ public class GenomeGunZipper extends Task<Void>  {
                         percentDone +=1.0d;
                     else
                         percentDone += 0.1d;
-                    progress.setProgress(percentDone);
+                    progress.setProgress(percentDone/100.0);
                 }
             }
-            progress.setProgress(100.0);
+            progress.setProgress(1.0);
             OK=true;
             tarIn.close();
             logger.info("Untar completed successfully for "+INPUT_GZIP_FILE);

@@ -25,6 +25,7 @@ import vpvgui.gui.createviewpointpb.CreateViewpointPBView;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
+import vpvgui.gui.logviewer.LogViewerFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.settings.SettingsViewFactory;
@@ -742,6 +743,12 @@ public class VPVMainPresenter implements Initializable {
         }
         this.model.setMarginSize(msize);
         logger.trace(String.format("We just set MarginSize to %d", model.getMarginSize()));
+    }
+
+    @FXML
+    public void showLog() {
+        LogViewerFactory factory = new LogViewerFactory();
+        factory.display();
     }
 
 

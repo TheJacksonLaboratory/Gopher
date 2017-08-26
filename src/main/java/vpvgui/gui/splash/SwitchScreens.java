@@ -48,7 +48,7 @@ public class SwitchScreens {
         this.primarystage.setMinWidth(1000);
         this.primarystage.setWidth(1600);
         String filepath = Platform.getAbsoluteProjectPath(name);
-        logger.trace("About to deserilize model at "+ filepath);
+        logger.trace("About to deserialize model at "+ filepath);
         Model model = SerializationManager.deserializeModel(filepath);
         logger.trace("Deserialized model "+ model.toString());
         presenter.setModel(model);

@@ -57,6 +57,11 @@
                               <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
                           </items>
                         </Menu>
+                        <Menu mnemonicParsing="false" text="Log">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                   <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="399.0" styleClass="menu-bar" HBox.hgrow="SOMETIMES">
