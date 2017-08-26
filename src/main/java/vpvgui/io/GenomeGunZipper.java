@@ -70,7 +70,7 @@ public class GenomeGunZipper extends Task<Void>  {
             return null;
         }
         if (this.progress != null)
-            this.progress.setProgress(0.000); /* show progress as 0% */
+            this.progress.setProgress(0.01); /* show progress as 1% to start off with */
         String INPUT_GZIP_FILE = (new File(this.genomeDirectoryPath + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
         try {

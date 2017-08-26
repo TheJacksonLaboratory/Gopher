@@ -14,10 +14,6 @@ public class URLMaker {
     private String genomebuild=null;
     /** Number of nucleotides to show before and after first and last base of viewpoint. */
     private static final int offset = 200;
-    // Index for the current color (will be rotated by the {@link #getNextColor()} method).
-   // private int coloridx = 0;
-    /** HTML colors for the Segments of the viewpoint. TODO add more colors. */
-   // final private static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F"};
 
     private String restrictionenzyme=null;
 
@@ -73,7 +69,7 @@ public class URLMaker {
      *     <li>multiZ alignments</li>
      *     <li>repeats</li>
      * </ol>
-     * This is how: hideTracks=1&<trackName>=full|dense|pack|hide
+     * This is how: {@code hideTracks=1&<trackName>=full|dense|pack|hide}
      * @param vp The {@link ViewPoint} object to be displayed on the UCSC browser
      * @param trackType either "hgTracks" (interactive browser) or "hgRenderTracks" (static image)
      * @return

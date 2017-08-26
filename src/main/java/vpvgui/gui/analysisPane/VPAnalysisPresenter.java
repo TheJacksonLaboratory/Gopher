@@ -208,6 +208,7 @@ public class VPAnalysisPresenter implements Initializable {
 
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
+     * @param vp This {@link ViewPoint} object will be opened into a new Tab.
      */
     private void openViewPointInTab(ViewPoint vp) {
         final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());

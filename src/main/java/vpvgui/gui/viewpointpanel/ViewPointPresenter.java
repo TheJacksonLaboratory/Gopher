@@ -364,7 +364,7 @@ public class ViewPointPresenter implements Initializable {
 
     /**
      * Creates a string to show highlights. Nonselected regions are highlighted in very light grey.
-     * @return something like this highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>.
+     * @return something like this {@code highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>}.
      * . */
     private String getHighlightRegions() {
         String genome = this.model.getGenomeBuild();

@@ -233,7 +233,7 @@ public class VPVMainPresenter implements Initializable {
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        createPanes();
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
     }
 
     private void setInitializedValuesInGUI() {
@@ -268,16 +268,6 @@ public class VPVMainPresenter implements Initializable {
         primaryStage = stage;
     }
 
-
-    /** Add theanalysis pane to the GUI. Since we are starting out with just one additional
-     * pane, TODO this could be moved to the initialize method.
-     */
-    private void createPanes() {
-        this.analysisPane.getChildren().add(vpanalysisview.getView());
-    }
-
-
-
     /**
      * Initialize the bindings to Java bean properties in the model with
      * the GUI elements.
@@ -295,15 +285,22 @@ public class VPVMainPresenter implements Initializable {
         */
     }
 
-
+    /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
-        this.fragNumUpTextField.setPromptText("4");
+        this.fragNumUpTextField.setPromptText(String.format("%d",Default.NUMBER_OF_FRAGMENTS_UPSTREAM));
+        this.fragNumDownTextField.setPromptText(String.format("%d",Default.NUMBER_OF_FRAGMENTS_DOWNSTREAM));
+        this.minSizeUpTextField.setPromptText(String.format("%d",Default.MINIMUM_SIZE_UPSTREAM));
+        this.minSizeDownTextField.setPromptText(String.format("%d",Default.MINIMUM_SIZE_DOWNSTREAM));
+        this.maxSizeUpTextField.setPromptText(String.format("%d",Default.MAXIMUM_SIZE_UPSTREAM));
+        this.maxSizeDownTextField.setPromptText(String.format("%d",Default.MAXIMUM_SIZE_DOWNSTREAM));
+        this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
+        this.maxRepContentTextField.setPromptText(String.format("%.1f",Default.MAXIMUM_REPEAT_CONTENT));
     }
 
 
     /** This gets called when the user chooses a new genome build. They need to do download, uncompression, indexing and
      * also get the corresponding transcript file.
-     * @param build
+     * @param build Name of genome build.
      */
     private void resetGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
@@ -345,7 +342,9 @@ public class VPVMainPresenter implements Initializable {
 
     }
 
-
+    /**
+     * @param e event triggeredby command to download appropriate RefGene.txt.gz file.
+     */
    @FXML public void downloadRefGeneTranscripts(ActionEvent e) {
         String genome = this.model.getGenomeURL();
         if (genome==null)
@@ -385,7 +384,9 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
-    /** G-unzip and un-tar the downloaded chromFa.tar.gz file.*/
+    /** G-unzip and un-tar the downloaded chromFa.tar.gz file.
+     * @param e  Event triggered by decompress genome command
+     */
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
@@ -400,7 +401,9 @@ public class VPVMainPresenter implements Initializable {
         th.start();
     }
 
-    /** Create fai (fasta index files) */
+    /** Create fai (fasta index files)
+     * @param e Event triggered by index genome command.
+     * */
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
         logger.trace("Indexing genome files...");
@@ -436,7 +439,7 @@ public class VPVMainPresenter implements Initializable {
      * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
      *
-     * @param e
+     * @param e event triggered by enter gene command.
      */
     public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
@@ -501,6 +504,9 @@ public class VPVMainPresenter implements Initializable {
         window.showAndWait();
     }
 
+    /**
+     * @param e Event triggered by close command.
+     */
     public void closeWindow(ActionEvent e) {
         boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
         if (answer) {
@@ -511,7 +517,9 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * Todo initialize model and ask user to choose a new name.
+     * This is called when the user starts a new project. It should erase everything from
+     * the GUI as well (TODO check this!)
+     * @param e Event triggered by new project command.
      */
     @FXML public void startNewProject(ActionEvent e) {
         logger.trace("Start new project");
@@ -532,8 +540,6 @@ public class VPVMainPresenter implements Initializable {
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-
-        createPanes();
         setInitializedValuesInGUI();
         e.consume();
         /* TODO */
@@ -547,6 +553,7 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * Content of {@link Model} is written to platform-dependent default location.
+     *  @throws IOException caused by an error in serialization
      */
     @FXML private void saveProject() throws IOException {
        // Model.writeSettingsToFile(this.model);
@@ -559,18 +566,26 @@ public class VPVMainPresenter implements Initializable {
         }
     }
 
+    /**
+     * @throws IOException caused by an error in serialization
+     */
     @FXML private void saveProjectAndClose() throws IOException {
         serialize();
         javafx.application.Platform.exit();
     }
 
 
-
+    /**
+     * @param e event triggered by show help command.
+     */
     @FXML public void showHelpWindow(ActionEvent e) {
         HelpViewFactory.display();
+        e.consume();
     }
 
-    /** Todo open a window to set the Proxy. */
+    /**
+     * @param e event triggered by set proxy command.
+     */
     @FXML void setProxyDialog(ActionEvent e) {
         Stage window;
         String windowTitle = "VPV Settings";
