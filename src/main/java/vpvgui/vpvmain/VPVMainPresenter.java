@@ -190,7 +190,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
-    public void serialize() {
+    public boolean serialize() {
         String projectname=this.model.getProjectName();
         if (projectname==null) {
             ErrorWindow.display("Error","Could not get project name (should never happen). Will save with default");
@@ -202,8 +202,10 @@ public class VPVMainPresenter implements Initializable {
             SerializationManager.serializeModel(this.model, serializedFilePath);
         } catch (IOException e) {
             ErrorWindow.displayException("Error","Unable to serialize VPV project",e);
+            return false;
         }
         logger.trace("Serialization successful to file "+serializedFilePath);
+        return true;
     }
 
 
@@ -503,11 +505,9 @@ public class VPVMainPresenter implements Initializable {
         boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
         if (answer) {
             logger.info("Closing VPV Gui");
-            //Model.writeSettingsToFile(this.model);
             serialize();
         }
-
-        System.exit(0);
+        javafx.application.Platform.exit();
     }
 
     /**
@@ -548,9 +548,22 @@ public class VPVMainPresenter implements Initializable {
     /**
      * Content of {@link Model} is written to platform-dependent default location.
      */
-    private void saveSettings() throws IOException {
-        Model.writeSettingsToFile(this.model);
+    @FXML private void saveProject() throws IOException {
+       // Model.writeSettingsToFile(this.model);
+        boolean result=serialize();
+        if (result) { /* if it didnt work, the serialize method will show an error dialog. */
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information");
+            alert.setHeaderText(String.format("Successfully saved project data to %s", Platform.getAbsoluteProjectPath(model.getProjectName())));
+            alert.show();
+        }
     }
+
+    @FXML private void saveProjectAndClose() throws IOException {
+        serialize();
+        javafx.application.Platform.exit();
+    }
+
 
 
     @FXML public void showHelpWindow(ActionEvent e) {

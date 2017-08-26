@@ -95,11 +95,6 @@ public class Model implements Serializable {
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
 
-
-    private int totalNumberOfProbeNucleotides;
-    public void setTotalNumberOfProbeNucleotides(int n) { this.totalNumberOfProbeNucleotides=n;}
-    public int getTotalNumberOfProbeNucleotides() {return this.totalNumberOfProbeNucleotides;}
-
     private Double tilingFactor =null;
     public double getTilingFactor(){return tilingFactor; }
     public void setTilingFactor(Double tilingFactor) {this.tilingFactor=tilingFactor; }

@@ -276,4 +276,18 @@ public class Segment implements Serializable {
         }
         return marginList;
     }
+
+    /**
+     * If the segment is large enough,it will contain two separate margins each of which is of size {@link #marginSize}.
+     * For smaller segments, the entire segment is taken to be the "margin",and we return the size of the entire segment.
+     * @return The total size of the margin(s) of this {@link Segment}.
+     */
+    public int getMarginSize() {
+        if (2 * marginSize < length()) { // return a pair of Segment objects
+            return 2*this.marginSize;
+        } else { // return a single Segment object with identical coordinates as the original Segment object
+            return (endPos-startPos+1);
+        }
+    }
+
 }

@@ -748,4 +748,12 @@ public class ViewPoint implements Serializable {
         calculateViewpointScore(this.currentMotif);
     }
 
+    public int getTotalMarginSize() {
+        int n=0;
+        for (Segment seg: getActiveSegments()) {
+            n += seg.getMarginSize();
+        }
+        return n;
+    }
+
 }
