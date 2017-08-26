@@ -11,6 +11,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
+import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
@@ -22,8 +23,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- *
- * Created by peterrobinson on 7/6/17.
+ * This is the Tab that shows a table with all of the viewpoints created together with a sumnmary of the overall
+ * quality of the results
+ * @author Peter Robinson
+ * @version 0.0.4 (2017-08-26).
  */
 public class VPAnalysisPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
@@ -49,16 +52,13 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> genomicLocationColumn;
 
-    //@FXML
-    //private TableColumn<ViewPoint, String> genPositionTableColumn;
-
     @FXML
     private TableColumn<ViewPoint, String> nSelectedTableColumn;
 
     @FXML private TableColumn<ViewPoint,String> viewpointScoreColumn;
 
 
-    private BooleanProperty editingStarted;
+   // private BooleanProperty editingStarted;
 
     private Model model;
     /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
@@ -244,17 +244,26 @@ public class VPAnalysisPresenter implements Initializable {
      */
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
-            System.out.println("[View Points not initialized");
+            logger.warn("[View Points not initialized");
+            ErrorWindow.display("Could not display viewpoints","No initialiyed viewpoints were found");
             return;
         }
+        refreshVPTable();
+    }
 
+    public void refreshVPTable() {
+        logger.trace("refreshing the VP Table");
+        if (model==null){
+            logger.fatal("Model null--should never happen");
+            return;
+        }
         // update WebView with N loaded ViewPoints
         ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
         contentWebEngine.loadContent(htmlgen.getHTML());
 
         ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
         if (model==null) {
-            System.err.println("[ERROR] VPAnalysisPresenter -- model null, should never happen" );
+            logger.error("model was null while trying to refresh VP table, should never happen" );
             return;
         }
         List<ViewPoint> vpl = this.model.getViewPointList();
@@ -262,6 +271,7 @@ public class VPAnalysisPresenter implements Initializable {
         for (ViewPoint v : vpl) {
             viewpointlist.add(v);
         }
+        viewPointTableView.getItems().clear(); /* clear previous rows, if any */
         viewPointTableView.getItems().addAll(vpl);
         viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }

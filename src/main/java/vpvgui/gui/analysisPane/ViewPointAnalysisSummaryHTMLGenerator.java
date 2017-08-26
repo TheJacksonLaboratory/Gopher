@@ -1,5 +1,6 @@
 package vpvgui.gui.analysisPane;
 
+import org.apache.log4j.Logger;
 import vpvgui.model.Model;
 import vpvgui.model.project.ViewPoint;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ViewPointAnalysisSummaryHTMLGenerator {
-
+    private static final Logger logger = Logger.getLogger(ViewPointAnalysisSummaryHTMLGenerator.class.getName());
     private Model model=null;
 
 
@@ -19,12 +20,13 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
     public ViewPointAnalysisSummaryHTMLGenerator(Model model) {
         this.model=model;
+        logger.trace("Consructing HTML generator with model="+this.model.toString());
     }
 
 
 
     public String getHTML() {
-
+        logger.trace(String.format("Getting HTML ViewPoint summary code for model=",model.toString()));
         List<ViewPoint> vplist=model.getViewPointList();
         int nviewpoints=vplist.size();
         int ngenes=model.getVPVGeneList().size();

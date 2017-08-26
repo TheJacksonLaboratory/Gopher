@@ -39,6 +39,7 @@ public class SwitchScreens {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
+        setStageDimensions();
         this.primarystage.show();
     }
 
@@ -50,12 +51,33 @@ public class SwitchScreens {
         String filepath = Platform.getAbsoluteProjectPath(name);
         logger.trace("About to deserialize model at "+ filepath);
         Model model = SerializationManager.deserializeModel(filepath);
+        presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
-        presenter.setModel(model);
+        if (presenter==null){
+            logger.fatal("Presenter was null ponter");
+            return;
+        }
+
+        if (model==null) {
+            logger.fatal("Model was null ponter");
+            return;
+        }
+        if (model.viewpointsInitialized()) {
+            presenter.refreshViewPoints();
+        }
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
+        setStageDimensions();
         this.primarystage.show();
+    }
+
+    private void setStageDimensions() {
+        if (this.primarystage==null) return;
+        this.primarystage.setMinWidth(1000);
+        this.primarystage.setWidth(1400);
+        this.primarystage.setMinHeight(800);
+        this.primarystage.setHeight(1000);
     }
 
 

@@ -262,7 +262,14 @@ public class VPVMainPresenter implements Initializable {
      */
     public void setModel(Model mod) {
         this.model=mod;
+        logger.trace(String.format("Setting model to %s",mod.toString()));
         setInitializedValuesInGUI();
+    }
+
+
+    public void setModelInMainAndInAnalysisPresenter(Model mod) {
+        setModel(mod);
+        this.vpanalysispresenter.setModel(mod);
     }
 
     public void initStage(Stage stage) {
@@ -516,6 +523,14 @@ public class VPVMainPresenter implements Initializable {
             serialize();
         }
         javafx.application.Platform.exit();
+    }
+
+    public void refreshViewPoints() {
+        if (this.vpanalysispresenter==null) {
+            logger.error("Could not refresh viewpoint table, since vpanalysispresenter was null");
+            return;
+        }
+        this.vpanalysispresenter.refreshVPTable();
     }
 
     /**
