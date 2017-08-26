@@ -3,6 +3,7 @@ package vpvgui.gui.splash;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import vpvgui.io.Platform;
 import vpvgui.model.Model;
 import vpvgui.util.SerializationManager;
@@ -14,6 +15,7 @@ import vpvgui.vpvmain.VPVMainView;
  * which project to work on.
  */
 public class SwitchScreens {
+    private static final Logger logger = Logger.getLogger(SwitchScreens.class.getName());
     /** A reference to the primary stage of the application. */
     private Stage primarystage = null;
     /** A reference to the model of the application. */
@@ -30,7 +32,7 @@ public class SwitchScreens {
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
         this.primarystage.setMinWidth(1000);
         this.primarystage.setWidth(1600);
-        Model model = presenter.getModel();
+        Model model = new Model();
         model.setProjectName(name);
         model.setDefaultValues();
         presenter.setModel(model);
@@ -46,7 +48,9 @@ public class SwitchScreens {
         this.primarystage.setMinWidth(1000);
         this.primarystage.setWidth(1600);
         String filepath = Platform.getAbsoluteProjectPath(name);
+        logger.trace("About to deserilize model at "+ filepath);
         Model model = SerializationManager.deserializeModel(filepath);
+        logger.trace("Deserialized model "+ model.toString());
         presenter.setModel(model);
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);

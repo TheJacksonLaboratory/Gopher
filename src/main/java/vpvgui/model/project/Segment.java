@@ -32,7 +32,7 @@ public class Segment implements Serializable {
     /** The repetitive content of the margin in downstream direction of this object of class Segment. */
     private double repeatContentDown;
     /** Object for reading a given FASTA file (HTSJDK). */
-    private IndexedFastaSequenceFile fastaReader;
+    //private IndexedFastaSequenceFile fastaReader;
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
@@ -46,11 +46,11 @@ public class Segment implements Serializable {
         this.referenceSequenceID = referenceSequenceID;
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
-        this.fastaReader = fastaReader;
+        //this.fastaReader = fastaReader;
         setSelected(selected);
-        calculateRepeatContent();
+        calculateRepeatContent(fastaReader);
         this.marginSize=150; /* todo--deprecated */
-        calculateRepeatContentMargins();
+        calculateRepeatContentMargins(fastaReader);
     }
 
 
@@ -58,11 +58,11 @@ public class Segment implements Serializable {
         this.referenceSequenceID=builder.referenceSequenceID;
         this.startPos=builder.startPos;
         this.endPos=builder.endPos;
-        this.fastaReader=builder.fastaReader;
+        //this.fastaReader=builder.fastaReader;
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
-        calculateRepeatContent();
-        calculateRepeatContentMargins();
+        calculateRepeatContent(builder.fastaReader);
+        calculateRepeatContentMargins(builder.fastaReader);
     }
 
 
@@ -160,10 +160,10 @@ public class Segment implements Serializable {
     /**
      * This function calculates the {@link #repeatContent} of this segment by counting lower and uppercase.
      */
-    private void calculateRepeatContent() {
+    private void calculateRepeatContent(IndexedFastaSequenceFile fastaReader) {
 
         /* get dna string */
-        String s = this.fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
+        String s = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
 
         /* determine repeat content */
 
@@ -180,7 +180,7 @@ public class Segment implements Serializable {
      * Calculates the repetitive content on the margins of the segment (if the segment is too small, we take the
      * repeat content of the entire segment to be the margin repeat content).
      */
-    private void calculateRepeatContentMargins() {
+    private void calculateRepeatContentMargins(IndexedFastaSequenceFile fastaReader) {
 
         /* generate Segment objects for margins */
 
@@ -201,7 +201,7 @@ public class Segment implements Serializable {
             IntPair seg =margins.get(i);
             int start=seg.getStartPos();
             int end=seg.getEndPos();
-            String s = this.fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
+            String s = fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
 
             /* determine repeat content */
             Integer lowerCase = 0, upperCase = 0;

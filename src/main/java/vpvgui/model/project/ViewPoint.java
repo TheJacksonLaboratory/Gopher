@@ -3,6 +3,7 @@ package vpvgui.model.project;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
+import vpvgui.model.Default;
 
 import java.io.Serializable;
 import java.util.*;
@@ -24,7 +25,7 @@ import java.util.*;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.0.4 (2017-07-24)
+ * @version 0.0.5 (2017-08-24)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -67,7 +68,7 @@ public class ViewPoint implements Serializable {
     /* List of restriction 'Fragment' objects that are within the viewpoint */
     private HashMap<String, ArrayList<Segment>> restSegListMap;
     /** Reference to the indexed FASTA file that corresponds to {@link #referenceSequenceID}.*/
-    private IndexedFastaSequenceFile fastaReader; /* TODO this should not be a class member variable */
+   // private IndexedFastaSequenceFile fastaReader; /* TODO this should not be a class member variable */
     /** Array of restriction enzyme patterns. */
     private String[] cuttingPatterns;
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
@@ -117,16 +118,16 @@ public class ViewPoint implements Serializable {
 
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
-        this.fastaReader=fastaReader;
+       // this.fastaReader=fastaReader;
         this.cuttingPatterns=cuttingPatterns;
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
-        init();
+        init(fastaReader);
     }
 
 
-    private void init() {
+    private void init(IndexedFastaSequenceFile fastaReader) {
 
         setStartPos(genomicPos - maxDistToGenomicPosUp);
         setEndPos(genomicPos + maxDistToGenomicPosDown);
@@ -135,15 +136,15 @@ public class ViewPoint implements Serializable {
         warnings="";
 
         /* Create cuttingPositionMap */
-        initCuttingPositionMap();
-        initRestrictionFragments();
+        initCuttingPositionMap(fastaReader);
+        initRestrictionFragments(fastaReader);
     }
 
 
     /**
      * This constructor is intended to be used by the builder.
      *
-     * @param builder TODO: Describe 'builder'
+     * @param builder Builder class aimed to make constructing a ViewPoint object unambiguous.
      */
     private ViewPoint(Builder builder){
         this.referenceSequenceID=builder.referenceSequenceID;
@@ -152,7 +153,7 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.cuttingPatterns=builder.cuttingPatterns;
-        this.fastaReader=builder.fastaReader;
+       // this.fastaReader=builder.fastaReader;
         this.minFragSize=builder.minFragSize;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
@@ -160,7 +161,7 @@ public class ViewPoint implements Serializable {
         this.minDistToGenomicPosDown=builder.minSizeDown;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
-        init();
+        init(builder.fastaReader);
     }
 
     /**
@@ -180,17 +181,17 @@ public class ViewPoint implements Serializable {
         private IndexedFastaSequenceFile fastaReader;
         private  String targetName="";
         // Optional parameters - initialized to default values
-        private Integer maxDistToGenomicPosUp  = 2000;
-        private Integer maxDistToGenomicPosDown  = 2000;
+        /* ToDo Check is this correct for maxDistToGenomicPosUp etc. ?*/
+        private Integer maxDistToGenomicPosUp  = Default.MAXIMUM_SIZE_UPSTREAM+2000;
+        private Integer maxDistToGenomicPosDown  = Default.MAXIMUM_SIZE_DOWNSTREAM+2000;
+        private Integer minSizeUp=Default.MINIMUM_SIZE_UPSTREAM;
+        private Integer maxSizeUp=Default.MAXIMUM_SIZE_UPSTREAM;
+        private Integer minSizeDown=Default.MINIMUM_SIZE_DOWNSTREAM;
+        private Integer maxSizeDown=Default.MAXIMUM_SIZE_DOWNSTREAM;
+        private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
+        private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
+        private int marginSize=Default.MARGIN_SIZE;
         private String[] cuttingPatterns;
-        private Integer minSizeUp=1500;
-        private Integer maxSizeUp=4000;
-        private Integer minSizeDown=1500;
-        private Integer maxSizeDown=4000;
-        private Integer minFragSize=120;
-        private double maximumRepeatContent=0.6;
-        private int marginSize=250;
-
 
         /** Derivation approach, either combined (CA), Andrey 2016 (AEA), or manually (M) */
         private String derivationApproach;
@@ -246,14 +247,14 @@ public class ViewPoint implements Serializable {
 
 
     /** Initialize {@link #cuttingPositionMap} on the basis of the chosen enzyme cutting patterns in {@link #cuttingPatterns}.*/
-    public void initCuttingPositionMap() {
+    public void initCuttingPositionMap(IndexedFastaSequenceFile fastaReader) {
         // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
         // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.
         // TODO: Exception: genomicPos.
         // TODO: Handling: Discard viewpoint and throw warning.
         cuttingPositionMap = new CuttingPositionMap(this.referenceSequenceID,
                 this.genomicPos,
-                this.fastaReader,
+                fastaReader,
                 this.maxDistToGenomicPosUp,
                 this.maxDistToGenomicPosDown,
                 this.cuttingPatterns);
@@ -265,7 +266,7 @@ public class ViewPoint implements Serializable {
      * to init a hash ({@link #restSegListMap}), in which the keys are the cutting motifs and the values are lists of objects of class
      * Segments.
      */
-    private void initRestrictionFragments() {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader) {
 
         this.restSegListMap = new HashMap<String, ArrayList<Segment>>();
         for (int i = 0; i < this.cuttingPatterns.length; i++) {

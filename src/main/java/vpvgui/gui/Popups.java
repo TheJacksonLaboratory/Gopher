@@ -152,7 +152,7 @@ public class Popups {
         // So that text field shows prompt.
         Platform.runLater(() -> okButton.requestFocus());
         Optional<Integer> i = dialog.showAndWait();
-        return i.orElseGet(null);
+        return i.orElse(null);
     }
 
 

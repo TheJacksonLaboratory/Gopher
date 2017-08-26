@@ -91,12 +91,16 @@ public class SplashPresenter implements Initializable {
        File[] files = dir.listFiles(new FileFilter() {
            @Override
            public boolean accept(File pathname) {
-               return pathname.getAbsolutePath().endsWith(".settings");
+               return pathname.getAbsolutePath().endsWith(".ser");
            }
        });
         ObservableList<String> lst = FXCollections.observableArrayList();
        for (File f : files) {
-           lst.add(f.getName());
+           /* We want to show just the base name without "ser". Also, transform underscores to spaces */
+           String basename=f.getName();
+           basename = basename.replaceAll(".ser","");
+           basename = basename.replaceAll("_"," ");
+           lst.add(basename);
        }
         return lst;
     }

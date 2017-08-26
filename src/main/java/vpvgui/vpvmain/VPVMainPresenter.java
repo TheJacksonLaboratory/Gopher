@@ -197,13 +197,13 @@ public class VPVMainPresenter implements Initializable {
             projectname="default";
         }
         File dir=getVPVDir();
-        String savepath=new String(dir+File.separator+projectname);
+        String serializedFilePath=Platform.getAbsoluteProjectPath(projectname);
         try {
-            SerializationManager.serializeModel(this.model, savepath);
+            SerializationManager.serializeModel(this.model, serializedFilePath);
         } catch (IOException e) {
             ErrorWindow.displayException("Error","Unable to serialize VPV project",e);
         }
-        logger.trace("Serialization successful to file "+savepath);
+        logger.trace("Serialization successful to file "+serializedFilePath);
     }
 
 
@@ -213,7 +213,6 @@ public class VPVMainPresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.trace("initialize() called");
-        this.model=new Model();
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -231,11 +230,8 @@ public class VPVMainPresenter implements Initializable {
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-        this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-
         createPanes();
-        setInitializedValuesInGUI();
     }
 
     private void setInitializedValuesInGUI() {
@@ -272,8 +268,17 @@ public class VPVMainPresenter implements Initializable {
         Model.initializeModelFromSettingsFile(defaultProject.getAbsolutePath(), model);
     } */
 
-
-    public void setModel(Model mod) { this.model=mod;}
+    /**
+     * This allows a caller to set the {@link Model} object for this presenter (for instance, a default
+     * {@link Model} object is set if the user chooses a new project. If the user chooses to open a previous
+     * project from a serialized file, then a  {@link Model} object is initialized from the file and set here.
+     * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
+     * @param mod A {@link Model} object.
+     */
+    public void setModel(Model mod) {
+        this.model=mod;
+        setInitializedValuesInGUI();
+    }
 
     public void initStage(Stage stage) {
         primaryStage = stage;
