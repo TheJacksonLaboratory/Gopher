@@ -5,7 +5,7 @@
 
     <groupId>vpvgui</groupId>
     <artifactId>vpvgui</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>vpvgui</name>
@@ -218,11 +218,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20</version>
                 <configuration>
-                    <forkCount>4</forkCount>
-                    <systemPropertyVariables>
-                        <log4j.configuration>${project.build.testOutputDirectory}/log/log4j.silent.properties
-                        </log4j.configuration>
-                    </systemPropertyVariables>
+                    <!--<forkCount>4</forkCount>-->
+                    <!--<systemPropertyVariables>-->
+                        <!--<log4j.configuration>${project.build.testOutputDirectory}/log/log4j.silent.properties-->
+                        <!--</log4j.configuration>-->
+                    <!--</systemPropertyVariables>-->
+                    <excludes>
+                        <exclude>**/TestViewPointCreation.java</exclude>
+                        <exclude>**/ViewPointPresenterTest.java</exclude>
+                    </excludes>
                 </configuration>
                 <dependencies>
                     <dependency>

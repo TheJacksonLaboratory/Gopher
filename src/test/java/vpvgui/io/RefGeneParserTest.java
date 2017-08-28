@@ -74,7 +74,7 @@ public class RefGeneParserTest {
         Assert.assertEquals("FAKE",name);
     }
 
-    /** The followinig tests the retrieval and information in one of the VPVGenes that
+    /** The following tests the retrieval and information in one of the VPVGenes that
      * is created from the refGeneSmall.txt.gz file.
      */
     @Test
@@ -85,20 +85,20 @@ public class RefGeneParserTest {
         List<VPVGene> vpvgenes=parser.getVPVGeneList();
         VPVGene gene=null;
         for (VPVGene g:vpvgenes) {
-            if (g.getGeneSymbol().equals("SAMD11")){
+            if (g.getGeneSymbol().equals("FAM216B")){
                 gene=g; break;
             }
         }
         Assert.assertNotNull(gene);
-        String exp="chr1";
+        String exp="chr13";
         Assert.assertEquals(exp,gene.getContigID());
-        exp="NM_152486";
+        exp="NM_182508";
         Assert.assertEquals(exp,gene.getRefSeqID());
         boolean isForwardStrand=true;
         Assert.assertEquals(isForwardStrand,gene.isForward());
         List<Integer> gPosList = gene.getTSSlist();
         Assert.assertEquals(1,gPosList.size());
-        Integer expectedPos=861120;
+        Integer expectedPos=43355685; /* Note: zero based numbering! */
         Assert.assertEquals(expectedPos,gPosList.get(0));
     }
 
