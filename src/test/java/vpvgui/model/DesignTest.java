@@ -72,11 +72,11 @@ public class DesignTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_1.generateViewpointLupianez(fragNumUp,fragNumDown,motif,maxSizeUp,maxSizeDown);
+        testViewpointLupianez_1.generateViewpointLupianez(fragNumUp,fragNumDown,"ALL",maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_1);
 
-        // third viewpoint on a different sequence
-        ViewPoint testViewpointLupianez_3 = new ViewPoint.Builder(referenceSequenceID_1, genomicPos_1).
+        // second viewpoint with identical parameters
+        ViewPoint testViewpointLupianez_2 = new ViewPoint.Builder(referenceSequenceID_1, genomicPos_1).
                 maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
                 cuttingPatterns(testCuttingPatterns).
@@ -89,9 +89,8 @@ public class DesignTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_3.generateViewpointLupianez(fragNumUp,fragNumDown,motif,maxSizeUp,maxSizeDown);
-        viewPointList.add(testViewpointLupianez_3);
-
+        testViewpointLupianez_2.generateViewpointLupianez(fragNumUp,fragNumDown,"ALL",maxSizeUp,maxSizeDown);
+        viewPointList.add(testViewpointLupianez_2);
 
         testModel.setViewPoints(viewPointList);
 
@@ -104,17 +103,15 @@ public class DesignTest {
     public void testGetTotalNumberOfProbeNucleotides() throws Exception {
 
         List<ViewPoint> viewPointList = testModel.getViewPointList();
+
         for (ViewPoint vp : viewPointList) {
             System.out.println("--------------------------------------------------------");
-            ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("GATC");
+            ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("ALL");
 
             for (Segment ss : selectedSegments) {
-                System.out.println(ss.getStartPos() + "\t" + ss.getEndPos());
+                System.out.println("start: " + ss.getStartPos() + "\t" + "end: " + ss.getEndPos() + "\t" + "selected: " + ss.isSelected());
             }
         }
-
-        //int x = testDesign.getTotalNumberOfProbeNucleotides();
-        //System.out.println(x);
     }
 
 }
