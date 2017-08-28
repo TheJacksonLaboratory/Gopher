@@ -290,4 +290,34 @@ public class Segment implements Serializable {
         }
     }
 
+
+    /** Hash code is based on the end and start positions as well as on the chromosome */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + startPos;
+        result = prime * result + endPos;
+        result = prime * result + referenceSequenceID.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Segment other = (Segment) obj;
+        if (!referenceSequenceID.equals(other.referenceSequenceID))
+            return false;
+        if (startPos != other.startPos)
+            return false;
+        if (endPos != other.endPos)
+            return false;
+        return true;
+    }
+
 }
