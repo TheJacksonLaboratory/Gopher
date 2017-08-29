@@ -3,6 +3,7 @@ package vpvgui.model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import vpvgui.model.project.CuttingPositionMap;
 import vpvgui.model.project.Segment;
 import vpvgui.model.project.ViewPoint;
 
@@ -40,7 +41,7 @@ public class DesignTest {
     private static Double minRepFrag = 0.6;
     private static String motif = "GATC";
 
-
+    private static IndexedFastaSequenceFile testFastaReader;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -53,7 +54,7 @@ public class DesignTest {
 
         // add a list of two overlapping viewpoints to the model
         final File fasta = new File(testFastaFile);
-        IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
+        testFastaReader = new IndexedFastaSequenceFile(fasta);
 
 
         List<ViewPoint> viewPointList = new ArrayList<>();
@@ -103,7 +104,7 @@ public class DesignTest {
     public void testGetTotalNumberOfProbeNucleotides() throws Exception {
 
         List<ViewPoint> viewPointList = testModel.getViewPointList();
-
+        /*
         for (ViewPoint vp : viewPointList) {
             System.out.println("--------------------------------------------------------");
             ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("ALL");
@@ -111,7 +112,21 @@ public class DesignTest {
             for (Segment ss : selectedSegments) {
                 System.out.println("start: " + ss.getStartPos() + "\t" + "end: " + ss.getEndPos() + "\t" + "selected: " + ss.isSelected());
             }
-        }
+        }*/
+    }
+
+
+    @Test
+    public void testCuttingPositionMapTwice() throws Exception {
+        final File fasta = new File(testFastaFile);
+        testFastaReader = new IndexedFastaSequenceFile(fasta);
+        System.out.println("testCuttingPositionMapTwice");
+        CuttingPositionMap cpm = new CuttingPositionMap(referenceSequenceID_1,
+                genomicPos_1,
+                testFastaReader,
+                 maxDistToGenomicPosUp,
+                 maxDistToGenomicPosDown,
+                testCuttingPatterns);
     }
 
 }

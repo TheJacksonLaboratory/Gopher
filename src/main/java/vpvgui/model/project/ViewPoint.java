@@ -161,6 +161,7 @@ public class ViewPoint implements Serializable {
         this.minDistToGenomicPosDown=builder.minSizeDown;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
+        logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
     }
 
@@ -205,6 +206,7 @@ public class ViewPoint implements Serializable {
         public Builder(String refID, int pos) {
             this.referenceSequenceID = refID;
             this.genomicPos    = pos;
+            logger.trace(String.format("Builder for refID=%s at pos=%d",refID,pos));
         }
 
         public Builder maxDistToGenomicPosDown(int val)
@@ -258,6 +260,13 @@ public class ViewPoint implements Serializable {
                 this.maxDistToGenomicPosUp,
                 this.maxDistToGenomicPosDown,
                 this.cuttingPatterns);
+        logger.trace("We just initiated the cutting position map for genomic Pos "+cuttingPositionMap.getGenomicPos());
+        List<Integer> all = cuttingPositionMap.getArrayListForGivenMotif("ALL");
+        logger.trace("Positions for All");
+        for (Integer i:all) {
+            logger.trace("\t"+i);
+        }
+
     }
 
 
@@ -649,8 +658,11 @@ public class ViewPoint implements Serializable {
         /* set start and end position of the viewpoint */
 
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
+        logger.trace("Will now calculate the start position from the restSegListMap, which has size "+restSegListMap.size());
         for (Segment segment : restSegListMap.get(motif)) {
+            logger.trace(String.format("\tSegment start = %d selected = %s",segment.getStartPos(),segment.isSelected()));
             if (segment.isSelected()) {
+                logger.trace("##Segment is selected so I am setting the start position to "+ segment.getStartPos());
                 setStartPos(segment.getStartPos());
                 break;
             }
@@ -666,6 +678,7 @@ public class ViewPoint implements Serializable {
         }
 
         setDerivationApproach("LUPIANEZ");
+        logger.trace("Done calculating lupianez viewpoint, start pos of view point is "+getStartPos());
         calculateViewpointScore(motif);
         setResolved(resolved);
     }

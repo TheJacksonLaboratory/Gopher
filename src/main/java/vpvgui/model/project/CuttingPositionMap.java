@@ -59,7 +59,7 @@ public class CuttingPositionMap implements Serializable {
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
-
+        logger.trace("Cutting Position Map for genomic pos "+ getGenomicPos());
 
         /* create maps */
 
@@ -71,6 +71,7 @@ public class CuttingPositionMap implements Serializable {
             Integer offSet=cuttingPatterns[i].indexOf('^');
             cuttingPatterns[i] = cuttingPatterns[i].replace("^",""); // remove '^' characters
             cuttingPositionMapOffsets.put(cuttingPatterns[i],offSet);
+            logger.trace(String.format("Offset for %s is %d",cuttingPatterns[i],offSet));
         }
 
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<Integer>();
@@ -78,7 +79,7 @@ public class CuttingPositionMap implements Serializable {
 
             // get sequence around genomic position and convert everything to uppercase
             if(fastaReader.getSequence(referenceSequenceID).length()<genomicPos + maxDistToGenomicPosDown) {
-                System.out.println("WARNING: maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + fastaReader.getSequence(referenceSequenceID).length() + ").");
+                logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + fastaReader.getSequence(referenceSequenceID).length() + ").");
                 maxDistToGenomicPosDown = fastaReader.getSequence(referenceSequenceID).length() - genomicPos;
             }
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID,genomicPos - maxDistToGenomicPosUp,genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
@@ -90,6 +91,7 @@ public class CuttingPositionMap implements Serializable {
             while(matcher.find()) {
 
                 if (matcher.start()<=genomicPos) {
+                    logger.trace("Matcher start="+matcher.start());
                     cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                     cuttingPositionListUnion.add(matcher.start()-maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                 }
@@ -97,7 +99,9 @@ public class CuttingPositionMap implements Serializable {
                     cuttingPositionList.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                     cuttingPositionListUnion.add(matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cuttingPatterns[i]) - 1);
                 }
-
+            }
+            for (Integer pos:cuttingPositionList){
+                logger.trace("\tCP list: "+pos);
             }
             cuttingPositionMap.put(cuttingPatterns[i],cuttingPositionList); // push array list to map
         }
