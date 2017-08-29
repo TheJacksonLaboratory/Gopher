@@ -68,8 +68,6 @@ public class ViewPoint implements Serializable {
     private CuttingPositionMap cuttingPositionMap;
     /* List of restriction 'Fragment' objects that are within the viewpoint */
     private HashMap<String, ArrayList<Segment>> restSegListMap;
-    /** Reference to the indexed FASTA file that corresponds to {@link #referenceSequenceID}.*/
-   // private IndexedFastaSequenceFile fastaReader; /* TODO this should not be a class member variable */
     /** Array of restriction enzyme patterns. */
     private String[] cuttingPatterns;
     /** List of restriction enzymes chosen by the User. */
@@ -123,7 +121,6 @@ public class ViewPoint implements Serializable {
 
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
-       // this.fastaReader=fastaReader;
         this.cuttingPatterns=cuttingPatterns;
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
@@ -139,7 +136,6 @@ public class ViewPoint implements Serializable {
         setDerivationApproach("INITIAL");
         setResolved(false);
         warnings="";
-
         /* Create cuttingPositionMap */
         initCuttingPositionMap(fastaReader);
         initRestrictionFragments(fastaReader);
@@ -264,7 +260,7 @@ public class ViewPoint implements Serializable {
                 this.maxDistToGenomicPosDown,
                 ViewPoint.chosenEnzymes);
         logger.trace("We just initiated the cutting position map for genomic Pos "+cuttingPositionMap.getGenomicPos());
-        List<Integer> all = cuttingPositionMap.getAllCutsForGivenMotif("ALL");
+        List<Integer> all = cuttingPositionMap.getAllCuts();
         logger.trace("Positions for All");
         for (Integer i:all) {
             logger.trace("\t"+i);
@@ -562,8 +558,11 @@ public class ViewPoint implements Serializable {
         logger.trace("entering generateViewpointLupianez for motif="+motif);
 
         // iterate over all fragments of the viewpoint and set them to true
-        for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
+       /* for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
             restSegListMap.get(motif).get(i).setSelected(true);
+        }*/
+        for (Segment segment: restSegListMap.get(motif)){
+            segment.setSelected(true);
         }
 
         // find the index of the fragment that contains genomicPos

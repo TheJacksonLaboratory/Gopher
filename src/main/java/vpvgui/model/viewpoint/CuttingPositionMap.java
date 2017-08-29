@@ -172,7 +172,6 @@ public class CuttingPositionMap implements Serializable {
      * @return only the <i>ArrayList</i> of <i>Integers</i> for a given motif.
      */
     public final ArrayList<Integer> getAllCutsForGivenMotif(String motif) {
-
         return cuttingPositionMap.get(motif);
     }
 
