@@ -86,7 +86,7 @@ public class ViewPointTest {
 
         for (int i = 0; i < testCuttingPatterns.length; i++) {
 
-            ArrayList<Integer> relPosIntArray = testViewpoint.getCuttingPositionMap().getArrayListForGivenMotif(testCuttingPatterns[i]);
+            ArrayList<Integer> relPosIntArray = testViewpoint.getCuttingPositionMap().getAllCutsForGivenMotif(testCuttingPatterns[i]);
 
             for (int j = 0; j < relPosIntArray.size(); j++) {
                 Integer genomicPosition = testGenomicPos + relPosIntArray.get(j);
@@ -436,7 +436,7 @@ public class ViewPointTest {
     private void printCuttingSites(ViewPoint vp, String motif) {
 
         String s = new String("");
-        ArrayList<Integer> relPosArr = vp.getCuttingPositionMap().getHashMapOnly().get(motif);
+        ArrayList<Integer> relPosArr = vp.getCuttingPositionMap().getCuttingPositionHashMap().get(motif);
 
         int l = 0;
         for (int k = 0; k < vp.relToAbsPos(vp.getMaxDownstreamGenomicPos()); k++) {

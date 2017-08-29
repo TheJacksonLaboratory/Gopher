@@ -90,6 +90,14 @@ public class CuttingPositionMapTest {
         Assert.assertEquals(expected,cpm.getGenomicPos());
     }
 
+    @Test
+    public void testMaxDistToGenomicPos() {
+        Integer expected = maxDistToGenomicPosUp;
+        Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosUp());
+        expected = maxDistToGenomicPosDown;
+        Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosDown());
+    }
+
 
 
 

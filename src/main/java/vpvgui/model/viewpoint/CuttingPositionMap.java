@@ -164,17 +164,24 @@ public class CuttingPositionMap implements Serializable {
     /**
      * @return only the <i>HashMap</i> object for the cutting positions.
      */
-    public final HashMap<String, ArrayList<Integer>> getHashMapOnly() {
+    public final HashMap<String, ArrayList<Integer>> getCuttingPositionHashMap() {
         return cuttingPositionMap;
     }
 
     /**
      * @return only the <i>ArrayList</i> of <i>Integers</i> for a given motif.
      */
-    public final ArrayList<Integer> getArrayListForGivenMotif(String motif) {
+    public final ArrayList<Integer> getAllCutsForGivenMotif(String motif) {
 
         return cuttingPositionMap.get(motif);
     }
+
+
+    public final List<Integer> getAllCuts() {
+        return cuttingPositionMap.get("ALL");
+    }
+
+
 
     /**
      * @return Only the <i>HashMap</i> object for the cutting offsets.

@@ -66,6 +66,10 @@ public class ViewPointCreationTask extends Task {
          */
         CuttingPositionMap.restrictionEnzymeMap = new HashMap<>();
         List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
+        if (chosen==null) {
+            logger.error("Unable to retrieve list of chosen restriction enzymes");
+            return;
+        }
         for (RestrictionEnzyme re : chosen) {
             String site = re.getSite();
             site=site.replaceAll("^","");
