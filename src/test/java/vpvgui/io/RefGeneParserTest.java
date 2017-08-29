@@ -4,7 +4,7 @@ package vpvgui.io;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.project.VPVGene;
+import vpvgui.model.VPVGene;
 
 
 import java.util.Arrays;

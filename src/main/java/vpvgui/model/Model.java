@@ -2,10 +2,7 @@ package vpvgui.model;
 
 
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
-import vpvgui.model.project.VPVGene;
-import vpvgui.model.project.ViewPoint;
-import static vpvgui.io.Platform.getVPVDir;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * This class stores all of the data related to a project, including the list of genes and the viewpoint objects.
+ * This class stores all of the data related to a viewpoint, including the list of genes and the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
  * @version 0.2
@@ -40,9 +37,9 @@ public class Model implements Serializable {
     private String httpProxy=null;
     /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
     private String httpPort=null;
-    /** the name of the project that will be used to write the settings file (default: vpvgui). */
+    /** the name of the viewpoint that will be used to write the settings file (default: vpvgui). */
     private String projectName=null;
-    /** This suffix is appended to the project name to get the name of the file for storing project settings. */
+    /** This suffix is appended to the viewpoint name to get the name of the file for storing viewpoint settings. */
     //public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
     /** Has the UCSC Genome build been unpacked yet? :*/
     private boolean genomeUnpacked=false;

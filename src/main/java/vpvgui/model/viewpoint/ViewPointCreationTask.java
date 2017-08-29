@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
@@ -6,6 +6,7 @@ import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
+import vpvgui.model.VPVGene;
 
 import java.io.File;
 import java.io.FileNotFoundException;

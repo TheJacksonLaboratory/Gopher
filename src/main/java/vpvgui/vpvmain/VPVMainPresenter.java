@@ -30,12 +30,9 @@ import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
-import vpvgui.model.Default;
-import vpvgui.model.Initializer;
-import vpvgui.model.Model;
-import vpvgui.model.RestrictionEnzyme;
-import vpvgui.model.project.ViewPoint;
-import vpvgui.model.project.ViewPointCreationTask;
+import vpvgui.model.*;
+import vpvgui.model.viewpoint.ViewPoint;
+import vpvgui.model.viewpoint.ViewPointCreationTask;
 import vpvgui.util.SerializationManager;
 
 import java.io.File;
@@ -98,7 +95,7 @@ public class VPVMainPresenter implements Initializable {
     /**
      * Clicking this button will download some combination of genome and (compatible) gene definition files.
      * A file chooser will appear and the user can decide where to download everything. The paths will be stored
-     * in the project settings file.
+     * in the viewpoint settings file.
      */
     @FXML private Button downloadGenomeButton;
     /** Show progress in downloading the Genome and corresponding transcript definition file.  */
@@ -194,7 +191,7 @@ public class VPVMainPresenter implements Initializable {
     public boolean serialize() {
         String projectname=this.model.getProjectName();
         if (projectname==null) {
-            ErrorWindow.display("Error","Could not get project name (should never happen). Will save with default");
+            ErrorWindow.display("Error","Could not get viewpoint name (should never happen). Will save with default");
             projectname="default";
         }
         File dir=getVPVDir();
@@ -202,7 +199,7 @@ public class VPVMainPresenter implements Initializable {
         try {
             SerializationManager.serializeModel(this.model, serializedFilePath);
         } catch (IOException e) {
-            ErrorWindow.displayException("Error","Unable to serialize VPV project",e);
+            ErrorWindow.displayException("Error","Unable to serialize VPV viewpoint",e);
             return false;
         }
         logger.trace("Serialization successful to file "+serializedFilePath);
@@ -255,8 +252,8 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * This allows a caller to set the {@link Model} object for this presenter (for instance, a default
-     * {@link Model} object is set if the user chooses a new project. If the user chooses to open a previous
-     * project from a serialized file, then a  {@link Model} object is initialized from the file and set here.
+     * {@link Model} object is set if the user chooses a new viewpoint. If the user chooses to open a previous
+     * viewpoint from a serialized file, then a  {@link Model} object is initialized from the file and set here.
      * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
      * @param mod A {@link Model} object.
      */
@@ -443,8 +440,8 @@ public class VPVMainPresenter implements Initializable {
     /**
      * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
      * The effect of the command <pre>EntrezGeneViewFactory.display(this.model);</pre>
-     * is to pass a list of {@link vpvgui.model.project.VPVGene} objects to the {@link Model}.
-     * These objects are used with other information in the Model to create {@link vpvgui.model.project.ViewPoint}
+     * is to pass a list of {@link VPVGene} objects to the {@link Model}.
+     * These objects are used with other information in the Model to create {@link vpvgui.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
      *
@@ -462,9 +459,9 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
-     * these will have been entered as {@link vpvgui.model.project.VPVGene} objects into the {@link Model}
-     * object. This function will use the {@link vpvgui.model.project.VPVGene} obejcts and other information
-     * to create {@link vpvgui.model.project.ViewPoint} objects that will then be displayed in the
+     * these will have been entered as {@link VPVGene} objects into the {@link Model}
+     * object. This function will use the {@link VPVGene} obejcts and other information
+     * to create {@link vpvgui.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
     public void createCaptureProbes() {
@@ -534,12 +531,12 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * This is called when the user starts a new project. It should erase everything from
+     * This is called when the user starts a new viewpoint. It should erase everything from
      * the GUI as well (TODO check this!)
-     * @param e Event triggered by new project command.
+     * @param e Event triggered by new viewpoint command.
      */
     @FXML public void startNewProject(ActionEvent e) {
-        logger.trace("Start new project");
+        logger.trace("Start new viewpoint");
         ObservableList<Tab> panes = this.tabpane.getTabs();
         /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
         List<Tab> tabsToBeRemoved=new ArrayList<>();
@@ -563,7 +560,7 @@ public class VPVMainPresenter implements Initializable {
         logger.trace("TODO -- also re-initialize first tab");
     }
 
-    /** Display the settings (parameters) of the current project. */
+    /** Display the settings (parameters) of the current viewpoint. */
     public void showSettingsOfCurrentProject() {
         SettingsViewFactory.showSettings(model.getProperties());
     }
@@ -578,7 +575,7 @@ public class VPVMainPresenter implements Initializable {
         if (result) { /* if it didnt work, the serialize method will show an error dialog. */
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information");
-            alert.setHeaderText(String.format("Successfully saved project data to %s", Platform.getAbsoluteProjectPath(model.getProjectName())));
+            alert.setHeaderText(String.format("Successfully saved viewpoint data to %s", Platform.getAbsoluteProjectPath(model.getProjectName())));
             alert.show();
         }
     }

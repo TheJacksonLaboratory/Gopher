@@ -12,7 +12,7 @@ import vpvgui.vpvmain.VPVMainView;
 
 
 /** This is a functor class with a callback to switch screens when the user has chosen
- * which project to work on.
+ * which viewpoint to work on.
  */
 public class SwitchScreens {
     private static final Logger logger = Logger.getLogger(SwitchScreens.class.getName());

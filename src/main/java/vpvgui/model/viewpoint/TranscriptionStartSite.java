@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.model.viewpoint;
 
 
 public class TranscriptionStartSite {

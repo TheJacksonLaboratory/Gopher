@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.consoletest;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.Test;
@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
+import vpvgui.model.viewpoint.CuttingPositionMap;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -16,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * <p>
  * @author Peter Hansen
  */
-public class CuttingPositionMapTest {
+public class CuttingPositionMapConsoleTest {
 
 
     /* test fields */
@@ -40,7 +42,7 @@ public class CuttingPositionMapTest {
 
     CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
 
-    public CuttingPositionMapTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
+    public CuttingPositionMapConsoleTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
 
     /* test constructor */
 

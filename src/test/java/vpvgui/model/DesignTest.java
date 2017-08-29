@@ -3,15 +3,12 @@ package vpvgui.model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.project.CuttingPositionMap;
-import vpvgui.model.project.Segment;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.viewpoint.CuttingPositionMap;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class DesignTest {
 

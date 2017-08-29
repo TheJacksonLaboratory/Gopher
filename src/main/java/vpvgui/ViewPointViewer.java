@@ -84,8 +84,8 @@ public class ViewPointViewer extends Application {
     }
 
     /**
-     * This will load the splash screen where a user can choose an existing project or create a new one.
-     * @param switchscreen An object that will switch the main screen when the user has chosen the project to be worked on
+     * This will load the splash screen where a user can choose an existing viewpoint or create a new one.
+     * @param switchscreen An object that will switch the main screen when the user has chosen the viewpoint to be worked on
      */
     private void loadSplashScreen(SwitchScreens switchscreen) {
         SplashView splashview = new SplashView();

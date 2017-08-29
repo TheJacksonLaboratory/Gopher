@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.Test;
@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 

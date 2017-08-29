@@ -2,7 +2,7 @@ package vpvgui.io;
 
 
 import org.apache.log4j.Logger;
-import vpvgui.model.project.VPVGene;
+import vpvgui.model.VPVGene;
 
 import java.io.*;
 import java.util.*;
@@ -163,7 +163,7 @@ public class RefGeneParser {
         return genelist;
     }
 
-    /** @return the total number of {@link vpvgui.model.project.VPVGene} objects created from parsing the
+    /** @return the total number of {@link VPVGene} objects created from parsing the
      * refGene.txt.gz file.
      */
     public int n_totalRefGenes() { return this.genemap.size(); }

@@ -1,7 +1,8 @@
-package vpvgui.model.project;
+package vpvgui.model.viewpoint;
 
 import org.junit.Assert;
 import org.junit.Test;
+import vpvgui.model.VPVGene;
 
 
 /**

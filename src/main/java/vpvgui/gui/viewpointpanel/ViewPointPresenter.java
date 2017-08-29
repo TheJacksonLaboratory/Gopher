@@ -21,8 +21,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
-import vpvgui.model.project.Segment;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.viewpoint.Segment;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import java.net.URL;
 import java.util.ArrayList;

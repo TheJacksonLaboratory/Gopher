@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.model;
 
 import java.io.Serializable;
 import java.util.*;

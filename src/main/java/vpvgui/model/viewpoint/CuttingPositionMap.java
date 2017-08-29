@@ -1,4 +1,4 @@
-package vpvgui.model.project;
+package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;

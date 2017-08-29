@@ -16,7 +16,7 @@ import vpvgui.framework.Signal;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.io.RefGeneParser;
 import vpvgui.model.Model;
-import vpvgui.model.project.VPVGene;
+import vpvgui.model.VPVGene;
 
 
 
@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  *     each valid symbol -- and passes this to the {@link Model}. It also causes the dialog to close</li>
  * </ol>
  * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link VPVGene} objects to the model.
- * This list should then be used to create {@link vpvgui.model.project.ViewPoint} objects elsewhere in the code.
+ * This list should then be used to create {@link vpvgui.model.viewpoint.ViewPoint} objects elsewhere in the code.
  * @author Peter Robinson
  * @version 0.0.2 (2017-07-22)
  */

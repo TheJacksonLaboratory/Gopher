@@ -1,7 +1,7 @@
 package vpvgui.io;
 
-import vpvgui.model.project.Segment;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.viewpoint.Segment;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -2,9 +2,8 @@ package vpvgui.gui.analysisPane;
 
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.viewpoint.ViewPoint;
 
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;

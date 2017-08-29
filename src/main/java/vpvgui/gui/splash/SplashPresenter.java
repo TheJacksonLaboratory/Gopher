@@ -26,7 +26,7 @@ import static vpvgui.io.Platform.getVPVDir;
 
 
 /**
- * This will show the startup screen that will include a button for creating a new project as well as
+ * This will show the startup screen that will include a button for creating a new viewpoint as well as
  * a list of buttons for opening previous projects.
  */
 public class SplashPresenter implements Initializable {
@@ -73,9 +73,9 @@ public class SplashPresenter implements Initializable {
 
 
     public void newProject(ActionEvent e) {
-        String projectname=Popups.getStringFromUser("New Project Name","name of project","Enter name of new project");
+        String projectname=Popups.getStringFromUser("New Project Name","name of viewpoint","Enter name of new viewpoint");
         if (projectname==null) {
-            ErrorWindow.display("Error","Please enter a valid project name!");
+            ErrorWindow.display("Error","Please enter a valid viewpoint name!");
             return;
         } else {
             this.switchscreen.createNewProject(projectname);

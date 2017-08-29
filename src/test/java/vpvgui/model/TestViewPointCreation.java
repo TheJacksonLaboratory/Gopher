@@ -4,7 +4,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import vpvgui.gui.ErrorWindow;
-import vpvgui.model.project.*;
+import vpvgui.model.viewpoint.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;

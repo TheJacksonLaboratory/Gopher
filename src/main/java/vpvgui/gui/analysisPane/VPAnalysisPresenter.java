@@ -15,7 +15,7 @@ import vpvgui.gui.ErrorWindow;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
-import vpvgui.model.project.ViewPoint;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import java.net.URL;
 import java.util.Comparator;

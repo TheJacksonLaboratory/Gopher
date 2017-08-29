@@ -7,7 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 /**
- * This is used to figure out where VPVGui will store the project files. For instance, with linux
+ * This is used to figure out where VPVGui will store the viewpoint files. For instance, with linux
  * this would be /home/username/.vpvgui/...
  */
 public class Platform {
@@ -41,8 +41,8 @@ public class Platform {
     }
 
     /**
-     * Get the absolute path to the project file, which is a serialized Java file (suffix {@code .ser}).
-     * @param basename The plain project name, e.g., human37cd4
+     * Get the absolute path to the viewpoint file, which is a serialized Java file (suffix {@code .ser}).
+     * @param basename The plain viewpoint name, e.g., human37cd4
      * @return the absolute path,e.g., /home/user/data/immunology/human37cd4.ser
      */
     public static String getAbsoluteProjectPath(String basename) {
