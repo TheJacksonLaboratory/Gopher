@@ -6,11 +6,14 @@ import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
+import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.VPVGene;
 
+import javax.swing.text.View;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,6 +46,8 @@ public class ViewPointCreationTask extends Task {
     private  Integer minSizeUp;
 
     private StringProperty currentVP=null;
+    /** List of one or more restriction enzymes choseon by the user. */
+    private List<RestrictionEnzyme> chosenEnzymes=null;
 
 
     private  Integer minFragSize;
@@ -54,10 +59,20 @@ public class ViewPointCreationTask extends Task {
         this.model=model;
         this.viewpointlist=new ArrayList<>();
         this.currentVP=currentVPproperty;
+         /* We use the same enzymes for all ViewPoints; therefore, ViewPoint.chosenEnzymes is a static variable */
+        ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
+         /* Set up the static map of restriction enyzmes in the CuttingPositionMap class -- we are using the same
+        enzymes for all viewpoints, so we can use a static variable.
+         */
+        CuttingPositionMap.restrictionEnzymeMap = new HashMap<>();
+        List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
+        for (RestrictionEnzyme re : chosen) {
+            String site = re.getSite();
+            site=site.replaceAll("^","");
+            CuttingPositionMap.restrictionEnzymeMap.put(site,re);
+        }
         init_parameters();
     }
-
-
 
 
 
@@ -74,6 +89,8 @@ public class ViewPointCreationTask extends Task {
         //this.cuttingPatterns=model.getCuttingPatterns();
         //TODO Get the cuttings patterns from GUI!
         this.cuttingPatterns=  new String[]{"GATC"};
+
+
     }
 
 
@@ -88,8 +105,6 @@ public class ViewPointCreationTask extends Task {
         }
         return n;
     }
-
-   // public  List<VPVGene> getViewPoints(){ return vpvGeneList;}
 
     /** This is the method that will create the viewpoints.
      * We have placed it in a task because it takes a while.

@@ -1,16 +1,21 @@
-package vpvgui.model;
+package vpvgui.consoletest;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.viewpoint.CuttingPositionMap;
-import vpvgui.model.viewpoint.ViewPoint;
+import vpvgui.model.Design;
+import vpvgui.model.Model;
+import vpvgui.model.RestrictionEnzyme;
+import vpvgui.model.viewpoint.*;
+import vpvgui.model.viewpoint.CuttingPositionMapTest;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class DesignTest {
+public class DesignConsoleTest {
 
     private static Model testModel;
     private static Design testDesign;
@@ -39,10 +44,21 @@ public class DesignTest {
     private static String motif = "GATC";
 
     private static IndexedFastaSequenceFile testFastaReader;
+    static List<RestrictionEnzyme> lst;
 
     @BeforeClass
     public static void setup() throws Exception {
+        RestrictionEnzyme re1 = new RestrictionEnzyme("HindIII", "A^AGCTT");
+        RestrictionEnzyme re2 = new RestrictionEnzyme("DpnII", "^GATC");
+        Map remap=new HashMap<>();
+        remap.put("AAGCTT",re1);
+        remap.put("GATC",re2);
+        CuttingPositionMap.setRestrictionEnzymeMap(remap);
 
+        lst=new ArrayList<>();
+        lst.add(re1);
+        lst.add(re2);
+        ViewPoint.setChosenEnzymes(lst);
         // create a model for testing
         testModel = new Model();
         testModel.setProbeLength(120);
@@ -95,13 +111,15 @@ public class DesignTest {
         // use model to create a design for testing
         testDesign = new Design(testModel);
 
+
+
     }
 
     @Test
     public void testGetTotalNumberOfProbeNucleotides() throws Exception {
 
         List<ViewPoint> viewPointList = testModel.getViewPointList();
-        /*
+
         for (ViewPoint vp : viewPointList) {
             System.out.println("--------------------------------------------------------");
             ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("ALL");
@@ -109,7 +127,7 @@ public class DesignTest {
             for (Segment ss : selectedSegments) {
                 System.out.println("start: " + ss.getStartPos() + "\t" + "end: " + ss.getEndPos() + "\t" + "selected: " + ss.isSelected());
             }
-        }*/
+        }
     }
 
 
@@ -123,7 +141,7 @@ public class DesignTest {
                 testFastaReader,
                  maxDistToGenomicPosUp,
                  maxDistToGenomicPosDown,
-                testCuttingPatterns);
+                lst);
     }
 
 }

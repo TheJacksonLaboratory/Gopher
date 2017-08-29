@@ -5,7 +5,8 @@ import org.apache.log4j.Logger;
 import java.io.Serializable;
 
 /**
- * Created by robinp on 5/11/17.
+ * @author Peter Robinson
+ * @version 0.2.1
  */
 public class RestrictionEnzyme implements Serializable {
     static Logger logger = Logger.getLogger(RestrictionEnzyme.class.getName());
@@ -18,10 +19,25 @@ public class RestrictionEnzyme implements Serializable {
      */
     private String site;
 
+    /** Same as site but without the caret symbol */
+    private String plainSite;
+    /** The offset of the cutting site in this restriction enzyme. For instancen the offset for ^GATC is 0 and the
+     * offset for A^AGCTT is 1.
+     */
+    private Integer offset=null;
+
     public RestrictionEnzyme(String n, String s) {
         name=n;
         site=s;
-        //logger.trace(String.format("CTOR: \"%s\", \"%s\"",name,site));
+        this.offset=site.indexOf('^');
+        if (offset<0) {
+            logger.error(String.format("Malformed site pattern for enyze %s (%s)",name,site)); /* Should never happen!*/
+        }
+        plainSite=site;
+        int i= site.indexOf('^');
+        if (i>=0) {
+            plainSite=site.substring(0,i)+site.substring(i+1);
+        }
     }
 
     public String getName() {
@@ -36,6 +52,8 @@ public class RestrictionEnzyme implements Serializable {
         return site;
     }
 
+    public String getPlainSite() { return  plainSite; }
+
     public void setSite(String site) {
         this.site = site;
     }
@@ -43,4 +61,6 @@ public class RestrictionEnzyme implements Serializable {
     public String getLabel() {
         return String.format("%s: %s",getName(),getSite());
     }
+
+    public Integer getOffset() { return this.offset; }
 }

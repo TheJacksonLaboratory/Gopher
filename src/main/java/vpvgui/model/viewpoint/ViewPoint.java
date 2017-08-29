@@ -4,6 +4,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import vpvgui.model.Default;
+import vpvgui.model.RestrictionEnzyme;
 
 import java.io.Serializable;
 import java.util.*;
@@ -71,6 +72,10 @@ public class ViewPoint implements Serializable {
    // private IndexedFastaSequenceFile fastaReader; /* TODO this should not be a class member variable */
     /** Array of restriction enzyme patterns. */
     private String[] cuttingPatterns;
+    /** List of restriction enzymes chosen by the User. */
+    static List<RestrictionEnzyme> chosenEnzymes=null;
+
+    public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
     private String warnings;
     /** Overall score of this Viewpoint.*/
@@ -152,8 +157,7 @@ public class ViewPoint implements Serializable {
         this.targetName=builder.targetName;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
-        this.cuttingPatterns=builder.cuttingPatterns;
-       // this.fastaReader=builder.fastaReader;
+        //this.cuttingPatterns=builder.cuttingPatterns;
         this.minFragSize=builder.minFragSize;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
@@ -193,7 +197,6 @@ public class ViewPoint implements Serializable {
         private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private String[] cuttingPatterns;
-
         /** Derivation approach, either combined (CA), Andrey 2016 (AEA), or manually (M) */
         private String derivationApproach;
 
@@ -259,7 +262,7 @@ public class ViewPoint implements Serializable {
                 fastaReader,
                 this.maxDistToGenomicPosUp,
                 this.maxDistToGenomicPosDown,
-                this.cuttingPatterns);
+                ViewPoint.chosenEnzymes);
         logger.trace("We just initiated the cutting position map for genomic Pos "+cuttingPositionMap.getGenomicPos());
         List<Integer> all = cuttingPositionMap.getArrayListForGivenMotif("ALL");
         logger.trace("Positions for All");
@@ -278,20 +281,31 @@ public class ViewPoint implements Serializable {
     private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader) {
 
         this.restSegListMap = new HashMap<String, ArrayList<Segment>>();
-        for (int i = 0; i < this.cuttingPatterns.length; i++) {
+        //for (int i = 0; i < this.cuttingPatterns.length; i++) {
+        for (RestrictionEnzyme re: ViewPoint.chosenEnzymes) {
+            String cuttingPat=re.getPlainSite();
             ArrayList arrList = new ArrayList<Segment>();
-            restSegListMap.put(cuttingPatterns[i], arrList);
+            restSegListMap.put(cuttingPat, arrList);
         }
         ArrayList arrList = new ArrayList<Segment>();
         restSegListMap.put("ALL", arrList);
 
-        for (int i = 0; i < this.cuttingPatterns.length; i++) {
-            for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(this.cuttingPatterns[i]).size() - 1; j++) {
+       // for (int i = 0; i < this.cuttingPatterns.length; i++) {
+        for (RestrictionEnzyme re: ViewPoint.chosenEnzymes) {
+            String cuttingPat=re.getPlainSite();
+            //for (int j = 0; j < cuttingPositionMap.getHashMapOnly().get(this.cuttingPatterns[i]).size() - 1; j++) {
+            ArrayList<Integer> cuttingPositionList=cuttingPositionMap.getHashMapOnly().get(cuttingPat);
+            logger.trace(String.format("About to add cutting positions for %s",cuttingPat ));
+            for (int i=0;i<cuttingPositionList.size()-1;i++) {
+                //Segment CTOR is Segment(refID, start, end)
+                // We get pairs of cutting sites to make the segments (for this reason, we cannot start from the last cutting site)
                 Segment restFrag=new Segment.Builder(referenceSequenceID,
-                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j)+1),
-                        relToAbsPos(cuttingPositionMap.getHashMapOnly().get(cuttingPatterns[i]).get(j + 1))).
-                        fastaReader(fastaReader).marginSize(marginSize).build();
-                restSegListMap.get(cuttingPatterns[i]).add(restFrag);
+                        relToAbsPos(cuttingPositionList.get(i)),
+                        relToAbsPos(cuttingPositionList.get(i+1))).
+                        fastaReader(fastaReader).
+                        marginSize(marginSize).
+                        build();
+                restSegListMap.get(cuttingPat).add(restFrag);
             }
         }
 
@@ -560,6 +574,7 @@ public class ViewPoint implements Serializable {
             Segment segment = restSegListMap.get(motif).get(i);
             Integer fragStaPos = segment.getStartPos();
             Integer fragEndPos = segment.getEndPos();
+            logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
             if (fragStaPos <= genomicPos && genomicPos <= fragEndPos) {
                 genomicPosFragIdx = i;
                 break;

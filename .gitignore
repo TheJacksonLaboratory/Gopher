@@ -6,3 +6,7 @@ target/**
 .idea
 .vpvgui.iml
 *.log
+/example.log
+target/
+vpvgui.iml
+/vpvgui.iml

@@ -5,20 +5,28 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
+import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.viewpoint.CuttingPositionMap;
+import vpvgui.model.viewpoint.CuttingPositionMapTest;
+import vpvgui.model.viewpoint.CuttingPositionMapTest;
+import vpvgui.model.viewpoint.ViewPoint;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * This test class tests an instance of the <i>CuttingPositionMap</i> class. The settings for the call of the constructor are specified at the head of this test class.
+ * This test class tests an instance of the <i>CuttingPositionMapTest</i> class. The settings for the call of the constructor are specified at the head of this test class.
  * <p>
  * The two functions <i>testHashMap</i> and <i>testGetNextPos</i> print output to the screen for demonstration purposes (see method descriptions for more details).
  * <p>
  * @author Peter Hansen
  */
-public class CuttingPositionMapConsoleTest {
+public class CuttingPositionMapTestConsole {
 
 
     /* test fields */
@@ -29,20 +37,41 @@ public class CuttingPositionMapConsoleTest {
     Integer testMaxDistToGenomicPosDown=50;
 
 
-    /* create CuttingPositionMap object for testing */
+    /* create CuttingPositionMapTest object for testing */
 
     private String[] testCuttingPatterns = new String[]{"ACT^TTTA","AAAC^CACTTAC","^GAG"};
     private String[] testCuttingPatternsCopy = testCuttingPatterns.clone();
+
+    RestrictionEnzyme re1 = new RestrictionEnzyme("re1","ACT^TTTA");
+    RestrictionEnzyme re2 = new RestrictionEnzyme("re2","AAAC^CACTTAC");
+    RestrictionEnzyme re3 = new RestrictionEnzyme("re2","^GAG");
+
+
 
     private String testFastaFile="src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
 
     private final File fasta = new File(testFastaFile);
 
-    IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
 
-    CuttingPositionMap testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
 
-    public CuttingPositionMapConsoleTest() throws FileNotFoundException {} // Not nice, but without there will be an error. Why?
+    CuttingPositionMap testCuttingPositionMap;// = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
+    IndexedFastaSequenceFile testFastaReader;
+
+    public CuttingPositionMapTestConsole() throws FileNotFoundException {
+        Map<String,RestrictionEnzyme> remap =new HashMap<>();
+        remap.put(re1.getPlainSite(),re1);
+        remap.put(re2.getPlainSite(),re2);
+        remap.put(re3.getPlainSite(),re3);
+        List<RestrictionEnzyme> lst=new ArrayList<>();
+        lst.add(re1);
+        lst.add(re2);
+        lst.add(re3);
+        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        testFastaReader = new IndexedFastaSequenceFile(fasta);
+        testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, lst);
+
+
+    } // Not nice, but without there will be an error. Why?
 
     /* test constructor */
 

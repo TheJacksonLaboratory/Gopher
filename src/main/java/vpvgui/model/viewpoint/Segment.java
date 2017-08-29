@@ -10,8 +10,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
- * This class is a temporary substitute fot the class <i>Fragment</i>, because there was consensus about the concept of the class fragment.
- * The class represents a restriction fragment that is a member of a viewpoint.
+ * This class represents a restriction fragment that is a member of a viewpoint.
+ * @author Peter Hansen
+ * @version 0.3.2
  */
 public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
@@ -31,8 +32,6 @@ public class Segment implements Serializable {
     private double repeatContentUp;
     /** The repetitive content of the margin in downstream direction of this object of class Segment. */
     private double repeatContentDown;
-    /** Object for reading a given FASTA file (HTSJDK). */
-    //private IndexedFastaSequenceFile fastaReader;
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
@@ -58,7 +57,6 @@ public class Segment implements Serializable {
         this.referenceSequenceID=builder.referenceSequenceID;
         this.startPos=builder.startPos;
         this.endPos=builder.endPos;
-        //this.fastaReader=builder.fastaReader;
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
         calculateRepeatContent(builder.fastaReader);

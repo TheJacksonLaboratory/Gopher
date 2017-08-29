@@ -306,6 +306,8 @@ public class Model implements Serializable {
         this.chosenEnzymelist = chosenEnzymes;
     }
 
+    public List<RestrictionEnzyme> getChosenEnzymelist(){return this.chosenEnzymelist; }
+
     public void setHttpProxyPort(String port) {this.httpPort=port; }
     public String getHttpProxyPort() { return this.httpPort; }
     public String getHttpProxy() { return this.httpProxy; }
