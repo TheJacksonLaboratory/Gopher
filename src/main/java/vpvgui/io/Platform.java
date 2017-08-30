@@ -14,7 +14,7 @@ public class Platform {
 
     /**
      * Get path to directory where HRMD-gui stores global settings.
-     * The path depends on underlying operating system. Linux, Windows & OSX
+     * The path depends on underlying operating system. Linux, Windows and OSX
      * currently supported.
      * @return File to directory
      */

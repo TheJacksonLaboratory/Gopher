@@ -26,7 +26,7 @@ import java.util.*;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.0.5 (2017-08-24)
+ * @version 0.0.6 (2017-08-29)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -66,10 +66,12 @@ public class ViewPoint implements Serializable {
     private Integer numOfSelectedFrags;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
     private CuttingPositionMap cuttingPositionMap;
-    /* List of restriction 'Fragment' objects that are within the viewpoint */
+    /** Map of restriction {@link vpvgui.model.viewpoint.Segment} objects that are contained within the viewpoint. The
+     * key is the site (e.g., GATC), and the value is a list of Segments that correspond to that site. This Map is
+     * initialized in {@link #initRestrictionFragments(IndexedFastaSequenceFile)}.*/
     private HashMap<String, ArrayList<Segment>> restSegListMap;
     /** Array of restriction enzyme patterns. */
-    private String[] cuttingPatterns;
+    //private String[] cuttingPatterns;
     /** List of restriction enzymes chosen by the User. */
     static List<RestrictionEnzyme> chosenEnzymes=null;
 
@@ -121,7 +123,7 @@ public class ViewPoint implements Serializable {
 
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
-        this.cuttingPatterns=cuttingPatterns;
+       // this.cuttingPatterns=cuttingPatterns;
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
@@ -192,7 +194,6 @@ public class ViewPoint implements Serializable {
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
         private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
-        private String[] cuttingPatterns;
         /** Derivation approach, either combined (CA), Andrey 2016 (AEA), or manually (M) */
         private String derivationApproach;
 
@@ -214,9 +215,6 @@ public class ViewPoint implements Serializable {
         { maxDistToGenomicPosUp = val;           return this; }
         public Builder targetName(String val)
         { targetName = val;  return this; }
-        public Builder cuttingPatterns(String [] val) {
-            this.cuttingPatterns=val; return this;
-        }
         public Builder fastaReader(IndexedFastaSequenceFile val) {
             this.fastaReader=val; return this;
         }
@@ -247,7 +245,7 @@ public class ViewPoint implements Serializable {
     }
 
 
-    /** Initialize {@link #cuttingPositionMap} on the basis of the chosen enzyme cutting patterns in {@link #cuttingPatterns}.*/
+    /** Initialize {@link #cuttingPositionMap} on the basis of the chosen enzyme cutting patterns in {@link #chosenEnzymes}.*/
     public void initCuttingPositionMap(IndexedFastaSequenceFile fastaReader) {
         // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
         // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.

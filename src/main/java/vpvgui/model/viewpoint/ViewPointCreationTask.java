@@ -17,19 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by peterrobinson on 7/22/17.
+ * This is the Task that coordinates creation of ViewPoints from the data entered by the user.
+ * @author Peter Robinson
+ * @version 0.0.2 (2017-09-29)
  */
 public class ViewPointCreationTask extends Task {
     private static final Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
     Model model=null;
 
-    /* List of VPVGenes representing User's gene list. */
+    /** List of {@link VPVGene} objects representing User's gene list. */
     List<VPVGene> vpvGeneList;
-
+    /** List of {@link ViewPoint} objects that we will return to the Model when this Task is done. */
     List<ViewPoint> viewpointlist=null;
-
     /** Restriction enzyme cuttings patterns (must have at least one) */
-    private  String[] cuttingPatterns;
+    //private  String[] cuttingPatterns;
     /** Maximum distance from central position (e.g., transcription start site) of the upstream boundary of the viewpoint.*/
     private  int maxDistanceUp;
     /** Maximum distance from central position (e.g., transcription start site) of the downstream boundary of the viewpoint.*/
@@ -55,25 +56,31 @@ public class ViewPointCreationTask extends Task {
 
     private  Integer marginSize=200; /* ToDo -- allow this to be set via the menu */
 
+    /**
+     * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
+     * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
+     * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
+     * values for the enzymes.
+     * @param model
+     * @param currentVPproperty
+     */
     public ViewPointCreationTask(Model model, StringProperty currentVPproperty){
         this.model=model;
         this.viewpointlist=new ArrayList<>();
         this.currentVP=currentVPproperty;
-         /* We use the same enzymes for all ViewPoints; therefore, ViewPoint.chosenEnzymes is a static variable */
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
-         /* Set up the static map of restriction enyzmes in the CuttingPositionMap class -- we are using the same
-        enzymes for all viewpoints, so we can use a static variable.
-         */
         CuttingPositionMap.restrictionEnzymeMap = new HashMap<>();
         List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
         if (chosen==null) {
             logger.error("Unable to retrieve list of chosen restriction enzymes");
             return;
+        } else {
+            logger.trace(String.format("Setting up viewpoint creation for %d enzymes", chosen.size() ));
         }
         for (RestrictionEnzyme re : chosen) {
-            String site = re.getSite();
-            site=site.replaceAll("^","");
+            String site = re.getPlainSite();
             CuttingPositionMap.restrictionEnzymeMap.put(site,re);
+
         }
         init_parameters();
     }
@@ -90,11 +97,7 @@ public class ViewPointCreationTask extends Task {
         this.maxDistanceDown =model.getMaxSizeDown();
         this.minFragSize=model.getMinFragSize();
         this.maxRepContent=model.getMaxRepeatContent();
-        //this.cuttingPatterns=model.getCuttingPatterns();
-        //TODO Get the cuttings patterns from GUI!
-        this.cuttingPatterns=  new String[]{"GATC"};
-
-
+        logger.trace("Finished initializing parameters to create ViewPoints.");
     }
 
 
@@ -116,7 +119,11 @@ public class ViewPointCreationTask extends Task {
      * @throws Exception
      */
     protected Object call() throws Exception {
-        String cuttingMotif=this.cuttingPatterns[0];/* TODO -- Why do we need this instead of taking cutting patterns? */
+        if (ViewPoint.chosenEnzymes==null) {
+            logger.error("Attempt to start ViewPoint creation thread with null chosenEnzymes");
+            return null;
+        }
+        String cuttingMotif = ViewPoint.chosenEnzymes.get(0).getPlainSite(); // TODO Need to extend this to more than one enzyme
         logger.trace("Creating viewpoints for cuting pattern: "+cuttingMotif);
 
         int total=getTotalViewpoints();
@@ -141,7 +148,7 @@ public class ViewPointCreationTask extends Task {
                             targetName(vpvgene.getGeneSymbol()).
                             maxDistToGenomicPosUp(maxDistanceUp).
                             maxDistToGenomicPosDown(maxDistanceDown).
-                            cuttingPatterns(this.cuttingPatterns).
+                            //cuttingPatterns(this.cuttingPatterns).
                             fastaReader(fastaReader).
                             minimumSizeUp(minSizeUp).
                             maximumSizeUp(maxDistanceUp).

@@ -2,6 +2,7 @@ package vpvgui.io;
 
 
 import org.apache.log4j.Logger;
+import vpvgui.gui.ErrorWindow;
 import vpvgui.model.VPVGene;
 
 import java.io.*;
@@ -37,23 +38,23 @@ public class RefGeneParser {
 
     static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
-     * the gene list uploaded by the user. */
+     * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.*/
     private Map<String, VPVGene> genemap=null;
-
-    /** The set of gene symbols that we could not find in Jannovar--and ergo,that we regard as being invalid because
-     * they are using nonstandard gene symbols.
-     */
+    /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
+     * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
-    /** The set of gene symbols that we could find in Jannovar--and ergo,that we regard as being valid.
-     */
+    /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.*/
     private Set<String> validGeneSymbols=null;
 
+    /**
+     * @param path Path to the {@code refGene.txt.gz} file.
+     */
     public RefGeneParser(String path) {
         genemap=new HashMap<>();
         parse(path);
     }
 
-    /** Parse the refGene.txt.gz file. Note that we parse zero-based numbers here. */
+    /** Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here. */
     private void parse(String path) {
         try {
             InputStream fileStream = new FileInputStream(path);
@@ -122,27 +123,22 @@ public class RefGeneParser {
 
     /** The user uploads a list of gene symbols. This function checks this list against the gene symbols that
      * are contained in the corresponding {@code refGene.txt.gz} file. Each uploaded symbol that is found in the
-     * {@code refGene.txt.gz}  file is placed in a {@code Map<String,VPVGene>} as the key,
+     * {@code refGene.txt.gz}  file is placed in {@link #genemap} as the key,
      * and the corresponding {@link VPVGene} object is placed in the Set {@link #validGeneSymbols},
      * and all uploaded gene symbols that are not found there are placed in the Set {@link #invalidGeneSymbols}.
      * @param genelst List of gene symbols uploaded by the user.
-     * @return map of valid symbols and  {@link VPVGene} objects
      */
     public void checkGenes(List<String> genelst) {
         if (genelst==null) {
-            logger.error("[ERROR] First initialize the gene list and then runm this test");
-            System.exit(1); /* todo add exception here. */
+            logger.error("Attempt to check genelist with null pointer");
+            ErrorWindow.display("Unable to check gene list", "Attempt to check genelist with null pointer");
+            return;
         }
         this.invalidGeneSymbols = new HashSet<>();
         this.validGeneSymbols = new HashSet<>();
-        Set<String> geneset = new HashSet<>();
-        for (String s:genelst) {geneset.add(s);}
-        /** key: gene symbol, value: list of corresponding transcripts. */
-        //Map<String,VPVGene> transcriptmap =new HashMap<>();
         for (String sym:genelst) {
             if (this.genemap.containsKey(sym)) {
                 validGeneSymbols.add(sym);
-                //transcriptmap.put(sym, this.genemap.get(sym));
             } else {
                 invalidGeneSymbols.add(sym);
             }
@@ -163,9 +159,7 @@ public class RefGeneParser {
         return genelist;
     }
 
-    /** @return the total number of {@link VPVGene} objects created from parsing the
-     * refGene.txt.gz file.
-     */
+    /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
     public int n_totalRefGenes() { return this.genemap.size(); }
 
     /** Calculates the total number of distinct start points (transcript start points), which would correspond to the

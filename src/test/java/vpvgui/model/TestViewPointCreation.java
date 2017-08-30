@@ -211,7 +211,7 @@ public class TestViewPointCreation {
                 ViewPoint vp= new ViewPoint.Builder(referenceSequenceID,gPos).
                         maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                         maxDistToGenomicPosDown(maxDistToGenomicPosDown).
-                        cuttingPatterns(cuttingPatterns).
+                      //  cuttingPatterns(cuttingPatterns).
                         fastaReader(fastaReader).
                         minimumSizeUp(minSizeUp).
                         maximumSizeUp(maxSizeUp).

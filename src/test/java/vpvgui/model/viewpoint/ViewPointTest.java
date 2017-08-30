@@ -232,7 +232,6 @@ public class ViewPointTest {
         ViewPoint testViewpointLupianez = new ViewPoint.Builder(referenceSequenceID, genomicPos).
                 maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
-                cuttingPatterns(testCuttingPatterns).
                 fastaReader(FastaReader).
                 minimumSizeUp(minSizeUp).
                 minimumSizeDown(minSizeDown).

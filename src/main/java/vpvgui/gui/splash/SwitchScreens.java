@@ -4,6 +4,7 @@ package vpvgui.gui.splash;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import vpvgui.gui.ErrorWindow;
 import vpvgui.io.Platform;
 import vpvgui.model.Model;
 import vpvgui.util.SerializationManager;
@@ -51,6 +52,11 @@ public class SwitchScreens {
         String filepath = Platform.getAbsoluteProjectPath(name);
         logger.trace("About to deserialize model at "+ filepath);
         Model model = SerializationManager.deserializeModel(filepath);
+        if (model == null) {
+            logger.error(String.format("Unable to deserialize model from %s at %s", name, filepath));
+            ErrorWindow.display("Null pointer", String.format("Unable to deserialize model from %s at %s", name, filepath));
+            return;
+        }
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
         if (presenter==null){

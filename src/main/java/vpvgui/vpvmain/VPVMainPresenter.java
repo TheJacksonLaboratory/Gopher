@@ -464,6 +464,12 @@ public class VPVMainPresenter implements Initializable {
                     "\nPlease enter a gene list and try again.");
             return false;
         }
+        if (this.model.getChosenEnzymelist()==null || this.model.getChosenEnzymelist().isEmpty()) {
+            ErrorWindow.display("Error","Viewpoints cannot be created before a restriction enzyme has been chosen."+
+                    "\nPlease choose a restriction enzyme and try again.");
+            return false;
+        }
+        //TODO check other parameters.
         return true;
     }
 
@@ -517,6 +523,7 @@ public class VPVMainPresenter implements Initializable {
             logger.trace("Finished factory.createViewPoints()");
             pbpresent.closeWindow();
         });
+        logger.trace("About to run task");
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();

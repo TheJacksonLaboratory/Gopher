@@ -2,7 +2,7 @@ package vpvgui.gui.logviewer;
 
 /**
  * log4j levels,which are
- * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+ * TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL
  */
 public enum Level {
     TRACE(1), DEBUG(2), INFO(3), WARN(4), ERROR(5),FATAL(6);

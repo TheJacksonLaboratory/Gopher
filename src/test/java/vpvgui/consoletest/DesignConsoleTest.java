@@ -76,7 +76,7 @@ public class DesignConsoleTest {
         ViewPoint testViewpointLupianez_1 = new ViewPoint.Builder(referenceSequenceID_1, genomicPos_1).
                 maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
-                cuttingPatterns(testCuttingPatterns).
+              //  cuttingPatterns(testCuttingPatterns).
                 fastaReader(testFastaReader).
                 minimumSizeUp(minSizeUp).
                 minimumSizeDown(minSizeDown).
@@ -93,7 +93,7 @@ public class DesignConsoleTest {
         ViewPoint testViewpointLupianez_2 = new ViewPoint.Builder(referenceSequenceID_1, genomicPos_1).
                 maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
-                cuttingPatterns(testCuttingPatterns).
+               // cuttingPatterns(testCuttingPatterns).
                 fastaReader(testFastaReader).
                 minimumSizeUp(minSizeUp).
                 minimumSizeDown(minSizeDown).
