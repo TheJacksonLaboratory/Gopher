@@ -73,9 +73,9 @@ public class SplashPresenter implements Initializable {
 
 
     public void newProject(ActionEvent e) {
-        String projectname=Popups.getStringFromUser("New Project Name","name of viewpoint","Enter name of new viewpoint");
+        String projectname=Popups.getStringFromUser("New Project Name","name of project","Enter name of new project");
         if (projectname==null) {
-            ErrorWindow.display("Error","Please enter a valid viewpoint name!");
+            ErrorWindow.display("Error","Please enter a valid project name!");
             return;
         } else {
             this.switchscreen.createNewProject(projectname);

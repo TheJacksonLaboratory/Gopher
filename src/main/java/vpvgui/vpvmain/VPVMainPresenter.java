@@ -457,6 +457,19 @@ public class VPVMainPresenter implements Initializable {
         e.consume();
     }
 
+
+    private boolean checkDataValidity() {
+        if (this.model.getVPVGeneList()==null|| this.model.getVPVGeneList().size()==0) {
+            ErrorWindow.display("Error","Viewpoints cannot be created before a gene list has been chosen."+
+                    "\nPlease enter a gene list and try again.");
+            return false;
+        }
+        return true;
+    }
+
+
+
+
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
      * these will have been entered as {@link VPVGene} objects into the {@link Model}
@@ -464,13 +477,12 @@ public class VPVMainPresenter implements Initializable {
      * to create {@link vpvgui.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
-    public void createCaptureProbes() {
-        logger.trace("Entering createCaptureProbes");
-        if (this.model.getVPVGeneList()==null|| this.model.getVPVGeneList().size()==0) {
-            ErrorWindow.display("Error","Viewpoints cannot be created before a gene list has been chosen."+
-            "\nPlease enter a gene list and try again.");
+    public void createViewPoints() {
+        logger.trace("Entering createViewPoints");
+        if (! checkDataValidity()) {
             return;
         }
+
 
         StringProperty sp=new SimpleStringProperty();
         ViewPointCreationTask task = new ViewPointCreationTask(model,sp);

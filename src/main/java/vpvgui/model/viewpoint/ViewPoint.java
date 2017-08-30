@@ -563,6 +563,7 @@ public class ViewPoint implements Serializable {
         }*/
         for (Segment segment: restSegListMap.get(motif)){
             segment.setSelected(true);
+            logger.trace(String.format("Setting segment %s to true",segment.toString()));
         }
 
         // find the index of the fragment that contains genomicPos
