@@ -306,7 +306,7 @@ public class ViewPointPresenter implements Initializable {
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
+        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
         // generate Colored segments - Segment paired with some color.
         this.coloredsegments = vp.getActiveSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))

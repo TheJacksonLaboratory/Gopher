@@ -7,6 +7,7 @@ import vpvgui.model.Default;
 import vpvgui.model.RestrictionEnzyme;
 
 import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -106,24 +107,19 @@ public class ViewPoint implements Serializable {
 
     /**
      * The constructor sets fields and creates a {@link CuttingPositionMap} object.
-     *
-     * @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
+     *  @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
      * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
      * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
      * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
-     * @param cuttingPatterns         array of cutting motifs, e.g. {@code A^AGCTT} for the restriction enzyme {@code HindIII}. The '^' indicates the cutting position within the motif.
      * @param fastaReader             indexed FASTA file corresponding to referenceSequenceID that has the sequence for restriction..
      */
     public ViewPoint(String referenceSequenceID,
                      Integer genomicPos,
                      Integer maxDistToGenomicPosUp,
                      Integer maxDistToGenomicPosDown,
-                     String[] cuttingPatterns,
                      IndexedFastaSequenceFile fastaReader) {
-
         setReferenceID(referenceSequenceID);
         setGenomicPos(genomicPos);
-       // this.cuttingPatterns=cuttingPatterns;
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
         setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
@@ -132,7 +128,6 @@ public class ViewPoint implements Serializable {
 
 
     private void init(IndexedFastaSequenceFile fastaReader) {
-
         setStartPos(genomicPos - maxDistToGenomicPosUp);
         setEndPos(genomicPos + maxDistToGenomicPosDown);
         setDerivationApproach("INITIAL");
@@ -155,7 +150,6 @@ public class ViewPoint implements Serializable {
         this.targetName=builder.targetName;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
-        //this.cuttingPatterns=builder.cuttingPatterns;
         this.minFragSize=builder.minFragSize;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
@@ -258,11 +252,11 @@ public class ViewPoint implements Serializable {
                 this.maxDistToGenomicPosDown,
                 ViewPoint.chosenEnzymes);
         logger.trace("We just initiated the cutting position map for genomic Pos "+cuttingPositionMap.getGenomicPos());
-        List<Integer> all = cuttingPositionMap.getAllCuts();
+       /* List<Integer> all = cuttingPositionMap.getAllCuts();
         logger.trace("Positions for All");
         for (Integer i:all) {
             logger.trace("\t"+i);
-        }
+        }*/
 
     }
 
@@ -302,10 +296,13 @@ public class ViewPoint implements Serializable {
         }
 
         /* finally add the segments for the key 'ALL', the combination of cutting sites derived from all motifs */
-        for (int j = 0; j < cuttingPositionMap.getCuttingPositionHashMap().get("ALL").size() - 1; j++) {
+        //for (int j = 0; j < cuttingPositionMap.getCuttingPositionHashMap().get("ALL").size() - 1; j++) {
+          for (int j=0;j < cuttingPositionMap.getAllCuts().size()-1; j++) {
             Segment restFrag=new Segment.Builder(referenceSequenceID,
-                    relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j)+1),
-                    relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j + 1))).
+                   // relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j)+1),
+                    relToAbsPos(cuttingPositionMap.getAllCuts().get(j)+1),
+                   // relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j + 1))).
+                    relToAbsPos(cuttingPositionMap.getAllCuts().get(j + 1))).
                     fastaReader(fastaReader).marginSize(marginSize).build();
             restSegListMap.get("ALL").add(restFrag);
         }
@@ -332,8 +329,8 @@ public class ViewPoint implements Serializable {
     public final Integer getGenomicPos() {
         return genomicPos;
     }
-
-    public String getGenomicLocationString() { return String.format("%s:%d",referenceSequenceID,genomicPos);}
+    //NumberFormat.getNumberInstance(Locale.US).format
+    public String getGenomicLocationString() { return String.format("%s:%s",referenceSequenceID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
 
 
     public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) {

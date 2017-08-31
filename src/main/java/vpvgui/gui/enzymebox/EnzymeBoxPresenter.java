@@ -1,5 +1,6 @@
 package vpvgui.gui.enzymebox;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -40,9 +41,9 @@ public class EnzymeBoxPresenter implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.boxlist = new ArrayList<>();
         this.enzymemap = new HashMap<>();
-        this.restrictionLabel.setText("Choose one or more restriction enzymes for Capture Hi-C");
-        logger.trace("We initialized restrictionLabel to " + this.restrictionLabel.getText());
+        this.restrictionLabel.setText("Choose one or more restriction enzymes");
         this.chosen = new ArrayList<>();
+        Platform.runLater( ()-> {this.okButton.requestFocus(); } );
     }
 
     public void initializeEnzymes(List<RestrictionEnzyme> enzymes) {
@@ -51,17 +52,20 @@ public class EnzymeBoxPresenter implements Initializable {
             CheckBox cb = new CheckBox(label);
             enzymemap.put(re.getName(),re);
             cb.setOnAction( e -> handle(re.getName()));
-            cb.setStyle(
+            cb.setAllowIndeterminate(false);
+           cb.setId("checkbx");
+           /* cb.setStyle(
                     "-fx-border-color: lightblue; "
                             + "-fx-font-size: 18;"
-                            + "-fx-border-insets: -5; "
+                            + "-fx-border-insets: -2; "
                             + "-fx-border-radius: 5;"
                             + "-fx-border-style: dotted;"
                             + "-fx-border-width: 2;"
-                            + "-fx-alignment: top-left"
-            );
+                            + "-fx-alignment: top-left;"
+            );*/
             boxlist.add(cb);
             this.restrictionVBox.getChildren().addAll(cb);
+            this.restrictionVBox.setSpacing(8);
         }
         logger.trace("We added " + boxlist.size() + " enzymes to boxlist");
 

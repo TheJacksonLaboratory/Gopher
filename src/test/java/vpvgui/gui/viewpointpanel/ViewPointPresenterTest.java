@@ -35,7 +35,7 @@ public class ViewPointPresenterTest extends ApplicationTest {
         IndexedFastaSequenceFile fai = new IndexedFastaSequenceFile(
                 new File(ViewPointPresenterTest.class.getResource("/smallgenome/chr11:0-600000.fa").toURI()));
         ViewPoint vp = new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos,
-                testMaxDownstreamPos, testCuttingPatterns, fai);
+                testMaxDownstreamPos, fai);
         vp.setTargetName("HRAS");
         // TODO - return real-life ViewPoint from here. This one has no Segments at the moment.
         return vp;

@@ -112,10 +112,10 @@ public class VPAnalysisPresenter implements Initializable {
                 return 0;
             if (!s2.startsWith("chr"))
                 return 0; /* should never happen */
-            logger.trace("s1 before=" + s1);
             s1 = s1.substring(3);
             s2 = s2.substring(3);
-            logger.trace("s1 after=" + s1);
+            s1=s1.replaceAll(",","");
+            s2=s2.replaceAll(",","");
             String chromStr1, chromStr2;
             Integer chr1, chr2;
             Integer pos1, pos2;
@@ -251,6 +251,7 @@ public class VPAnalysisPresenter implements Initializable {
         refreshVPTable();
     }
 
+    /** This method is called to refresh the values of the ViewPoint in the table of the analysis tab. */
     public void refreshVPTable() {
         logger.trace("refreshing the VP Table");
         if (model==null){
@@ -277,12 +278,11 @@ public class VPAnalysisPresenter implements Initializable {
     }
 
 
-    private TableColumn createTextColumn(String name, String caption) {
+   /* private TableColumn createTextColumn(String name, String caption) {
         TableColumn column = new TableColumn(caption);
-        //appendEditListeners(column);
         column.setCellValueFactory(new PropertyValueFactory<ViewPoint, String>(name));
         column.setCellFactory(TextFieldTableCell.forTableColumn());
         return column;
-    }
+    }*/
 
 }
