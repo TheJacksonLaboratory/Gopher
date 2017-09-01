@@ -22,7 +22,8 @@ import java.util.*;
  * which can be either set manually or automatically using different (so far two) approaches.
  * The last editing step will be tracked.</p>
  * <p>
- * TODO, implement utility functions calculating characteristics of the viewpoint, such as repetitive or GC content, or the number of restriction enzyme cutting sites.
+ * TODO, implement utility functions calculating characteristics of the viewpoint, such as repetitive or GC content,
+ * or the number of restriction enzyme cutting sites.
  * <p>
  *
  * @author Peter N Robinson
@@ -49,9 +50,9 @@ public class ViewPoint implements Serializable {
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosDown;
     /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}. */
-    private Integer minDistToGenomicPosUp;
+    //private Integer minDistToGenomicPosUp;
     /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}*/
-    private Integer minDistToGenomicPosDown;
+    //private Integer minDistToGenomicPosDown;
     /** start position of the viewpoint */
     private Integer startPos;
     /** end position of the viewpoint */
@@ -81,8 +82,7 @@ public class ViewPoint implements Serializable {
     private String warnings;
     /** Overall score of this Viewpoint.*/
     private Double score;
-    /** TODO Hack -- we need to refactor, but this will keep us at the last used restriction fragment as
-     * passed to the Lupianez method so that we can recalculate the score from the GUI.
+    /** TODO Hack -- brauchen wir currentMotif noch?
      */
     private String currentMotif=null;
 
@@ -107,7 +107,7 @@ public class ViewPoint implements Serializable {
 
     /**
      * The constructor sets fields and creates a {@link CuttingPositionMap} object.
-     *  @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
+     * @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
      * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
      * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
      * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
@@ -153,8 +153,8 @@ public class ViewPoint implements Serializable {
         this.minFragSize=builder.minFragSize;
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
-        this.minDistToGenomicPosUp=builder.minSizeUp;
-        this.minDistToGenomicPosDown=builder.minSizeDown;
+       // this.minDistToGenomicPosUp=builder.minSizeUp;
+        //this.minDistToGenomicPosDown=builder.minSizeDown;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
