@@ -63,7 +63,7 @@ public class DesignConsoleTest {
         testModel = new Model();
         testModel.setProbeLength(120);
         testModel.setMaximumAllowedRepeatOverlap(20);
-        testModel.setTilingFactor(2.0);
+        testModel.setTilingFactor(2);
 
         // add a list of two overlapping viewpoints to the model
         final File fasta = new File(testFastaFile);

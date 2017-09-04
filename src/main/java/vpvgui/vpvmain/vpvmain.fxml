@@ -8,6 +8,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
@@ -47,7 +48,15 @@
                         <Menu mnemonicParsing="false" text="Design parameters">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length" />
-                              <MenuItem mnemonicParsing="false" onAction="#setTilingFactor" text="Set tiling factor" />
+                              <Menu mnemonicParsing="false" text="Set Tiling Factor">
+                                <items>
+                                    <RadioMenuItem fx:id="tiling1" mnemonicParsing="false" text="1" />
+                                    <RadioMenuItem fx:id="tiling2" mnemonicParsing="false" text="2" />
+                                    <RadioMenuItem fx:id="tiling3" mnemonicParsing="false" text="3" />
+                                    <RadioMenuItem fx:id="tiling4" mnemonicParsing="false" text="4" />
+                                    <RadioMenuItem fx:id="tiling5" mnemonicParsing="false" text="5" />
+                                </items>
+                              </Menu>
                               <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
                               <MenuItem mnemonicParsing="false" onAction="#setMaximumAllowedRepeatOverlap" text="Set maximum allowed repeat overlap" />
                           </items>

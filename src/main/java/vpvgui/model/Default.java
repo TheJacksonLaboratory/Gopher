@@ -21,7 +21,7 @@ public class Default {
 
     public final static int MAXIMUM_SIZE_DOWNSTREAM = 5000;
 
-    public final static double TILING_FACTOR = 2.0;
+    public final static int TILING_FACTOR = 1;
 
     public final static int MINIMUM_FRAGMENT_SIZE = 120;
 

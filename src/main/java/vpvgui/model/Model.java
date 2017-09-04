@@ -89,10 +89,12 @@ public class Model implements Serializable {
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
 
-    private Double tilingFactor =null;
-    public double getTilingFactor(){return tilingFactor; }
-    public void setTilingFactor(Double tilingFactor) {this.tilingFactor=tilingFactor; }
-
+    private Integer tilingFactor =null;
+    public int getTilingFactor(){return tilingFactor; }
+    public void setTilingFactor(Integer tilingFactor) {
+        logger.trace(String.format("Setting tiling factor to %d",tilingFactor));
+        this.tilingFactor=tilingFactor;
+    }
     public Integer maximumAllowedRepeatOverlap =null;
     public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
     public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }

@@ -130,6 +130,11 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Label indexGenomeLabel;
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
+    @FXML RadioMenuItem tiling1;
+    @FXML RadioMenuItem tiling2;
+    @FXML RadioMenuItem tiling3;
+    @FXML RadioMenuItem tiling4;
+    @FXML RadioMenuItem tiling5;
 
     @FXML
     private Button showButton;
@@ -232,6 +237,13 @@ public class VPVMainPresenter implements Initializable {
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
+        ToggleGroup tGroup = new ToggleGroup();
+        tGroup.getToggles().addAll(tiling1,tiling2,tiling3,tiling4,tiling5);
+        tiling1.setOnAction(e->{this.model.setTilingFactor(1);e.consume(); });
+        tiling2.setOnAction(e->{this.model.setTilingFactor(2);e.consume(); });
+        tiling3.setOnAction(e->{this.model.setTilingFactor(3);e.consume(); });
+        tiling4.setOnAction(e->{this.model.setTilingFactor(4);e.consume(); });
+        tiling5.setOnAction(e->{this.model.setTilingFactor(5);e.consume(); });
     }
 
     private void setInitializedValuesInGUI() {
@@ -737,7 +749,7 @@ public class VPVMainPresenter implements Initializable {
         logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
     }
 
-    @FXML
+    /*@FXML
     public void setTilingFactor(ActionEvent e) {
         Double factor = Popups.getDoubleFromUser("Enter Tiling Factor",
                 (double)Default.TILING_FACTOR,
@@ -748,7 +760,7 @@ public class VPVMainPresenter implements Initializable {
         }
         this.model.setTilingFactor(factor);
         logger.trace(String.format("We just set set TilingFactor to %f", model.getTilingFactor()));
-    }
+    }*/
 
 
     @FXML

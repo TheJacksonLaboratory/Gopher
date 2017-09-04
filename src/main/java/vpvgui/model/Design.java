@@ -31,7 +31,7 @@ public class Design {
         //System.out.println(viewPointList.size());
         Integer probeLength = model.getProbeLength();
         Integer maximumAllowedOverlap = model.getMaximumAllowedRepeatOverlap();
-        Double tilingFactor = model.getTilingFactor();
+        Integer tilingFactor = model.getTilingFactor();
 
         /* TODO calculate total number of nucleotides in model */
 
