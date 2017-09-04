@@ -50,9 +50,9 @@ public class ViewPoint implements Serializable {
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosDown;
     /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}. */
-    //private Integer minDistToGenomicPosUp;
+    private Integer minDistToGenomicPosUp;
     /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}*/
-    //private Integer minDistToGenomicPosDown;
+    private Integer minDistToGenomicPosDown;
     /** start position of the viewpoint */
     private Integer startPos;
     /** end position of the viewpoint */
@@ -95,6 +95,7 @@ public class ViewPoint implements Serializable {
             logger.error(String.format("Error-- null list of restriction segments for %s",getTargetName()));
             return segs;/* return empty list.*/
         }
+        /* TODO -- just all */
         for (ArrayList<Segment> seglst:restSegListMap.values()) {
             for (Segment seg:seglst) {
                 if (seg.isSelected())
@@ -203,7 +204,7 @@ public class ViewPoint implements Serializable {
             logger.trace(String.format("Builder for refID=%s at pos=%d",refID,pos));
         }
 
-        public Builder maxDistToGenomicPosDown(int val)
+       public Builder maxDistToGenomicPosDown(int val)
         { maxDistToGenomicPosDown = val;    return this; }
         public Builder maxDistToGenomicPosUp(int val)
         { maxDistToGenomicPosUp = val;           return this; }
@@ -553,15 +554,13 @@ public class ViewPoint implements Serializable {
         logger.trace("entering generateViewpointLupianez for motif="+motif);
 
         // iterate over all fragments of the viewpoint and set them to true
-       /* for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
-            restSegListMap.get(motif).get(i).setSelected(true);
-        }*/
         for (Segment segment: restSegListMap.get(motif)){
             segment.setSelected(true);
             logger.trace(String.format("Setting segment %s to true",segment.toString()));
         }
 
         // find the index of the fragment that contains genomicPos
+        /* TODO replace motif with ALL */
         Integer genomicPosFragIdx = -1;
         for (int i = 0; i < restSegListMap.get(motif).size(); i++) {
             Segment segment = restSegListMap.get(motif).get(i);
@@ -575,7 +574,7 @@ public class ViewPoint implements Serializable {
         }
 
         if (genomicPosFragIdx == -1) {
-            logger.error("ERROR: At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
+            logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
             resolved = false;
         }
 

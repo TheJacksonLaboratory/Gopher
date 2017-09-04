@@ -11,21 +11,20 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * This class stores all of the data related to a viewpoint, including the list of genes and the viewpoint objects.
+ * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.2
+ * @version 0.0.3 (2017-09-04)
  */
 public class Model implements Serializable {
-
-
-    private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     private static final Logger logger = Logger.getLogger(Model.class.getName());
-
+    /** This is the name of the file we download from UCSC for any of the genomes. */
+    private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
     private List<RestrictionEnzyme> chosenEnzymelist=null;
+    /** List of {@link ViewPoint} objects created from the gene list chosen by the user. */
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
@@ -39,57 +38,53 @@ public class Model implements Serializable {
     private String httpPort=null;
     /** the name of the viewpoint that will be used to write the settings file (default: vpvgui). */
     private String projectName=null;
-    /** This suffix is appended to the viewpoint name to get the name of the file for storing viewpoint settings. */
-    //public static final String PROJECT_FILENAME_SUFFIX = "-vpvsettings.txt";
     /** Has the UCSC Genome build been unpacked yet? :*/
     private boolean genomeUnpacked=false;
     /** Has the downloaded genome been FASTA indexed yet? */
     private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
-    /** The genome build chosen by theuser, e.g., hg19, GRCh38, mm10  */
+    /** The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
     private String genomeBuild = null;
-    public String getGenomeBuild() {
-        return genomeBuild;
-    }
+    /** @return The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
+    public String getGenomeBuild() { return genomeBuild; }
+    /** @param newDatabase The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
     public void setGenomeBuild(String newDatabase) { genomeBuild=newDatabase; }
-    /** Minimum size upstream of the view point. */
+    /** Minimum size of the view point upstream of the anchor (transcription start site, usually). */
     private Integer minSizeUp = null;
     public int getMinSizeUp() {return minSizeUp;}
     public void setMinSizeUp(Integer i) { this.minSizeUp=i;}
-
+    /** Minimum size of the view point downstream of the anchor (transcription start site, usually). */
     private Integer minSizeDown=null;
     public int getMinSizeDown() {return minSizeDown;}
     public void setMinSizeDown(Integer i) { this.minSizeDown=i;}
-
+    /** Maximum size of the view point upstream of the anchor (transcription start site, usually). */
     private Integer maxSizeUp=null;
     public int getMaxSizeUp() {return maxSizeUp;}
     public void setMaxSizeUp(Integer i) { this.maxSizeUp=i;}
-
+    /** Maximum size of the view point downstream of the anchor (transcription start site, usually). */
     private Integer maxSizeDown = null;
     public int getMaxSizeDown() {return maxSizeDown;}
     public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
-
+    /** Minimum allowable size of a restriction fragment within a ViewPoint chosen for capture Hi C enrichment. */
     private Integer minFragSize = null;
     public int getMinFragSize() { return minFragSize; }
     public void setMinFragSize(Integer i) { this.minFragSize=i;}
-
+    /** TODO exact definition. */
     private Integer fragNumUp = null;
     public int getFragNumUp() { return fragNumUp; }
     public void setFragNumUp(Integer i) { this.fragNumUp=i;}
-
+    /** TODO exact definition. */
     private Integer fragNumDown = null;
     public int fragNumDown() { return fragNumDown; }
     public void setFragNumDown(Integer i) { this.fragNumDown=i;}
-
+    /** Maximum allowable repeat content in the margin of a selected fragment. */
     private Double maxRepeatContent = null;
     public double getMaxRepeatContent() {return maxRepeatContent;}
     public void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
-
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
-
-
+    /** The length of a probe that will be used to enrich a restriction fragment within a viewpoint. */
     private Integer probeLength =null;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }

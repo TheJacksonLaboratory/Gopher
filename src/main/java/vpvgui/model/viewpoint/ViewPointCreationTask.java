@@ -129,9 +129,6 @@ public class ViewPointCreationTask extends Task {
         int total=getTotalViewpoints();
         int i=0;
 
-        int maxSizeUp=1500;
-        int maxSizeDown=1500;
-
         for (VPVGene vpvgene:this.vpvGeneList) {
             String referenceSequenceID = vpvgene.getContigID();/* Usually a chromosome */
             //logger.trace("Retrieving indexed fasta file for contig: "+referenceSequenceID);
@@ -146,28 +143,26 @@ public class ViewPointCreationTask extends Task {
                 for (Integer gPos : gPosList) {
                     ViewPoint vp = new ViewPoint.Builder(referenceSequenceID,gPos).
                             targetName(vpvgene.getGeneSymbol()).
-                            maxDistToGenomicPosUp(maxDistanceUp).
-                            maxDistToGenomicPosDown(maxDistanceDown).
-                            //cuttingPatterns(this.cuttingPatterns).
+                            maxDistToGenomicPosUp(model.getMaxSizeUp()).
+                            maxDistToGenomicPosDown(model.getMaxSizeDown()).
+                            minimumSizeDown(model.getMinSizeDown()).
+                            maximumSizeDown(model.getMaxSizeDown()).
                             fastaReader(fastaReader).
-                            minimumSizeUp(minSizeUp).
-                            maximumSizeUp(maxDistanceUp).
-                            minimumSizeDown(minDistToGenomicPosDown).
-                            maximumSizeDown(maxDistanceDown).
-                            minimumFragmentSize(minFragSize).
-                            maximumRepeatContent(maxRepContent).
-                            marginSize(marginSize).
+                            minimumSizeUp(model.getMinSizeUp()).
+                            maximumSizeUp(model.getMaxSizeUp()).
+                            minimumFragmentSize(model.getMinFragSize()).
+                            maximumRepeatContent(model.getMaxRepeatContent()).
+                            marginSize(model.getMarginSize()).
                             build();
                     updateProgress(i++,total); /* this will update the progress bar */
                     updateLabelText(this.currentVP,vpvgene.toString());
-                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,maxSizeUp,maxSizeDown);
+                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, cuttingMotif,model.getMaxSizeUp(),model.getMaxSizeDown());
                     viewpointlist.add(vp);
                     logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));
                 }
             } catch (FileNotFoundException e) {
                 logger.error("[ERROR] could not open/find faidx file for "+referenceSequenceID);
                 logger.error(e,e);
-                // just skip this TODO -- better error handling
             }
         }
         this.model.setViewPoints(viewpointlist);
