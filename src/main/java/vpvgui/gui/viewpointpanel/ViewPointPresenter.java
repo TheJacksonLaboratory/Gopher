@@ -255,6 +255,8 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
                     getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
+                } else {
+                    getTableRow().setStyle(String.format("-fx-background-color: transparent;"));
                 }
             }
         });
@@ -390,8 +392,10 @@ public class ViewPointPresenter implements Initializable {
             logger.trace(String.format("Zooming ViewPoint for %s at factor %.1f. Old length %d new length %d",vp.getTargetName(),factor,
                     vp.getEndPos()-vp.getStartPos(),newVP.getEndPos()-newVP.getStartPos()));
             segmentsTableView.getItems().clear();
+            this.coloredsegments.clear();
             setViewPoint(newVP);
             refreshUCSCButtonAction();
+            updateScore();
         } catch (FileNotFoundException e) {
             logger.error("Could not zoom for "+vp.getTargetName());
             logger.error(e,e);
