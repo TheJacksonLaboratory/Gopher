@@ -97,15 +97,41 @@ public class ViewPoint implements Serializable {
             logger.error(String.format("Error-- null list of restriction segments for %s",getTargetName()));
             return segs;/* return empty list.*/
         }
-        /* TODO -- just all */
+        /* TODO -- just all
         for (ArrayList<Segment> seglst:restSegListMap.values()) {
             for (Segment seg:seglst) {
                 if (seg.isSelected())
                    segs.add(seg);
             }
+
+        }*/
+
+        for (String re:restSegListMap.keySet()) {
+            ArrayList<Segment> seglist=restSegListMap.get(re);
+            for (Segment seg:seglist) {
+                logger.info(String.format("TOP re=%s seg%d isselected=%s",re,seg.length(),seg.isSelected() ));
+            }
+
+        }
+
+
+
+
+        for (Segment segment:restSegListMap.get("ALL")) {
+            logger.info("adding with ALL "+segment.length() + " isselected="+segment.isSelected());
+            if (segment.isSelected())
+                segs.add(segment);
         }
         return segs;
+
     }
+
+    public List<Segment> getAllSegments() {
+        return restSegListMap.get("ALL");
+    }
+
+
+
 
 
     /**

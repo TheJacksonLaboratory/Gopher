@@ -244,10 +244,8 @@ public class ViewPointPresenter implements Initializable {
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
         /* The following line is needed to avoid an SSL handshake alert
-         * when opening the UCSC Browser.
-         */
+         * when opening the UCSC Browser. */
         System.setProperty("jsse.enableSNIExtension", "false");
-
         // This is a hack when by using dummy column a color for the cell's TableRow is set.
         colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
             @Override
