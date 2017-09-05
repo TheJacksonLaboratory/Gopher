@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="800.0" pannable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
+<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="1000.0" pannable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
    <content>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL">
         <items>
@@ -35,6 +35,8 @@
                   </TableView>
                   <Button fx:id="copyToClipboardButton" layoutX="452.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="5.0" />
                   <Button fx:id="deleteButton" layoutX="303.0" layoutY="8.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" prefWidth="130.0" text="Delete" AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="zoomInButton" layoutX="415.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="zoomOutButton" layoutX="324.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" AnchorPane.rightAnchor="575.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
         </items>

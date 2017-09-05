@@ -1,5 +1,6 @@
 package vpvgui.gui.viewpointpanel;
 
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -24,6 +25,8 @@ import vpvgui.model.Model;
 import vpvgui.model.viewpoint.Segment;
 import vpvgui.model.viewpoint.ViewPoint;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -64,6 +67,11 @@ public class ViewPointPresenter implements Initializable {
     private StringProperty vpScoreProperty;
     /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
+
+
+    private static double ZOOMFACTOR =1.5;
+
+
     /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     @FXML
     private TableView<ColoredSegment> segmentsTableView;
@@ -84,6 +92,10 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML private Button deleteButton;
     @FXML private Button copyToClipboardButton;
+
+    @FXML private Button zoomInButton;
+    @FXML private Button zoomOutButton;
+
 
     /**
      * Reference to the {@link Tab} where this content is placed.
@@ -362,6 +374,46 @@ public class ViewPointPresenter implements Initializable {
 
 
 
+    private void zoom(double factor) {
+        String path=this.model.getIndexFastaFilePath(vp.getReferenceID());
+        try {
+            IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
+            ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
+            String cuttingMotif = ViewPoint.getChosenEnzyme(0).getPlainSite(); // TODO Need to extend this to more than one enzyme
+            int maxSizeUp = (int) (vp.getMaxUpstreamGenomicPos() * factor);
+            int maxSizeDown = (int) (vp.getMaxDownstreamGenomicPos() * factor);
+            newVP.generateViewpointLupianez( model.getFragNumUp(),
+                    model.fragNumDown(),
+                    cuttingMotif,
+                    maxSizeUp,
+                    maxSizeDown);
+            segmentsTableView.getItems().removeAll();
+            setViewPoint(newVP);
+            refreshUCSCButtonAction();
+        } catch (FileNotFoundException e) {
+            logger.error("Could not zoom for "+vp.getTargetName());
+            logger.error(e,e);
+        }
+    }
+
+
+    @FXML private void zoomIn() {
+        if (ZOOMFACTOR ==0) {
+            logger.error("Attempt to zoom in with LOGFACTOR zero");
+            return;
+        }
+        zoom(1/ ZOOMFACTOR);
+    }
+
+    @FXML private void zoomOut() {
+        if (ZOOMFACTOR ==0) {
+            logger.error("Attempt to zoom out with LOGFACTOR zero");
+            return;
+        }
+        zoom(ZOOMFACTOR);
+
+    }
+
     /**
      * Creates a string to show highlights. Nonselected regions are highlighted in very light grey.
      * @return something like this {@code highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>}.
@@ -432,4 +484,9 @@ public class ViewPointPresenter implements Initializable {
             return sb.toString();
         }
     }
+
+
+
+
+
 }

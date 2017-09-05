@@ -78,6 +78,8 @@ public class ViewPoint implements Serializable {
     static List<RestrictionEnzyme> chosenEnzymes=null;
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
+    /** To do refactor */
+    public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
     private String warnings;
     /** Overall score of this Viewpoint.*/
@@ -138,6 +140,25 @@ public class ViewPoint implements Serializable {
         initCuttingPositionMap(fastaReader);
         initRestrictionFragments(fastaReader);
     }
+
+    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
+        this.referenceSequenceID=vp.referenceSequenceID;
+        this.genomicPos=vp.genomicPos;
+        this.targetName=vp.targetName;
+        this.maxDistToGenomicPosUp=(int)(vp.maxDistToGenomicPosUp*zoomfactor);
+        this.maxDistToGenomicPosDown=(int)(vp.maxDistToGenomicPosDown*zoomfactor);
+        this.minFragSize=vp.minFragSize;
+
+        // this.minDistToGenomicPosUp=builder.minSizeUp;
+        //this.minDistToGenomicPosDown=builder.minSizeDown;
+        this.marginSize= vp.marginSize;
+        this.maximumRepeatContent=vp.maximumRepeatContent;
+        logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
+        init(fastaReader);
+
+    }
+
+
 
 
     /**
