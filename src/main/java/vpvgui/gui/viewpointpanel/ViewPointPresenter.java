@@ -387,7 +387,9 @@ public class ViewPointPresenter implements Initializable {
                     cuttingMotif,
                     maxSizeUp,
                     maxSizeDown);
-            segmentsTableView.getItems().removeAll();
+            logger.trace(String.format("Zooming ViewPoint for %s at factor %.1f. Old length %d new length %d",vp.getTargetName(),factor,
+                    vp.getEndPos()-vp.getStartPos(),newVP.getEndPos()-newVP.getStartPos()));
+            segmentsTableView.getItems().clear();
             setViewPoint(newVP);
             refreshUCSCButtonAction();
         } catch (FileNotFoundException e) {

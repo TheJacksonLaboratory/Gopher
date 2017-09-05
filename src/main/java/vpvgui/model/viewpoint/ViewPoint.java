@@ -297,10 +297,8 @@ public class ViewPoint implements Serializable {
         }
         restSegListMap.put("ALL", new ArrayList<Segment>());
 
-       // for (int i = 0; i < this.cuttingPatterns.length; i++) {
         for (RestrictionEnzyme re: ViewPoint.chosenEnzymes) {
             String cuttingPat=re.getPlainSite();
-            //for (int j = 0; j < cuttingPositionMap.getCuttingPositionHashMap().get(this.cuttingPatterns[i]).size() - 1; j++) {
             ArrayList<Integer> cuttingPositionList=cuttingPositionMap.getCuttingPositionHashMap().get(cuttingPat);
             logger.trace(String.format("About to add cutting positions for %s",cuttingPat ));
             for (int i=0;i<cuttingPositionList.size()-1;i++) {
@@ -318,12 +316,9 @@ public class ViewPoint implements Serializable {
         }
 
         /* finally add the segments for the key 'ALL', the combination of cutting sites derived from all motifs */
-        //for (int j = 0; j < cuttingPositionMap.getCuttingPositionHashMap().get("ALL").size() - 1; j++) {
           for (int j=0;j < cuttingPositionMap.getAllCuts().size()-1; j++) {
             Segment restFrag=new Segment.Builder(referenceSequenceID,
-                   // relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j)+1),
                     relToAbsPos(cuttingPositionMap.getAllCuts().get(j)+1),
-                   // relToAbsPos(cuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(j + 1))).
                     relToAbsPos(cuttingPositionMap.getAllCuts().get(j + 1))).
                     fastaReader(fastaReader).marginSize(marginSize).build();
             restSegListMap.get("ALL").add(restFrag);

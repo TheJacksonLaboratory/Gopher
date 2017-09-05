@@ -74,15 +74,13 @@ public class CuttingPositionMap implements Serializable {
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
-        logger.trace("Cutting Position Map for genomic pos " + getGenomicPos());
+        logger.trace("Constructing CuttingPositionMap for genomic pos " + getGenomicPos());
         cuttingPositionMap = new HashMap<String, ArrayList<Integer>>();
         // determine offsets
         cuttingPositionMapOffsets = new HashMap<String, Integer>();
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
             String site = enzyme.getPlainSite(); /* gets the site without "^", e.g., GATC instead of ^GATC */
-
             Integer offset = enzyme.getOffset();
-            logger.trace(String.format("offset for %s:%d ", site,offset));
             cuttingPositionMapOffsets.put(site, offset);
         }
 
@@ -95,29 +93,19 @@ public class CuttingPositionMap implements Serializable {
                 maxDistToGenomicPosDown = fastaReader.getSequence(referenceSequenceID).length() - genomicPos;
             }
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
-            logger.trace(String.format("We retrieved genomicPosRegionString with len %d", genomicPosRegionString.length()));
             Pattern pattern = Pattern.compile(cutpat);
             Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
-            logger.trace("Searching matcher for " + cutpat);
             while (matcher.find()) {
-                logger.trace("matcherstart=" + matcher.start());
                 if (matcher.start() <= genomicPos) {
-                    logger.trace(" <= Matcher start=" + matcher.start());
                     int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
-                    logger.trace(String.format("pos=%d", pos));
                     cuttingPositionList.add(pos);
                     cuttingPositionListUnion.add(pos);
                 } else if (genomicPos < matcher.start()) {
-                    logger.trace(" > Matcher start=" + matcher.start());
                     int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
-                    logger.trace(String.format("Adding pos=%d", pos));
                     cuttingPositionList.add(pos);
                     cuttingPositionListUnion.add(pos);
                 }
-            }
-            for (Integer pos : cuttingPositionList) {
-                logger.trace("\tCP list: " + pos);
             }
             cuttingPositionMap.put(enzyme.getPlainSite(), cuttingPositionList); // push array list to map
         }
