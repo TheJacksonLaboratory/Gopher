@@ -78,7 +78,7 @@ public class ViewPoint implements Serializable {
     static List<RestrictionEnzyme> chosenEnzymes=null;
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
-    /** To do refactor */
+    /** Todo refactor */
     public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
     private String warnings;
@@ -344,7 +344,7 @@ public class ViewPoint implements Serializable {
         /* finally add the segments for the key 'ALL', the combination of cutting sites derived from all motifs */
           for (int j=0;j < cuttingPositionMap.getAllCuts().size()-1; j++) {
             Segment restFrag=new Segment.Builder(referenceSequenceID,
-                    relToAbsPos(cuttingPositionMap.getAllCuts().get(j)+1),
+                    relToAbsPos(cuttingPositionMap.getAllCuts().get(j)),
                     relToAbsPos(cuttingPositionMap.getAllCuts().get(j + 1))).
                     fastaReader(fastaReader).marginSize(marginSize).build();
             restSegListMap.get("ALL").add(restFrag);
@@ -592,6 +592,16 @@ public class ViewPoint implements Serializable {
                                           Integer maxSizeUp,
                                           Integer maxSizeDown) {
 
+        generateViewpointLupianezAllFrags( fragNumUp,
+                 fragNumDown,
+                 maxSizeUp,
+                 maxSizeDown);
+        boolean tricksen=false; /* need to do this to be able to return here -- hack */
+        if (! tricksen)
+        return; // TEsting new function TODO refactor if everything works
+
+
+
         boolean resolved = true;
         logger.trace("entering generateViewpointLupianez for motif="+motif);
 
@@ -707,7 +717,7 @@ public class ViewPoint implements Serializable {
         /* set start and end position of the viewpoint */
 
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
-        logger.trace("Will now calculate the start position from the restSegListMap, which has size "+restSegListMap.size());
+        logger.trace("Calculating the start position from the restSegListMap (size ="+restSegListMap.size()+")");
         for (Segment segment : restSegListMap.get(motif)) {
             logger.trace(String.format("\tSegment start = %d selected = %s",segment.getStartPos(),segment.isSelected()));
             if (segment.isSelected()) {
@@ -731,6 +741,167 @@ public class ViewPoint implements Serializable {
         calculateViewpointScore(motif);
         setResolved(resolved);
     }
+
+
+    /**
+     * This function can be used to reshape the viewpoint according to rules that were developed in consultation with bench scientists.
+     * In this approach, the viewpoint is seen as a set of selected fragments within a given range around {@link #genomicPos}.
+     * Fragments can be discarded because they shorter, or because their margins a higher repetitive content than a given thresholds.
+     * This is a protoype that does not use {@link #currentMotif} but instead ALL motifs.
+     *
+     * @param fragNumUp    required number of fragments upstream of the fragment that contains {@link #genomicPos} (e.g. 4).
+     * @param fragNumDown  required number of fragments downstream of the fragment that contains {@link #genomicPos} (e.g. 4).
+     * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
+     * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
+     */
+    public void generateViewpointLupianezAllFrags(Integer fragNumUp,
+                                          Integer fragNumDown,
+                                          Integer maxSizeUp,
+                                          Integer maxSizeDown) {
+
+        boolean resolved = true;
+        logger.trace("entering generateViewpointLupianez for ALL motifs");
+
+        // iterate over all fragments of the viewpoint and set them to true
+        for (Segment segment: restSegListMap.get("ALL")){
+            segment.setSelected(true);
+            logger.trace(String.format("Setting segment %s to true for ALL segs",segment.toString()));
+        }
+
+        // find the index of the fragment that contains genomicPos
+        /* TODO replacing currentmotif with ALL CHECK THIS*/
+        Integer genomicPosFragIdx = -1;
+        List<Segment> allFrags=restSegListMap.get("ALL");
+        for (int i=0;i< allFrags.size();i++) {
+            Segment segment  =allFrags.get(i);
+            Integer fragStaPos = segment.getStartPos();
+            Integer fragEndPos = segment.getEndPos();
+            logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
+            if (fragStaPos <= genomicPos && genomicPos <= fragEndPos) {
+                genomicPosFragIdx = i;
+                break;
+            }
+        }
+
+        if (genomicPosFragIdx == -1) {
+            logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
+            resolved = false;
+        }
+
+        // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
+
+        Integer fragCountUp = 0;
+        for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
+
+            Segment segment = allFrags.get(i);
+
+            // set fragment to 'false', if it is shorter than 'getMinFragSize'
+            Integer len = segment.length();
+            if (len < this.minFragSize) {
+                allFrags.get(i).setSelected(false);
+            }
+
+            // set fragments to 'false' that are not entirely within the allowed range
+            Integer upLen = genomicPos - segment.getStartPos();
+            if (maxSizeUp < upLen) {
+                segment.setSelected(false);
+            }
+
+            // set fragment to 'false', if required number of fragments has already been found
+            if (fragNumUp + 1 <= fragCountUp) {
+                segment.setSelected(false);
+            }
+
+            // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
+            if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
+                segment.setSelected(false);
+            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+                segment.setSelected(false);
+            }
+
+            // if after all this the fragment is still selected, increase count
+            if (segment.isSelected()) {
+                fragCountUp++;
+            }
+        }
+
+        if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
+            warnings += "WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+            resolved = false;
+        }
+
+        // originating from the centralized fragment containing 'genomicPos' (excluded) openExistingProject fragment-wise in DOWNSTREAM direction
+
+        Integer fragCountDown = 0;
+        for (int i = genomicPosFragIdx + 1; i < allFrags.size(); i++) { // downstream
+
+            Segment segment = allFrags.get(i);
+
+            // set fragment to 'false', if it is shorter than 'getMinFragSize'
+            if (segment.length() < minFragSize) {
+                segment.setSelected(false);
+            }
+
+            // set fragments to 'false' that are not entirely within the allowed range
+            Integer downLen = genomicPos - segment.getEndPos();
+            if (maxSizeDown < -downLen) {
+                segment.setSelected(false);
+            }
+
+            // set fragment to 'false', if required number of fragments has already been found
+            if (fragNumDown <= fragCountDown) {
+                segment.setSelected(false);
+            }
+
+            // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
+            if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
+                segment.setSelected(false);
+            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+                segment.setSelected(false);
+            }
+
+            // if after all this the fragment is still selected, increase count
+            if (segment.isSelected()) {
+                fragCountDown++;
+            }
+        }
+
+        if (fragCountDown < fragNumDown) {
+            warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+            resolved = false;
+        }
+        numOfSelectedFrags = fragCountUp + fragCountDown;
+
+        /* set start and end position of the viewpoint */
+
+        // set start position of the viewpoint to start position of the most upstream SELECTED fragment
+        logger.trace("Calculating the start position from allFrags (size ="+allFrags.size()+")");
+        for (Segment segment : allFrags) {
+            logger.trace(String.format("\tSegment start = %d selected = %s",segment.getStartPos(),segment.isSelected()));
+            if (segment.isSelected()) {
+                logger.trace("##Segment is selected so I am setting the start position to "+ segment.getStartPos());
+                setStartPos(segment.getStartPos());
+                break;
+            }
+        }
+
+        // set end position of the viewpoint to end position of the most downstream fragment
+        for (int i = allFrags.size() - 1; --i >= 0;) {
+            Segment segment = allFrags.get(i);
+            if (segment.isSelected()) {
+                setEndPos(segment.getEndPos());
+                break;
+            }
+        }
+
+        setDerivationApproach("LUPIANEZ");
+        logger.trace("Done calculating lupianez viewpointALLFRAGS, start pos of view point is "+getStartPos());
+        calculateViewpointScoreAllFrags();
+        logger.info("Done calculating lupianez viewpointALLFRAGS, start pos of view point is "+getStartPos()+
+                ", score="+getScoreAsPercentString());
+        setResolved(resolved);
+    }
+
 
 
     /**
@@ -805,6 +976,59 @@ public class ViewPoint implements Serializable {
             this.score = score / posCnt;
         }
     }
+
+    /**
+     * This function calculates the viewpoint score and sets the field 'score' of this class.
+     * The function is also intended to update the score.
+     * <p>
+     * The function iterates over all restriction segments of the viewpoint.
+     * For selected segments a <i>position distance score</i> is calculated for each position.
+     * The scores for all positions are summed up and in the end divided by the total number of positions for which
+     * <i>position distance scores</i> were calculated.
+     * <p>
+     * The overall score for the viewpoint is again between 0 and 1.
+     *
+     * @param motif The restriction fragment used to cut this viewpoint.
+     */
+    public void calculateViewpointScoreAllFrags() {
+        Double score = 0.0;
+
+        /* iterate over all selected fragments */
+
+        Integer posCnt = 0;
+        List<Segment> allFrags=restSegListMap.get("ALL");
+        for (Segment currentSegment : allFrags) {
+            double repCont = 0;
+            double positionScoreSumFragment = 0;
+
+            if (currentSegment.isSelected()) {
+
+                repCont=currentSegment.getMeanMarginRepeatContent();
+
+                /* get position distance score for each position of the fragment */
+
+                positionScoreSumFragment = 0;
+                for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
+                    Integer dist = j - genomicPos;
+                    if (dist < 0) {
+                        positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, maxDistToGenomicPosUp);
+                    } else {
+                        positionScoreSumFragment += getViewpointPositionDistanceScore(dist, maxDistToGenomicPosDown);
+                    }
+                    posCnt++;
+                }
+            }
+            score += (1 - repCont) * positionScoreSumFragment;
+        }
+        if (posCnt == 0) {
+            this.score = 0.0;
+        } else {
+            this.score = score / posCnt;
+        }
+    }
+
+
+
 
     public void calculateViewpointScore() {
         calculateViewpointScore(this.currentMotif);

@@ -11,8 +11,9 @@ import java.util.ArrayList;
 
 /**
  * This class represents a restriction fragment that is a member of a viewpoint.
+ * Note that {@link #startPos} and {@link #endPos} use one-based inclusive numbering.
  * @author Peter Hansen
- * @version 0.3.2
+ * @version 0.3.3 (2017-09-07)
  */
 public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
@@ -41,11 +42,9 @@ public class Segment implements Serializable {
     /* constructor -- we will move to the builder. */
     @Deprecated
     public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected, IndexedFastaSequenceFile fastaReader) {
-
         this.referenceSequenceID = referenceSequenceID;
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
-        //this.fastaReader = fastaReader;
         setSelected(selected);
         calculateRepeatContent(fastaReader);
         this.marginSize=150; /* todo--deprecated */
@@ -159,18 +158,13 @@ public class Segment implements Serializable {
      * This function calculates the {@link #repeatContent} of this segment by counting lower and uppercase.
      */
     private void calculateRepeatContent(IndexedFastaSequenceFile fastaReader) {
-
-        /* get dna string */
-        String s = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
-
+        String subsequence = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
         /* determine repeat content */
-
-        Integer lowerCase = 0, upperCase = 0;
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isLowerCase(s.charAt(i))) lowerCase++;
-            if (Character.isUpperCase(s.charAt(i))) upperCase++;
+        int lowerCase = 0, upperCase = 0;
+        for (int i = 0; i < subsequence.length(); i++) {
+            if (Character.isLowerCase(subsequence.charAt(i))) lowerCase++;
+            if (Character.isUpperCase(subsequence.charAt(i))) upperCase++;
         }
-
         this.repeatContent = ((double) lowerCase / (lowerCase + (double) upperCase));
     }
 
@@ -225,17 +219,19 @@ public class Segment implements Serializable {
     public double getRepeatContent() {
         return repeatContent;
     }
-    private void setRepeatContent(double val) {this.repeatContent=val;}
+    /** @return A formatted string, e.g., "7.23%", representing the repeat content */
     public String getRepeatContentAsPercent() { return String.format("%.2f%%",100*repeatContent);}
 
     public double getRepeatContentMarginUp() {
         return repeatContentUp;
     }
+    /** @return A formatted string, e.g., "7.23%", representing the repeat content of the margin on the up side */
     public String getRepeatContentMarginUpAsPercent() { return String.format("%.2f%%",100*repeatContentUp);}
 
     public double getRepeatContentMarginDown() {
         return repeatContentDown;
     }
+    /** @return A formatted string, e.g., "7.23%", representing the repeat content of the margin on the down side */
     public String getRepeatContentMarginDownAsPercent() { return String.format("%.2f%%",100*repeatContentDown);}
 
     public double getMeanMarginRepeatContent() { return 0.5*(repeatContentUp+repeatContentDown);}

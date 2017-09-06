@@ -1,4 +1,4 @@
-package vpvgui.model.viewpoint;
+package vpvgui.model;
 
 import org.junit.Assert;
 import org.junit.Test;
