@@ -80,7 +80,6 @@ public class ViewPointCreationTask extends Task {
         for (RestrictionEnzyme re : chosen) {
             String site = re.getPlainSite();
             CuttingPositionMap.restrictionEnzymeMap.put(site,re);
-
         }
         init_parameters();
     }

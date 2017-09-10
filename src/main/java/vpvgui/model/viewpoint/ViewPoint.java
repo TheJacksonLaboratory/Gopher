@@ -988,7 +988,6 @@ public class ViewPoint implements Serializable {
      * <p>
      * The overall score for the viewpoint is again between 0 and 1.
      *
-     * @param motif The restriction fragment used to cut this viewpoint.
      */
     public void calculateViewpointScoreAllFrags() {
         Double score = 0.0;
@@ -1031,7 +1030,7 @@ public class ViewPoint implements Serializable {
 
 
     public void calculateViewpointScore() {
-        calculateViewpointScore(this.currentMotif);
+        calculateViewpointScoreAllFrags();
     }
 
     public int getTotalMarginSize() {
