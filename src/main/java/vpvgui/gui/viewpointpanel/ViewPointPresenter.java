@@ -89,6 +89,7 @@ public class ViewPointPresenter implements Initializable {
     private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
     @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
     @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
+    @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
 
     @FXML private Button deleteButton;
     @FXML private Button copyToClipboardButton;
@@ -296,6 +297,10 @@ public class ViewPointPresenter implements Initializable {
         repeatContentDown.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginDownAsPercent())));
         repeatContentDown.setComparator(new PercentComparator());
+
+        gcContentTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+                getSegment().getGCcontentAsPercent())));
+        gcContentTableColumn.setComparator(new PercentComparator());
         vpScoreProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         /* the following will start us off with a different color each time. */

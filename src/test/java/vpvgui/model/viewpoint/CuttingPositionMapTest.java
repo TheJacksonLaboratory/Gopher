@@ -9,11 +9,34 @@ import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
+
+/**
+ * This test class used the sequence
+ * {@code chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy} that has
+ * GATC sites at positions {21,45,69,93,113,137,161,185,209,229,259,279}
+ * The code identifies the position as follows (where matcher is looking for a pattern such as GATC and
+ * the offset refers to the location of the cut offset for patterns such as ^GATC or GA^TC
+ * int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
+ * Note that maxDistToGenomicPositition up is defined as the distance from the center point of the
+ * fragment (genomicPos). The subsequence is extracted as
+ * <pre>genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown</pre>
+ * Note that these are all one-based inclusive numbers. So if maxDistToGenomicPosUp and
+ * maxDistToGenomicPosDown are both equal to 1, then the resulting fragment is 3 nucleotides long.
+ * Thus, we would get zero for a restriction site that begins exactly at genomicPos, negative numbers for
+ * sites that begin 5' to genomicPos, and positive numbers for sites that begin 3' to genomicPos.
+ * The offset will indicate where in the cutting site the restriction enzyme actually cuts.
+ * ^GATC would have an offset of zero, G^ATC would have an offset of one, etc.
+ * MaxDistToGenomicPosUp is the number of bases 3' to genomic pos that our fragment goes.
+ * Here is the sequence
+ * <pre>
+ * >chr_t4_GATC_veryshort
+ * AGATCACCGG.TGACATGACA.TTTGATCAAC.CGGTGACATG.ANCATTTGAT.CAACCG
+ *</pre>
+ * The sequence is 56 nucleotides long. There is a GATC at position 2,24,48 (one-based numbering)
+ */
 public class CuttingPositionMapTest {
 
     private static Model testModel;
@@ -46,6 +69,9 @@ public class CuttingPositionMapTest {
     static List<RestrictionEnzyme> chosenEnzymeList;
     static CuttingPositionMap cpm=null;
 
+    private static List<Integer> gatcsites;
+    private static List<Integer> adjustedGatcSitesOffsetZero;
+
     @BeforeClass
     public static void setup() throws Exception {
         RestrictionEnzyme re1 = new RestrictionEnzyme("HindIII", "A^AGCTT");
@@ -67,6 +93,17 @@ public class CuttingPositionMapTest {
                 maxDistToGenomicPosUp,
                 maxDistToGenomicPosDown,
                 chosenEnzymeList);
+        // The following are the first bases of the GATC fragments in the sequence with ^GATC, i.e.,
+        //offset zero.
+        gatcsites=new ArrayList<>(Arrays.asList(21,45,69,93,113,137,161,185,209,229,259,279));
+        adjustedGatcSitesOffsetZero=new ArrayList<>();
+        int offset=0; // for ^GATC
+        for (Integer pos:gatcsites) {
+            Integer adjustedPos=genomicPos_1-maxDistToGenomicPosUp-1+offset;
+            System.out.println("genomePos_1 ="+genomicPos_1 + ", pos="+pos);
+            Integer j=genomicPos_1-pos;
+            adjustedGatcSitesOffsetZero.add(j);
+        }
     }
 
 
@@ -96,6 +133,67 @@ public class CuttingPositionMapTest {
         Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosUp());
         expected = maxDistToGenomicPosDown;
         Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosDown());
+    }
+
+    @Test
+    public void testCalculateGATC() {
+        List<Integer> gatc = cpm.getAllCutsForGivenMotif("GATC");
+        for (Integer i:gatc) {
+            System.out.println("gatc :"+i);
+        }
+        for (Integer i:adjustedGatcSitesOffsetZero) {
+            System.out.println("adjustedGatkSites :"+i);
+        }
+        Assert.assertTrue(gatcsites.equals(gatc));
+    }
+
+    public CuttingPositionMap createVeryShortCPM() {
+        RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
+        Map remap = new HashMap<>();
+        remap.put(re.getPlainSite(), re);
+        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        chosenEnzymeList = new ArrayList<>();
+        chosenEnzymeList.add(re);
+        ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
+        testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
+        final File fasta = new File(testFastaFile);
+        String refID="veryshort";
+        //refID="chr_t4_GATC_short_20bp_and_long_24bp_fragments";
+        Integer genomicPos=42;
+        int maxDistUp=20;
+        int maxDistDown=15;
+        try {
+            testFastaReader = new IndexedFastaSequenceFile(fasta);
+            cpm = new CuttingPositionMap(refID,
+                    genomicPos,
+                    testFastaReader,
+                    maxDistUp,
+                    maxDistDown,
+                    chosenEnzymeList);
+            return cpm;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Test
+    public void testVeryShortCPM (){
+
+       CuttingPositionMap cpm = createVeryShortCPM();
+        // The following are the first bases of the GATC fragments in the sequence with ^GATC, i.e.,
+        //offset zero.
+        gatcsites=new ArrayList<>(Arrays.asList(2,24,48));
+        adjustedGatcSitesOffsetZero=new ArrayList<>();
+        int offset=0; // for ^GATC
+        for (Integer pos:gatcsites) {
+            Integer adjustedPos=genomicPos_1-maxDistToGenomicPosUp-1+offset;
+            System.out.println("genomePos_1 ="+genomicPos_1 + ", pos="+pos);
+            Integer j=genomicPos_1-pos;
+            adjustedGatcSitesOffsetZero.add(j);
+        }
+        Assert.assertTrue(adjustedGatcSitesOffsetZero.equals(cpm.getAllCuts()));
+
     }
 
 

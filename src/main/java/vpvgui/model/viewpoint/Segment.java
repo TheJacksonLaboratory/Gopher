@@ -33,6 +33,8 @@ public class Segment implements Serializable {
     private double repeatContentUp;
     /** The repetitive content of the margin in downstream direction of this object of class Segment. */
     private double repeatContentDown;
+    /** Proportion of Gs anc Cs in sequence */
+    private double GCcontent;
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
@@ -46,7 +48,7 @@ public class Segment implements Serializable {
         this.startPos = startPos; // absolute coordinate
         this.endPos = endPos;     // absolute coordinate
         setSelected(selected);
-        calculateRepeatContent(fastaReader);
+        calculateGCandRepeatContent(fastaReader);
         this.marginSize=150; /* todo--deprecated */
         calculateRepeatContentMargins(fastaReader);
     }
@@ -58,7 +60,7 @@ public class Segment implements Serializable {
         this.endPos=builder.endPos;
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
-        calculateRepeatContent(builder.fastaReader);
+        calculateGCandRepeatContent(builder.fastaReader);
         calculateRepeatContentMargins(builder.fastaReader);
     }
 
@@ -157,15 +159,24 @@ public class Segment implements Serializable {
     /**
      * This function calculates the {@link #repeatContent} of this segment by counting lower and uppercase.
      */
-    private void calculateRepeatContent(IndexedFastaSequenceFile fastaReader) {
+    private void calculateGCandRepeatContent(IndexedFastaSequenceFile fastaReader) {
         String subsequence = fastaReader.getSubsequenceAt(referenceSequenceID, startPos, endPos).getBaseString();
         /* determine repeat content */
-        int lowerCase = 0, upperCase = 0;
+        int lowerCase = 0, upperCase = 0; int GC=0;
+        if (subsequence.length()==0) return;
         for (int i = 0; i < subsequence.length(); i++) {
             if (Character.isLowerCase(subsequence.charAt(i))) lowerCase++;
             if (Character.isUpperCase(subsequence.charAt(i))) upperCase++;
+            switch (subsequence.charAt(i)){
+                case 'G':
+                case 'g':
+                case 'C':
+                case 'c':
+                    GC++;
+            }
         }
         this.repeatContent = ((double) lowerCase / (lowerCase + (double) upperCase));
+        this.GCcontent=(double)GC/(double)subsequence.length();
     }
 
     /**
@@ -212,7 +223,7 @@ public class Segment implements Serializable {
 
 
     /**
-     * This function returns the repetitive content calculated by the function {@link #calculateRepeatContent}.
+     * This function returns the repetitive content calculated by the function {@link #calculateGCandRepeatContent}.
      *
      * @return repeat content of this segment.
      */
@@ -235,6 +246,10 @@ public class Segment implements Serializable {
     public String getRepeatContentMarginDownAsPercent() { return String.format("%.2f%%",100*repeatContentDown);}
 
     public double getMeanMarginRepeatContent() { return 0.5*(repeatContentUp+repeatContentDown);}
+
+    public String getGCcontentAsPercent() {
+        return String.format("%.2f%%",100*GCcontent);
+    }
 
     public String getChromosomalPositionString() {
         String s=formatter.format(startPos);
