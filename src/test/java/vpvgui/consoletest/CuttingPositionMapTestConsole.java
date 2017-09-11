@@ -42,7 +42,7 @@ public class CuttingPositionMapTestConsole {
     RestrictionEnzyme re1 = new RestrictionEnzyme("re1","ACT^TTTA");
     RestrictionEnzyme re2 = new RestrictionEnzyme("re2","AAAC^CACTTAC");
     RestrictionEnzyme re3 = new RestrictionEnzyme("re2","^GAG");
-
+    List<RestrictionEnzyme> renzymeList;
 
 
     private String testFastaFile="src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
@@ -59,13 +59,17 @@ public class CuttingPositionMapTestConsole {
         remap.put(re1.getPlainSite(),re1);
         remap.put(re2.getPlainSite(),re2);
         remap.put(re3.getPlainSite(),re3);
-        List<RestrictionEnzyme> lst=new ArrayList<>();
-        lst.add(re1);
-        lst.add(re2);
-        lst.add(re3);
+//        List<RestrictionEnzyme> lst=new ArrayList<>();
+//        lst.add(re1);
+//        lst.add(re2);
+//        lst.add(re3);
+        renzymeList = new ArrayList<>();
+        renzymeList.add(re1);
+        renzymeList.add(re2);
+        renzymeList.add(re3);
         CuttingPositionMap.setRestrictionEnzymeMap(remap);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
-        testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, lst);
+        testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, renzymeList);
 
 
     } // Not nice, but without there will be an error. Why?
@@ -109,9 +113,9 @@ public class CuttingPositionMapTestConsole {
         // print offsets
         System.out.println();
         System.out.println("Offsets of cutting motifs:");
-        for(int i = 0; i<testCuttingPositionMap.getCuttingPositionMapOffsets().size();i++) {
-            System.out.println(testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]));
-        }
+//        for(int i = 0; i<testCuttingPositionMap.getCuttingPositionMapOffsets().size();i++) {
+//            System.out.println(testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]));
+//        }
 
         // print the initial sequence
         System.out.println();
@@ -140,11 +144,12 @@ public class CuttingPositionMapTestConsole {
             ArrayList<Integer> relPosIntArray = testCuttingPositionMap.getCuttingPositionHashMap().get(testCuttingPatterns[i]);
             for (int j = 0; j < relPosIntArray.size(); j++) {
                 s = "";
-                Integer offset=testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
+                Integer offset= this.renzymeList.get(i).getOffset();
+//                        testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
                 for (int k = 0; k < relPosIntArray.get(j)+testMaxDistToGenomicPosUp -offset; k++) { // subtract offset
                     s += " ";
                 }
-                Integer sta = testGenomicPos + relPosIntArray.get(j) - testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
+                Integer sta = testGenomicPos + relPosIntArray.get(j) - renzymeList.get(i).getOffset();//testCuttingPositionMap.getCuttingPositionMapOffsets().get(testCuttingPatterns[i]);
                 Integer end = sta + testCuttingPatterns[i].length() - 1;
                 s += testFastaReader.getSubsequenceAt(testReferenceSequenceID, sta, end).getBaseString();
                 System.out.println(s);
@@ -171,11 +176,11 @@ public class CuttingPositionMapTestConsole {
     /* test utility functions */
 
     /**
-     * In this function some usage applications for the function <i>getNextCutPos</i> are given.
+     * In this function some usage applications for the function <i>getNextCutPosOLD</i> are given.
      * Furthermore, the correctness of the function is tested.
      * <p>
      * At first a test position between two cutting sites is generated.
-     * This position is used to perform alternate calls of the function <i>getNextCutPos</i> for up and downstream direction.
+     * This position is used to perform alternate calls of the function <i>getNextCutPosOLD</i> for up and downstream direction.
      * For checking purposes compare the output to the output of the test <i>testHashMap</i>.
      * <p>
      * In addition, the handled exception <i>NoCuttingSiteFoundUpOrDownstreamException</i> is tested for up and downstream direction.
@@ -199,22 +204,22 @@ public class CuttingPositionMapTestConsole {
 
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for downstream direction...");
-            Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
+            Integer nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos,"down");
             System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
 
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for upstream direction...");
-            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
+            nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos,"up");
             System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
 
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for downstream direction...");
-            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"down");
+            nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos,"down");
             System.out.println("Next cutting site in downstream direction is: " +  nextCutPos);
 
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("Testing position " + testPos + " for upstream direction...");
-            nextCutPos = testCuttingPositionMap.getNextCutPos(testPos,"up");
+            nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos,"up");
             System.out.println("Next cutting site in upstream direction is: " +  nextCutPos);
 
         } else {
@@ -227,14 +232,14 @@ public class CuttingPositionMapTestConsole {
         Integer testPos = testCuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(testCuttingPositionMap.getCuttingPositionHashMap().get("ALL").size()-1) + 1;
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for downstream direction...");
-        Integer nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "down");
+        Integer nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos, "down");
         System.out.println("Returned value: " + nextCutPos);
 
         // first cutting position, upstream
         testPos = testCuttingPositionMap.getCuttingPositionHashMap().get("ALL").get(0) - 1;
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("Testing position " + testPos + " for upstream direction...");
-        nextCutPos = testCuttingPositionMap.getNextCutPos(testPos, "up");
+        nextCutPos = testCuttingPositionMap.getNextCutPosOLD(testPos, "up");
         System.out.println("Returned value: " + nextCutPos);
 
         System.out.println("=========================================================================================");
@@ -247,13 +252,13 @@ public class CuttingPositionMapTestConsole {
     @Test(expected = IntegerOutOfRangeException.class)
     public void testIntegerOutOfRangeExceptionDownstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
         Integer testPos = testMaxDistToGenomicPosDown+1;
-        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPosOLD(testPos, "down");
     }
 
     @Test(expected = IntegerOutOfRangeException.class)
     public void testIntegerOutOfRangeExceptionUpstream() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
         Integer testPos = testMaxDistToGenomicPosUp-1;
-        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "down");
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPosOLD(testPos, "down");
     }
 
     /* test unhandled IllegalArgumentException for function 'testgetNextCutPos' */
@@ -261,7 +266,7 @@ public class CuttingPositionMapTestConsole {
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalArgumentException() throws IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
         Integer testPos = testMaxDistToGenomicPosDown+1;
-        Integer nextCutPos =  testCuttingPositionMap.getNextCutPos(testPos, "illegal argument");
+        Integer nextCutPos =  testCuttingPositionMap.getNextCutPosOLD(testPos, "illegal argument");
     }
 
 

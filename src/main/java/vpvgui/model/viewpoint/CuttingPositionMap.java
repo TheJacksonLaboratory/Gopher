@@ -38,7 +38,7 @@ public class CuttingPositionMap implements Serializable {
      * relative to {@link #genomicPos}. */
     private HashMap<String, ArrayList<Integer>> cuttingPositionMap;
     /** Position of the "^", which indicates the cutting site, e.g., 0 for ^GATC and 2 for GA^TC */
-    private HashMap<String, Integer> cuttingPositionMapOffsets;
+   // private HashMap<String, Integer> cuttingPositionMapOffsets;
     /** TODO what is key?. Value, the corresponding {@link RestrictionEnzyme} object. */
     static Map<String, RestrictionEnzyme> restrictionEnzymeMap;
 
@@ -53,7 +53,6 @@ public class CuttingPositionMap implements Serializable {
      * which will be derived only for the interval [<i>genomicPos-maxDistToGenomicPosUp,genomicPos+maxDistToGenomicPosDown</i>].
      * <p>
      * The keys for the <i>HashMap</i> will be the cutting sites, e.g., GATC (without '^' characters).
-     * The information about the cutting position within in a particular motif is recorded in  {@link #cuttingPositionMapOffsets}.
      * In addition to the specific sites, there is one special key <i>ALL</i> which contains the cutting positions for the union of all motifs.
      *
      * @param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>. TODO Not needed, we can delete this argument
@@ -156,15 +155,17 @@ public class CuttingPositionMap implements Serializable {
     }
 
     /** @return map of cutting offsets (key: . */
-    public final HashMap<String, Integer> getCuttingPositionMapOffsets() {
-        return cuttingPositionMapOffsets;
-    }
+//    public final HashMap<String, Integer> getCuttingPositionMapOffsets() {
+//        return cuttingPositionMapOffsets;
+//    }
 
 
 
     /**
      * Given a position within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown],
      * this function returns the next cutting position in up or downstream direction.
+     *
+     * TODO -- this is only used in the console test class and will be removed
      *
      * @param pos       Position relative to 'genomicPos'.
      * @param direction Direction in which the next cutting site will be searched.
@@ -173,7 +174,8 @@ public class CuttingPositionMap implements Serializable {
      * @throws IntegerOutOfRangeException                if 'pos' is not within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown].
      * @throws NoCuttingSiteFoundUpOrDownstreamException if there is no cutting position up or downstream of 'pos'. Exception is handled by returning the position of outermost cutting site up or downstream.
      */
-    public Integer getNextCutPos(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
+    @Deprecated
+    public Integer getNextCutPosOLD(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
         if (!(direction.equals("up") || direction.equals("down"))) {
             logger.error(String.format("direction object must be up or down but was \"%s\"",direction ));
             throw new IllegalArgumentException("Please pass either 'up' or 'down' for 'direction'.");
@@ -205,7 +207,7 @@ public class CuttingPositionMap implements Serializable {
                     break;
                 } else {
                     returnCutPos = cutPosArray.get(cutPosArray.size() - 1);
-                    throw new NoCuttingSiteFoundUpOrDownstreamException("EXCEPTION in function 'getNextCutPos': No cutting site " + direction + "stream of position " + pos + ". Will return the " +
+                    throw new NoCuttingSiteFoundUpOrDownstreamException("EXCEPTION in function 'getNextCutPosOLD': No cutting site " + direction + "stream of position " + pos + ". Will return the " +
                             "outermost cutting site in " + direction + "stream direction.");
                 }
             }

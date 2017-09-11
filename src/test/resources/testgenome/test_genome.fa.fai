@@ -1,5 +1,6 @@
 chr_t1_GATC	164	13	164	165
-chr_t2_AAGCTT	176	193	176	177
-chr_t3_GATC_AAGCTT	356	390	356	357
-chr_t4_GATC_short_20bp_and_long_24bp_fragments	308	795	308	309
-chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy	308	1157	308	309
+veryshort	56	189	56	57
+chr_t2_AAGCTT	176	261	176	177
+chr_t3_GATC_AAGCTT	356	458	356	357
+chr_t4_GATC_short_20bp_and_long_24bp_fragments	308	863	308	309
+chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy	308	1225	308	309
