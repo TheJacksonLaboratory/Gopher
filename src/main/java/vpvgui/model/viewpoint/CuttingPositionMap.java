@@ -75,16 +75,17 @@ public class CuttingPositionMap implements Serializable {
         logger.trace("Constructing CuttingPositionMap for genomic pos " + getGenomicPos());
         cuttingPositionMap = new HashMap<String, ArrayList<Integer>>();
         // determine offsets
-        cuttingPositionMapOffsets = new HashMap<String, Integer>();
+       /* cuttingPositionMapOffsets = new HashMap<String, Integer>();
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
-            String site = enzyme.getPlainSite(); /* gets the site without "^", e.g., GATC instead of ^GATC */
+            String site = enzyme.getPlainSite(); // gets the site without "^", e.g., GATC instead of ^GATC
             Integer offset = enzyme.getOffset();
             cuttingPositionMapOffsets.put(site, offset);
-        }
-
+        }*/
+        Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>();
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
             String cutpat = enzyme.getPlainSite();
+            int offset = enzyme.getOffset();
             // get sequence around genomic position and convert everything to uppercase
             if (fastaReader.getSequence(referenceSequenceID).length() < genomicPos + maxDistToGenomicPosDown) {
                 logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + fastaReader.getSequence(referenceSequenceID).length() + ").");
@@ -95,24 +96,18 @@ public class CuttingPositionMap implements Serializable {
             Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
             while (matcher.find()) {
-                if (matcher.start() <= genomicPos) {
-                    int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
+                    int pos = matcher.start() - maxDistToGenomicPosUp + offset - 1;
                     cuttingPositionList.add(pos);
-                    cuttingPositionListUnion.add(pos);
-                } else if (genomicPos < matcher.start()) {
-                    int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
-                    cuttingPositionList.add(pos);
-                    cuttingPositionListUnion.add(pos);
-                }
+                    allPositionSet.add(pos);
             }
             cuttingPositionMap.put(enzyme.getPlainSite(), cuttingPositionList); // push array list to map
         }
 
         // add an array for the union of all cutting positions with key 'ALL'
-        Set<Integer> uniqueSet = new HashSet<>(); // remove duplicates
-        uniqueSet.addAll(cuttingPositionListUnion);
-        cuttingPositionListUnion.clear();
-        cuttingPositionListUnion.addAll(uniqueSet);
+        //Set<Integer> uniqueSet = new HashSet<>(); // remove duplicates
+        //uniqueSet.addAll(cuttingPositionListUnion);
+        //cuttingPositionListUnion.clear();
+        cuttingPositionListUnion.addAll(allPositionSet);
         Collections.sort(cuttingPositionListUnion);
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
     }
