@@ -12,7 +12,7 @@ import java.util.Map;
 import vpvgui.exception.IntegerOutOfRangeException;
 import vpvgui.exception.NoCuttingSiteFoundUpOrDownstreamException;
 import vpvgui.model.RestrictionEnzyme;
-import vpvgui.model.viewpoint.CuttingPositionMap;
+import vpvgui.model.viewpoint.SegmentFactory;
 
 import static org.junit.Assert.assertEquals;
 
@@ -51,7 +51,7 @@ public class CuttingPositionMapTestConsole {
 
 
 
-    CuttingPositionMap testCuttingPositionMap;// = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
+    SegmentFactory testCuttingPositionMap;// = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, testCuttingPatterns);
     IndexedFastaSequenceFile testFastaReader;
 
     public CuttingPositionMapTestConsole() throws FileNotFoundException {
@@ -67,9 +67,9 @@ public class CuttingPositionMapTestConsole {
         renzymeList.add(re1);
         renzymeList.add(re2);
         renzymeList.add(re3);
-        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        SegmentFactory.setRestrictionEnzymeMap(remap);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
-        testCuttingPositionMap = new CuttingPositionMap(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, renzymeList);
+        testCuttingPositionMap = new SegmentFactory(testReferenceSequenceID, testGenomicPos, testFastaReader, testMaxDistToGenomicPosUp, testMaxDistToGenomicPosDown, renzymeList);
 
 
     } // Not nice, but without there will be an error. Why?

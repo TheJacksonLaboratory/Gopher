@@ -69,7 +69,7 @@ public class ViewPointCreationTask extends Task {
         this.viewpointlist=new ArrayList<>();
         this.currentVP=currentVPproperty;
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
-        CuttingPositionMap.restrictionEnzymeMap = new HashMap<>();
+        SegmentFactory.restrictionEnzymeMap = new HashMap<>();
         List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
         if (chosen==null) {
             logger.error("Unable to retrieve list of chosen restriction enzymes");
@@ -79,7 +79,7 @@ public class ViewPointCreationTask extends Task {
         }
         for (RestrictionEnzyme re : chosen) {
             String site = re.getPlainSite();
-            CuttingPositionMap.restrictionEnzymeMap.put(site,re);
+            SegmentFactory.restrictionEnzymeMap.put(site,re);
         }
         init_parameters();
     }

@@ -53,7 +53,7 @@ public class DesignConsoleTest {
         Map remap=new HashMap<>();
         remap.put("AAGCTT",re1);
         remap.put("GATC",re2);
-        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        SegmentFactory.setRestrictionEnzymeMap(remap);
 
         lst=new ArrayList<>();
         lst.add(re1);
@@ -136,7 +136,7 @@ public class DesignConsoleTest {
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
         System.out.println("testCuttingPositionMapTwice");
-        CuttingPositionMap cpm = new CuttingPositionMap(referenceSequenceID_1,
+        SegmentFactory cpm = new SegmentFactory(referenceSequenceID_1,
                 genomicPos_1,
                 testFastaReader,
                  maxDistToGenomicPosUp,

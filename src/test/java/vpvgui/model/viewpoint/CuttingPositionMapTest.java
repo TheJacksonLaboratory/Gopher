@@ -67,7 +67,7 @@ public class CuttingPositionMapTest {
 
     private static IndexedFastaSequenceFile testFastaReader;
     static List<RestrictionEnzyme> chosenEnzymeList;
-    static CuttingPositionMap cpm=null;
+    static SegmentFactory cpm=null;
 
     private static List<Integer> gatcsites;
     private static List<Integer> adjustedGatcSitesOffsetZero;
@@ -79,7 +79,7 @@ public class CuttingPositionMapTest {
         Map remap = new HashMap<>();
         remap.put("AAGCTT", re1);
         remap.put("GATC", re2);
-        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        SegmentFactory.setRestrictionEnzymeMap(remap);
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re1);
         chosenEnzymeList.add(re2);
@@ -87,7 +87,7 @@ public class CuttingPositionMapTest {
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
-        cpm = new CuttingPositionMap(refSeqID1,
+        cpm = new SegmentFactory(refSeqID1,
                 genomicPos_1,
                 testFastaReader,
                 maxDistToGenomicPosUp,
@@ -147,11 +147,11 @@ public class CuttingPositionMapTest {
         Assert.assertTrue(gatcsites.equals(gatc));
     }
 
-    public CuttingPositionMap createVeryShortCPM() {
+    public SegmentFactory createVeryShortCPM() {
         RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
         Map remap = new HashMap<>();
         remap.put(re.getPlainSite(), re);
-        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        SegmentFactory.setRestrictionEnzymeMap(remap);
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re);
         ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
@@ -172,7 +172,7 @@ public class CuttingPositionMapTest {
             System.out.println("maxDistUp="+maxDistUp);
             System.out.println("maxDistDown="+maxDistDown);
             System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            cpm = new CuttingPositionMap(refID,
+            cpm = new SegmentFactory(refID,
                     genomicPos,
                     testFastaReader,
                     maxDistUp,
@@ -191,7 +191,7 @@ public class CuttingPositionMapTest {
         RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
         Map remap = new HashMap<>();
         remap.put(re.getPlainSite(), re);
-        CuttingPositionMap.setRestrictionEnzymeMap(remap);
+        SegmentFactory.setRestrictionEnzymeMap(remap);
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re);
         ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
@@ -202,7 +202,7 @@ public class CuttingPositionMapTest {
         Integer genomicPos=42;
         int maxDistUp=20;
         int maxDistDown=15;
-        CuttingPositionMap cpm=null;
+        SegmentFactory cpm=null;
         try {
             testFastaReader = new IndexedFastaSequenceFile(fasta);
             String seq=testFastaReader.getSequence(refID).getBaseString();
@@ -213,7 +213,7 @@ public class CuttingPositionMapTest {
             System.out.println("maxDistUp="+maxDistUp);
             System.out.println("maxDistDown="+maxDistDown);
             System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            cpm = new CuttingPositionMap(refID,
+            cpm = new SegmentFactory(refID,
                     genomicPos,
                     testFastaReader,
                     maxDistUp,
