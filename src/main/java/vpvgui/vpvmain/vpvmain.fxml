@@ -90,7 +90,7 @@
                                     <MenuItem fx:id="openFlyGeneWindow" mnemonicParsing="false" onAction="#openGeneWindowWithExampleFlyGenes" text="fly" />
                                 </items>
                               </Menu>
-                          <MenuItem mnemonicParsing="false" text="About" />
+                          <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
                         </items>
                       </Menu>
                     </menus>

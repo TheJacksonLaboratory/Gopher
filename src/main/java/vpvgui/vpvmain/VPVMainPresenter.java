@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import static vpvgui.io.Platform.getVPVDir;
@@ -793,6 +794,12 @@ public class VPVMainPresenter implements Initializable {
     public void showLog() {
         LogViewerFactory factory = new LogViewerFactory();
         factory.display();
+    }
+
+    @FXML
+    public void about(ActionEvent e) {
+        Popups.showAbout(model.getVersion(), model.getLastChangeDate());
+        e.consume();
     }
 
 

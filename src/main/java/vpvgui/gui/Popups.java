@@ -221,29 +221,13 @@ public class Popups {
 
 
 
-    /**
-     * Request a String from user.
-     *
-     * @param windowTitle - Title of PopUp window
-     * @param promptValue  - Prompt of Text field (suggestion for user)
-     * @param labelText   - Text of your request
-     * @return String with user input
-     */
-    public static Double getDoubleFromUserOLD(String windowTitle, Double promptValue, String labelText) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.getEditor().setPromptText(String.format("%.1f",promptValue));
-        dialog.setTitle(windowTitle);
-        dialog.setHeaderText(null);
-        dialog.setContentText(labelText);
-        /*Platform.runLater(() -> okButton.requestFocus());*/
-        Optional<String> result = dialog.showAndWait();
-        String r=result.orElse(null);
-        if (r==null) return null;
-        try {
-            return Double.parseDouble(r);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
+   public static void showAbout(String versionString, String dateString) {
+       Alert alert = new Alert(Alert.AlertType.INFORMATION);
+       alert.setTitle("ViewPoint Viewer");
+       alert.setHeaderText(null);
+       alert.setContentText(String.format("Version %s\nLast changed: %s",versionString,dateString ));
+
+       alert.showAndWait();
+   }
 
 }
