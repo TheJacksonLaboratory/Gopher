@@ -16,18 +16,13 @@ public class SerializationManager {
         fos.close();
     }
 
-    public static Model deserializeModel(String fileName){
+    public static Model deserializeModel(String fileName) throws IOException,ClassNotFoundException {
         Object obj=null;
-        try {
+
             FileInputStream fis = new FileInputStream(fileName);
             ObjectInputStream ois = new ObjectInputStream(fis);
             obj = ois.readObject();
             ois.close();
-        } catch (IOException ioe) {
-
-        } catch (ClassNotFoundException cnfe) {
-
-        }
         Model model = (Model) obj;
         return model;
     }

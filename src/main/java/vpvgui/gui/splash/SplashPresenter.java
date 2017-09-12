@@ -51,20 +51,10 @@ public class SplashPresenter implements Initializable {
         ObservableList<String> filelist = getExistingProjectNames();
         projectBox.setItems(filelist);
         projectBox.getSelectionModel().selectFirst();
-
-        /*
-        projectBox.getSelectionModel().
-                selectedItemProperty().
-                addListener((observable,  oldValue,  newValue)
-                        -> {
-                    System.out.println(newValue);
-                });
-                 */
         Image newFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/newFileIcon.png"));
         Image openFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/openFileIcon.png"));
         this.openFileView.setImage(openFileImage);
         this.newFileView.setImage(newFileImage);
-
     }
 
     public void setSignal(Consumer<Signal> signal) {
@@ -84,10 +74,9 @@ public class SplashPresenter implements Initializable {
     }
 
 
-
+    /** @return list of project serialized files in the user's vpvgui directory. */
     private ObservableList<String> getExistingProjectNames() {
         File dir=getVPVDir();
-       /* todo find all settings files */
        File[] files = dir.listFiles(new FileFilter() {
            @Override
            public boolean accept(File pathname) {

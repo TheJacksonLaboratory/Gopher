@@ -97,6 +97,7 @@ public class ViewPointViewer extends Application {
 
         this.primarystage.setMinWidth(400);
         this.primarystage.setWidth(600);
+        this.primarystage.setMaxWidth(600);
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);

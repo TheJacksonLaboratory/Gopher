@@ -11,6 +11,8 @@ import vpvgui.util.SerializationManager;
 import vpvgui.vpvmain.VPVMainPresenter;
 import vpvgui.vpvmain.VPVMainView;
 
+import java.io.IOException;
+
 
 /** This is a functor class with a callback to switch screens when the user has chosen
  * which viewpoint to work on.
@@ -47,16 +49,25 @@ public class SwitchScreens {
     public void openExistingModel(String name) {
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
-        this.primarystage.setMinWidth(1000);
-        this.primarystage.setWidth(1600);
+
         String filepath = Platform.getAbsoluteProjectPath(name);
         logger.trace("About to deserialize model at "+ filepath);
-        Model model = SerializationManager.deserializeModel(filepath);
+        try {
+            Model model = SerializationManager.deserializeModel(filepath);
+        } catch (IOException e) {
+            ErrorWindow.displayException("IOException",String.format("I/O problem while attempting to deserialize %s",filepath),e);
+            return;
+        } catch (ClassNotFoundException e) {
+            ErrorWindow.displayException("ClassNotFoundException",String.format("Could not find class while attempting to deserialize %s",filepath),e);
+            return;
+        }
         if (model == null) {
             logger.error(String.format("Unable to deserialize model from %s at %s", name, filepath));
             ErrorWindow.display("Null pointer", String.format("Unable to deserialize model from %s at %s", name, filepath));
             return;
         }
+        this.primarystage.setMinWidth(1000);
+        this.primarystage.setWidth(1600);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
         if (presenter==null){

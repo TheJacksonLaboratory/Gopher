@@ -18,6 +18,8 @@ import java.util.Properties;
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
+    /** serialization version ID */
+    static final long serialVersionUID = 3L;
     /** This is the name of the file we download from UCSC for any of the genomes. */
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
