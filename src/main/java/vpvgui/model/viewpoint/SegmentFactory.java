@@ -95,7 +95,7 @@ public class SegmentFactory implements Serializable {
             Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
             while (matcher.find()) {
-                    int pos = matcher.start() - maxDistToGenomicPosUp + offset - 1;
+                    int pos = matcher.start() - maxDistToGenomicPosUp + offset;
                     cuttingPositionList.add(pos);
                     allPositionSet.add(pos);
             }
