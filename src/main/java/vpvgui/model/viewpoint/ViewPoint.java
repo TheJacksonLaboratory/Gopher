@@ -350,7 +350,7 @@ public class ViewPoint implements Serializable {
                     //relToAbsPos(segmentFactory.getAllCuts().get(j)),
                    // relToAbsPos(segmentFactory.getAllCuts().get(j + 1))).
                     segmentFactory.getUpstreamCut(j),
-                    segmentFactory.getDownstreamCut(j)).
+                    segmentFactory.getDownstreamCut(j)-1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
             restSegListMap.get("ALL").add(restFrag);
         }
