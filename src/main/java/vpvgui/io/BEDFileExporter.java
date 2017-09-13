@@ -23,7 +23,7 @@ public class BEDFileExporter {
     private String directoryPath=null;
 
 
-    private String cuttingMotif="GATC"; /* TODO MAKE THIS DYNAMIC!!!! */
+    private String cuttingMotif="ALL"; /* TODO MAKE THIS DYNAMIC!!!! */
 
 
     public BEDFileExporter(String dirpath, String outPrefix){
