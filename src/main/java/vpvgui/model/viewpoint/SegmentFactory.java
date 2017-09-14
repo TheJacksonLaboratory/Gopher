@@ -71,15 +71,7 @@ public class SegmentFactory implements Serializable {
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
-        logger.trace("Constructing CuttingPositionMap for genomic pos " + getGenomicPos());
         cuttingPositionMap = new HashMap<String, ArrayList<Integer>>();
-        // determine offsets
-       /* cuttingPositionMapOffsets = new HashMap<String, Integer>();
-        for (RestrictionEnzyme enzyme : chosenEnzymeList) {
-            String site = enzyme.getPlainSite(); // gets the site without "^", e.g., GATC instead of ^GATC
-            Integer offset = enzyme.getOffset();
-            cuttingPositionMapOffsets.put(site, offset);
-        }*/
         Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>();
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
@@ -104,10 +96,6 @@ public class SegmentFactory implements Serializable {
             cuttingPositionMap.put(enzyme.getPlainSite(), cuttingPositionList); // push array list to map
         }
 
-        // add an array for the union of all cutting positions with key 'ALL'
-        //Set<Integer> uniqueSet = new HashSet<>(); // remove duplicates
-        //uniqueSet.addAll(cuttingPositionListUnion);
-        //cuttingPositionListUnion.clear();
         cuttingPositionListUnion.addAll(allPositionSet);
         Collections.sort(cuttingPositionListUnion);
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
@@ -155,11 +143,6 @@ public class SegmentFactory implements Serializable {
     public final List<Integer> getAllCuts() {
         return cuttingPositionMap.get("ALL");
     }
-
-    /** @return map of cutting offsets (key: . */
-//    public final HashMap<String, Integer> getCuttingPositionMapOffsets() {
-//        return cuttingPositionMapOffsets;
-//    }
 
 
 
@@ -227,15 +210,13 @@ public class SegmentFactory implements Serializable {
         return returnCutPos;
     }
 
-    // replaces
-    // relToAbsPos(segmentFactory.getAllCuts().get(j))
+
     public Integer getUpstreamCut(int j) {
         // replaces return relToAbsPos(getAllCuts().get(j));
         return getAllCuts().get(j);
     }
 
-    // replaces
-    // relToAbsPos(segmentFactory.getAllCuts().get(j + 1))).
+
     public Integer getDownstreamCut(int j) {
         // replaces return relToAbsPos(getAllCuts().get(j+1));
         return getAllCuts().get(j+1);
@@ -247,66 +228,11 @@ public class SegmentFactory implements Serializable {
      * @param relPos   position relative to <i>genomicPos</i>.
      * @return         absolute genomic position.
      */
-    public Integer relToAbsPos(Integer relPos) {
-        return relPos + genomicPos;
-    }
-
-
-
-    /// The Following Functions were never used and can probably be deleted.
-
-    /**
-     * This function converts absolute coordinates of the genomic sequence to coordinates relative to <i>genomicPos</i>.
-     *
-     * @param absPos   absolute genomic position.
-     * @return         the coordinate relative to <i>genomicPos</i>.
-     */
-//    public Integer absToRelPos(Integer absPos) {
-//        return absPos - genomicPos;
+//   // public Integer relToAbsPos(Integer relPos) {
+//        return relPos + genomicPos;
 //    }
 
 
-
-
-    /**
-     * This function converts absolute genomic coordinates to absolute coordinates within the viewpoint (<i>startPos</i> corresponds to 0).
-     *
-     * @param absPos   absolute genomic position.
-     * @return         postion within the viewpoint.
-     */
-//    public Integer absToVpIdxPos(Integer absPos) {
-//        return absPos - startPos;
-//    }
-
-    /**
-     * This function converts absolute coordinates within the viewpoint to absolute genomic coordinates.
-     *
-     * @param vpIdx    position within the viewpoint.
-     * @return         absolute genomic position.
-     */
-//    public Integer vpIdxToAbsPos(Integer vpIdx) {
-//        return vpIdx + startPos;
-//    }
-
-    /**
-     * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates within the viewpoint.
-     *
-     * @param relPos   position relative to <i>genomicPos</i>.
-     * @return         position within the viewpoint.
-     */
-//    public Integer relToVpIdxPos(Integer relPos) {
-//        return relPos - startPos + genomicPos;
-//    }
-
-    /**
-     * This function converts absolute coordinates within the viewpoint to coordinates relative to <i>genomicPos</i>.
-     *
-     * @param vpIdx    position within the viewpoint.
-     * @return         position relative to <i>genomicPos</i>.
-     */
-//    public Integer vpIdxToRelPos(Integer vpIdx) {
-//        return vpIdx - genomicPos + startPos;
-//    }
 
 
 }

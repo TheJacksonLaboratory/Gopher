@@ -93,8 +93,10 @@ public class SwitchScreens {
         if (this.primarystage==null) return;
         this.primarystage.setMinWidth(1000);
         this.primarystage.setWidth(1400);
+        this.primarystage.setMaxWidth(1800);
         this.primarystage.setMinHeight(800);
         this.primarystage.setHeight(1000);
+        this.primarystage.setMaxHeight(1200);
     }
 
 

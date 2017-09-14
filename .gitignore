@@ -10,3 +10,5 @@ target/**
 target/
 vpvgui.iml
 /vpvgui.iml
+/example.log.1
+/example.log.2

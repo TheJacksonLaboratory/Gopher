@@ -37,40 +37,42 @@ import java.util.*;
  *</pre>
  * The sequence is 56 nucleotides long. There is a GATC at position 2,24,48 (one-based numbering)
  */
-public class CuttingPositionMapTest {
+public class SegmentFactoryTest {
 
-    private static Model testModel;
-    private static Design testDesign;
+//    private static Model testModel;
+//    private static Design testDesign;
     private static String testFastaFile = null;
     private static String refSeqID1 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
     private static Integer genomicPos_1 = 125;
-    private static Integer genomicPos_2 = 150; // position on the next fragment in downstream direction -> overlapping viewpoints
-    private static String referenceSequenceID_2 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy"; // same sequence, but different name
-    private static Integer genomicPos_3 = 125; // non overlapping viewpoint
+//    private static Integer genomicPos_2 = 150; // position on the next fragment in downstream direction -> overlapping viewpoints
+//    private static String referenceSequenceID_2 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy"; // same sequence, but different name
+//    private static Integer genomicPos_    private static Integer genomicPos_2 = 150; // position on the next fragment in downstream direction -> overlapping viewpoints
+//    private static String referenceSequenceID_2 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy"; // same sequence, but different name
+//    private static Integer genomicPos_3 = 125; // non overlapping viewpoint
     private static Integer maxDistToGenomicPosUp = 115;
     private static Integer maxDistToGenomicPosDown = 115;
 
-    private static String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
+//    private static String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
 
 
     // parameters for Lupianez-Funktion
-    private static Integer fragNumUp = 1;
-    private static Integer fragNumDown = 2;
-    private static Integer minSizeUp = 20;
-    private static Integer minSizeDown = 20;
-    private static Integer maxSizeUp = 95;
-    private static Integer maxSizeDown = 150;
-    private static Integer marginSize = 10;
-    private static Integer minFragSize = 20;
-    private static Double minRepFrag = 0.6;
-    private static String motif = "GATC";
+//    private static Integer fragNumUp = 1;
+//    private static Integer fragNumDown = 2;
+//    private static Integer minSizeUp = 20;
+//    private static Integer minSizeDown = 20;
+//    private static Integer maxSizeUp = 95;
+//    private static Integer maxSizeDown = 150;
+//    private static Integer marginSize = 10;
+//    private static Integer minFragSize = 20;
+//    private static Double minRepFrag = 0.6;
+//    private static String motif = "GATC";
 
     private static IndexedFastaSequenceFile testFastaReader;
     static List<RestrictionEnzyme> chosenEnzymeList;
     static SegmentFactory cpm=null;
 
     private static List<Integer> gatcsites;
-    private static List<Integer> adjustedGatcSitesOffsetZero;
+
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -83,7 +85,7 @@ public class CuttingPositionMapTest {
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re1);
         chosenEnzymeList.add(re2);
-        ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
+        ClassLoader classLoader = SegmentFactoryTest.class.getClassLoader();
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
@@ -96,14 +98,6 @@ public class CuttingPositionMapTest {
         // The following are the first bases of the GATC fragments in the sequence with ^GATC, i.e.,
         //offset zero.
         gatcsites=new ArrayList<>(Arrays.asList(21,45,69,93,113,137,161,185,209,229,259,279));
-        adjustedGatcSitesOffsetZero=new ArrayList<>();
-        int offset=0; // for ^GATC
-        for (Integer pos:gatcsites) {
-            Integer adjustedPos=genomicPos_1-maxDistToGenomicPosUp-1+offset;
-            System.out.println("genomePos_1 ="+genomicPos_1 + ", pos="+pos);
-            Integer j=genomicPos_1-pos;
-            adjustedGatcSitesOffsetZero.add(j);
-        }
     }
 
 
@@ -135,17 +129,7 @@ public class CuttingPositionMapTest {
         Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosDown());
     }
 
-    @Test
-    public void testCalculateGATC() {
-        List<Integer> gatc = cpm.getAllCutsForGivenMotif("GATC");
-        for (Integer i:gatc) {
-            System.out.println("gatc :"+i);
-        }
-        for (Integer i:adjustedGatcSitesOffsetZero) {
-            System.out.println("adjustedGatkSites :"+i);
-        }
-        Assert.assertTrue(gatcsites.equals(gatc));
-    }
+
 
     public SegmentFactory createVeryShortCPM() {
         RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
@@ -154,7 +138,7 @@ public class CuttingPositionMapTest {
         SegmentFactory.setRestrictionEnzymeMap(remap);
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re);
-        ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
+        ClassLoader classLoader = SegmentFactoryTest.class.getClassLoader();
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         String refID="veryshort";
@@ -187,14 +171,14 @@ public class CuttingPositionMapTest {
 
     @Test
     public void testVeryShortCPM (){
-
+        List<Integer> adjustedGatcSitesOffsetZero=new ArrayList<>();
         RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
         Map remap = new HashMap<>();
         remap.put(re.getPlainSite(), re);
         SegmentFactory.setRestrictionEnzymeMap(remap);
         chosenEnzymeList = new ArrayList<>();
         chosenEnzymeList.add(re);
-        ClassLoader classLoader = CuttingPositionMapTest.class.getClassLoader();
+        ClassLoader classLoader = SegmentFactoryTest.class.getClassLoader();
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         String refID="veryshort";
@@ -226,24 +210,21 @@ public class CuttingPositionMapTest {
         // The following are the first bases of the GATC fragments in the sequence with ^GATC, i.e.,
         //offset zero.
         gatcsites=new ArrayList<>(Arrays.asList(2,24,48));
-        adjustedGatcSitesOffsetZero=new ArrayList<>();
+
         int offset=0; // for ^GATC
         for (Integer pos:gatcsites) {
-            Integer adjustedPos=pos-maxDistUp-1+offset;
-            System.out.println("genomePos ="+genomicPos + ", adjustedPos="+adjustedPos);
-            adjustedGatcSitesOffsetZero.add(adjustedPos);
+           // System.out.println("^GATC sites: " +pos);
+            if (pos >= genomicPos - maxDistUp) {
+                adjustedGatcSitesOffsetZero.add(pos);
+            }
         }
-        System.out.println("Calculated sites");
-        List<Integer> sites = cpm.getAllCuts();
-        for (Integer i:sites) {
-            System.out.println("\t site="+i);
-        }
-      //  Assert.assertTrue(adjustedGatcSitesOffsetZero.equals(cpm.getAllCuts()));
 
+//        List<Integer> sites = cpm.getAllCuts();
+        for (Integer j:adjustedGatcSitesOffsetZero) {
+            System.out.println("adjusted="+j);
+        }
+        Assert.assertTrue(adjustedGatcSitesOffsetZero.equals(cpm.getAllCuts()));
     }
-
-
-
 
 
 
