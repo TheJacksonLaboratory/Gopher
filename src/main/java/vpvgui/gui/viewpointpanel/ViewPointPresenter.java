@@ -51,8 +51,8 @@ public class ViewPointPresenter implements Initializable {
 
     private static final int UCSC_WIDTH = 1600;
 
-    private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "F7DC6F", "8D230F", "A1D6E2",
-            "EC96A4", "E6DF44", "E4EA8C"};
+    private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
+            "EC96A4", "E6DF44", "E4EA8C", "FDD2D6", };
 
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
@@ -90,6 +90,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
     @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
     @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
+    @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
     @FXML private Button deleteButton;
     @FXML private Button copyToClipboardButton;
@@ -284,6 +285,7 @@ public class ViewPointPresenter implements Initializable {
         locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getChromosomalPositionString())));
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
+        segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepeatContentAsPercent())));
         inRepetitiveTableColumn.setComparator(new PercentComparator());
@@ -325,8 +327,11 @@ public class ViewPointPresenter implements Initializable {
         this.vp = vp;
         this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
         // generate Colored segments - Segment paired with some color.
-        this.coloredsegments = vp.getActiveSegments().stream()
-                .map(s -> new ColoredSegment(s, getNextColor()))
+//        this.coloredsegments = vp.getActiveSegments().stream()
+//                .map(s -> new ColoredSegment(s, getNextColor()))
+//                .collect(Collectors.toList());
+        this.coloredsegments = vp.getAllSegments().stream()
+                .map(s -> new ColoredSegment(s, getNextColor(s.isSelected())))
                 .collect(Collectors.toList());
         segmentsTableView.getItems().addAll(coloredsegments);
 
@@ -369,11 +374,20 @@ public class ViewPointPresenter implements Initializable {
     }
 
 
-    /** @return a rotating list of colors for the fragment highlights */
-    private String getNextColor() {
-        String color = colors[this.coloridx];
-        this.coloridx = (this.coloridx + 1) % (colors.length);
-        return String.format("%%23%s", color);
+    /**
+     * This function returns a rotating list of colors for the fragment highlights designed to be displayed on the
+     * UCSC browser. If a segment is not selected, it returns "" (an emtpy string), which basically causes the corresponding
+     * segment to show as not color-highlighted in the UCSC image or in the table.
+     * @return a rotating list of colors for the fragment highlights.
+     */
+    private String getNextColor(boolean isSelected) {
+        if (isSelected) {
+            String color = colors[this.coloridx];
+            this.coloridx = (this.coloridx + 1) % (colors.length);
+            return String.format("%%23%s", color);
+        } else {
+            return "";
+        }
     }
 
 

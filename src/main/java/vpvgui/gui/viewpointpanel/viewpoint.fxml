@@ -27,6 +27,7 @@
                     <columns>
                       <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
                         <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="220.0" text="Location" />
+                        <TableColumn fx:id="segmentLengthColumn" prefWidth="75.0" text="Length" />
                         <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Repeat content" />
                         <TableColumn fx:id="repeatContentUp" prefWidth="175.0" text="Repeat content (up)" />
                         <TableColumn fx:id="repeatContentDown" prefWidth="200.0" text="Repeat content (down)" />

@@ -7,7 +7,7 @@ import vpvgui.model.Design;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.viewpoint.*;
-import vpvgui.model.viewpoint.CuttingPositionMapTest;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.Map;
 public class DesignConsoleTest {
 
     private static Model testModel;
-    private static Design testDesign;
     private static String testFastaFile = "src/test/resources/testgenome/test_genome.fa";
     private static String referenceSequenceID_1 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
     private static Integer genomicPos_1 = 125;
@@ -107,12 +106,6 @@ public class DesignConsoleTest {
         viewPointList.add(testViewpointLupianez_2);
 
         testModel.setViewPoints(viewPointList);
-
-        // use model to create a design for testing
-        testDesign = new Design(testModel);
-
-
-
     }
 
     @Test

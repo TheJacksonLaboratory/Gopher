@@ -99,14 +99,6 @@ public class ViewPoint implements Serializable {
             logger.error(String.format("Error-- null list of restriction segments for %s",getTargetName()));
             return segs;/* return empty list.*/
         }
-        /* TODO -- just all
-        for (ArrayList<Segment> seglst:restSegListMap.values()) {
-            for (Segment seg:seglst) {
-                if (seg.isSelected())
-                   segs.add(seg);
-            }
-
-        }*/
 
         for (String re:restSegListMap.keySet()) {
             ArrayList<Segment> seglist=restSegListMap.get(re);
@@ -115,8 +107,6 @@ public class ViewPoint implements Serializable {
             }
 
         }
-
-
 
 
         for (Segment segment:restSegListMap.get("ALL")) {
@@ -128,9 +118,9 @@ public class ViewPoint implements Serializable {
 
     }
 
-//    public List<Segment> getAllSegments() {
-//        return restSegListMap.get("ALL");
-//    }
+   public List<Segment> getAllSegments() {
+        return restSegListMap.get("ALL");
+   }
 
 
 
