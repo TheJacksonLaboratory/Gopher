@@ -94,8 +94,10 @@ public class SegmentFactory implements Serializable {
             Pattern pattern = Pattern.compile(cutpat);
             Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
+            int fragmentStart=genomicPos - maxDistToGenomicPosUp; /* one-based position of first nucleotide in the entire subsequence returned by fasta reader */
             while (matcher.find()) {
-                    int pos = matcher.start() - maxDistToGenomicPosUp + offset;
+                    // replaces matcher.start() - maxDistToGenomicPosUp + offset;
+                    int pos = fragmentStart + matcher.start() + offset; /* one-based position of first nucleotide after the restriction enzyme cuts */
                     cuttingPositionList.add(pos);
                     allPositionSet.add(pos);
             }
@@ -228,13 +230,15 @@ public class SegmentFactory implements Serializable {
     // replaces
     // relToAbsPos(segmentFactory.getAllCuts().get(j))
     public Integer getUpstreamCut(int j) {
-        return relToAbsPos(getAllCuts().get(j));
+        // replaces return relToAbsPos(getAllCuts().get(j));
+        return getAllCuts().get(j);
     }
 
     // replaces
     // relToAbsPos(segmentFactory.getAllCuts().get(j + 1))).
     public Integer getDownstreamCut(int j) {
-        return relToAbsPos(getAllCuts().get(j+1));
+        // replaces return relToAbsPos(getAllCuts().get(j+1));
+        return getAllCuts().get(j+1);
     }
 
     /**
