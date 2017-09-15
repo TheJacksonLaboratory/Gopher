@@ -86,7 +86,7 @@ public class BEDFileExporter {
                 }
                 viewPointScore=vp.getNumOfSelectedFrags();
                 //double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
-                out_viewpoints.println(getReferenceSequenceID + "\t" + vpStaPos + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
+                out_viewpoints.println(getReferenceSequenceID + "\t" + (vpStaPos-1) + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
@@ -96,16 +96,15 @@ public class BEDFileExporter {
 
                     Integer rsStaPos = selectedRestSegList.get(k).getStartPos();
                     Integer rsEndPos = selectedRestSegList.get(k).getEndPos();
-                    out_fragments.println(getReferenceSequenceID + "\t" + rsStaPos + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k);
+                    out_fragments.println(getReferenceSequenceID + "\t" + (rsStaPos-1) + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k);
 
                     // print margins of selected fragments
                     for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins().size(); l++) {
                         Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getStartPos();
                         Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getEndPos();
-                        out_fragment_margins.println(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
-                        uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + fmStaPos + "\t" + fmEndPos + "\t" + geneSymbol);
+                        out_fragment_margins.println(getReferenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
+                        uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol);
                     }
-
                 }
             }
         out_viewpoints.close();
