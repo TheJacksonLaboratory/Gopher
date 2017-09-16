@@ -20,9 +20,8 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <Label fx:id="viewpointScoreLabel" styleClass="mylabel" text="." AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="5.0" />
+                  <Label fx:id="viewpointScoreLabel" styleClass="mylabel" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="5.0" />
                   <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
-                  <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#refreshUCSCButtonAction" prefHeight="30.0" prefWidth="130.0" text="Refresh UCSC" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
                   <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                     <columns>
                       <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />

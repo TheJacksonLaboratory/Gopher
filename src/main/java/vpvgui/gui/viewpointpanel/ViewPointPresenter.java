@@ -156,8 +156,6 @@ public class ViewPointPresenter implements Initializable {
         this.ucscWebEngine = ucscContentWebView.getEngine();
         this.ucscWebEngine.load(url);
 
-        // updating progress bar using binding
-        //progress.progressProperty().bind(this.ucscWebEngine.getLoadWorker().progressProperty()); TODO not working
         progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         sproot.getChildren().addAll(progress);
 
@@ -177,8 +175,6 @@ public class ViewPointPresenter implements Initializable {
                         }
                     }
                 });
-
-
     }
 
 //  TODO - save action here
@@ -274,6 +270,7 @@ public class ViewPointPresenter implements Initializable {
                     Platform.runLater(new Runnable() {
                         @Override public void run() {
                             updateScore();
+                            refreshUCSCButtonAction();
                         }
                     });
 
@@ -289,9 +286,6 @@ public class ViewPointPresenter implements Initializable {
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepeatContentAsPercent())));
         inRepetitiveTableColumn.setComparator(new PercentComparator());
-
-
-
 
         repeatContentUp.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginUpAsPercent())));
@@ -311,7 +305,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         this.vp.calculateViewpointScore();
-        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%%",vp.getTargetName(),100*vp.getScore()));
+        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s], Length: %s",vp.getTargetName(),100*vp.getScore(),vp.getGenomicLocationString(), vp.getActiveLength()));
     }
 
     public void setModel(Model m) {
@@ -325,7 +319,9 @@ public class ViewPointPresenter implements Initializable {
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
+        //this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
+        updateScore();
+
         // generate Colored segments - Segment paired with some color.
 //        this.coloredsegments = vp.getActiveSegments().stream()
 //                .map(s -> new ColoredSegment(s, getNextColor()))

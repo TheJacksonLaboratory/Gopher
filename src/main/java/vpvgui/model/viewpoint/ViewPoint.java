@@ -1,6 +1,7 @@
 package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import javafx.util.Pair;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import vpvgui.model.Default;
@@ -9,6 +10,7 @@ import vpvgui.model.RestrictionEnzyme;
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A region, usually at the transcription start site (TSS) of a gene, that will be enriched in a Capture-C experiment.
@@ -115,12 +117,35 @@ public class ViewPoint implements Serializable {
                 segs.add(segment);
         }
         return segs;
-
     }
 
    public List<Segment> getAllSegments() {
         return restSegListMap.get("ALL");
    }
+
+    /** @return A string with the length from the start of the first to end of the last active segment in kb */
+   public String getActiveLength() {
+
+       Integer from=Integer.MAX_VALUE;
+       Integer to = Integer.MIN_VALUE;
+       Integer combined=0;
+
+       for (Segment seg:getActiveSegments()) {
+           if (from > seg.getStartPos()) from = seg.getStartPos();
+           if (to<seg.getEndPos()) to = seg.getEndPos();
+           combined += seg.length();
+       }
+       Double len = to-from+1.0;
+       len=len/1000; // kilobases
+       double comb = (double)combined/1000;
+       return String.format("%s kb (all selected fragments: %s kb)",
+               NumberFormat.getNumberInstance(Locale.US).format(len),
+               NumberFormat.getNumberInstance(Locale.US).format(comb));
+
+    }
+
+
+
 
 
 
