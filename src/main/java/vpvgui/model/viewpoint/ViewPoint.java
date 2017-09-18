@@ -155,6 +155,7 @@ public class ViewPoint implements Serializable {
      * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
      * @param fastaReader             indexed FASTA file corresponding to referenceSequenceID that has the sequence for restriction..
      */
+    @Deprecated
     public ViewPoint(String referenceSequenceID,
                      Integer genomicPos,
                      Integer maxDistToGenomicPosUp,
@@ -209,8 +210,8 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.minFragSize=builder.minFragSize;
-        this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
-        this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
+//        this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
+//        this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
@@ -349,7 +350,7 @@ public class ViewPoint implements Serializable {
     public final Integer getGenomicPos() {
         return genomicPos;
     }
-
+    /** @return a string like chr4:29,232,796 */
     public String getGenomicLocationString() { return String.format("%s:%s",referenceSequenceID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
 
 
@@ -371,9 +372,9 @@ public class ViewPoint implements Serializable {
     }
 
 
-    public final void setScore(double score) {
-        this.score = score;
-    }
+//    public final void setScore(double score) {
+//        this.score = score;
+//    }
 
     public final double getScore() {
         return score;

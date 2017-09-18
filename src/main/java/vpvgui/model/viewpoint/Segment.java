@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * This class represents a restriction fragment that is a member of a viewpoint.
  * Note that {@link #startPos} and {@link #endPos} use one-based inclusive numbering.
  * @author Peter Hansen
- * @version 0.3.3 (2017-09-07)
+ * @version 0.3.5 (2017-09-19)
  */
 public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
@@ -41,17 +41,17 @@ public class Segment implements Serializable {
     private static DecimalFormat formatter = new DecimalFormat("#,###");
 
 
-    /* constructor -- we will move to the builder. */
-    @Deprecated
-    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected, IndexedFastaSequenceFile fastaReader) {
-        this.referenceSequenceID = referenceSequenceID;
-        this.startPos = startPos; // absolute coordinate
-        this.endPos = endPos;     // absolute coordinate
-        setSelected(selected);
-        calculateGCandRepeatContent(fastaReader);
-        this.marginSize=150; /* todo--deprecated */
-        calculateRepeatContentMargins(fastaReader);
-    }
+//    /* constructor -- we will move to the builder. */
+//    @Deprecated
+//    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected, IndexedFastaSequenceFile fastaReader) {
+//        this.referenceSequenceID = referenceSequenceID;
+//        this.startPos = startPos; // absolute coordinate
+//        this.endPos = endPos;     // absolute coordinate
+//        setSelected(selected);
+//        calculateGCandRepeatContent(fastaReader);
+//        this.marginSize=150; /* todo--deprecated */
+//        calculateRepeatContentMargins(fastaReader);
+//    }
 
 
     private Segment(Builder builder) {
@@ -105,7 +105,6 @@ public class Segment implements Serializable {
     public void setStartPos(Integer startPos) { this.startPos=startPos; }
 
     /**
-     * Returns starting position of the Segment.
      * @return Starting position of the Segment.
      */
     public Integer getStartPos() {
@@ -122,7 +121,6 @@ public class Segment implements Serializable {
     }
 
     /**
-     * Returns end position of the Segment.
      * @return End position of the Segment.
      */
     public Integer getEndPos() {
@@ -130,7 +128,6 @@ public class Segment implements Serializable {
     }
 
     /**
-     *
      * @param selected true if the segment is to be included in a viewpoint.
      */
     public void setSelected(boolean selected) {
@@ -138,7 +135,6 @@ public class Segment implements Serializable {
     }
 
     /**
-     * Returns true, if the Segment is selected, otherwise false.
      * @return true, if the Segment is selected, otherwise false.
      */
     public boolean isSelected() {
@@ -147,8 +143,6 @@ public class Segment implements Serializable {
 
 
     /**
-     * Returns length of the segment:
-     *
      * @return Length of the segment.
      */
     public Integer length() {
@@ -223,8 +217,7 @@ public class Segment implements Serializable {
 
 
     /**
-     * This function returns the repetitive content calculated by the function {@link #calculateGCandRepeatContent}.
-     *
+     * This function returns the repeat content calculated by the function {@link #calculateGCandRepeatContent}.
      * @return repeat content of this segment.
      */
     public double getRepeatContent() {
@@ -254,7 +247,7 @@ public class Segment implements Serializable {
     public double getGCcontent() {
         return GCcontent;
     }
-
+    /** @return a String such as {@code chr3:425930-736434}. */
     public String getChromosomalPositionString() {
         String s=formatter.format(startPos);
         String e=formatter.format(endPos);
@@ -276,14 +269,11 @@ public class Segment implements Serializable {
         IntPair downStreamFrag;
 
         if (2 * marginSize < length()) { // return a pair of Segment objects
-
             upStreamFrag = new IntPair(startPos, startPos + this.marginSize - 1);
             marginList.add(upStreamFrag);
             downStreamFrag = new IntPair(endPos - this.marginSize + 1, endPos);
             marginList.add(downStreamFrag);
-
         } else { // return a single Segment object with identical coordinates as the original Segment object
-
             upStreamFrag = new IntPair(startPos, endPos);
             marginList.add(upStreamFrag);
         }

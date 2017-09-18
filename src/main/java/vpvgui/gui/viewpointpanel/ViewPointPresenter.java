@@ -52,7 +52,7 @@ public class ViewPointPresenter implements Initializable {
     private static final int UCSC_WIDTH = 1600;
 
     private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
-            "EC96A4", "E6DF44", "E4EA8C", "FDD2D6", };
+            "EC96A4", "E6DF44", "F76FDA","E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5"};
 
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
