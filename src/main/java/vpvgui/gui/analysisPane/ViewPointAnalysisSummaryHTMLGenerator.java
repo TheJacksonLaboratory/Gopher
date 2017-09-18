@@ -25,8 +25,16 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
 
     public String getHTML() {
-        logger.trace(String.format("Getting HTML ViewPoint summary code for model=",model.toString()));
+        logger.trace(String.format("Getting HTML ViewPoint summary code for model=%s",this.model.toString()));
+        if (model==null){
+            logger.error("model was null");
+            return "";
+        }
         List<ViewPoint> vplist=model.getViewPointList();
+        if (vplist==null) {
+            logger.error("vplist was null");
+            return "";
+        }
         int nviewpoints=vplist.size();
         int ngenes=model.getVPVGeneList().size();
         long total_size=0;
@@ -34,6 +42,10 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         long total_margin_size=0;
         double total_score=0d;
         for (ViewPoint vp:vplist) {
+            if (vp==null) {
+                logger.error("VP object was null, skipping.");
+                continue;
+            }
             total_size += vp.getEndPos()-vp.getStartPos();
             total_active_frags += vp.getNumOfSelectedFrags();
             total_score += vp.getScore();

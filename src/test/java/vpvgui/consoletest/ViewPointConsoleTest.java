@@ -244,7 +244,7 @@ public class ViewPointConsoleTest {
                 marginSize(marginSize).
                 build();
 
-        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif,maxSizeUp,maxSizeDown);
+        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
 
 
 

@@ -32,7 +32,7 @@ public class LogViewerFactory {
     /**
      * Read lines from logfile.
      * Like this
-     * [TRACE] 08-26-2017 07:25:47 [Thread-6] (ViewPointCreationTask.java:138) - Adding viewpoint ZMYM2 to list (size: 37)
+     * [TRACE] 08-26-2017 07:25:47 [Thread-6] (ExtendedViewPointCreationTask.java:138) - Adding viewpoint ZMYM2 to list (size: 37)
      */
     public void display() {
         Log log = new Log();

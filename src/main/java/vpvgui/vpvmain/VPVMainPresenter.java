@@ -31,7 +31,9 @@ import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.*;
+import vpvgui.model.viewpoint.SimpleViewPointCreationTask;
 import vpvgui.model.viewpoint.ViewPoint;
+import vpvgui.model.viewpoint.ExtendedViewPointCreationTask;
 import vpvgui.model.viewpoint.ViewPointCreationTask;
 import vpvgui.util.SerializationManager;
 
@@ -40,7 +42,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 import static vpvgui.io.Platform.getVPVDir;
@@ -72,7 +73,7 @@ public class VPVMainPresenter implements Initializable {
     private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
     /** List of genome builds. Used by genomeChoiceBox*/
     @FXML
-    private ObservableList<String> approachList = FXCollections.observableArrayList("Custom Panel", "Promoterome");
+    private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
     @FXML
     private ChoiceBox<String> genomeChoiceBox;
     @FXML
@@ -502,9 +503,26 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
 
+        String approach = this.approachChoiceBox.getValue();
+        boolean doSimple=false;
+        if (approach.equals("Simple")) {
+            doSimple=true;
+        } else if (approach.equals("Extended")) {
+            doSimple=false;
+        } else {
+            logger.error("Could not retrieve approach, I got "+approach);
+            return;
+        }
+
 
         StringProperty sp=new SimpleStringProperty();
-        ViewPointCreationTask task = new ViewPointCreationTask(model,sp);
+        ViewPointCreationTask task =null;
+        if (doSimple) {
+            task = new SimpleViewPointCreationTask(model,sp);
+        } else {
+            task = new ExtendedViewPointCreationTask(model,sp);
+        }
+
         CreateViewpointPBView pbview = new CreateViewpointPBView();
         CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
         pbpresent.initBindings(task,sp);

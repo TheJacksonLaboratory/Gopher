@@ -251,6 +251,10 @@ public class Segment implements Serializable {
         return String.format("%.2f%%",100*GCcontent);
     }
 
+    public double getGCcontent() {
+        return GCcontent;
+    }
+
     public String getChromosomalPositionString() {
         String s=formatter.format(startPos);
         String e=formatter.format(endPos);

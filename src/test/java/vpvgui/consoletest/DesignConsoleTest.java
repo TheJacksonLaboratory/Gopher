@@ -85,7 +85,7 @@ public class DesignConsoleTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_1.generateViewpointLupianez(fragNumUp,fragNumDown,"ALL",maxSizeUp,maxSizeDown);
+        testViewpointLupianez_1.generateViewpointLupianez(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_1);
 
         // second viewpoint with identical parameters
@@ -102,7 +102,7 @@ public class DesignConsoleTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_2.generateViewpointLupianez(fragNumUp,fragNumDown,"ALL",maxSizeUp,maxSizeDown);
+        testViewpointLupianez_2.generateViewpointLupianez(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_2);
 
         testModel.setViewPoints(viewPointList);

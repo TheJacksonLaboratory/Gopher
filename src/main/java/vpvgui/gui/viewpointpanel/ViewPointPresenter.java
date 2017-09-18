@@ -394,12 +394,10 @@ public class ViewPointPresenter implements Initializable {
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
-            String cuttingMotif = ViewPoint.getChosenEnzyme(0).getPlainSite(); // TODO Need to extend this to more than one enzyme
             int maxSizeUp = (int) (vp.getMaxUpstreamGenomicPos() * factor);
             int maxSizeDown = (int) (vp.getMaxDownstreamGenomicPos() * factor);
             newVP.generateViewpointLupianez( model.getFragNumUp(),
                     model.fragNumDown(),
-                    cuttingMotif,
                     maxSizeUp,
                     maxSizeDown);
             logger.trace(String.format("Zooming ViewPoint for %s at factor %.1f. Old length %d new length %d",vp.getTargetName(),factor,
