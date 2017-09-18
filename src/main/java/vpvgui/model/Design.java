@@ -37,7 +37,7 @@ public class Design {
 
         for (ViewPoint vp : viewPointList) {
             /* get selected fragments of viewpoint */
-            ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("GATC"); // TODO: Make this more general with 'ALL', the combination of all cutting motifs
+            List<Segment> selectedSegments = vp.getActiveSegments();
             for (Segment ss : selectedSegments) {
             }
         }

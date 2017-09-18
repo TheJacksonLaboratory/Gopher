@@ -135,7 +135,7 @@ public class ViewPointPresenter implements Initializable {
     }
 
     @FXML private void deleteThisViewPoint(Event e) {
-        logger.trace("TODO CODE TO DELETE THIS VIEWPOINT GO BACK TO MODEL");
+        logger.error("TODO CODE TO DELETE THIS VIEWPOINT GO BACK TO MODEL");
        // e.g., this.model.deleteThisViewPoint(this.vp);
         // e.g., analysisTab->refreshTable()
         // e.g., close this viewpoint Tab
@@ -189,7 +189,7 @@ public class ViewPointPresenter implements Initializable {
                 (Collectors.joining(","))));
     }
 
-
+    /** class for sorting chromosome locations like chr5:43679423 */
     class FormattedChromosomeComparator implements Comparator<String> {
         @Override
         public int compare(String s1, String s2) {
@@ -321,11 +321,6 @@ public class ViewPointPresenter implements Initializable {
         this.vp = vp;
         //this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
         updateScore();
-
-        // generate Colored segments - Segment paired with some color.
-//        this.coloredsegments = vp.getActiveSegments().stream()
-//                .map(s -> new ColoredSegment(s, getNextColor()))
-//                .collect(Collectors.toList());
         this.coloredsegments = vp.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor(s.isSelected())))
                 .collect(Collectors.toList());
@@ -377,13 +372,9 @@ public class ViewPointPresenter implements Initializable {
      * @return a rotating list of colors for the fragment highlights.
      */
     private String getNextColor(boolean isSelected) {
-        if (isSelected) {
-            String color = colors[this.coloridx];
-            this.coloridx = (this.coloridx + 1) % (colors.length);
-            return String.format("%%23%s", color);
-        } else {
-            return "";
-        }
+        String color = colors[this.coloridx];
+        this.coloridx = (this.coloridx + 1) % (colors.length);
+        return String.format("%%23%s", color);
     }
 
 
@@ -460,7 +451,7 @@ public class ViewPointPresenter implements Initializable {
 
         private String color;
 
-        private final static String VERYLIGHTGREY="E8E8EE";
+//        private final static String VERYLIGHTGREY="E8E8EE";
 
         private Segment segment;
 

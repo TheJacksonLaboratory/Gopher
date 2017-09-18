@@ -132,12 +132,9 @@ public class ViewPointConsoleTest {
         printViewPointSegments(tvp, "ALL");
 
         System.out.println("Start and end coordinates directly taken from getRestSegListMap:");
-        for (String key : tvp.getRestSegListMap().keySet()) {
-            System.out.println(key);
-            for(Segment segment: tvp.getRestSegListMap().get(key)){
+            for(Segment segment: tvp.getActiveSegments()){
                 System.out.println(segment.getStartPos() + "\t" + segment.getEndPos());
             }
-        }
     }
 
 
@@ -180,12 +177,12 @@ public class ViewPointConsoleTest {
         System.out.println("the fragment will be swichted from 'selected' to 'deselected' or the other way around.");
         System.out.println();
         System.out.println();
-        testViewpointGATC.selectOrDeSelectFragment(-20);
-        printViewPointSegments(testViewpointGATC, "GATC");
-        testViewpointGATC.selectOrDeSelectFragment(-20);
-        printViewPointSegments(testViewpointGATC, "GATC");
-        testViewpointGATC.selectOrDeSelectFragment(18);
-        printViewPointSegments(testViewpointGATC, "GATC");
+//        testViewpointGATC.selectOrDeSelectFragment(-20);
+//        printViewPointSegments(testViewpointGATC, "GATC");
+//        testViewpointGATC.selectOrDeSelectFragment(-20);
+//        printViewPointSegments(testViewpointGATC, "GATC");
+//        testViewpointGATC.selectOrDeSelectFragment(18);
+//        printViewPointSegments(testViewpointGATC, "GATC");
 
         System.out.println("=========================================================================================");
         System.out.println("Test function 'testFragmentListMap' END");
@@ -364,19 +361,19 @@ public class ViewPointConsoleTest {
 
     private void printViewPointSegments(ViewPoint vp, String motif) {
 
-        for (int i = 0; i < vp.getRestSegListMap().get(motif).size(); i++) {
-            Integer sta = vp.getRestSegListMap().get(motif).get(i).getStartPos();
-            Integer end = vp.getRestSegListMap().get(motif).get(i).getEndPos();
-            boolean selected = vp.getRestSegListMap().get(motif).get(i).isSelected();
+        for (Segment seg : vp.getActiveSegments()) {
+            Integer sta = seg.getStartPos();
+            Integer end = seg.getEndPos();
+            boolean selected = seg.isSelected();
 
             if (selected) {
-                printSegment(vp.getRestSegListMap().get(motif).get(i), 'T');
+                printSegment(seg, 'T');
             } else {
-                printSegment(vp.getRestSegListMap().get(motif).get(i), 'F');
+                printSegment(seg, 'F');
 
             }
 
-            ArrayList<IntPair> marginSegments = vp.getRestSegListMap().get(motif).get(i).getSegmentMargins();
+            ArrayList<IntPair> marginSegments = seg.getSegmentMargins();
 
             if (marginSegments.size() == 2) {
                 printIntPair(marginSegments.get(0), '>');

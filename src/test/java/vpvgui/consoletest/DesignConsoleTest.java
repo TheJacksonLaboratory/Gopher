@@ -115,7 +115,7 @@ public class DesignConsoleTest {
 
         for (ViewPoint vp : viewPointList) {
             System.out.println("--------------------------------------------------------");
-            ArrayList<Segment> selectedSegments = vp.getSelectedRestSegList("ALL");
+            List<Segment> selectedSegments = vp.getActiveSegments();
 
             for (Segment ss : selectedSegments) {
                 System.out.println("start: " + ss.getStartPos() + "\t" + "end: " + ss.getEndPos() + "\t" + "selected: " + ss.isSelected());

@@ -23,7 +23,7 @@ public class BEDFileExporter {
     private String directoryPath=null;
 
 
-    private String cuttingMotif="ALL"; /* TODO MAKE THIS DYNAMIC!!!! */
+//    private String cuttingMotif="ALL"; /* TODO MAKE THIS DYNAMIC!!!! */
 
 
     public BEDFileExporter(String dirpath, String outPrefix){
@@ -91,7 +91,8 @@ public class BEDFileExporter {
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 // print selected fragments of the viewpoint
-                ArrayList<Segment> selectedRestSegList = vp.getSelectedRestSegList(cuttingMotif);
+//                ArrayList<Segment> selectedRestSegList = vp.getSelectedRestSegList(cuttingMotif);
+                List<Segment> selectedRestSegList = vp.getActiveSegments();
                 for (int k = 0; k < selectedRestSegList.size(); k++) {
 
                     Integer rsStaPos = selectedRestSegList.get(k).getStartPos();
