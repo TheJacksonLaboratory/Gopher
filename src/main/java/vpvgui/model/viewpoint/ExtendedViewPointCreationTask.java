@@ -3,7 +3,6 @@ package vpvgui.model.viewpoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
-import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
@@ -154,7 +153,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                             build();
                     updateProgress(i++,total); /* this will update the progress bar */
                     updateLabelText(this.currentVP,vpvgene.toString());
-                    vp.generateViewpointLupianez(fragNumUp, fragNumDown, model.getMaxSizeUp(),model.getMaxSizeDown());
+                    vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown, model.getMaxSizeUp(),model.getMaxSizeDown());
                     viewpointlist.add(vp);
                     logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));
                 }

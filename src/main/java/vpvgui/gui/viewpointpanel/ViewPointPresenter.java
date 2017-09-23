@@ -305,7 +305,11 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         this.vp.calculateViewpointScore();
-        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s], Length: %s",vp.getTargetName(),100*vp.getScore(),vp.getGenomicLocationString(), vp.getActiveLength()));
+        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s], Length: %s",
+                vp.getTargetName(),
+                100*vp.getScore(),
+                vp.getGenomicLocationString(),
+                vp.getActiveLengthInKilobases()));
     }
 
     public void setModel(Model m) {
@@ -387,7 +391,7 @@ public class ViewPointPresenter implements Initializable {
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
             int maxSizeUp = (int) (vp.getMaxUpstreamGenomicPos() * factor);
             int maxSizeDown = (int) (vp.getMaxDownstreamGenomicPos() * factor);
-            newVP.generateViewpointLupianez( model.getFragNumUp(),
+            newVP.generateViewpointExtendedApproach( model.getFragNumUp(),
                     model.fragNumDown(),
                     maxSizeUp,
                     maxSizeDown);
@@ -430,7 +434,7 @@ public class ViewPointPresenter implements Initializable {
         String genome = this.model.getGenomeBuild();
         String chromosome=this.vp.getReferenceID();
         List<String> colorsegmentlist=new ArrayList<>();
-        for (ColoredSegment cseg: coloredsegments) {
+       for (ColoredSegment cseg: coloredsegments) {
            Segment s=cseg.segment;
             Integer start = s.getStartPos();
             Integer end = s.getEndPos();
@@ -441,6 +445,19 @@ public class ViewPointPresenter implements Initializable {
                 colorsegmentlist.add(part);
             }
         }
+
+//        colorsegmentlist = coloredsegments.stream().
+//                filter(c -> c.isSelected()).
+//                filter(c -> c.getColor()!=null).
+//                map( c -> String.format("%s.%s%%3A%d-%d%s",
+//                        genome,
+//                        chromosome,
+//                        c.segment.getStartPos(),
+//                        c.segment.getEndPos(),
+//                        c.getColor()) ).
+//                collect(Collectors.toList());
+//
+
         return String.format("highlight=%s", join(colorsegmentlist,"%7C"));
     }
 

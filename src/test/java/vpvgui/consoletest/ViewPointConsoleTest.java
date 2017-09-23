@@ -30,31 +30,25 @@ public class ViewPointConsoleTest {
     private Integer testMaxDownstreamPos = 100;
     private Integer testStartPos = testGenomicPos - testMaxUpstreamGenomicPos;
     private Integer testEndPos = testGenomicPos + testMaxDownstreamPos;
-    private String testDerivationApproach = "INITIAL";
+    private ViewPoint.Approach testDerivationApproach = ViewPoint.Approach.EXTENDED;
     private String[] testCuttingPatterns = new String[]{"TCCG", "CA", "AAA"};
     private String testFastaFile = "src/test/resources/smallgenome/chr4_ctg9_hap1.fa";
 
     private final File fasta = new File(testFastaFile);
     IndexedFastaSequenceFile testFastaReader = new IndexedFastaSequenceFile(fasta);
-    ViewPoint testViewpoint = new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos, testMaxDownstreamPos, testFastaReader);
-
+//    ViewPoint testViewpoint = new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos, testMaxDownstreamPos, testFastaReader);
+ViewPoint testViewpoint = new ViewPoint.Builder(testReferenceSequenceID,testGenomicPos).
+        maximumSizeUp(testMaxUpstreamGenomicPos).
+        maximumSizeDown(testMaxDownstreamPos)
+        .fastaReader(testFastaReader)
+        .build();
     public ViewPointConsoleTest() throws FileNotFoundException {
     } // Not nice, but without there will be an error. Why?
 
 
     /* test getter and setter functions */
 
-    @Test
-    public void testSetAndGetReferenceID() throws Exception {
-        testViewpoint.setReferenceID(testReferenceSequenceID);
-        assertEquals(testReferenceSequenceID, testViewpoint.getReferenceID());
-    }
 
-    @Test
-    public void testSetAndGetGenomicPos() throws Exception {
-        testViewpoint.setGenomicPos(testGenomicPos);
-        assertEquals(testGenomicPos, testViewpoint.getGenomicPos());
-    }
 
     @Test
     public void testSetAndGetMaxUpstreamGenomicPos() throws Exception {
@@ -76,11 +70,11 @@ public class ViewPointConsoleTest {
         assertEquals(testEndPos, testViewpoint.getEndPos());
     }
 
-    @Test
-    public void testSetAndGetDerivationApproach() throws Exception {
-        testViewpoint.setDerivationApproach(testDerivationApproach);
-        assertEquals(testDerivationApproach, testViewpoint.getDerivationApproach());
-    }
+//    @Test
+//    public void testSetAndGetDerivationApproach() throws Exception {
+//        testViewpoint.setDerivationApproach(testDerivationApproach);
+//        assertEquals(testDerivationApproach, testViewpoint.getDerivationApproach());
+//    }
 
 
 //    @Test
@@ -116,7 +110,11 @@ public class ViewPointConsoleTest {
 
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
-        ViewPoint tvp = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, FastaReader);
+        ViewPoint tvp =  new ViewPoint.Builder(referenceSequenceID,genomicPos)
+                .maximumSizeUp(maxDistToGenomicPosUp)
+                .maximumSizeDown(maxDistToGenomicPosDown)
+                .fastaReader(FastaReader)
+                .build();
         String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------------");
@@ -157,8 +155,13 @@ public class ViewPointConsoleTest {
 
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
-        ViewPoint testViewpointGATC = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, FastaReader);
-        String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
+        ViewPoint testViewpointGATC = new ViewPoint.Builder(referenceSequenceID,genomicPos)
+                .maximumSizeUp(maxDistToGenomicPosUp)
+                .maximumSizeDown(maxDistToGenomicPosDown)
+                .fastaReader(FastaReader)
+                .build();
+
+                String referenceSequence = FastaReader.getSubsequenceAt(referenceSequenceID, 0, FastaReader.getSequence(referenceSequenceID).length()).getBaseString();
 
 
         /* print to screen */
@@ -191,7 +194,7 @@ public class ViewPointConsoleTest {
 
 
     /**
-     * This function creates a small especially contructed viewpoints and applies the function <i>generateViewpointLupianez()</i> to it.
+     * This function creates a small especially contructed viewpoints and applies the function <i>generateViewpointExtendedApproach()</i> to it.
      * Reference sequence, <i>genomicPos</i>, fragments and fragment margins are printed to the screen before and after application of the function.
      *
      * @throws FileNotFoundException
@@ -217,7 +220,7 @@ public class ViewPointConsoleTest {
         File fasta = new File(testFastaFile);
         IndexedFastaSequenceFile FastaReader = new IndexedFastaSequenceFile(fasta);
         //ViewPoint testViewpointLupianez = new ViewPoint(referenceSequenceID, genomicPos, maxDistToGenomicPosUp, maxDistToGenomicPosDown, testCuttingPatterns, FastaReader);
-        //        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
+        //        testViewpointLupianez.generateViewpointExtendedApproach(fragNumUp, fragNumDown, motif, minSizeUp, maxSizeUp, minSizeDown, maxSizeDown, minFragSize, minRepFrag, marginSize);
         Integer fragNumUp = 1;
         Integer fragNumDown = 1;
         String motif = "ALL";
@@ -241,7 +244,7 @@ public class ViewPointConsoleTest {
                 marginSize(marginSize).
                 build();
 
-        testViewpointLupianez.generateViewpointLupianez(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez.generateViewpointExtendedApproach(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
 
 
 
@@ -273,7 +276,7 @@ public class ViewPointConsoleTest {
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
-        System.out.println("Arguments used to call the function 'generateViewpointLupianez':");
+        System.out.println("Arguments used to call the function 'generateViewpointExtendedApproach':");
         System.out.println("\t" + "fragNumUp = " + fragNumUp);
         System.out.println("\t" + "fragNumDown = " + fragNumDown);
         System.out.println("\t" + "motif = " + motif);
@@ -286,7 +289,7 @@ public class ViewPointConsoleTest {
 
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
-        System.out.println("Print fragments after application of 'generateViewpointLupianez':");
+        System.out.println("Print fragments after application of 'generateViewpointExtendedApproach':");
         printLabledPos(testViewpointLupianez.getGenomicPos(), "genomicPos", true);
         System.out.println(referenceSequence);
         printStaEndString(testViewpointLupianez.getStartPos(), testViewpointLupianez.getEndPos());

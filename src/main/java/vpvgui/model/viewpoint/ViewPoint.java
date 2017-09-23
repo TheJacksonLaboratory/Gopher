@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A region, usually at the transcription start site (TSS) of a gene, that will be enriched in a Capture-C experiment.
@@ -67,7 +68,7 @@ public class ViewPoint implements Serializable {
     private int minFragSize;
     /** Derivation approach, either combined (CA), Andrey 2016 (AEA), or manually (M) */
 //    private String derivationApproach;
-    /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointLupianez}. */
+    /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointExtendedApproach}. */
     private boolean resolved;
     /** Number of fragments within the viewpoint that are selected for generating capture hi-c probes. */
 //    private int numOfSelectedFrags=0;
@@ -395,14 +396,14 @@ public class ViewPoint implements Serializable {
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    public void generateViewpointLupianez(Integer fragNumUp,
-                                          Integer fragNumDown,
-                                          Integer maxSizeUp,
-                                          Integer maxSizeDown) {
+    public void generateViewpointExtendedApproach(Integer fragNumUp,
+                                                  Integer fragNumDown,
+                                                  Integer maxSizeUp,
+                                                  Integer maxSizeDown) {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        logger.trace("entering generateViewpointLupianez");
+        logger.trace("entering generateViewpointExtendedApproach");
 
         // iterate over all fragments of the viewpoint and set them to true
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
@@ -413,7 +414,7 @@ public class ViewPoint implements Serializable {
             Segment segment  =restrictionSegmentList.get(i);
             Integer fragStaPos = segment.getStartPos();
             Integer fragEndPos = segment.getEndPos();
-            logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
+            //logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
             if (fragStaPos <= genomicPos && genomicPos <= fragEndPos) {
                 genomicPosFragIdx = i;
                 break;
@@ -521,6 +522,35 @@ public class ViewPoint implements Serializable {
         if (lastSelectedSegment != null) {
             setEndPos(lastSelectedSegment.getEndPos());
         }
+
+        // discard fragments except for the selecxted fragments and their immediate neighbors, i.e.,
+        // retain one unselected fragment on each end
+        // this will keep the table from having lots of unselected fragments
+
+        int LEN = restrictionSegmentList.size();
+        logger.error(String.format("Starting finding first the LEN is %d for VP=%s",LEN,getTargetName()));
+        int firstSelectedIndex = IntStream.range(0,LEN)
+               .filter(i->restrictionSegmentList.get(i).isSelected())
+                .findFirst().orElse(0);
+        logger.error(String.format("Done finding first the index is %d",firstSelectedIndex));
+//        // The map reverses the order.
+        int lastSelectedIndex = IntStream.range(0,LEN-1).
+                map(i -> LEN - i - 1).
+                filter(i->restrictionSegmentList.get(i).isSelected())
+               .findFirst().orElse(0);
+        logger.trace(String.format("Reducing indices from (0,%d) to (%d,%d)",LEN,firstSelectedIndex,lastSelectedIndex));
+
+        if (firstSelectedIndex+lastSelectedIndex==0) {
+            logger.trace("Skipping trimming Segment List because no segments are selected for "+getTargetName());
+        } else {
+            int i = Math.max(0, firstSelectedIndex - 1);
+            int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
+            List<Segment> newlist = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
+            restrictionSegmentList = newlist;
+        }
+
+
+
 
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScore();

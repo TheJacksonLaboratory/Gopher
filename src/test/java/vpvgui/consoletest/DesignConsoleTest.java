@@ -3,7 +3,6 @@ package vpvgui.consoletest;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.Design;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.viewpoint.*;
@@ -85,7 +84,7 @@ public class DesignConsoleTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_1.generateViewpointLupianez(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez_1.generateViewpointExtendedApproach(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_1);
 
         // second viewpoint with identical parameters
@@ -102,7 +101,7 @@ public class DesignConsoleTest {
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_2.generateViewpointLupianez(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez_2.generateViewpointExtendedApproach(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_2);
 
         testModel.setViewPoints(viewPointList);

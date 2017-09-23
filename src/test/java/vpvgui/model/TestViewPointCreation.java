@@ -222,7 +222,7 @@ public class TestViewPointCreation {
                         marginSize(marginSize).
                         build();
 
-                vp.generateViewpointLupianez(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
+                vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
                 //vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
                // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;
@@ -266,7 +266,7 @@ public class TestViewPointCreation {
                     genomicPos = iv.withStrand(Strand.FWD).getGenomeEndPos().getPos();
                 }
                 ViewPoint vp = new ViewPoint(referenceSequenceID,genomicPos,maxDistToGenomicPosUp,maxDistToGenomicPosDown,cuttingPatterns,fastaReader);
-                vp.generateViewpointLupianez(getFragNumUp, fragNumDown, cuttingMotif,  getMinSizeUp, getMaxSizeUp, getMinSizeDown, getMaxSizeDown,
+                vp.generateViewpointExtendedApproach(getFragNumUp, fragNumDown, cuttingMotif,  getMinSizeUp, getMaxSizeUp, getMinSizeDown, getMaxSizeDown,
                         getMinFragSize, maxRepFrag,marginSize);
                 vpvgene.addViewPoint(vp);
             }
