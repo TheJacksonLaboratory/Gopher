@@ -9,6 +9,7 @@ import vpvgui.model.RestrictionEnzyme;
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A region, usually at the transcription start site (TSS) of a gene, that will be enriched in a Capture-C experiment.
@@ -28,7 +29,7 @@ import java.util.*;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.0.7 (2017-09-18)
+ * @version 0.0.8 (2017-09-22)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -65,11 +66,11 @@ public class ViewPoint implements Serializable {
      * that are used for enrichment (e.g., 130 bp. */
     private int minFragSize;
     /** Derivation approach, either combined (CA), Andrey 2016 (AEA), or manually (M) */
-    private String derivationApproach;
+//    private String derivationApproach;
     /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointLupianez}. */
     private boolean resolved;
     /** Number of fragments within the viewpoint that are selected for generating capture hi-c probes. */
-    private int numOfSelectedFrags=0;
+//    private int numOfSelectedFrags=0;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
     private SegmentFactory segmentFactory;
     /** List of active and inactive restriction {@link vpvgui.model.viewpoint.Segment} objects that are contained within the viewpoint. */
@@ -78,15 +79,12 @@ public class ViewPoint implements Serializable {
     static List<RestrictionEnzyme> chosenEnzymes=null;
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
-    /** Todo refactor */
+    /** A list of restriction enzymes (at least one) as chosen by the user. */
     public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
     private String warnings;
     /** Overall score of this Viewpoint.*/
     private Double score;
-    /** TODO Hack -- brauchen wir currentMotif noch?
-     */
-//    private String currentMotif=null;
     /** Minimum allowable fragment size for the simple approach */
     private static final int SIMPLE_APPROACH_MINSIZE=146;
     /** Maximim allowable fragment size for simple approach */
@@ -101,27 +99,21 @@ public class ViewPoint implements Serializable {
      * Gets a list of all active (chosen) {@link Segment} objects.
      * @return a list of Segments of a viewpoint that are active and will be displayed on the UCSC Browser. */
     public List<Segment> getActiveSegments() {
-        List<Segment> segs=new ArrayList<>();
         if (restrictionSegmentList==null) {
             logger.error(String.format("Error-- null list of restriction segments for %s",getTargetName()));
-            return segs;/* return empty list.*/
+            return new ArrayList<Segment>();/* return empty list.*/
         }
-
-        for (Segment segment:restrictionSegmentList) {
-            if (segment.isSelected())
-                segs.add(segment);
-        }
-        return segs;
+        //return a List of all selected segments
+        return this.restrictionSegmentList.stream().filter(s -> s.isSelected()).collect(Collectors.toList());
     }
 
+    /** @return List of all segments (selected or not). */
    public List<Segment> getAllSegments() {
         return restrictionSegmentList;
-//        return restSegListMap.get("ALL");
    }
 
     /** @return A string with the length from the start of the first to end of the last active segment in kb */
-   public String getActiveLength() {
-
+   public double getActiveLength() {
        Integer from=Integer.MAX_VALUE;
        Integer to = Integer.MIN_VALUE;
        Integer combined=0;
@@ -132,55 +124,25 @@ public class ViewPoint implements Serializable {
            combined += seg.length();
        }
        Double len = to-from+1.0;
-       len=len/1000; // kilobases
-       double comb = (double)combined/1000;
-       return String.format("%s kb (all selected fragments: %s kb)",
-               NumberFormat.getNumberInstance(Locale.US).format(len),
-               NumberFormat.getNumberInstance(Locale.US).format(comb));
-
+       return len;
     }
 
+    /** @return a formated String representing the length of the ViewPoint in kb, e.g., 10;203 kb. */
+    public String getActiveLengthInKilobases() {
+       double len = getActiveLength();
 
-
-
-
-
-
+        double lenInKb=len/1000; // kilobases
+        return String.format("%s kb (all selected fragments: %s kb)",
+                NumberFormat.getNumberInstance(Locale.US).format(len),
+                NumberFormat.getNumberInstance(Locale.US).format(lenInKb));
+    }
 
     /**
-     * The constructor sets fields and creates a {@link SegmentFactory} object.
-     * @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
-     * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
-     * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
-     * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
-     * @param fastaReader             indexed FASTA file corresponding to referenceSequenceID that has the sequence for restriction..
+     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
+     * @param vp An existing ViewPoint that is used as the center point of the zoom
+     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
+     * @param fastaReader The reader used to get new sequences.
      */
-    @Deprecated
-    public ViewPoint(String referenceSequenceID,
-                     Integer genomicPos,
-                     Integer maxDistToGenomicPosUp,
-                     Integer maxDistToGenomicPosDown,
-                     IndexedFastaSequenceFile fastaReader) {
-        setReferenceID(referenceSequenceID);
-        setGenomicPos(genomicPos);
-        setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
-        setMaxUpstreamGenomicPos(maxDistToGenomicPosUp);
-        setMaxDownstreamGenomicPos(maxDistToGenomicPosDown);
-        init(fastaReader);
-    }
-
-
-    private void init(IndexedFastaSequenceFile fastaReader) {
-        setStartPos(genomicPos - maxDistToGenomicPosUp);
-        setEndPos(genomicPos + maxDistToGenomicPosDown);
-        this.restrictionSegmentList=new ArrayList<>();
-        setDerivationApproach("INITIAL");
-        setResolved(false);
-        warnings="";
-        /* Create segmentFactory */
-        initializeSegmentFactory(fastaReader);
-        initRestrictionFragments(fastaReader);
-    }
 
     public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
         this.referenceSequenceID=vp.referenceSequenceID;
@@ -210,12 +172,22 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.minFragSize=builder.minFragSize;
-//        this.maxDistToGenomicPosUp=builder.maxDistToGenomicPosUp;
-//        this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
+    }
+
+
+    private void init(IndexedFastaSequenceFile fastaReader) {
+        setStartPos(genomicPos - maxDistToGenomicPosUp);
+        setEndPos(genomicPos + maxDistToGenomicPosDown);
+        this.restrictionSegmentList=new ArrayList<>();
+        setResolved(false);
+        warnings="";
+        /* Create segmentFactory */
+        initializeSegmentFactory(fastaReader);
+        initRestrictionFragments(fastaReader);
     }
 
     /**
@@ -308,7 +280,7 @@ public class ViewPoint implements Serializable {
                 this.maxDistToGenomicPosUp,
                 this.maxDistToGenomicPosDown,
                 ViewPoint.chosenEnzymes);
-        logger.trace("We just initiated the cutting position map for genomic Pos "+ segmentFactory.getGenomicPos());
+        logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
     }
 
 
@@ -328,25 +300,12 @@ public class ViewPoint implements Serializable {
             restrictionSegmentList.add(restFrag);
         }
     }
-
-
-    /* --------------------------- */
-    /* getter and setter functions */
-    /* --------------------------- */
-
+    /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
         return referenceSequenceID;
     }
 
-    public final void setReferenceID(String setReferenceID) {
-        this.referenceSequenceID = setReferenceID;
-    }
-
-
-    public final void setGenomicPos(Integer genomicPos) {
-        this.genomicPos = genomicPos;
-    }
-
+    /** @return the middle (anchor) position of this ViewPoint. */
     public final Integer getGenomicPos() {
         return genomicPos;
     }
@@ -371,11 +330,7 @@ public class ViewPoint implements Serializable {
         return maxDistToGenomicPosDown;
     }
 
-
-//    public final void setScore(double score) {
-//        this.score = score;
-//    }
-
+    /** @return overall score of this ViewPoint. TODO what about simple?     */
     public final double getScore() {
         return score;
     }
@@ -401,11 +356,11 @@ public class ViewPoint implements Serializable {
 
 
     public final String getDerivationApproach() {
-        return derivationApproach;
+        return approach.toString();
     }
 
-    public final void setDerivationApproach(String derivationApproach) {
-        this.derivationApproach = derivationApproach;
+    public final void setDerivationApproach(Approach derivationApproach) {
+        this.approach = derivationApproach;
     }
 
 
@@ -416,9 +371,9 @@ public class ViewPoint implements Serializable {
     public final void setResolved(boolean resolved) {
         this.resolved = resolved;
     }
-
-    public final Integer getNumOfSelectedFrags() {
-        return numOfSelectedFrags;
+    /** @return Number of Segments in this ViewPoint that are active (selected). */
+    public final int getNumOfSelectedFrags() {
+        return (int) this.restrictionSegmentList.stream().filter(s -> s.isSelected()).count();
     }
 
     public void setTargetName(String name) { this.targetName=name;}
@@ -450,16 +405,12 @@ public class ViewPoint implements Serializable {
         logger.trace("entering generateViewpointLupianez");
 
         // iterate over all fragments of the viewpoint and set them to true
-        for (Segment segment:restrictionSegmentList){
-            segment.setSelected(true);
-            logger.trace(String.format("Setting segment %s to true for ALL segs",segment.toString()));
-        }
+        restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
 
         // find the index of the fragment that contains genomicPos
         Integer genomicPosFragIdx = -1;
-        List<Segment> allFrags=restrictionSegmentList;
-        for (int i=0;i< allFrags.size();i++) {
-            Segment segment  =allFrags.get(i);
+        for (int i=0;i< restrictionSegmentList.size();i++) {
+            Segment segment  =restrictionSegmentList.get(i);
             Integer fragStaPos = segment.getStartPos();
             Integer fragEndPos = segment.getEndPos();
             logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
@@ -474,17 +425,17 @@ public class ViewPoint implements Serializable {
             resolved = false;
         }
 
-        // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
+        // starting from the centralized fragment containing 'genomicPos' (included)
+        // openExistingProject fragment-wise in UPSTREAM direction
 
         Integer fragCountUp = 0;
         for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
 
-            Segment segment = allFrags.get(i);
+            Segment segment = restrictionSegmentList.get(i);
 
             // set fragment to 'false', if it is shorter than 'getMinFragSize'
-            Integer len = segment.length();
-            if (len < this.minFragSize) {
-                allFrags.get(i).setSelected(false);
+            if (segment.length() < this.minFragSize) {
+                restrictionSegmentList.get(i).setSelected(false);
             }
 
             // set fragments to 'false' that are not entirely within the allowed range
@@ -519,9 +470,9 @@ public class ViewPoint implements Serializable {
         // originating from the centralized fragment containing 'genomicPos' (excluded) openExistingProject fragment-wise in DOWNSTREAM direction
 
         Integer fragCountDown = 0;
-        for (int i = genomicPosFragIdx + 1; i < allFrags.size(); i++) { // downstream
+        for (int i = genomicPosFragIdx + 1; i < restrictionSegmentList.size(); i++) { // downstream
 
-            Segment segment = allFrags.get(i);
+            Segment segment = restrictionSegmentList.get(i);
 
             // set fragment to 'false', if it is shorter than 'getMinFragSize'
             if (segment.length() < minFragSize) {
@@ -556,33 +507,24 @@ public class ViewPoint implements Serializable {
             warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
             resolved = false;
         }
-        numOfSelectedFrags = fragCountUp + fragCountDown;
-
+//        numOfSelectedFrags = fragCountUp + fragCountDown;
 
 
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
-        logger.trace("Calculating the start position from allFrags (size ="+allFrags.size()+")");
-        for (Segment segment : allFrags) {
-            logger.trace(String.format("\tSegment start = %d selected = %s",segment.getStartPos(),segment.isSelected()));
-            if (segment.isSelected()) {
-                setStartPos(segment.getStartPos());
-                break;
-            }
+        Segment firstSelectedSegment = restrictionSegmentList.stream().filter(segment -> segment.isSelected()).findFirst().orElse(null);
+        if (firstSelectedSegment != null) {
+            setStartPos(firstSelectedSegment.getStartPos());
         }
-
         // set end position of the viewpoint to end position of the most downstream fragment
-        for (int i = allFrags.size() - 1; --i >= 0;) {
-            Segment segment = allFrags.get(i);
-            if (segment.isSelected()) {
-                setEndPos(segment.getEndPos());
-                break;
-            }
+        // Get the last active segment (i.e., most 3'/most downstream
+        Segment lastSelectedSegment = restrictionSegmentList.stream().filter(segment->segment.isSelected()).reduce((a, b) -> b).orElse(null);
+        if (lastSelectedSegment != null) {
+            setEndPos(lastSelectedSegment.getEndPos());
         }
 
-        setDerivationApproach("LUPIANEZ");
-        logger.trace("Done calculating lupianez viewpointALLFRAGS, start pos of view point is "+getStartPos());
-        calculateViewpointScoreAllFrags();
-        logger.info("Done calculating lupianez viewpointALLFRAGS, start pos of view point is "+getStartPos()+
+        setDerivationApproach(Approach.EXTENDED);
+        calculateViewpointScore();
+        logger.trace("Done calculated extended viewpoint; start pos of view point is "+getStartPos()+
                 ", score="+getScoreAsPercentString());
         setResolved(resolved);
     }
@@ -595,62 +537,51 @@ public class ViewPoint implements Serializable {
      */
     public void generateViewpointSimple() {
         boolean resolved = true;
-        approach=Approach.SIMPLE;
+        approach = Approach.SIMPLE;
         logger.trace("entering generateViewpointSimple");
-        // find the index of the fragment that contains genomicPos
-        Integer genomicPosFragIdx = -1;
-        List<Segment> allFrags=restrictionSegmentList;
-        for (int i=0;i< allFrags.size();i++) {
-            Segment segment  =allFrags.get(i);
-            Integer fragStaPos = segment.getStartPos();
-            Integer fragEndPos = segment.getEndPos();
+        // find the fragment that contains genomicPos
+        Segment centerSegment = restrictionSegmentList.stream().
+                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
+                findFirst().
+                orElse(null);
 
-            if (fragStaPos <= genomicPos && genomicPos <= fragEndPos) {
-                logger.trace(String.format("SimpleApproach, found fragment with genomicPos fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
-                genomicPosFragIdx = i;
-                break;
-            }
-        }
-
-        if (genomicPosFragIdx == -1) {
+        if (centerSegment == null) {
             logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
             resolved = false;
-        }
-
-        // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
-
-        Segment segment = allFrags.get(genomicPosFragIdx);
-        double gc=segment.getGCcontent();
-        int length = segment.length();
-        if (gc>= SIMPLE_APPROACH_MIN_GC
-                && gc <= SIMPLE_APPROACH_MAX_GC
-                && length >= SIMPLE_APPROACH_MINSIZE
-                && length <= SIMPLE_APPROACH_MAXSIZE) {
-            List<Segment> newsegs=new ArrayList<>();
-            segment.setSelected(true);
-            setEndPos(segment.getEndPos());
-            setStartPos(segment.getStartPos());
-            // Add the selected fragment and the two neighboring fragments (which are deselected)
-            if (genomicPosFragIdx>0) {
-                newsegs.add(allFrags.get(genomicPosFragIdx-1));
-            }
-            newsegs.add(allFrags.get(genomicPosFragIdx));
-            if (genomicPosFragIdx<allFrags.size()-1) {
-                newsegs.add(allFrags.get(genomicPosFragIdx+1));
-            }
-            allFrags.clear();
-            allFrags.addAll(newsegs);
-            resolved=true;
+            restrictionSegmentList.clear(); /* no fragments */
         } else {
-            segment.setSelected(false);
-            allFrags.clear(); /* no fragments */
-            resolved=false;
+
+            // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
+
+            double gc = centerSegment.getGCcontent();
+            int length = centerSegment.length();
+            if (gc >= SIMPLE_APPROACH_MIN_GC
+                    && gc <= SIMPLE_APPROACH_MAX_GC
+                    && length >= SIMPLE_APPROACH_MINSIZE
+                    && length <= SIMPLE_APPROACH_MAXSIZE) {
+                List<Segment> newsegs = new ArrayList<>();
+                centerSegment.setSelected(true);
+                setEndPos(centerSegment.getEndPos());
+                setStartPos(centerSegment.getStartPos());
+                // Add the selected fragment and the two neighboring fragments (which are deselected)
+                int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
+                if (genomicPosFragIdx > 0) {
+                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
+                }
+                newsegs.add(centerSegment);
+                if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
+                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
+                }
+                restrictionSegmentList.clear();
+                restrictionSegmentList.addAll(newsegs);
+                resolved = true;
+            }
         }
 
-        setDerivationApproach("SIMPLE");
-        calculateViewpointScoreAllFrags();
-        logger.trace("Done calculating Simple viewpoint, start pos of view point is "+getStartPos()+
-                ", score="+getScoreAsPercentString());
+        setDerivationApproach(Approach.SIMPLE);
+        calculateViewpointScore();
+        logger.trace("Done calculating Simple viewpoint, start pos of view point is " + getStartPos() +
+                ", score=" + getScoreAsPercentString());
         setResolved(resolved);
     }
 
@@ -690,7 +621,7 @@ public class ViewPoint implements Serializable {
      * The overall score for the viewpoint is again between 0 and 1.
      *
      */
-    public void calculateViewpointScoreAllFrags() {
+    public void calculateViewpointScore() {
         Double score = 0.0;
 
         /* iterate over all selected fragments */
@@ -727,19 +658,14 @@ public class ViewPoint implements Serializable {
         }
     }
 
-
-
-
-    public void calculateViewpointScore() {
-        calculateViewpointScoreAllFrags();
-    }
-
+    /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
-        int n=0;
-        for (Segment seg: getActiveSegments()) {
-            n += seg.getMarginSize();
-        }
-        return n;
+//        int n=0;
+//        for (Segment seg: getActiveSegments()) {
+//            n += seg.getMarginSize();
+//        }
+//        return n;
+        return getActiveSegments().stream().mapToInt(segment -> segment.getMarginSize()).sum();
     }
 
 }
