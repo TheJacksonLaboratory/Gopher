@@ -3,6 +3,7 @@ package vpvgui.model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import vpvgui.consoletest.TranscriptionStartSite;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.viewpoint.*;
 

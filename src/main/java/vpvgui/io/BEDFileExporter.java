@@ -1,5 +1,7 @@
 package vpvgui.io;
 
+import org.apache.log4j.Logger;
+import vpvgui.gui.viewpointpanel.URLMaker;
 import vpvgui.model.viewpoint.Segment;
 import vpvgui.model.viewpoint.ViewPoint;
 
@@ -14,11 +16,13 @@ import java.util.Set;
 
 public class BEDFileExporter {
 
+    private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
     private String viewpointBEDfile=null;
     private String fragmentBEDfile=null;
     private String fragmentMarginsBEDfile=null;
     private String genomicPositionsBEDfile=null;
     private String fragmentMarginsUniqueBEDfile=null;
+    private String ucscURLfile=null;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private String directoryPath=null;
 
@@ -41,6 +45,7 @@ public class BEDFileExporter {
         this.fragmentMarginsBEDfile=String.format("%s_fragment_margins.bed",prefix);
         this.genomicPositionsBEDfile=String.format("%s_genomic_positions.bed",prefix);
         this.fragmentMarginsUniqueBEDfile=String.format("%s_fragment_margins_unique.bed",prefix);
+        this.ucscURLfile=String.format("%s_ucscURLs.tsv",prefix);
     }
 
     private String getFullPath(String fname) {
@@ -49,7 +54,7 @@ public class BEDFileExporter {
 
 
 
-    public void printRestFragsToBed(List<ViewPoint> viewpointlist) throws FileNotFoundException {
+    public void printRestFragsToBed(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
         /* prepare output file handles for writing */
         PrintStream out_viewpoints = new PrintStream(new FileOutputStream(getFullPath(viewpointBEDfile)));
         String description = viewpointBEDfile;
@@ -71,7 +76,12 @@ public class BEDFileExporter {
         description = fragmentMarginsUniqueBEDfile;
         out_fragment_margins_unique.println("track name='" + description + "' description='" + description + "'");
 
+        PrintStream out_uscuURL = new PrintStream(new FileOutputStream(getFullPath(ucscURLfile)));
+        out_uscuURL.println("Gene\tTSS\tURL");
+
         Set<String> uniqueFragmentMargins = new HashSet<String>();
+
+        URLMaker urlmaker = new URLMaker(genomeBuild);
 
         for (ViewPoint vp : viewpointlist) {
                 // print viewpoint
@@ -107,11 +117,14 @@ public class BEDFileExporter {
                         uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol);
                     }
                 }
+            String url= getDefaultURL(vp,genomeBuild);
+                out_uscuURL.println(String.format("%s\t%s\t%s",vp.getTargetName(),vp.getGenomicLocationString(),url));
             }
         out_viewpoints.close();
         out_genomic_positions.close();
         out_fragments.close();
         out_fragment_margins.close();
+        out_uscuURL.close();
 
         /* print out unique set of margins for enrichment (and calculate the total length of all  margins) */
         Integer totalLengthOfMargins=0;
@@ -125,7 +138,24 @@ public class BEDFileExporter {
         }
         out_fragment_margins_unique.close();
 
-        System.out.println("totalLengthOfMargins: " + totalLengthOfMargins);
+        logger.trace("totalLengthOfMargins: " + totalLengthOfMargins);
+    }
+
+
+
+    public String getDefaultURL(ViewPoint vp, String genomebuild) {
+        int posFrom, posTo;
+         int offset = 500;
+        posFrom = vp.getStartPos() - offset;
+        posTo = vp.getEndPos() + offset;
+        String chrom = vp.getReferenceID();
+        if (!chrom.startsWith("chr"))
+            chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
+        String targetItem = vp.getTargetName();
+        String trackType="hgTracks";
+        String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&pix=1800",
+                trackType, genomebuild, chrom, posFrom, posTo, targetItem);
+        return url;
     }
 
 }
