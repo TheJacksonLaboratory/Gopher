@@ -432,33 +432,18 @@ public class ViewPointPresenter implements Initializable {
      * . */
     private String getHighlightRegions() {
         String genome = this.model.getGenomeBuild();
-        String chromosome=this.vp.getReferenceID();
-        List<String> colorsegmentlist=new ArrayList<>();
-       for (ColoredSegment cseg: coloredsegments) {
-           Segment s=cseg.segment;
-            Integer start = s.getStartPos();
-            Integer end = s.getEndPos();
-            String color = cseg.getColor();
-            // highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>
-            if (color!=null) { /* Not able to get UCSC to show light gray */
-                String part = String.format("%s.%s%%3A%d-%d%s", genome, chromosome, start, end, color);
-                colorsegmentlist.add(part);
-            }
-        }
-
-//        colorsegmentlist = coloredsegments.stream().
-//                filter(c -> c.isSelected()).
-//                filter(c -> c.getColor()!=null).
-//                map( c -> String.format("%s.%s%%3A%d-%d%s",
-//                        genome,
-//                        chromosome,
-//                        c.segment.getStartPos(),
-//                        c.segment.getEndPos(),
-//                        c.getColor()) ).
-//                collect(Collectors.toList());
-//
-
-        return String.format("highlight=%s", join(colorsegmentlist,"%7C"));
+        String chromosome = this.vp.getReferenceID();
+        List<String> colorsegmentlist = coloredsegments.stream().
+                filter(c -> c.isSelected()).
+                map( c -> String.format("%s.%s%%3A%d-%d%s",
+                        genome,
+                        chromosome,
+                        c.segment.getStartPos(),
+                        c.segment.getEndPos(),
+                        c.getColor()) ).
+                collect(Collectors.toList());
+        String highlightregions=colorsegmentlist.stream().collect( Collectors.joining( "%7C" ) );
+        return String.format("highlight=%s", highlightregions);
     }
 
     /**
@@ -497,7 +482,7 @@ public class ViewPointPresenter implements Initializable {
         }
 
         public boolean isSelected() {
-            return checkBox.isSelected();
+            return segment.isSelected();
         }
 
         @Override
