@@ -748,7 +748,7 @@ public class VPVMainPresenter implements Initializable {
         String prefix="testprefix";
         BEDFileExporter exporter = new BEDFileExporter(file.getAbsolutePath(),prefix);
         try {
-            exporter.printRestFragsToBed(this.model.getViewPointList());
+            exporter.printRestFragsToBed(this.model.getViewPointList(),this.model.getGenomeBuild());
         } catch (Exception exc) {
             ErrorWindow.displayException("Could not save data to BED files", exc.getMessage(),exc);
         }
@@ -767,20 +767,6 @@ public class VPVMainPresenter implements Initializable {
         this.model.setProbeLength(len);
         logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
     }
-
-    /*@FXML
-    public void setTilingFactor(ActionEvent e) {
-        Double factor = Popups.getDoubleFromUser("Enter Tiling Factor",
-                (double)Default.TILING_FACTOR,
-                "Tiling factor:");
-        if (factor == null) {
-            ErrorWindow.display("Could not get tiling factor", "enter a numeric value!");
-            return;
-        }
-        this.model.setTilingFactor(factor);
-        logger.trace(String.format("We just set set TilingFactor to %f", model.getTilingFactor()));
-    }*/
-
 
     @FXML
     public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
