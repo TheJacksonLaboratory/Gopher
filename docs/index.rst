@@ -6,8 +6,14 @@
 Welcome to VPV's documentation!
 ===============================
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+	:maxdepth: 2
+	:caption: Contents:
+
+	CHC	
+	installation
+	setup
+	running
+	output
 
 ViewPointViewer (VPV)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,6 +24,8 @@ on the Hi-C protocol but uses capture baits (similar to whole-exome sequencing) 
 
 - CHC detects interactions between viewpoint regions and distal enhancers (or other genomic regions).
 - CHC has been most commonly performed with the 4-cutter DpnII or with the 6-cutter HindIII.
+
+
 
 Quick start
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,11 +39,3 @@ This site provides detailed explanations and tips for the various steps of this 
 
 
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
