@@ -23,14 +23,7 @@ import java.util.Map;
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
-
-
-    /**  Key: Name of chromosome; value: Chromosome with {@link VPVGene} objects located on the chromosome. */
-    private Map<String, ChromosomeGroup> chromosomes = null;
-
-
-
-    /**
+  /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
@@ -41,10 +34,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      */
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         super(model,currentVPproperty);
-
-        assignVPVGenesToChromosomes(model.getVPVGeneList());
-
-        logger.trace("end of ctor");
     }
 
 
@@ -67,6 +56,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         int total = getTotalGeneCount();
         int i = 0;
         logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
+        long milli=System.currentTimeMillis();
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
             String path = this.model.getIndexFastaFilePath(referenceSequenceID);
@@ -111,6 +101,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 }
             }
         }
+        long end=milli-System.currentTimeMillis();
+        logger.trace(String.format("It took %.1f sec",end/1000.0 ));
         this.model.setViewPoints(viewpointlist);
         return null;
     }

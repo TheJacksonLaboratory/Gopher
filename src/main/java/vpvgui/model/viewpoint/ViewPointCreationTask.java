@@ -15,17 +15,16 @@ import java.util.Map;
 /**
  * Base class for the tasks that create viewpoints.
  * @author Peter Robinson
- * @version 0.0.2
+ * @version 0.0.3 (2017-09-27)
  */
 public abstract class ViewPointCreationTask extends Task<Void> {
     private static final Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
     /**  Key: Name of chromosome; value: Chromosome with {@link VPVGene} objects located on the chromosome. */
     protected Map<String, ChromosomeGroup> chromosomes = null;
-
     /** The total number of genes for which we are making viewpoints. This number is only used for the progress
      * bar (Some genes have multiple transcription start sites and so one gene may have multiple ViewPoints)..*/
     private int n_totalGenes;
-
+    /** Referece to the model with all project data. */
     protected Model model = null;
     /** This is used to show the name of the current Gene on the viewpoint creation dialog. */
     protected StringProperty currentVP = null;
@@ -39,10 +38,10 @@ public abstract class ViewPointCreationTask extends Task<Void> {
 
 
     protected ViewPointCreationTask(Model model, StringProperty currentVPproperty) {
-
         this.model = model;
         this.viewpointlist = new ArrayList<>();
-        logger.trace("got back");
+        assignVPVGenesToChromosomes(model.getVPVGeneList());
+        logger.trace(String.format("ViewPointCreationTask -- we got %d total genes",n_totalGenes));
         this.currentVP = currentVPproperty;
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
         SegmentFactory.restrictionEnzymeMap = new HashMap<>();

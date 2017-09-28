@@ -22,37 +22,6 @@ import java.util.List;
  */
 public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(ExtendedViewPointCreationTask.class.getName());
-    Model model=null;
-    /** List of {@link ViewPoint} objects that we will return to the Model when this Task is done. */
-    List<ViewPoint> viewpointlist=null;
-
-    /** Maximum distance from central position (e.g., transcription start site) of the upstream boundary of the viewpoint.*/
-    private  int maxDistanceUp;
-    /** Maximum distance from central position (e.g., transcription start site) of the downstream boundary of the viewpoint.*/
-    private  int maxDistanceDown;
-
-    private int minDistToGenomicPosDown;
-
-    /** The total number of viewpoints we are making (equal to the number of unique transcription
-     * start sites on all of the {@link #chromosomes}.*/
-    private int n_totalViewpoints;
-    /* declare viewpoint parameters as requested by Darío */
-
-    private  Integer fragNumUp;
-    private  Integer fragNumDown;
-
-    private  Integer minSizeUp;
-
-    private StringProperty currentVP=null;
-    /** List of one or more restriction enzymes choseon by the user. */
-    //private List<RestrictionEnzyme> chosenEnzymes=null;
-
-
-    private  Integer minFragSize;
-    private  double maxRepContent;
-
-    private  Integer marginSize=200; /* ToDo -- allow this to be set via the menu */
-
     /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
@@ -62,65 +31,9 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * @param currentVPproperty
      */
     public ExtendedViewPointCreationTask(Model model, StringProperty currentVPproperty){
-        this.model=model;
-        this.viewpointlist=new ArrayList<>();
-        this.currentVP=currentVPproperty;
-        ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
-        SegmentFactory.restrictionEnzymeMap = new HashMap<>();
-        List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
-        if (chosen==null) {
-            logger.error("Unable to retrieve list of chosen restriction enzymes");
-            return;
-        } else {
-            logger.trace(String.format("Setting up viewpoint creation for %d enzymes", chosen.size() ));
-        }
-        for (RestrictionEnzyme re : chosen) {
-            String site = re.getPlainSite();
-            SegmentFactory.restrictionEnzymeMap.put(site,re);
-        }
-        init_parameters();
+        super(model,currentVPproperty);
     }
 
-    private void assignVPVGenesToChromosomes(List<VPVGene> vgenes) {
-        this.chromosomes = new HashMap<>();
-        n_totalViewpoints=0;
-        for (VPVGene g : vgenes) {
-            String referenceseq = g.getContigID();
-            ChromosomeGroup group = null;
-            if (chromosomes.containsKey(referenceseq)) {
-                group = chromosomes.get(referenceseq);
-            } else {
-                group = new ChromosomeGroup(referenceseq);
-                chromosomes.put(referenceseq, group);
-            }
-            group.addVPVGene(g);
-            n_totalViewpoints++;
-        }
-    }
-
-
-
-    private void init_parameters() {
-        assignVPVGenesToChromosomes(model.getVPVGeneList());
-        this.fragNumUp=model.getFragNumUp();
-        this.fragNumDown=model.fragNumDown();
-        this.minSizeUp=model.getMinSizeUp();
-        this.minDistToGenomicPosDown=model.getMinSizeDown();
-        this.maxDistanceUp =model.getMaxSizeUp();
-        this.maxDistanceDown =model.getMaxSizeDown();
-        this.minFragSize=model.getMinFragSize();
-        this.maxRepContent=model.getMaxRepeatContent();
-        logger.trace("Finished initializing parameters to create ViewPoints.");
-    }
-
-
-    /** Get the total number of viewpoints we will create.This is needed in order
-     * to get the progress indicator to be accurate.
-     * @return
-     */
-    private int getTotalGeneCount() {
-        return n_totalViewpoints;
-    }
 
     /** This is the method that will create the viewpoints.
      * We have placed it in a task because it takes a while.
@@ -166,7 +79,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                                 build();
                         updateProgress(i++, total); /* this will update the progress bar */
                         updateLabelText(this.currentVP, vpvgene.toString());
-                        vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown, model.getMaxSizeUp(), model.getMaxSizeDown());
+                        vp.generateViewpointExtendedApproach(model.getFragNumUp(), model.fragNumDown(), model.getMaxSizeUp(), model.getMaxSizeDown());
                         viewpointlist.add(vp);
                     }
                 } catch (FileNotFoundException e) {
