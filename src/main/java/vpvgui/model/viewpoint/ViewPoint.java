@@ -78,6 +78,8 @@ public class ViewPoint implements Serializable {
     private List<Segment> restrictionSegmentList;
     /** List of restriction enzymes chosen by the User. */
     static List<RestrictionEnzyme> chosenEnzymes=null;
+    /** The length of the chromosome on which this gene is located. */
+    private int chromosomeLength;
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** A list of restriction enzymes (at least one) as chosen by the user. */
@@ -153,6 +155,7 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosDown=(int)(vp.maxDistToGenomicPosDown*zoomfactor);
         this.minFragSize=vp.minFragSize;
         this.marginSize= vp.marginSize;
+        this.chromosomeLength=vp.chromosomeLength;
         this.maximumRepeatContent=vp.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(fastaReader);
@@ -174,6 +177,7 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
+        this.chromosomeLength=builder.chromosomeLength;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
@@ -207,6 +211,7 @@ public class ViewPoint implements Serializable {
         // other params
         private IndexedFastaSequenceFile fastaReader;
         private  String targetName="";
+        private int chromosomeLength;
         // Optional parameters - initialized to default values
         /* ToDo Check is this correct for maxDistToGenomicPosUp etc. ?*/
         private Integer maxDistToGenomicPosUp  = Default.MAXIMUM_SIZE_UPSTREAM+2000;
@@ -262,6 +267,9 @@ public class ViewPoint implements Serializable {
         }
         public Builder marginSize(int val) {
             this.marginSize=val; return this;
+        }
+        public Builder chromosomeLength(int len) {
+            chromosomeLength=len; return this;
         }
         public ViewPoint build() {
             return new ViewPoint(this);
@@ -528,12 +536,11 @@ public class ViewPoint implements Serializable {
         // this will keep the table from having lots of unselected fragments
 
         int LEN = restrictionSegmentList.size();
-        logger.error(String.format("Starting finding first the LEN is %d for VP=%s",LEN,getTargetName()));
         int firstSelectedIndex = IntStream.range(0,LEN)
                .filter(i->restrictionSegmentList.get(i).isSelected())
                 .findFirst().orElse(0);
-        logger.error(String.format("Done finding first the index is %d",firstSelectedIndex));
-//        // The map reverses the order.
+
+        // The map reverses the order.
         int lastSelectedIndex = IntStream.range(0,LEN-1).
                 map(i -> LEN - i - 1).
                 filter(i->restrictionSegmentList.get(i).isSelected())

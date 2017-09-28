@@ -68,6 +68,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             for (VPVGene vpvgene : group.getGenes()) {
                 try {
                     IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
+                    int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+                    logger.trace(String.format("Length of %s is %d", referenceSequenceID,chromosomeLength));
                     logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
                     List<Integer> gPosList = vpvgene.getTSSlist();
                     for (Integer gPos : gPosList) {
@@ -83,6 +85,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                                 minimumFragmentSize(model.getMinFragSize()).
                                 maximumRepeatContent(model.getMaxRepeatContent()).
                                 marginSize(model.getMarginSize()).
+                                chromosomeLength(chromosomeLength).
                                 build();
                         updateProgress(i++, total); /* this will update the progress bar */
                         updateLabelText(this.currentVP, vpvgene.toString());
