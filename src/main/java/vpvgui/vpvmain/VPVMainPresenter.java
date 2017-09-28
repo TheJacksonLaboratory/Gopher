@@ -231,7 +231,7 @@ public class VPVMainPresenter implements Initializable {
             this.approachLabel.setText(newValue);
         });
         this.approachLabel.setText(approachChoiceBox.getValue());
-        initializeBindings();
+//        initializeBindings();
         initializePromptTextsToDefaultValues();
         this.initializer=new Initializer(model);
 
@@ -291,18 +291,18 @@ public class VPVMainPresenter implements Initializable {
      * Initialize the bindings to Java bean properties in the model with
      * the GUI elements.
      */
-    private void initializeBindings() {
-       // genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
-        /*this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
-        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
-        this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-        this.maxSizeUpTextField.textProperty().bindBidirectional(model.getMaxSizeUp(),new NumberStringConverter());
-        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
-        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
-        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
-        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
-        */
-    }
+//    private void initializeBindings() {
+//       // genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
+//        /*this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
+//        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
+//        this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
+//        this.maxSizeUpTextField.textProperty().bindBidirectional(model.getMaxSizeUp(),new NumberStringConverter());
+//        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
+//        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
+//        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
+//        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
+//        */
+//    }
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
@@ -556,6 +556,7 @@ public class VPVMainPresenter implements Initializable {
         });
         logger.trace("About to run task");
         new Thread(task).start();
+        logger.trace("Past");
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
     }

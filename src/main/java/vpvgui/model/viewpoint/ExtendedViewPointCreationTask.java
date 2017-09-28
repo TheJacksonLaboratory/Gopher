@@ -16,19 +16,16 @@ import java.util.List;
 
 /**
  * This is the Task that coordinates creation of ViewPoints from the data entered by the user.
+ * The class implements the extended probe design strategy with multiple fragments per ViewPoint.
  * @author Peter Robinson
- * @version 0.0.2 (2017-09-29)
+ * @version 0.0.3 (2017-09-27)
  */
 public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(ExtendedViewPointCreationTask.class.getName());
     Model model=null;
-
-    /** List of {@link VPVGene} objects representing User's gene list. */
-    List<VPVGene> vpvGeneList;
     /** List of {@link ViewPoint} objects that we will return to the Model when this Task is done. */
     List<ViewPoint> viewpointlist=null;
-    /** Restriction enzyme cuttings patterns (must have at least one) */
-    //private  String[] cuttingPatterns;
+
     /** Maximum distance from central position (e.g., transcription start site) of the upstream boundary of the viewpoint.*/
     private  int maxDistanceUp;
     /** Maximum distance from central position (e.g., transcription start site) of the downstream boundary of the viewpoint.*/
@@ -36,7 +33,9 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
 
     private int minDistToGenomicPosDown;
 
-
+    /** The total number of viewpoints we are making (equal to the number of unique transcription
+     * start sites on all of the {@link #chromosomes}.*/
+    private int n_totalViewpoints;
     /* declare viewpoint parameters as requested by Darío */
 
     private  Integer fragNumUp;
@@ -46,7 +45,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
 
     private StringProperty currentVP=null;
     /** List of one or more restriction enzymes choseon by the user. */
-    private List<RestrictionEnzyme> chosenEnzymes=null;
+    //private List<RestrictionEnzyme> chosenEnzymes=null;
 
 
     private  Integer minFragSize;
@@ -82,10 +81,27 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         init_parameters();
     }
 
+    private void assignVPVGenesToChromosomes(List<VPVGene> vgenes) {
+        this.chromosomes = new HashMap<>();
+        n_totalViewpoints=0;
+        for (VPVGene g : vgenes) {
+            String referenceseq = g.getContigID();
+            ChromosomeGroup group = null;
+            if (chromosomes.containsKey(referenceseq)) {
+                group = chromosomes.get(referenceseq);
+            } else {
+                group = new ChromosomeGroup(referenceseq);
+                chromosomes.put(referenceseq, group);
+            }
+            group.addVPVGene(g);
+            n_totalViewpoints++;
+        }
+    }
+
 
 
     private void init_parameters() {
-        this.vpvGeneList=model.getVPVGeneList();
+        assignVPVGenesToChromosomes(model.getVPVGeneList());
         this.fragNumUp=model.getFragNumUp();
         this.fragNumDown=model.fragNumDown();
         this.minSizeUp=model.getMinSizeUp();
@@ -102,12 +118,8 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * to get the progress indicator to be accurate.
      * @return
      */
-    private int getTotalViewpoints() {
-        int n=0;
-        for (VPVGene vpvgene:this.vpvGeneList) {
-            n += vpvgene.n_viewpointstarts();
-        }
-        return n;
+    private int getTotalGeneCount() {
+        return n_totalViewpoints;
     }
 
     /** This is the method that will create the viewpoints.
@@ -123,50 +135,56 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         String cuttingMotif = ViewPoint.chosenEnzymes.get(0).getPlainSite(); // TODO Need to extend this to more than one enzyme
         logger.trace("Creating viewpoints for cuting pattern: "+cuttingMotif);
 
-        int total=getTotalViewpoints();
+        int total= getTotalGeneCount();
         int i=0;
 
-        for (VPVGene vpvgene:this.vpvGeneList) {
-            String referenceSequenceID = vpvgene.getContigID();/* Usually a chromosome */
-            //logger.trace("Retrieving indexed fasta file for contig: "+referenceSequenceID);
-            String path=this.model.getIndexFastaFilePath(referenceSequenceID);
-            if (path==null) {
-                logger.error("Could not retrieve faidx file for "+referenceSequenceID);
+        for (ChromosomeGroup group : chromosomes.values()) {
+            String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
+            String path = this.model.getIndexFastaFilePath(referenceSequenceID);
+            if (path == null) {
+                logger.error("Could not retrieve faidx file for " + referenceSequenceID);
                 continue;
             }
-            try {
-                IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-                List<Integer> gPosList = vpvgene.getTSSlist();
-                for (Integer gPos : gPosList) {
-                    ViewPoint vp = new ViewPoint.Builder(referenceSequenceID,gPos).
-                            targetName(vpvgene.getGeneSymbol()).
-                            maxDistToGenomicPosUp(model.getMaxSizeUp()).
-                            maxDistToGenomicPosDown(model.getMaxSizeDown()).
-                            minimumSizeDown(model.getMinSizeDown()).
-                            maximumSizeDown(model.getMaxSizeDown()).
-                            fastaReader(fastaReader).
-                            minimumSizeUp(model.getMinSizeUp()).
-                            maximumSizeUp(model.getMaxSizeUp()).
-                            minimumFragmentSize(model.getMinFragSize()).
-                            maximumRepeatContent(model.getMaxRepeatContent()).
-                            marginSize(model.getMarginSize()).
-                            build();
-                    updateProgress(i++,total); /* this will update the progress bar */
-                    updateLabelText(this.currentVP,vpvgene.toString());
-                    vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown, model.getMaxSizeUp(),model.getMaxSizeDown());
-                    viewpointlist.add(vp);
-                    logger.trace(String.format("Adding viewpoint %s to list (size: %d)",vp.getTargetName(),viewpointlist.size()));
+            logger.trace("Got RefID=" + referenceSequenceID);
+            for (VPVGene vpvgene : group.getGenes()) {
+                try {
+                    IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
+                    List<Integer> gPosList = vpvgene.getTSSlist();
+                    for (Integer gPos : gPosList) {
+                        ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+                                targetName(vpvgene.getGeneSymbol()).
+                                maxDistToGenomicPosUp(model.getMaxSizeUp()).
+                                maxDistToGenomicPosDown(model.getMaxSizeDown()).
+                                minimumSizeDown(model.getMinSizeDown()).
+                                maximumSizeDown(model.getMaxSizeDown()).
+                                fastaReader(fastaReader).
+                                minimumSizeUp(model.getMinSizeUp()).
+                                maximumSizeUp(model.getMaxSizeUp()).
+                                minimumFragmentSize(model.getMinFragSize()).
+                                maximumRepeatContent(model.getMaxRepeatContent()).
+                                marginSize(model.getMarginSize()).
+                                build();
+                        updateProgress(i++, total); /* this will update the progress bar */
+                        updateLabelText(this.currentVP, vpvgene.toString());
+                        vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown, model.getMaxSizeUp(), model.getMaxSizeDown());
+                        viewpointlist.add(vp);
+                    }
+                } catch (FileNotFoundException e) {
+                    logger.error("[ERROR] could not open/find faidx file for " + referenceSequenceID);
+                    logger.error(e, e);
                 }
-            } catch (FileNotFoundException e) {
-                logger.error("[ERROR] could not open/find faidx file for "+referenceSequenceID);
-                logger.error(e,e);
             }
         }
+        logger.trace(String.format("Created %d extended viewpoints", viewpointlist.size()));
         this.model.setViewPoints(viewpointlist);
         return null;
     }
 
-
+    /**
+     * This function updates the label on the viewpoint creation dialog with the name of the current viewpoint.
+     * @param sb A StringPoperty that is bound to a label on the viewpoint creation dialog
+     * @param msg Name of the current viewpoint
+     */
     private void updateLabelText(StringProperty sb,String msg) {
         Platform.runLater(new Runnable(){
             @Override

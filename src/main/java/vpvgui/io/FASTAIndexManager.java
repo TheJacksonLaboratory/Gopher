@@ -66,11 +66,12 @@ public class FASTAIndexManager extends Task<Void> {
             } else if (!fileEntry.getPath().endsWith(".fa")) {
                 continue;
             } else if (fastaFAIalreadyExists(fileEntry.getAbsolutePath())) {
-                logger.trace("Checking fileEntry map entry: "+fileEntry.getAbsolutePath());
                 contigname=getContigName(fileEntry);
-                logger.trace("basename: "+contigname);
                 this.indexedFastaFiles.put(contigname,fileEntry.getAbsolutePath());
-                logger.trace("Size of indexedFastaFiles: "+this.indexedFastaFiles.size());
+                logger.trace(String.format("Fasta file: %s (basename: %s): Size-%d ",
+                        fileEntry.getAbsolutePath(),
+                        contigname,
+                        this.indexedFastaFiles.size()));
                 continue;
             } else {
                     /* if we get here, we have a FASTA file ending with ".fa" that has not yet been indexed */

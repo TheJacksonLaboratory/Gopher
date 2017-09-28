@@ -35,7 +35,7 @@ import java.util.stream.IntStream;
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 2L;
     /** The possible approaches used to generate this Viewpoint. */
     public static enum Approach {SIMPLE, EXTENDED};
     /* The approach used to generate this viewpoint */

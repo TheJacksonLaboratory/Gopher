@@ -10,7 +10,7 @@ import java.util.*;
  * @author Peter Robinson
  * @version 0.2
  */
-public class VPVGene implements Serializable {
+public class VPVGene implements Comparable<VPVGene>, Serializable {
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /** An NCBI RefSeq id such as NM_001353311. */
@@ -25,20 +25,17 @@ public class VPVGene implements Serializable {
      * in order to avoid entering duplicate ViewPoint objects.
      * The set then has all TSS (unique)
      */
-    private Set<Integer> positions;
+    private TreeSet<Integer> positions;
 
 
     public VPVGene(String geneid, String symbol) {
         this.refSeqID =geneid;
         this.geneSymbol=symbol;
-        this.positions =new HashSet<>();
+        this.positions =new TreeSet<>();
     }
     /** @return a sorted list of TSS. */
     public List<Integer> getTSSlist() {
-        List<Integer> lst = new ArrayList<>();
-        lst.addAll(this.positions);
-        Collections.sort(lst);
-        return lst;
+        return new ArrayList<>(positions);
     }
 
     public void setChromosome(String c) {
@@ -73,7 +70,7 @@ public class VPVGene implements Serializable {
             strand="+";
         }
         sb.append(String.format("%s [%s,%s]",geneSymbol, contigID,strand));
-        if (this.positions==null || this.positions.size()==0) {
+        if (this.positions ==null || this.positions.size()==0) {
            // no-op
         } else {
             for (Integer ii : positions) {
@@ -93,7 +90,12 @@ public class VPVGene implements Serializable {
     }
 
     public int n_viewpointstarts() {
-        if (this.positions==null) return 0;
-        else return this.positions.size();
+        if (this.positions ==null) return 0;
+        else return positions.size();
+    }
+
+    @Override
+    public int compareTo(VPVGene other) {
+        return other.positions.first() - this.positions.first();
     }
 }
