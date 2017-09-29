@@ -36,6 +36,7 @@ import vpvgui.model.viewpoint.ViewPoint;
 import vpvgui.model.viewpoint.ExtendedViewPointCreationTask;
 import vpvgui.model.viewpoint.ViewPointCreationTask;
 import vpvgui.util.SerializationManager;
+import vpvgui.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -653,7 +654,7 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML void setProxyDialog(ActionEvent e) {
         Stage window;
-        String windowTitle = "VPV Settings";
+        String windowTitle = "Proxy Settings";
         window = new Stage();
         window.setOnCloseRequest( event -> {window.close();} );
         window.setTitle(windowTitle);
@@ -674,7 +675,7 @@ public class VPVMainPresenter implements Initializable {
             presenter.setProxyProperty(model.getHttpProxy());
         }
         if (model.getHttpProxyPort()!=null) {
-            logger.trace(String.format("http proxy prot get: %s",model.getHttpProxyPort()));
+            logger.trace(String.format("http proxy port: %s",model.getHttpProxyPort()));
             presenter.setPort(model.getHttpProxyPort());
         }
         window.setScene(new Scene(view.getView()));
@@ -687,12 +688,8 @@ public class VPVMainPresenter implements Initializable {
         }
         this.model.setHttpProxy(proxy);
         this.model.setHttpProxyPort(port);
-        logger.info("Set proxy to "+proxy);
-        logger.info("Set proxy port to "+port);
-        System.setProperty("http.proxyHost",proxy);
-        System.setProperty("http.proxyPort",port);
-        System.setProperty("https.proxyHost",proxy);
-        System.setProperty("https.proxyPort",port);
+        logger.info(String.format("Set proxy to %s[%s]",proxy,port));
+        Utils.setSystemProxyAndPort(proxy,port);
     }
 
 
@@ -746,7 +743,7 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error","Could not get path to export BED files.");
             return;
         }
-        String prefix="testprefix";
+        String prefix=model.getProjectName();
         BEDFileExporter exporter = new BEDFileExporter(file.getAbsolutePath(),prefix);
         try {
             exporter.printRestFragsToBed(this.model.getViewPointList(),this.model.getGenomeBuild());

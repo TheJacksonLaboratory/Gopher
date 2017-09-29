@@ -8,6 +8,7 @@ import vpvgui.gui.ErrorWindow;
 import vpvgui.io.Platform;
 import vpvgui.model.Model;
 import vpvgui.util.SerializationManager;
+import vpvgui.util.Utils;
 import vpvgui.vpvmain.VPVMainPresenter;
 import vpvgui.vpvmain.VPVMainView;
 
@@ -70,6 +71,9 @@ public class SwitchScreens {
             logger.error(String.format("Unable to deserialize model from %s at %s", name, filepath));
             ErrorWindow.display("Null pointer", String.format("Unable to deserialize model from %s at %s", name, filepath));
             return;
+        }
+        if (this.model.getHttpProxy() != null) {
+            Utils.setSystemProxyAndPort(model.getHttpProxy(),model.getHttpProxyPort());
         }
         this.primarystage.setMinWidth(1000);
         this.primarystage.setWidth(1600);

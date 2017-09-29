@@ -27,9 +27,6 @@ public class BEDFileExporter {
     private String directoryPath=null;
 
 
-//    private String cuttingMotif="ALL"; /* TODO MAKE THIS DYNAMIC!!!! */
-
-
     public BEDFileExporter(String dirpath, String outPrefix){
         initFileNames(outPrefix);
         /* remove trailing slash if necessary. */
