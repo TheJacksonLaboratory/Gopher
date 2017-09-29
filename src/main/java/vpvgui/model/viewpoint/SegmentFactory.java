@@ -74,13 +74,16 @@ public class SegmentFactory implements Serializable {
         cuttingPositionMap = new HashMap<String, ArrayList<Integer>>();
         Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>();
+
+        int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
             String cutpat = enzyme.getPlainSite();
             int offset = enzyme.getOffset();
             // get sequence around genomic position and convert everything to uppercase
-            if (fastaReader.getSequence(referenceSequenceID).length() < genomicPos + maxDistToGenomicPosDown) {
-                logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + fastaReader.getSequence(referenceSequenceID).length() + ").");
-                maxDistToGenomicPosDown = fastaReader.getSequence(referenceSequenceID).length() - genomicPos;
+            if (chromosomeLength < genomicPos + maxDistToGenomicPosDown) {
+                logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + chromosomeLength + ").");
+                maxDistToGenomicPosDown = chromosomeLength - genomicPos;
             }
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
             Pattern pattern = Pattern.compile(cutpat);

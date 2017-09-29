@@ -78,8 +78,6 @@ public class ViewPoint implements Serializable {
     private List<Segment> restrictionSegmentList;
     /** List of restriction enzymes chosen by the User. */
     static List<RestrictionEnzyme> chosenEnzymes=null;
-    /** The length of the chromosome on which this gene is located. */
-    private int chromosomeLength;
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** A list of restriction enzymes (at least one) as chosen by the user. */
@@ -155,7 +153,6 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosDown=(int)(vp.maxDistToGenomicPosDown*zoomfactor);
         this.minFragSize=vp.minFragSize;
         this.marginSize= vp.marginSize;
-        this.chromosomeLength=vp.chromosomeLength;
         this.maximumRepeatContent=vp.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(fastaReader);
@@ -177,7 +174,6 @@ public class ViewPoint implements Serializable {
         this.maxDistToGenomicPosDown=builder.maxDistToGenomicPosDown;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
-        this.chromosomeLength=builder.chromosomeLength;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
@@ -211,7 +207,6 @@ public class ViewPoint implements Serializable {
         // other params
         private IndexedFastaSequenceFile fastaReader;
         private  String targetName="";
-        private int chromosomeLength;
         // Optional parameters - initialized to default values
         /* ToDo Check is this correct for maxDistToGenomicPosUp etc. ?*/
         private Integer maxDistToGenomicPosUp  = Default.MAXIMUM_SIZE_UPSTREAM+2000;
@@ -267,9 +262,6 @@ public class ViewPoint implements Serializable {
         }
         public Builder marginSize(int val) {
             this.marginSize=val; return this;
-        }
-        public Builder chromosomeLength(int len) {
-            chromosomeLength=len; return this;
         }
         public ViewPoint build() {
             return new ViewPoint(this);
@@ -412,6 +404,7 @@ public class ViewPoint implements Serializable {
         boolean resolved = true;
         approach=Approach.EXTENDED;
         logger.trace("entering generateViewpointExtendedApproach");
+        Segment centerSegment=null; // the fragment that contains the TSS. Always show it!
 
         // iterate over all fragments of the viewpoint and set them to true
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
@@ -422,9 +415,9 @@ public class ViewPoint implements Serializable {
             Segment segment  =restrictionSegmentList.get(i);
             Integer fragStaPos = segment.getStartPos();
             Integer fragEndPos = segment.getEndPos();
-            //logger.trace(String.format("fragStart=%d, fragEnd=%d",fragStaPos,fragEndPos ));
             if (fragStaPos <= genomicPos && genomicPos <= fragEndPos) {
                 genomicPosFragIdx = i;
+                centerSegment=segment;
                 break;
             }
         }
@@ -432,6 +425,7 @@ public class ViewPoint implements Serializable {
         if (genomicPosFragIdx == -1) {
             logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
             resolved = false;
+            return;
         }
 
         // starting from the centralized fragment containing 'genomicPos' (included)
@@ -524,12 +518,16 @@ public class ViewPoint implements Serializable {
         if (firstSelectedSegment != null) {
             setStartPos(firstSelectedSegment.getStartPos());
         }
+        int centerpos=centerSegment.getStartPos();
+        if (this.startPos>centerpos) setStartPos(centerpos);
         // set end position of the viewpoint to end position of the most downstream fragment
         // Get the last active segment (i.e., most 3'/most downstream
         Segment lastSelectedSegment = restrictionSegmentList.stream().filter(segment->segment.isSelected()).reduce((a, b) -> b).orElse(null);
         if (lastSelectedSegment != null) {
             setEndPos(lastSelectedSegment.getEndPos());
         }
+        centerpos=centerSegment.getEndPos();
+        if (this.endPos<centerpos) setEndPos(centerpos);
 
         // discard fragments except for the selecxted fragments and their immediate neighbors, i.e.,
         // retain one unselected fragment on each end

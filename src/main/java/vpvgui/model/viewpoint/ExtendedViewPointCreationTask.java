@@ -77,7 +77,6 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                                 minimumFragmentSize(model.getMinFragSize()).
                                 maximumRepeatContent(model.getMaxRepeatContent()).
                                 marginSize(model.getMarginSize()).
-                                chromosomeLength(chromosomeLength).
                                 build();
                         updateProgress(i++, total); /* this will update the progress bar */
                         updateLabelText(this.currentVP, vpvgene.toString());
