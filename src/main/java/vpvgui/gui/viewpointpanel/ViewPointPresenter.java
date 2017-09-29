@@ -271,6 +271,17 @@ public class ViewPointPresenter implements Initializable {
                         @Override public void run() {
                             updateScore();
                             refreshUCSCButtonAction();
+                            colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+                                @Override
+                                protected void updateItem(String item, boolean empty) {
+                                    super.updateItem(item, empty);
+                                    if (item != null && !empty) {
+                                        getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
+                                    } else {
+                                        getTableRow().setStyle(String.format("-fx-background-color: transparent;"));
+                                    }
+                                }
+                            });
                         }
                     });
 

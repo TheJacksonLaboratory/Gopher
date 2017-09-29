@@ -510,9 +510,6 @@ public class ViewPoint implements Serializable {
             warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
             resolved = false;
         }
-//        numOfSelectedFrags = fragCountUp + fragCountDown;
-
-
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
         Segment firstSelectedSegment = restrictionSegmentList.stream().filter(segment -> segment.isSelected()).findFirst().orElse(null);
         if (firstSelectedSegment != null) {
@@ -587,7 +584,6 @@ public class ViewPoint implements Serializable {
         } else {
 
             // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
-
             double gc = centerSegment.getGCcontent();
             int length = centerSegment.length();
             if (gc >= SIMPLE_APPROACH_MIN_GC
@@ -695,11 +691,6 @@ public class ViewPoint implements Serializable {
 
     /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
-//        int n=0;
-//        for (Segment seg: getActiveSegments()) {
-//            n += seg.getMarginSize();
-//        }
-//        return n;
         return getActiveSegments().stream().mapToInt(segment -> segment.getMarginSize()).sum();
     }
 
