@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Parse the refGene.txt.gz file from UCSC. The format is the same for all of the Genomebuilds we are considering.
+ * Parse the refGene.txt.gz file from UCSC. The format is the same for all of the genome builds we are considering.
  * <ol>
  *     <li>bin (e.g., 197) No meaning forus, itis used to index the UCSC files</li>
  *     <li>name (e.g., NM_001353310)</li>
@@ -31,6 +31,10 @@ import java.util.zip.GZIPInputStream;
  * </ol>
  * <p>Note that we skip all gene models located on random chromosomes because we do not want to create probes for
  * random chromosome contigs at this time.</p>
+ * <p> The class procudes a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
+ * These objects use numbering, which is 0-start, half-open (0-based). In other words, the interval (0,5) could
+ * be used to describe the coordinates of five fingers -- starting with 0 for the thumb, and with the 5 being open-end
+ * (excluded).</p>
  * @author Peter Robinson
  * @version 0.0.3 (2017-08-26)
  */

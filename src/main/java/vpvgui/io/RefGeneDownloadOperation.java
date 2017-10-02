@@ -2,10 +2,14 @@ package vpvgui.io;
 
 import java.io.File;
 
+/**
+ * This class is used to check whether the UCSC transcript file, {@code refGene.txt.gz}, has already been downloaded
+ * to the directory specified by the user.
+ */
 public class RefGeneDownloadOperation implements Operation {
-
+    /** Path to the directory where the refGene.txt.gz file from UCSC will be downloaded. */
     private String directoryPath =null;
-    /** Basename of the file that we will store to disk */
+    /** Basename of the UCSC transcript file that we will store to disk */
     private static final String localFilename = "refGene.txt.gz";
 
     /**
@@ -15,8 +19,8 @@ public class RefGeneDownloadOperation implements Operation {
     public RefGeneDownloadOperation(String path) {
         this.directoryPath =path;
     }
-
-    private String getLocalFilePath(){ return this.directoryPath; }
+    /** @return absolute path of directory where {@code refGene.txt.gz} will be stored */
+    private String getLocalDirectoryPath(){ return this.directoryPath; }
 
 
     /** This method checks whether the UCSC refGene.txt.gz file or the corresponding unpacked
@@ -29,11 +33,11 @@ public class RefGeneDownloadOperation implements Operation {
      */
     @Override
     public boolean execute() {
-        File f = new File(getLocalFilePath() + File.separator + "refGene.txt.gz");
+        File f = new File(getLocalDirectoryPath() + File.separator + "refGene.txt.gz");
         if(f.exists() && !f.isDirectory()) {
             return false;
         }
-        f = new File(getLocalFilePath() + File.separator + "refGene.txt");
+        f = new File(getLocalDirectoryPath() + File.separator + "refGene.txt");
         if(f.exists() && !f.isDirectory()) {
             return false;
         }
