@@ -14,6 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
+/**
+ * This class exports BEDfiles that can be used to check the results and for ordering probes.
+ * @author Peter Hansen, Peter Robinson
+ * @version 0.0.2 (2017-10-2)
+ */
 public class BEDFileExporter {
 
     private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
@@ -73,8 +79,8 @@ public class BEDFileExporter {
         description = fragmentMarginsUniqueBEDfile;
         out_fragment_margins_unique.println("track name='" + description + "' description='" + description + "'");
 
-        PrintStream out_uscuURL = new PrintStream(new FileOutputStream(getFullPath(ucscURLfile)));
-        out_uscuURL.println("Gene\tTSS\tURL");
+        PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(ucscURLfile)));
+        out_ucscURL.println("Gene\tTSS\tURL");
 
         Set<String> uniqueFragmentMargins = new HashSet<String>();
 
@@ -82,46 +88,47 @@ public class BEDFileExporter {
 
         for (ViewPoint vp : viewpointlist) {
                 // print viewpoint
-                String getReferenceSequenceID = vp.getReferenceID(); // vpvGeneList.get(i).getContigID();
-                Integer vpStaPos = vp.getStartPos(); // vpvGeneList.get(i).getviewPointList().get(j).getStartPos();
-                Integer vpEndPos = vp.getEndPos(); //vpvGeneList.get(i).getviewPointList().get(j).getEndPos();
-                Integer vpGenomicPos = vp.getGenomicPos(); //vpvGeneList.get(i).getviewPointList().get(j).getGenomicPos();
-                String geneSymbol =  vp.getTargetName(); //.get(i).getGeneSymbol();
+                String getReferenceSequenceID = vp.getReferenceID();
+                Integer vpStaPos = vp.getStartPos();
+                Integer vpEndPos = vp.getEndPos();
+                Integer vpGenomicPos = vp.getGenomicPos();
+                String geneSymbol =  vp.getTargetName();
                 Integer viewPointScore=0;
                 if(vp.getResolved()) {
                     viewPointScore=1;
                 }
                 viewPointScore=vp.getNumOfSelectedFrags();
-                //double viewPointScore2 = vpvGeneList.get(i).getviewPointList().get(j).getViewpointScore("GATC",marginSize);
+
                 out_viewpoints.println(getReferenceSequenceID + "\t" + (vpStaPos-1) + "\t" + vpEndPos + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 out_genomic_positions.println(getReferenceSequenceID + "\t" + vpGenomicPos + "\t" + (vpGenomicPos+1) + "\t" + geneSymbol + "\t" + viewPointScore);
 
                 // print selected fragments of the viewpoint
-//                ArrayList<Segment> selectedRestSegList = vp.getSelectedRestSegList(cuttingMotif);
-                List<Segment> selectedRestSegList = vp.getActiveSegments();
-                for (int k = 0; k < selectedRestSegList.size(); k++) {
-
-                    Integer rsStaPos = selectedRestSegList.get(k).getStartPos();
-                    Integer rsEndPos = selectedRestSegList.get(k).getEndPos();
+                //List<Segment> selectedRestSegList = vp.getActiveSegments();
+                //for (int k = 0; k < selectedRestSegList.size(); k++) {
+                int k=0; // index of selected fragment
+                for (Segment segment : vp.getActiveSegments()) {
+                    k++;
+                    Integer rsStaPos = segment.getStartPos();
+                    Integer rsEndPos = segment.getEndPos();
                     out_fragments.println(getReferenceSequenceID + "\t" + (rsStaPos-1) + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k);
 
                     // print margins of selected fragments
-                    for(int l = 0; l<selectedRestSegList.get(k).getSegmentMargins().size(); l++) {
-                        Integer fmStaPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getStartPos();
-                        Integer fmEndPos = selectedRestSegList.get(k).getSegmentMargins().get(l).getEndPos();
+                    for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
+                        Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
+                        Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
                         out_fragment_margins.println(getReferenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin");
                         uniqueFragmentMargins.add(getReferenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol);
                     }
                 }
             String url= getDefaultURL(vp,genomeBuild);
-                out_uscuURL.println(String.format("%s\t%s\t%s",vp.getTargetName(),vp.getGenomicLocationString(),url));
+                out_ucscURL.println(String.format("%s\t%s\t%s",vp.getTargetName(),vp.getGenomicLocationString(),url));
             }
         out_viewpoints.close();
         out_genomic_positions.close();
         out_fragments.close();
         out_fragment_margins.close();
-        out_uscuURL.close();
+        out_ucscURL.close();
 
         /* print out unique set of margins for enrichment (and calculate the total length of all  margins) */
         Integer totalLengthOfMargins=0;
