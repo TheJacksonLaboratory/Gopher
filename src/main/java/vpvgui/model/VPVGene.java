@@ -6,9 +6,12 @@ import java.util.*;
 /**
  * This class will represent Genes according to the way we are analyzing them in VPV.
  * The main purpose of the class is to keep track of the gene symbols and all of the
- * independent transcription start sites that are dervied from the UCSC RefGenes file.
+ * independent transcription start sites that are derived from the UCSC RefGenes file.
+ * <p> Note that the numbering system used internally by this class is one-based, fully closed. The
+ * transcription start sites recorded in the set {@link #positions} is thus one-based and corresponds to
+ * the positions seen in the UCSC browser.
  * @author Peter Robinson
- * @version 0.2
+ * @version 0.0.3 (2017-10-02)
  */
 public class VPVGene implements Comparable<VPVGene>, Serializable {
     /** serialization version ID */
@@ -21,19 +24,20 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
     private String contigID =null;
     /** Is this a plus strand gene? */
     private boolean forward;
-    /** this will keep count of the transcript start site position we have already seen
-     * in order to avoid entering duplicate ViewPoint objects.
-     * The set then has all TSS (unique)
-     */
+    /** The transcript start site positions that correspond to this gene. We use a TreeSet to avoid duplicates and keep
+     * the entries sorted in ascending order.   */
     private TreeSet<Integer> positions;
 
-
+    /**
+     * @param geneid The RefSeq id (e.g., NM_12345)
+     * @param symbol The official gene symbol
+     */
     public VPVGene(String geneid, String symbol) {
         this.refSeqID =geneid;
         this.geneSymbol=symbol;
         this.positions =new TreeSet<>();
     }
-    /** @return a sorted list of TSS. */
+    /** @return a list of TSS sorted in ascending order with one-based numbering. */
     public List<Integer> getTSSlist() {
         return new ArrayList<>(positions);
     }
@@ -56,7 +60,7 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
 
     /** This function adds a position (such as a transcription start site) that is the
      * "central" or "important" position around which we want to construct a ViewPoint.
-     * @param pos
+     * @param pos Position on the reference sequence (usually a chromosome) given in one-based numbering
      */
     public void addGenomicPosition(int pos) {
         this.positions.add(pos);

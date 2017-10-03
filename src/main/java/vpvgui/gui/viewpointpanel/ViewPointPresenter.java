@@ -266,7 +266,7 @@ public class ViewPointPresenter implements Initializable {
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
-                    cdf.getValue().getSegment().setSelected(new_val); /* changes the selected value of the Segment */
+                    cdf.getValue().getSegment().setSelected(new_val); // changes the selected value of the Segment
                     Platform.runLater(new Runnable() {
                         @Override public void run() {
                             updateScore();

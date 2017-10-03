@@ -49,7 +49,7 @@ public class ViewPoint implements Serializable {
     private String referenceSequenceID;
     /** Name of the target of the viewpoint (often a gene).*/
     private String targetName;
-    /** central genomic coordinate of the viewpoint, usually a trancription start site */
+    /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
     private Integer genomicPos;
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosUp;
@@ -187,7 +187,13 @@ public class ViewPoint implements Serializable {
         setResolved(false);
         warnings="";
         /* Create segmentFactory */
-        initializeSegmentFactory(fastaReader);
+        segmentFactory = new SegmentFactory(this.referenceSequenceID,
+                this.genomicPos,
+                fastaReader,
+                this.maxDistToGenomicPosUp,
+                this.maxDistToGenomicPosDown,
+                ViewPoint.chosenEnzymes);
+        logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
         initRestrictionFragments(fastaReader);
     }
 
@@ -266,22 +272,6 @@ public class ViewPoint implements Serializable {
         public ViewPoint build() {
             return new ViewPoint(this);
         }
-    }
-
-
-    /** Initialize {@link #segmentFactory} on the basis of the chosen enzyme cutting patterns in {@link #chosenEnzymes}.*/
-    public void initializeSegmentFactory(IndexedFastaSequenceFile fastaReader) {
-        // TODO: Exception: genomicPos + maxDistToGenomicPosDown outside genomic range.
-        // TODO: Handling: Set maxDistToGenomicPosDown to largest possible value and throw warning.
-        // TODO: Exception: genomicPos.
-        // TODO: Handling: Discard viewpoint and throw warning.
-        segmentFactory = new SegmentFactory(this.referenceSequenceID,
-                this.genomicPos,
-                fastaReader,
-                this.maxDistToGenomicPosUp,
-                this.maxDistToGenomicPosDown,
-                ViewPoint.chosenEnzymes);
-        logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
     }
 
 

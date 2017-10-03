@@ -31,12 +31,11 @@ import java.util.zip.GZIPInputStream;
  * </ol>
  * <p>Note that we skip all gene models located on random chromosomes because we do not want to create probes for
  * random chromosome contigs at this time.</p>
- * <p> The class procudes a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
- * These objects use numbering, which is 0-start, half-open (0-based). In other words, the interval (0,5) could
- * be used to describe the coordinates of five fingers -- starting with 0 for the thumb, and with the 5 being open-end
- * (excluded).</p>
+ * <p> The class produces a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
+ * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
+ * included, which is the way the data are shown on the UCSC browser).</p>
  * @author Peter Robinson
- * @version 0.0.3 (2017-08-26)
+ * @version 0.0.4 (2017-10-02)
  */
 public class RefGeneParser {
 
@@ -74,10 +73,12 @@ public class RefGeneParser {
                 if (chrom.contains("random")) { continue; } /* do not take gene models on random contigs. */
                 String strand=A[3];
                 Integer gPos;
+                // The UCSC database files have 0-based, closed start, open end numbers
+                // we want to return 1-0based, fully closed position (both endpoints included).
                 if (strand.equals("+")) {
-                    gPos = Integer.parseInt(A[4]);
+                    gPos = Integer.parseInt(A[4]) + 1;
                 } else {
-                    gPos = Integer.parseInt(A[5])-1;
+                    gPos = Integer.parseInt(A[5]);
                 }
                 String name2=A[12];
                 //System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
