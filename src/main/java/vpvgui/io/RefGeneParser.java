@@ -70,6 +70,7 @@ public class RefGeneParser {
                 String A[]=line.split("\t");
                 String accession=A[1];
                 String chrom=A[2];
+                if (chrom.contains("_")) { continue;}
                 if (chrom.contains("random")) { continue; } /* do not take gene models on random contigs. */
                 String strand=A[3];
                 Integer gPos;
