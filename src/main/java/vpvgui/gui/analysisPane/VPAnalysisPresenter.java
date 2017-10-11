@@ -57,6 +57,8 @@ public class VPAnalysisPresenter implements Initializable {
 
     @FXML private TableColumn<ViewPoint,String> viewpointScoreColumn;
 
+    @FXML private TableColumn<ViewPoint,String> viewpointTotalLengthOfActiveSegments;
+
 
    // private BooleanProperty editingStarted;
 
@@ -80,6 +82,21 @@ public class VPAnalysisPresenter implements Initializable {
 
     }
 
+    /** Class for sorting items like 100 and 1000 */
+    class IntegerComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            try {
+                Integer d1 = Integer.parseInt(s1);
+                Integer d2 = Integer.parseInt(s2);
+                return d1.compareTo(d2);
+            } catch (Exception e) {
+                logger.error(String.format("Error encounted while sorting integer values %s and %s",s1,s2));
+                logger.error(e,e);
+                return 0;
+            }
+        }
+    }
 
     /** Class for sorting items like 2.3% and 34.5% */
     class PercentComparator implements Comparator<String> {
@@ -203,6 +220,14 @@ public class VPAnalysisPresenter implements Initializable {
         // fifth column--score of fragments.
         viewpointScoreColumn.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScoreAsPercentString())));
         viewpointScoreColumn.setComparator(new PercentComparator());
+
+        // sixth column--total length of active segments
+        viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
+        viewpointTotalLengthOfActiveSegments.setComparator(new IntegerComparator());
+
+
+        //viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf-> new ReadOnlyIntegerWrapper(Integer.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
+        //viewpointTotalLengthOfActiveSegments.setComparator();
     }
 
 
