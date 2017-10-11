@@ -684,4 +684,11 @@ public class ViewPoint implements Serializable {
         return getActiveSegments().stream().mapToInt(segment -> segment.getMarginSize()).sum();
     }
 
+    /** @return the total length of all active segments of this ViewPoint. */
+    public int getTotalLengthOfActiveSegments() {
+        return getActiveSegments().stream().mapToInt(segment -> segment.length()).sum();
+    }
+
+
+
 }
