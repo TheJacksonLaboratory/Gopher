@@ -31,12 +31,11 @@ import java.util.zip.GZIPInputStream;
  * </ol>
  * <p>Note that we skip all gene models located on random chromosomes because we do not want to create probes for
  * random chromosome contigs at this time.</p>
- * <p> The class procudes a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
- * These objects use numbering, which is 0-start, half-open (0-based). In other words, the interval (0,5) could
- * be used to describe the coordinates of five fingers -- starting with 0 for the thumb, and with the 5 being open-end
- * (excluded).</p>
+ * <p> The class produces a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
+ * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
+ * included, which is the way the data are shown on the UCSC browser).</p>
  * @author Peter Robinson
- * @version 0.0.3 (2017-08-26)
+ * @version 0.0.4 (2017-10-02)
  */
 public class RefGeneParser {
 
@@ -44,6 +43,7 @@ public class RefGeneParser {
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.*/
     private Map<String, VPVGene> genemap=null;
+    private Map<String, VPVGene> genemap_2=null;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
@@ -55,6 +55,7 @@ public class RefGeneParser {
      */
     public RefGeneParser(String path) {
         genemap=new HashMap<>();
+        genemap_2=new HashMap<>();
         parse(path);
     }
 
@@ -71,19 +72,23 @@ public class RefGeneParser {
                 String A[]=line.split("\t");
                 String accession=A[1];
                 String chrom=A[2];
+                if (chrom.contains("_")) { continue;}
                 if (chrom.contains("random")) { continue; } /* do not take gene models on random contigs. */
                 String strand=A[3];
                 Integer gPos;
+                // The UCSC database files have 0-based, closed start, open end numbers
+                // we want to return 1-0based, fully closed position (both endpoints included).
                 if (strand.equals("+")) {
-                    gPos = Integer.parseInt(A[4]);
+                    gPos = Integer.parseInt(A[4]) + 1;
                 } else {
-                    gPos = Integer.parseInt(A[5])-1;
+                    gPos = Integer.parseInt(A[5]);
                 }
                 String name2=A[12];
-                //System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
+                String key = name2.concat(chrom);
+                System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
                 VPVGene gene=null;
-                if (genemap.containsKey(name2)) {
-                    gene = genemap.get(name2);
+                if (genemap_2.containsKey(key)) {
+                    gene = genemap_2.get(key);
                 } else {
                     gene = new VPVGene(accession, name2);
                     gene.setChromosome(chrom);
@@ -96,6 +101,7 @@ public class RefGeneParser {
                         System.exit(1); /* todo throw some exception. */
                     }
                     genemap.put(name2,gene);
+                    genemap_2.put(key,gene);
                 }
                 gene.addGenomicPosition(gPos);
             }
@@ -141,7 +147,7 @@ public class RefGeneParser {
         this.invalidGeneSymbols = new HashSet<>();
         this.validGeneSymbols = new HashSet<>();
         for (String sym:genelst) {
-            if (this.genemap.containsKey(sym)) {
+            if (this.genemap.containsKey(sym)) { // it's only checked, if a gene is in refGene or not -> use genemap
                 validGeneSymbols.add(sym);
             } else {
                 invalidGeneSymbols.add(sym);
@@ -156,15 +162,15 @@ public class RefGeneParser {
      */
     public List<VPVGene> getVPVGeneList() {
         List<VPVGene> genelist=new ArrayList<>();
-        for (VPVGene g: genemap.values()) {
+        for (VPVGene g: genemap_2.values()) {
             if (this.validGeneSymbols.contains(g.getGeneSymbol()))
             genelist.add(g);
         }
-        return genelist;
+        return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use genemap_2
     }
 
     /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
-    public int n_totalRefGenes() { return this.genemap.size(); }
+    public int n_totalRefGenes() { return this.genemap.size(); } // not sure if I should use genemap or genemap_2 -> use genemap
 
     /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
      * number of viewpoints we will design for this gene. Intended for unit testing.
@@ -172,7 +178,7 @@ public class RefGeneParser {
      */
     public int n_totalTSSstarts() {
         int n=0;
-        for (VPVGene vpg :genemap.values()) {
+        for (VPVGene vpg :genemap_2.values()) { // must contain all TSS -> use genemap_2
             n+=vpg.n_viewpointstarts();
         }
         return n;

@@ -36,8 +36,8 @@ import java.util.List;
 public class RefGeneParserTest {
 
     private static RefGeneParser parser;
-    /** four gene symbols that should be found by the parser, and one that should not. */
-    private static String[] symbols={"CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
+    /** five gene symbols that should be found by the parser, and one that should not. */
+    private static String[] symbols={"WASH7P","CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -56,7 +56,7 @@ public class RefGeneParserTest {
 
     @Test
     public void testFindValidGenes() {
-        int expected=4;
+        int expected=5; /* there are five valid genes in "symbols" */
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
         List<String> valid=parser.getValidGeneSymbols();
@@ -98,7 +98,7 @@ public class RefGeneParserTest {
         Assert.assertEquals(isForwardStrand,gene.isForward());
         List<Integer> gPosList = gene.getTSSlist();
         Assert.assertEquals(1,gPosList.size());
-        Integer expectedPos=43355685; /* Note: zero based numbering! */
+        Integer expectedPos=43355686; /* Note: one based fully closed numbering! */
         Assert.assertEquals(expectedPos,gPosList.get(0));
     }
 
@@ -109,7 +109,63 @@ public class RefGeneParserTest {
     public void testNumberOfStartPoints() {
         int expected=22;
         Assert.assertEquals(expected,parser.n_totalTSSstarts());
-
     }
+
+
+    /**
+     * WASH7P is on the negative strand of chromosome 1. It has one entry in out test file
+     * <pre>chr1	-	14361	29370	29370	29370</pre>
+     * The TSS is thus 29370 (zero-based half closed). The conversion to the reverse strand for
+     * one-based fully closes numbering means that 29730 is the expected TSS for this gene.
+     */
+
+    @Test
+    public void testGenomicPosNegStrandExample() {
+        List<String> list = Arrays.asList(symbols);
+        parser.checkGenes(list);
+        List<VPVGene> vpvgenes=parser.getVPVGeneList();
+        VPVGene gene=null;
+        for (VPVGene g:vpvgenes) {
+            if (g.getGeneSymbol().equals("WASH7P")){
+                gene=g; break;
+            }
+        }
+        Assert.assertNotNull(gene);
+        Assert.assertFalse(gene.isForward());
+        List<Integer> tssList=gene.getTSSlist();
+        Assert.assertEquals(1,tssList.size());
+        Integer expected=29370;
+        System.err.println(gene.toString());
+        Assert.assertEquals(expected,tssList.get(0));
+    }
+
+
+    /**
+     * LINC01010 is on the positive strand of chromosome 6
+     * In our test file there is only one line for the gene
+     * <pre>chr6	+	134758853	134825158	134825158	134825158...</pre>
+     * There is thus only one TSS at 134758853 (zero based). We are expecting the parser to
+     * return 1-start, fully-closed numbers, so we actually expect 134758854.
+     */
+    @Test
+    public void testGenomicPosPlusStrandExample() {
+        List<String> list = Arrays.asList(symbols);
+        parser.checkGenes(list);
+        List<VPVGene> vpvgenes=parser.getVPVGeneList();
+        VPVGene gene=null;
+        for (VPVGene g:vpvgenes) {
+            if (g.getGeneSymbol().equals("LINC01010")){
+                gene=g; break;
+            }
+        }
+        Assert.assertNotNull(gene);
+        Assert.assertTrue(gene.isForward());
+        List<Integer> tssList=gene.getTSSlist();
+        //there should be just one TSS for this gene!
+        Assert.assertEquals(1,tssList.size());
+        Integer expected=134758854;
+        Assert.assertEquals(expected,tssList.get(0));
+    }
+
 
 }

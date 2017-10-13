@@ -28,7 +28,7 @@ public class SegmentFactory implements Serializable {
      * serialization version ID
      */
     static final long serialVersionUID = 1L;
-    /** The central, anchor position of the viewpoint. */
+    /** The central, anchor position of the viewpoint (one-based numbering). */
     private Integer genomicPos;
     /** The distance from {@link #genomicPos} in 3' direction.*/
     private Integer maxDistToGenomicPosUp;
@@ -55,8 +55,8 @@ public class SegmentFactory implements Serializable {
      * The keys for the <i>HashMap</i> will be the cutting sites, e.g., GATC (without '^' characters).
      * In addition to the specific sites, there is one special key <i>ALL</i> which contains the cutting positions for the union of all motifs.
      *
-     * @param referenceSequenceID     name of the genomic sequence, e.g. <i>chr1</i>. TODO Not needed, we can delete this argument
-     * @param genomicPos              central position of the region for which the CuttingPositionMap is created.
+     * @param referenceSequenceID     name of the genomic sequence, e.g. {@code chr1}.
+     * @param genomicPos              central position of the region for which the CuttingPositionMap is created (one-based numbering).
      * @param maxDistToGenomicPosUp   maximal distance to 'genomicPos' in upstream direction.
      * @param maxDistToGenomicPosDown maximal distance to 'genomicPos' in downstream direction.
      * @param fastaReader             indexed FASTA file that contains the sequence information required for the calculation of cutting positions.
@@ -85,10 +85,11 @@ public class SegmentFactory implements Serializable {
                 logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + chromosomeLength + ").");
                 maxDistToGenomicPosDown = chromosomeLength - genomicPos;
             }
+            // note fastaReader refers to one-based numbering scheme.
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
             Pattern pattern = Pattern.compile(cutpat);
             Matcher matcher = pattern.matcher(genomicPosRegionString);
-            ArrayList<Integer> cuttingPositionList = new ArrayList<Integer>();
+            ArrayList<Integer> cuttingPositionList = new ArrayList<>();
             int fragmentStart=genomicPos - maxDistToGenomicPosUp; /* one-based position of first nucleotide in the entire subsequence returned by fasta reader */
             while (matcher.find()) {
                     // replaces matcher.start() - maxDistToGenomicPosUp + offset;

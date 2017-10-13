@@ -15,6 +15,7 @@
             <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
             <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
             <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
+            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Length active segments" />
          </columns>
       </TableView>
 
