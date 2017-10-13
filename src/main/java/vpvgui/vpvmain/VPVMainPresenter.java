@@ -224,7 +224,7 @@ public class VPVMainPresenter implements Initializable {
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            resetGenomeBuild(newValue);
+            setGenomeBuild(newValue);
         });
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
@@ -254,9 +254,20 @@ public class VPVMainPresenter implements Initializable {
         if (genomebuild!=null)
             this.genomeBuildLabel.setText(genomebuild);
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
+        boolean genomeDownloaded=false;
         if (path_to_downloaded_genome_directory!= null) {
             this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
+        } else {
+            this.downloadedGenomeLabel.setText("...");
+            this.genomeDownloadPI.setProgress(0);
+        }
+        if (model.isGenomeUnpacked()) {
+            this.decompressGenomeLabel.setText("extraction previously completed");
+            this.genomeDecompressPI.setProgress(1.00);
+        } else {
+            this.decompressGenomeLabel.setText("...");
+            this.genomeDecompressPI.setProgress(0.0);
         }
         String refGenePath=this.model.getRefGenePath();
         if (refGenePath!=null) {
@@ -288,22 +299,6 @@ public class VPVMainPresenter implements Initializable {
         primaryStage = stage;
     }
 
-    /**
-     * Initialize the bindings to Java bean properties in the model with
-     * the GUI elements.
-     */
-//    private void initializeBindings() {
-//       // genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
-//        /*this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
-//        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
-//        this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-//        this.maxSizeUpTextField.textProperty().bindBidirectional(model.getMaxSizeUp(),new NumberStringConverter());
-//        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
-//        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
-//        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
-//        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
-//        */
-//    }
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
@@ -322,7 +317,7 @@ public class VPVMainPresenter implements Initializable {
      * also get the corresponding transcript file.
      * @param build Name of genome build.
      */
-    private void resetGenomeBuild(String build) {
+    private void setGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
@@ -353,13 +348,16 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error","Could not get path to download genome.");
             return;
         }
-        logger.info("Got back as download dir "+file.getAbsolutePath());
-        gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDownloadPI);
-        model.setGenomeDirectoryPath(file.getAbsolutePath());
-        this.downloadedGenomeLabel.setText(file.getAbsolutePath());
-        this.genomeDownloadPI.setProgress(1.0);
-
-
+        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
+        if (this.model.checkDownloadComplete(file.getAbsolutePath())) {
+            // we're done!
+            this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
+            this.genomeDownloadPI.setProgress(1.0);
+        } else {
+            gdownloader.downloadGenome(file.getAbsolutePath(), model.getGenomeBasename(), genomeDownloadPI);
+            model.setGenomeDirectoryPath(file.getAbsolutePath());
+            this.downloadedGenomeLabel.setText(file.getAbsolutePath());
+        }
     }
 
     /**
@@ -388,7 +386,12 @@ public class VPVMainPresenter implements Initializable {
         }
         Operation op = new RefGeneDownloadOperation(file.getPath());
         Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
-        // TODO make this setOnSucceeded and then set model and GUI.
+        downloadTask.setOnSucceeded( event -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
+            this.downloadedTranscriptsLabel.setText(transcriptName);
+        });
+
         if (downloadTask.needToDownload(op)) {
             Thread th = new Thread(downloadTask);
             th.setDaemon(true);
@@ -396,10 +399,6 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.transcriptDownloadPI.setProgress(1.0);
         }
-        /* ToDo-put this in setOnsucceeded. */
-       String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-       this.model.setRefGenePath(abspath);
-       this.downloadedTranscriptsLabel.setText(transcriptName);
        e.consume();
     }
 
@@ -409,7 +408,13 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
-        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
+        if (this.model.getGenome().isIndexingComplete()) {
+            decompressGenomeLabel.setText("chromosome files extracted");
+            genomeDecompressPI.setProgress(1.00);
+            model.setGenomeUnpacked();
+            return;
+        }
+        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
         gindexer.setOnSucceeded( event -> {
             decompressGenomeLabel.setText(gindexer.getStatus());

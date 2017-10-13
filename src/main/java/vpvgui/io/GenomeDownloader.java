@@ -38,21 +38,18 @@ public class GenomeDownloader {
     }
 
 
-
-
-
-    public void setDownloadDirectoryAndDownloadIfNeeded(String directory, String basename, ProgressIndicator pi) {
-        Operation op = new GenomeDownloadOperation(directory);
+    /**
+     * Start a thread that will download the chromFa.tar.gz file from UCSC.
+     * @param directory Directory we will download to
+     * @param basename Name of the file (chromFa.tar.gz)
+     * @param pi Progress indicator bound to the download operation.
+     */
+    public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-
-        } else {
-            currentStatus=String.format("Genome %s was already downloaded",this.genomebuild);
-            this.successful=true;
-        }
+        logger.trace(String.format("Starting download of %s to %s",directory,url));
+        Thread th = new Thread(downloadTask);
+        th.setDaemon(true);
+        th.start();
     }
 
 
