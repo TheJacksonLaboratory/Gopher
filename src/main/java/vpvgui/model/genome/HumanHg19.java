@@ -33,6 +33,7 @@ public class HumanHg19 extends Genome implements Serializable {
         if (gZippedGenomeFileDownloaded()) {
             return true; // i.e., we found the chromFa.tar.gz file
         }
+        logger.trace("Did not find chromFa.tar.gz. Will check for individual unpacked files.");
         // Now look for the unpacked files (the user may have deleted chromFa.tar.gz)
        return alreadyExtracted();
     }

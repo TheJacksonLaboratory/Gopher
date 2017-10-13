@@ -361,18 +361,18 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * @param e event triggeredby command to download appropriate RefGene.txt.gz file.
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
      */
    @FXML public void downloadRefGeneTranscripts(ActionEvent e) {
         String genome = this.model.getGenomeURL();
         if (genome==null)
             genome=genomeChoiceBox.getValue();
-        RefGeneDownloader rsd = new RefGeneDownloader(genome);
-        String transcriptName = rsd.getTranscriptName();
-        String basename=rsd.getBaseName();
+        RefGeneDownloader rgd = new RefGeneDownloader(genome);
+        String transcriptName = rgd.getTranscriptName();
+        String basename=rgd.getBaseName();
         String url=null;
         try {
-            url = rsd.getURL();
+            url = rgd.getURL();
         } catch (DownloadFileNotFoundException dfne) {
             ErrorWindow.display("Could not identify RefGene file for genome",dfne.getMessage());
             return;
@@ -380,25 +380,27 @@ public class VPVMainPresenter implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath()=="") {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             ErrorWindow.display("Error","Could not get path to download transcript file.");
             return;
         }
-        Operation op = new RefGeneDownloadOperation(file.getPath());
+        if (! rgd.needToDownload(file.getAbsolutePath())) {
+            logger.trace(String.format("Found refGene.txt.gz file at %s. No need to download",file.getAbsolutePath()));
+            this.transcriptDownloadPI.setProgress(1.0);
+            this.downloadedTranscriptsLabel.setText(transcriptName);
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
+        }
+
         Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
         downloadTask.setOnSucceeded( event -> {
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
             this.model.setRefGenePath(abspath);
             this.downloadedTranscriptsLabel.setText(transcriptName);
         });
-
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-        } else {
-            this.transcriptDownloadPI.setProgress(1.0);
-        }
+       Thread th = new Thread(downloadTask);
+       th.setDaemon(true);
+       th.start();
        e.consume();
     }
 
@@ -467,7 +469,7 @@ public class VPVMainPresenter implements Initializable {
      *
      * @param e event triggered by enter gene command.
      */
-    public void enterGeneList(ActionEvent e) {
+    @FXML public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
         /** The following command is just for debugging. We now have all VPVGenes, but still need to
          * add information about the restriction enzymes and the indexed FASTA file.

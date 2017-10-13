@@ -41,8 +41,6 @@ public class Model implements Serializable {
     private List<VPVGene> geneList=null;
     /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
     private Map<String,Integer> contigLengths;
-    /** Directory to which the Genome was downloaded */
-    private String genomeDirectoryPath=null;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
     /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
@@ -55,9 +53,6 @@ public class Model implements Serializable {
     private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
-    /** The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
-    //private String genomeBuild = null;
-
     /** An object to coordinate the genome build as well as the status of download, unpacking, and indexing. */
     private Genome genome;
     /** @return true if the genome files have been previously downloaded to the indicated path. */
@@ -226,9 +221,11 @@ public class Model implements Serializable {
         this.enzymelist=lst;
     }
 
-    public void setGenomeDirectoryPath(String p) { this.genomeDirectoryPath=p;}
-    public void setGenomeDirectoryPath(File f) { this.genomeDirectoryPath=f.getAbsolutePath();}
-    public String getGenomeDirectoryPath() { return this.genomeDirectoryPath;}
+    public void setGenomeDirectoryPath(String p) { this.genome.setPathToGenomeDirectory(p); }
+    public void setGenomeDirectoryPath(File f) { this.genome.setPathToGenomeDirectory(f.getAbsolutePath());}
+    public String getGenomeDirectoryPath() {
+        return this.genome.getPathToGenomeDirectory();
+    }
 
 
 
@@ -239,8 +236,6 @@ public class Model implements Serializable {
      */
     private void initializeEnzymesFromFile() {
         enzymelist = new ArrayList<>();
-        String fileName = "enzymelist.tab";
-        File file = new File(getClass().getClassLoader().getResource("enzymelist.tab").getFile());
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
             String line;

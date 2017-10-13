@@ -1,5 +1,7 @@
 package vpvgui.model.genome;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -10,6 +12,7 @@ import java.io.Serializable;
  * @version 0.0.1
  */
 public abstract class Genome implements Serializable {
+    static Logger logger = Logger.getLogger(Genome.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */
@@ -31,6 +34,7 @@ public abstract class Genome implements Serializable {
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
     }
+    public void setPathToGenomeDirectory(String absolutePath) { this.pathToGenomeDirectory=absolutePath;}
 
     public boolean isDownloadComplete() {
         return pathToGenomeDirectory!= null && downloadComplete;
@@ -63,6 +67,7 @@ public abstract class Genome implements Serializable {
     /** @return true if the chromFar.tar.gz file is found in the indicated directory. */
     protected boolean gZippedGenomeFileDownloaded() {
         File f = new File(this.pathToGenomeDirectory + File.separator + "chromFa.tar.gz");
+        logger.trace(String.format("Checking existing of file %s",f.getAbsolutePath()));
         return (f.exists() && !f.isDirectory());
     }
 

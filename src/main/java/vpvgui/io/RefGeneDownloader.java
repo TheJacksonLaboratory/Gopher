@@ -2,6 +2,8 @@ package vpvgui.io;
 
 import vpvgui.exception.DownloadFileNotFoundException;
 
+import java.io.File;
+
 /**
  * This class stores the URLs for the RefSeq.txt.gz file for the
  * indicated species (mm9,mm10,hg19,hg38.
@@ -39,6 +41,20 @@ public class RefGeneDownloader {
     public String getTranscriptName() { return String.format("%s (%s)",getBaseName(),genome); }
     /** @return "refGene.txt.gz", the basename of all of the downloaded UCSC files. */
     public String getBaseName() { return "refGene.txt.gz";}
+
+
+
+    public boolean needToDownload(String localDirectory) {
+        File f = new File(localDirectory + File.separator + "refGene.txt.gz");
+        if(f.exists() && !f.isDirectory()) {
+            return false;
+        }
+        f = new File(localDirectory + File.separator + "refGene.txt");
+        if(f.exists() && !f.isDirectory()) {
+            return false;
+        }
+        return true;
+    }
 
 
 }
