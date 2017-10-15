@@ -36,6 +36,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" />
                               <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
                               <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
+                              <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>

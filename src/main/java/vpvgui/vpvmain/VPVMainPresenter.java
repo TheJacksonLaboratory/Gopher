@@ -22,6 +22,7 @@ import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBView;
+import vpvgui.gui.deletepane.delete.DeleteFactory;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
@@ -808,6 +809,16 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void about(ActionEvent e) {
         Popups.showAbout(model.getVersion(), model.getLastChangeDate());
+        e.consume();
+    }
+
+    /** Open a window that will allow the user to delete unwanted project files. Do not allow the
+     * user to delete the file that is currently opened.
+     * @param e action event.
+     */
+    @FXML
+    public void deleteProjectFiles(ActionEvent e) {
+        DeleteFactory.display(this.model);
         e.consume();
     }
 

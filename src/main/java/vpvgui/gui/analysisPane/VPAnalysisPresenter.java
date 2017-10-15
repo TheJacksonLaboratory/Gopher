@@ -302,12 +302,4 @@ public class VPAnalysisPresenter implements Initializable {
         viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
-
-   /* private TableColumn createTextColumn(String name, String caption) {
-        TableColumn column = new TableColumn(caption);
-        column.setCellValueFactory(new PropertyValueFactory<ViewPoint, String>(name));
-        column.setCellFactory(TextFieldTableCell.forTableColumn());
-        return column;
-    }*/
-
 }
