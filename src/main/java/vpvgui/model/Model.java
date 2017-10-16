@@ -2,6 +2,9 @@ package vpvgui.model;
 
 
 import org.apache.log4j.Logger;
+import vpvgui.gui.ErrorWindow;
+import vpvgui.model.genome.Genome;
+import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
@@ -19,10 +22,10 @@ import java.util.Properties;
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 3L;
+    static final long serialVersionUID = 4L;
 
-    private static final String VERSION="0.1.13";
-    private static final String LAST_CHANGE_DATE="09/12/2017, 4:22 PM";
+    private static final String VERSION="0.1.14";
+    private static final String LAST_CHANGE_DATE="10/04/2017, 4:22 PM";
 
 
 
@@ -38,8 +41,6 @@ public class Model implements Serializable {
     private List<VPVGene> geneList=null;
     /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
     private Map<String,Integer> contigLengths;
-    /** Directory to which the Genome was downloaded */
-    private String genomeDirectoryPath=null;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
     /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
@@ -52,12 +53,25 @@ public class Model implements Serializable {
     private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
-    /** The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
-    private String genomeBuild = null;
+    /** An object to coordinate the genome build as well as the status of download, unpacking, and indexing. */
+    private Genome genome;
+    /** @return true if the genome files have been previously downloaded to the indicated path. */
+    public boolean checkDownloadComplete(String path) {
+        return this.genome.checkDownloadComplete(path);
+    }
     /** @return The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
-    public String getGenomeBuild() { return genomeBuild; }
+    public String getGenomeBuild() { return genome.getGenomeBuild(); }
     /** @param newDatabase The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
-    public void setGenomeBuild(String newDatabase) { genomeBuild=newDatabase; }
+    public void setGenomeBuild(String newDatabase) {
+        if (newDatabase.equals("hg19")) {
+            this.genome = new HumanHg19();
+        } else {
+            ErrorWindow.display("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
+            return;
+        }
+    }
+
+    public Genome getGenome() { return this.genome; }
     /** Minimum size of the view point upstream of the anchor (transcription start site, usually). */
     private Integer minSizeUp = null;
     public int getMinSizeUp() {return minSizeUp;}
@@ -165,6 +179,7 @@ public class Model implements Serializable {
 
 
     public Model() {
+        this.genome=new HumanHg19(); /* the default genome */
         initializeEnzymesFromFile();
     }
 
@@ -206,9 +221,11 @@ public class Model implements Serializable {
         this.enzymelist=lst;
     }
 
-    public void setGenomeDirectoryPath(String p) { this.genomeDirectoryPath=p;}
-    public void setGenomeDirectoryPath(File f) { this.genomeDirectoryPath=f.getAbsolutePath();}
-    public String getGenomeDirectoryPath() { return this.genomeDirectoryPath;}
+    public void setGenomeDirectoryPath(String p) { this.genome.setPathToGenomeDirectory(p); }
+    public void setGenomeDirectoryPath(File f) { this.genome.setPathToGenomeDirectory(f.getAbsolutePath());}
+    public String getGenomeDirectoryPath() {
+        return this.genome.getPathToGenomeDirectory();
+    }
 
 
 
@@ -219,8 +236,6 @@ public class Model implements Serializable {
      */
     private void initializeEnzymesFromFile() {
         enzymelist = new ArrayList<>();
-        String fileName = "enzymelist.tab";
-        File file = new File(getClass().getClassLoader().getResource("enzymelist.tab").getFile());
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
             String line;

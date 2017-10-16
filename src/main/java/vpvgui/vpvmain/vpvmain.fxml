@@ -36,6 +36,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" />
                               <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
                               <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
+                              <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
@@ -198,7 +199,7 @@
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </padding>
                                     </Label>
-                                    <Label fx:id="approachLabel" GridPane.columnIndex="3" />
+                                    <Label fx:id="approachLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" />
                                     <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6" />
                                     <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="7" />
                                     <Label fx:id="decompressGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3" />

@@ -22,6 +22,7 @@ import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBView;
+import vpvgui.gui.deletepane.delete.DeleteFactory;
 import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
@@ -224,7 +225,7 @@ public class VPVMainPresenter implements Initializable {
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
         genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            resetGenomeBuild(newValue);
+            setGenomeBuild(newValue);
         });
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
@@ -254,9 +255,20 @@ public class VPVMainPresenter implements Initializable {
         if (genomebuild!=null)
             this.genomeBuildLabel.setText(genomebuild);
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
+        boolean genomeDownloaded=false;
         if (path_to_downloaded_genome_directory!= null) {
             this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
+        } else {
+            this.downloadedGenomeLabel.setText("...");
+            this.genomeDownloadPI.setProgress(0);
+        }
+        if (model.isGenomeUnpacked()) {
+            this.decompressGenomeLabel.setText("extraction previously completed");
+            this.genomeDecompressPI.setProgress(1.00);
+        } else {
+            this.decompressGenomeLabel.setText("...");
+            this.genomeDecompressPI.setProgress(0.0);
         }
         String refGenePath=this.model.getRefGenePath();
         if (refGenePath!=null) {
@@ -288,22 +300,6 @@ public class VPVMainPresenter implements Initializable {
         primaryStage = stage;
     }
 
-    /**
-     * Initialize the bindings to Java bean properties in the model with
-     * the GUI elements.
-     */
-//    private void initializeBindings() {
-//       // genomeChoiceBox.valueProperty().bindBidirectional(model.genomeBuildProperty());
-//        /*this.fragNumUpTextField.textProperty().bindBidirectional(model.fragNumUpProperty(),new NumberStringConverter());
-//        this.fragNumDownTextField.textProperty().bindBidirectional(model.fragNumDownProperty(),new NumberStringConverter());
-//        this.minSizeUpTextField.textProperty().bindBidirectional(model.minSizeUpProperty(),new NumberStringConverter());
-//        this.maxSizeUpTextField.textProperty().bindBidirectional(model.getMaxSizeUp(),new NumberStringConverter());
-//        this.minSizeDownTextField.textProperty().bindBidirectional(model.minSizeDownProperty(),new NumberStringConverter());
-//        this.maxSizeDownTextField.textProperty().bindBidirectional(model.maxSizeDownProperty(),new NumberStringConverter());
-//        this.minFragSizeTextField.textProperty().bindBidirectional(model.minFragSizeProperty(),new NumberStringConverter());
-//        this.maxRepContentTextField.textProperty().bindBidirectional(model.maxRepeatContentProperty(),new NumberStringConverter());
-//        */
-//    }
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
@@ -322,7 +318,7 @@ public class VPVMainPresenter implements Initializable {
      * also get the corresponding transcript file.
      * @param build Name of genome build.
      */
-    private void resetGenomeBuild(String build) {
+    private void setGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
@@ -353,28 +349,31 @@ public class VPVMainPresenter implements Initializable {
             ErrorWindow.display("Error","Could not get path to download genome.");
             return;
         }
-        logger.info("Got back as download dir "+file.getAbsolutePath());
-        gdownloader.setDownloadDirectoryAndDownloadIfNeeded(file.getAbsolutePath(),model.getGenomeBasename(),genomeDownloadPI);
-        model.setGenomeDirectoryPath(file.getAbsolutePath());
-        this.downloadedGenomeLabel.setText(file.getAbsolutePath());
-        this.genomeDownloadPI.setProgress(1.0);
-
-
+        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
+        if (this.model.checkDownloadComplete(file.getAbsolutePath())) {
+            // we're done!
+            this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
+            this.genomeDownloadPI.setProgress(1.0);
+        } else {
+            gdownloader.downloadGenome(file.getAbsolutePath(), model.getGenomeBasename(), genomeDownloadPI);
+            model.setGenomeDirectoryPath(file.getAbsolutePath());
+            this.downloadedGenomeLabel.setText(file.getAbsolutePath());
+        }
     }
 
     /**
-     * @param e event triggeredby command to download appropriate RefGene.txt.gz file.
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
      */
    @FXML public void downloadRefGeneTranscripts(ActionEvent e) {
         String genome = this.model.getGenomeURL();
         if (genome==null)
             genome=genomeChoiceBox.getValue();
-        RefGeneDownloader rsd = new RefGeneDownloader(genome);
-        String transcriptName = rsd.getTranscriptName();
-        String basename=rsd.getBaseName();
+        RefGeneDownloader rgd = new RefGeneDownloader(genome);
+        String transcriptName = rgd.getTranscriptName();
+        String basename=rgd.getBaseName();
         String url=null;
         try {
-            url = rsd.getURL();
+            url = rgd.getURL();
         } catch (DownloadFileNotFoundException dfne) {
             ErrorWindow.display("Could not identify RefGene file for genome",dfne.getMessage());
             return;
@@ -382,24 +381,27 @@ public class VPVMainPresenter implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath()=="") {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             ErrorWindow.display("Error","Could not get path to download transcript file.");
             return;
         }
-        Operation op = new RefGeneDownloadOperation(file.getPath());
-        Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
-        // TODO make this setOnSucceeded and then set model and GUI.
-        if (downloadTask.needToDownload(op)) {
-            Thread th = new Thread(downloadTask);
-            th.setDaemon(true);
-            th.start();
-        } else {
+        if (! rgd.needToDownload(file.getAbsolutePath())) {
+            logger.trace(String.format("Found refGene.txt.gz file at %s. No need to download",file.getAbsolutePath()));
             this.transcriptDownloadPI.setProgress(1.0);
+            this.downloadedTranscriptsLabel.setText(transcriptName);
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
         }
-        /* ToDo-put this in setOnsucceeded. */
-       String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-       this.model.setRefGenePath(abspath);
-       this.downloadedTranscriptsLabel.setText(transcriptName);
+
+        Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
+        downloadTask.setOnSucceeded( event -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
+            this.downloadedTranscriptsLabel.setText(transcriptName);
+        });
+       Thread th = new Thread(downloadTask);
+       th.setDaemon(true);
+       th.start();
        e.consume();
     }
 
@@ -409,7 +411,13 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
-        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenomeDirectoryPath(),
+        if (this.model.getGenome().isIndexingComplete()) {
+            decompressGenomeLabel.setText("chromosome files extracted");
+            genomeDecompressPI.setProgress(1.00);
+            model.setGenomeUnpacked();
+            return;
+        }
+        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
         gindexer.setOnSucceeded( event -> {
             decompressGenomeLabel.setText(gindexer.getStatus());
@@ -462,7 +470,7 @@ public class VPVMainPresenter implements Initializable {
      *
      * @param e event triggered by enter gene command.
      */
-    public void enterGeneList(ActionEvent e) {
+    @FXML public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
         /** The following command is just for debugging. We now have all VPVGenes, but still need to
          * add information about the restriction enzymes and the indexed FASTA file.
@@ -801,6 +809,16 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void about(ActionEvent e) {
         Popups.showAbout(model.getVersion(), model.getLastChangeDate());
+        e.consume();
+    }
+
+    /** Open a window that will allow the user to delete unwanted project files. Do not allow the
+     * user to delete the file that is currently opened.
+     * @param e action event.
+     */
+    @FXML
+    public void deleteProjectFiles(ActionEvent e) {
+        DeleteFactory.display(this.model);
         e.consume();
     }
 

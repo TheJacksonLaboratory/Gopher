@@ -88,17 +88,7 @@ public class Downloader extends Task<Void> {
         this.urlstring=url;
     }
 
-    /** This method will be used for each of the data sources to check
-     * whether the requested file has already been downloaded.
-     * @param operation A functor that implements the required data check.
-     * @return
-     */
-    public boolean needToDownload(Operation operation){
-        if (operation.execute())
-            return true;
-        else
-            return false;
-        }
+
 
 
     /**

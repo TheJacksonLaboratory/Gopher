@@ -1,24 +1,27 @@
 package vpvgui.io;
 
 //import htsjdk.samtools.reference.FastaSequenceIndexCreator;
+import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
+import vpvgui.model.genome.Genome;
 
 import java.io.*;
 
 /**
  * This class is responsible for g-unzipping and untarring a downloaded genome file.
  * @author Peter Robinson
- * @version 0.0.2 (25 August, 2017)
+ * @version 0.0.4 (5 October, 2017)
  */
 public class GenomeGunZipper extends Task<Void>  {
     static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
     /** Path to the directory where we will download and decompress the genome file. */
-    private String genomeDirectoryPath=null;
+   // private String genomeDirectoryPath=null;
+    private Genome genome=null;
     /** This is the basename of the compressed genome file that we download from UCSC. */
     private static final String genomeFileNameTarGZ = "chromFa.tar.gz";
     /** This is the basename of the decompressed but still tar'd genome file that we download from UCSC. */
@@ -34,15 +37,18 @@ public class GenomeGunZipper extends Task<Void>  {
     public boolean OK() {return OK;}
 
     /**
-     * @param directoryPath Path to the direcotry where chromFa.tar.gz was downloaded.
+     * @param genom Reference to the model for downloaded/unpacked/index genome data.
      */
-    public GenomeGunZipper(String directoryPath, ProgressIndicator pi) {
+    public GenomeGunZipper(Genome genom, ProgressIndicator pi) {
         this.progress=pi;
-        this.genomeDirectoryPath=directoryPath;
+        this.genome=genom;
     }
 
+    public Genome getGenome() {
+        return genome;
+    }
 
-    public String getStatus(){return status;}
+    public String getStatus() { return status; }
 
     /**
      * We use this method to check if we need to g-unzip the genome files. (We only check for the
@@ -50,7 +56,7 @@ public class GenomeGunZipper extends Task<Void>  {
      * @return true if the chromFGa.tar.gz file has been previously extracted
      */
     private boolean alreadyExtracted() {
-        File f = new File(this.genomeDirectoryPath + File.separator + "chr1.fa");
+        File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + "chr1.fa");
         return f.exists();
     }
 
@@ -59,7 +65,7 @@ public class GenomeGunZipper extends Task<Void>  {
 
 
     /** This function uses the apache library to transform the chromFa.tar.gz file into the individual chromosome files.
-     * It is packaged as a Task to allow concurrency*/
+     * It is packaged as a Task to allow concurrency. */
     @Override
     protected Void call() {
         logger.debug("entering extractTarGZ");
@@ -72,7 +78,7 @@ public class GenomeGunZipper extends Task<Void>  {
         }
         if (this.progress != null)
             this.progress.setProgress(0.01); /* show progress as 1% to start off with */
-        String INPUT_GZIP_FILE = (new File(this.genomeDirectoryPath + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
+        String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
         try {
             InputStream in = new FileInputStream(INPUT_GZIP_FILE);
@@ -91,7 +97,7 @@ public class GenomeGunZipper extends Task<Void>  {
                 } else {
                     int count;
                     byte data[] = new byte[BUFFER_SIZE];
-                    File outfile = new File(this.genomeDirectoryPath + File.separator +entry.getName());
+                    File outfile = new File(this.genome.getPathToGenomeDirectory() + File.separator +entry.getName());
                     logger.trace("ungzip'ping "+ entry.getName());
                     FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
                     try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE)) {
