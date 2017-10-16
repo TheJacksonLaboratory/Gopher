@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.0.8 (2017-09-22)
+ * @version 0.0.9 (2017-10-14)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -113,7 +113,7 @@ public class ViewPoint implements Serializable {
         return restrictionSegmentList;
    }
 
-    /** @return A string with the length from the start of the first to end of the last active segment in kb */
+    /** @return A string with the length from the start of the first to end of the last active segment in kb
    public double getActiveLength() {
        Integer from=Integer.MAX_VALUE;
        Integer to = Integer.MIN_VALUE;
@@ -126,11 +126,11 @@ public class ViewPoint implements Serializable {
        }
        Double len = to-from+1.0;
        return len;
-    }
+    }*/
 
     /** @return a formated String representing the length of the ViewPoint in kb, e.g., 10;203 kb. */
     public String getActiveLengthInKilobases() {
-       double len = getActiveLength();
+       double len = getTotalLengthOfActiveSegments();
 
         double lenInKb=len/1000; // kilobases
         return String.format("%s kb (all selected fragments: %s kb)",
@@ -687,6 +687,22 @@ public class ViewPoint implements Serializable {
     /** @return the total length of all active segments of this ViewPoint. */
     public Integer getTotalLengthOfActiveSegments() {
         return getActiveSegments().stream().mapToInt(segment -> segment.length()).sum();
+    }
+
+    /**
+     * If no segments are active/selected, then return zero. Otherwise return the length between the 5' end of the
+     * first selected segment and the 3' end of the last selected segment.
+     * @return
+     */
+    public Integer getTotalLengthOfViewpoint() {
+        if (getActiveSegments().size()==0) return 0;
+        int min=Integer.MAX_VALUE;
+        int max=Integer.MIN_VALUE;
+        for (Segment s : getActiveSegments()) {
+            if (s.getStartPos()<min) min = s.getStartPos();
+            if (s.getEndPos()>max) max=s.getEndPos();
+        }
+        return max - min + 1;
     }
 
 

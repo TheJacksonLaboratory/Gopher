@@ -228,7 +228,7 @@ public class VPAnalysisPresenter implements Initializable {
         viewpointTotalLengthOfActiveSegments.setComparator(new IntegerComparator());
 
         // seventh column--total length viewpoint
-        viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getActiveLength()))));
+        viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
 
     }
