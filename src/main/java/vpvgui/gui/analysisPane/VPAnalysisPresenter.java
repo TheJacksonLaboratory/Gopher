@@ -59,6 +59,8 @@ public class VPAnalysisPresenter implements Initializable {
 
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLengthOfActiveSegments;
 
+    @FXML private TableColumn<ViewPoint,String> viewpointTotalLength;
+
 
    // private BooleanProperty editingStarted;
 
@@ -225,9 +227,10 @@ public class VPAnalysisPresenter implements Initializable {
         viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
         viewpointTotalLengthOfActiveSegments.setComparator(new IntegerComparator());
 
+        // seventh column--total length viewpoint
+        viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getActiveLength()))));
+        viewpointTotalLength.setComparator(new IntegerComparator());
 
-        //viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf-> new ReadOnlyIntegerWrapper(Integer.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
-        //viewpointTotalLengthOfActiveSegments.setComparator();
     }
 
 

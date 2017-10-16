@@ -5,17 +5,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
+
+
 <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
    <children>
-      <WebView fx:id="contentWebView" minHeight="300.0" minWidth="900.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
-      <TableView fx:id="viewPointTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0">
+      <WebView fx:id="contentWebView" minHeight="200.0" minWidth="1900.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+
+      <TableView fx:id="viewPointTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0" >
          <columns>
             <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" />
             <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
             <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
             <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
             <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
-            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Length active segments" />
+            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active segment's length" />
+            <TableColumn fx:id="viewpointTotalLength" minWidth="100.0" prefWidth="120.0" text="Total viewpoint length" />
          </columns>
       </TableView>
 
