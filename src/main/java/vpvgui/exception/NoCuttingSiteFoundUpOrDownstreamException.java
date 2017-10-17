@@ -3,12 +3,10 @@ package vpvgui.exception;
 /**
  * Created by phansen on 6/21/17.
  */
-public class NoCuttingSiteFoundUpOrDownstreamException extends Exception {
+public class NoCuttingSiteFoundUpOrDownstreamException extends VPVException {
 
-    // Parameterless Constructor
     public NoCuttingSiteFoundUpOrDownstreamException() {}
 
-    // Constructor that accepts a message
     public NoCuttingSiteFoundUpOrDownstreamException(String message)
     {
         super(message);

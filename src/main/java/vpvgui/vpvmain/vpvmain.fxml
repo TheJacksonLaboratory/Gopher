@@ -33,17 +33,18 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                               <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New" />
+                              <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open ..." />
                               <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" />
+                              <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
                               <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
                               <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
-                              <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
                       </Menu>
                       <Menu mnemonicParsing="false" text="Edit">
                         <items>
-                          <MenuItem mnemonicParsing="false" text="Delete" />
                               <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
+                              <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
                         </items>
                       </Menu>
                         <Menu mnemonicParsing="false" text="Design parameters">

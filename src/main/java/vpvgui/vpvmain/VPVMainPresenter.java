@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
@@ -61,15 +62,13 @@ public class VPVMainPresenter implements Initializable {
     private Model model = null;
     /** Convenience class that knows about the required order of operations and dependencies.*/
     private Initializer initializer=null;
-
-    private Stage primaryStage;
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
-     * obtain a reference to the primary scene, which is needed by FileChooser, etc.
+     * obtain a reference to the primary scene, which is needed by FileChooser, etc. It is set in the FXML
+     * document to refer to the Anchor pane that is the root node of the GUI.
      */
     @FXML
     private Node rootNode;
-
     /** List of genome builds. Used by genomeChoiceBox*/
     @FXML
     private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
@@ -112,8 +111,6 @@ public class VPVMainPresenter implements Initializable {
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
 
-
-
     @FXML private TextField fragNumUpTextField;
     @FXML private TextField fragNumDownTextField;
     @FXML private TextField minSizeUpTextField;
@@ -139,48 +136,29 @@ public class VPVMainPresenter implements Initializable {
     @FXML RadioMenuItem tiling3;
     @FXML RadioMenuItem tiling4;
     @FXML RadioMenuItem tiling5;
+    @FXML private Button showButton;
+    @FXML private Button exitButton;
+    @FXML private Button enterGeneListButton;
+    @FXML private Button createCaptureProbesButton;
 
-    @FXML
-    private Button showButton;
+    //@FXML
+    //private Label textLabel;
 
-    @FXML
-    private Button exitButton;
+    @FXML private TabPane tabpane;
+    @FXML private AnchorPane analysisPane;
+    @FXML private Tab setuptab;
 
-    @FXML
-    private Button enterGeneListButton;
-
-    @FXML
-    Button createCaptureProbesButton;
-
-    @FXML
-    private Label textLabel;
-
-    @FXML
-    private TabPane tabpane;
-
-    @FXML
-    private AnchorPane analysisPane;
-
-    @FXML
-    private Tab setuptab;
-
-    @FXML
-    MenuItem showSettingsCurrentProject;
-
+    @FXML MenuItem showSettingsCurrentProject;
     @FXML MenuItem helpMenuItem;
     @FXML MenuItem openHumanGeneWindow;
     @FXML MenuItem openMouseGeneWindow;
     @FXML MenuItem openRatGeneWindow;
     @FXML MenuItem openFlyGeneWindow;
     @FXML MenuItem exportBEDFilesMenuItem;
-
-
-    @FXML
-    private Tab analysistab;
-
+    /** The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints. */
+    @FXML private Tab analysistab;
     /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
     @FXML private Button chooseEnzymeButton;
-
     /** Presenter for the second tab. */
     private VPAnalysisPresenter vpanalysispresenter;
     /** View for the second tab. */
@@ -191,32 +169,38 @@ public class VPVMainPresenter implements Initializable {
         e.consume();
         logger.info("Closing VPV Gui");
         serialize();
-        //Model.writeSettingsToFile(this.model);
-        //closeWindow(e);
         javafx.application.Platform.exit();
     }
 
-
+    /** Serialize the project data to the default location. */
     public boolean serialize() {
         String projectname=this.model.getProjectName();
         if (projectname==null) {
             ErrorWindow.display("Error","Could not get viewpoint name (should never happen). Will save with default");
             projectname="default";
         }
-        File dir=getVPVDir();
         String serializedFilePath=Platform.getAbsoluteProjectPath(projectname);
+        return serializeToLocation(serializedFilePath);
+    }
+
+    /** Serialialize the project file to the location given as path.
+     * @param path absolute path to which the serilaized file should be saved.
+     * @return
+     */
+    private boolean serializeToLocation(String path) {
+        if (path==null) {
+            ErrorWindow.display("Error","Could not get file name for saving project file.");
+            return false;
+        }
         try {
-            SerializationManager.serializeModel(this.model, serializedFilePath);
+            SerializationManager.serializeModel(this.model, path);
         } catch (IOException e) {
             ErrorWindow.displayException("Error","Unable to serialize VPV viewpoint",e);
             return false;
         }
-        logger.trace("Serialization successful to file "+serializedFilePath);
+        logger.trace("Serialization successful to file "+path);
         return true;
     }
-
-
-
 
 
     @Override
@@ -293,10 +277,6 @@ public class VPVMainPresenter implements Initializable {
     public void setModelInMainAndInAnalysisPresenter(Model mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
-    }
-
-    public void initStage(Stage stage) {
-        primaryStage = stage;
     }
 
 
@@ -422,6 +402,10 @@ public class VPVMainPresenter implements Initializable {
             if (gindexer.OK())
                 model.setGenomeUnpacked();
         });
+        gindexer.setOnFailed(eventh -> {
+            decompressGenomeLabel.setText("Decompression failed");
+            ErrorWindow.display("Could not decompress genome file" ,gindexer.getException().getMessage());
+        });
         Thread th = new Thread(gindexer);
         th.setDaemon(true);
         th.start();
@@ -435,12 +419,18 @@ public class VPVMainPresenter implements Initializable {
         logger.trace("Indexing genome files...");
         FASTAIndexManager manager = new FASTAIndexManager(this.model,this.genomeIndexPI);
         manager.setOnSucceeded(event ->{
+
             indexGenomeLabel.setText("FASTA files successfully indexed.");
             logger.debug("Number of FASTA files retrieved> "+manager.getIndexedFastaFiles().size());
             model.setIndexedFastaFiles(manager.getIndexedFastaFiles());
             model.setGenomeIndexed();
             model.setContigLengths(manager.getContigLengths());
         } );
+        manager.setOnFailed(event-> {
+            indexGenomeLabel.setText("FASTA indexing failed");
+            ErrorWindow.display("Failure to extract FASTA files.",
+                    manager.getException().getMessage());
+        });
         Thread th = new Thread(manager);
         th.setDaemon(true);
         th.start();
@@ -615,7 +605,7 @@ public class VPVMainPresenter implements Initializable {
         setInitializedValuesInGUI();
         e.consume();
         /* TODO */
-        logger.trace("TODO -- also re-initialize first tab");
+        logger.error("TODO -- also re-initialize first tab");
     }
 
     /** Display the settings (parameters) of the current viewpoint. */
@@ -627,7 +617,7 @@ public class VPVMainPresenter implements Initializable {
      * Content of {@link Model} is written to platform-dependent default location.
      *  @throws IOException caused by an error in serialization
      */
-    @FXML private void saveProject() throws IOException {
+    @FXML private void saveProject(ActionEvent e) throws IOException {
        // Model.writeSettingsToFile(this.model);
         boolean result=serialize();
         if (result) { /* if it didnt work, the serialize method will show an error dialog. */
@@ -636,6 +626,7 @@ public class VPVMainPresenter implements Initializable {
             alert.setHeaderText(String.format("Successfully saved viewpoint data to %s", Platform.getAbsoluteProjectPath(model.getProjectName())));
             alert.show();
         }
+        e.consume();
     }
 
     /**
@@ -799,9 +790,10 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML
-    public void showLog() {
+    public void showLog(ActionEvent e) {
         LogViewerFactory factory = new LogViewerFactory();
         factory.display();
+        e.consume();
     }
 
     @FXML
@@ -812,11 +804,47 @@ public class VPVMainPresenter implements Initializable {
 
     /** Open a window that will allow the user to delete unwanted project files. Do not allow the
      * user to delete the file that is currently opened.
-     * @param e action event.
-     */
+     * @param e action event.*/
     @FXML
     public void deleteProjectFiles(ActionEvent e) {
         DeleteFactory.display(this.model);
+        e.consume();
+    }
+
+    /** Export the project ser file to a location chosen by the user (instead of the default location,
+     * which is the .vpvgui directory). */
+    @FXML
+    public void exportProject(ActionEvent e) {
+        FileChooser chooser = new FileChooser();
+        String initFileName=String.format("%s.ser",this.model.getProjectName());
+        chooser.setInitialFileName(initFileName);
+        chooser.setTitle("Choose file path to save project file");
+        File file = chooser.showSaveDialog(null);
+        String path = file.getAbsolutePath();
+        if (path==null) {
+            ErrorWindow.display("Error","Could not retrieve path to export project file");
+            return;
+        }
+        serializeToLocation(path);
+        logger.trace(String.format("Serialized file to %s",path));
+        e.consume();
+    }
+
+    /** Open a project from a file specified by the user. */
+    @FXML
+    public void openProject(ActionEvent e) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Open VPV project file");
+        File file = chooser.showOpenDialog(null);
+        try {
+            this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
+            setModelInMainAndInAnalysisPresenter(this.model);
+            logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
+        } catch (IOException ex) {
+            ErrorWindow.displayException("Error","I/O Error opening project file", ex);
+        } catch (ClassNotFoundException clnf) {
+            ErrorWindow.displayException("Error","Deserialization error",clnf);
+        }
         e.consume();
     }
 

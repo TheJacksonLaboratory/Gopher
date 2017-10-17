@@ -50,6 +50,9 @@ public class GenomeDownloader {
         downloadTask.setOnSucceeded(e -> {
             logger.trace("Finished downloading genome file to "+directory);
         });
+        downloadTask.setOnFailed(eh -> {
+            logger.trace("Failed to download genome file. "+downloadTask.getError());
+        });
         Thread th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();

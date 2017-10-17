@@ -16,9 +16,9 @@ import java.util.Set;
 /**
  * This class exports BEDfiles that can be used to check the results and for ordering probes. We export three files
  * <ol>
- *     <li>Target regions -> now unique margins</li>
- *     <li>All tracks -> combine genomic positions, viewpoints, fragments, etc. in one BED file</li>
- *      <li>Summary tsv -> For each viewpoint collect all informations that are useful for sharing the results,
+ *     <li>Target regions; now unique margins</li>
+ *     <li>All tracks; combine genomic positions, viewpoints, fragments, etc. in one BED file</li>
+ *      <li>Summary tsv; For each viewpoint collect all informations that are useful for sharing the results,
  * such as UCSC links, scores, number of selected fragments, etc..</li>
  * </ol>
  * The target regions file is intended to be used to generate probes, .e.g., by use of a Wizard of a probe manufacturer.
@@ -34,6 +34,11 @@ public class BEDFileExporter {
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private String directoryPath=null;
 
+    /**
+     *
+     * @param dirpath The directory where we will write the BED and TSV files to
+     * @param outPrefix The prefix (name) of the files.
+     */
     public BEDFileExporter(String dirpath, String outPrefix){
         initFileNames(outPrefix);
         /* remove trailing slash if necessary. */
@@ -67,7 +72,6 @@ public class BEDFileExporter {
 
         // print tsv file that can be used to share the results of VPV
         // -----------------------------------------------------------
-
         PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryTSVfile)));
         out_ucscURL.println("Gene\tGENOMIC_POS\tURL\t#SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH");
 

@@ -55,7 +55,7 @@ public class FASTAIndexManager extends Task<Void> {
     /** Create FAI indices for all FASTA files in {@link #genomeDirectoryPath} (only if needed).
      * It is packaged as a Task to allow concurrency*/
     @Override
-    protected Void call() {
+    protected Void call() throws Exception{
         final File genomeDirectory = new File(this.genomeDirectoryPath);
         int n=genomeDirectory.listFiles().length;
         double blocksize=1.0/(double)n;
@@ -77,7 +77,7 @@ public class FASTAIndexManager extends Task<Void> {
                         contigname,
                         this.indexedFastaFiles.size()));
                 continue;
-            } else {
+            } else if (genome.isCanonical(fileEntry.getName())){
                     /* if we get here, we have a FASTA file ending with ".fa" that has not yet been indexed */
                 try {
                     FASTAIndexer indexer=new FASTAIndexer(fileEntry.getAbsolutePath());
@@ -91,6 +91,7 @@ public class FASTAIndexManager extends Task<Void> {
                 } catch (IOException e) {
                     logger.error("Error encountered while indexing FASTA files");
                     logger.error(e,e);
+                    throw e;
                 }
                 logger.trace("Adding map entry: "+contigname+": "+fileEntry.getAbsolutePath());
                 this.indexedFastaFiles.put(contigname,fileEntry.getAbsolutePath());
