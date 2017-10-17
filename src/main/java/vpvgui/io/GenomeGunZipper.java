@@ -89,7 +89,7 @@ public class GenomeGunZipper extends Task<Void>  {
             For simplicity, we will update the ProgressIndicator by 1% per file. If we get to 95, we will begin to update by 0.1% until
             we are done.
              */
-            double percentDone=0d;
+            double percentDone=0.01d;
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 /** If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway. **/
                 if (entry.isDirectory()) {

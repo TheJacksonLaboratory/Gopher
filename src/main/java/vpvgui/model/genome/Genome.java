@@ -31,6 +31,8 @@ public abstract class Genome implements Serializable {
 
     protected boolean indexingComplete=false;
 
+    private String genomeURL = null;
+
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
     }
@@ -47,6 +49,8 @@ public abstract class Genome implements Serializable {
     public boolean isIndexingComplete() {
         return pathToGenomeDirectory!= null && indexingComplete;
     }
+
+    public String getGenomeURL() { return this.genomeURL;}
 
     /**
      * The default constructor is called when the {@link vpvgui.model.Model} object is initialized.
@@ -72,6 +76,8 @@ public abstract class Genome implements Serializable {
     }
 
     public abstract String getGenomeBuild();
+    public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
+    public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
 
     /** This should be the first function that is called to create and collect the data about the
      * downloaded genome files.

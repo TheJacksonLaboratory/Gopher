@@ -47,6 +47,9 @@ public class GenomeDownloader {
     public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
         logger.trace(String.format("Starting download of %s to %s",directory,url));
+        downloadTask.setOnSucceeded(e -> {
+            logger.trace("Finished downloading genome file to "+directory);
+        });
         Thread th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();

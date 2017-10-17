@@ -233,7 +233,6 @@ public class VPVMainPresenter implements Initializable {
             this.approachLabel.setText(newValue);
         });
         this.approachLabel.setText(approachChoiceBox.getValue());
-//        initializeBindings();
         initializePromptTextsToDefaultValues();
         this.initializer=new Initializer(model);
 
@@ -365,10 +364,9 @@ public class VPVMainPresenter implements Initializable {
      * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
      */
    @FXML public void downloadRefGeneTranscripts(ActionEvent e) {
-        String genome = this.model.getGenomeURL();
-        if (genome==null)
-            genome=genomeChoiceBox.getValue();
-        RefGeneDownloader rgd = new RefGeneDownloader(genome);
+
+        String genomeBuild=genomeChoiceBox.getValue();
+        RefGeneDownloader rgd = new RefGeneDownloader(genomeBuild);
         String transcriptName = rgd.getTranscriptName();
         String basename=rgd.getBaseName();
         String url=null;
@@ -379,7 +377,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + genome + " (will be downloaded if not found).");
+        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
             ErrorWindow.display("Error","Could not get path to download transcript file.");
@@ -435,7 +433,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
         logger.trace("Indexing genome files...");
-        FASTAIndexManager manager = new FASTAIndexManager(this.model.getGenomeDirectoryPath(),this.genomeIndexPI);
+        FASTAIndexManager manager = new FASTAIndexManager(this.model,this.genomeIndexPI);
         manager.setOnSucceeded(event ->{
             indexGenomeLabel.setText("FASTA files successfully indexed.");
             logger.debug("Number of FASTA files retrieved> "+manager.getIndexedFastaFiles().size());

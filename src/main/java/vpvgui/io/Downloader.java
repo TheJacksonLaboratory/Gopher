@@ -113,16 +113,15 @@ public class Downloader extends Task<Void> {
             URL url = new URL(urlstring);
             URLConnection urlc = url.openConnection();
             reader = urlc.getInputStream();
-            System.out.println("URL host : "+ url.getHost() + "\n reader available="+reader.available());
-            System.out.println("1 localFilePath="+localFilePath);
+            logger.trace("URL host: "+ url.getHost() + "\n reader available="+reader.available());
+            logger.trace("LocalFilePath: "+localFilePath);
             writer = new FileOutputStream(localFilePath);
-            System.out.println("2 localFilePath="+localFilePath);
             byte[] buffer = new byte[153600];
             int totalBytesRead = 0;
             int bytesRead = 0;
             int size = urlc.getContentLength();
             if (progress!=null) { progress.setProgress(0.01); }
-            System.out.println("size="+size);
+            logger.trace("Size of file to be downloaded: "+size);
             if (size >= 0)
                 block = size /100;
             //System.err.println("0%       50%      100%");

@@ -3,6 +3,8 @@ package vpvgui.io;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
+import vpvgui.model.Model;
+import vpvgui.model.genome.Genome;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,17 +19,19 @@ public class FASTAIndexManager extends Task<Void> {
     static Logger logger = Logger.getLogger(FASTAIndexManager.class.getName());
     /** Path to the directory where we will download and decompress the genome file. */
     private String genomeDirectoryPath=null;
+    /** Model of the current genome we are downloading. */
+    private Genome genome;
 
-    public FASTAIndexManager(String path, ProgressIndicator pi) {
-        logger.trace("Initializing fasta indexing at directory "+path);
-        this.genomeDirectoryPath=path;
+    public FASTAIndexManager(Model model, ProgressIndicator pi) {
+        this.genomeDirectoryPath=model.getGenomeDirectoryPath();
+        logger.trace("Initializing fasta indexing at directory "+this.genomeDirectoryPath);
         this.progress=pi;
+        this.genome=model.getGenome();
         this.indexedFastaFiles=new HashMap<>();
         this.contigLengths=new HashMap<>();
     }
 
-    /** Key: name of chromosome or contig; value-absolute path to the corresponding
-     * FASTA file on disk. */
+    /** Key: name of chromosome or contig; value-absolute path to the corresponding FASTA file on disk. */
     private Map<String,String> indexedFastaFiles;
     /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
     private Map<String,Integer> contigLengths;

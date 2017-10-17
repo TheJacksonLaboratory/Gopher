@@ -48,9 +48,9 @@ public class Model implements Serializable {
     /** the name of the viewpoint that will be used to write the settings file (default: vpvgui). */
     private String projectName=null;
     /** Has the UCSC Genome build been unpacked yet? :*/
-    private boolean genomeUnpacked=false;
+    //private boolean genomeUnpacked=false;
     /** Has the downloaded genome been FASTA indexed yet? */
-    private boolean genomeIndexed=false;
+    //private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
     /** An object to coordinate the genome build as well as the status of download, unpacking, and indexing. */
@@ -129,19 +129,17 @@ public class Model implements Serializable {
 
     public List<VPVGene> getVPVGeneList() { return this.geneList; }
 
-    public boolean isGenomeUnpacked() { return genomeUnpacked; }
-    public boolean isGenomeIndexed() { return genomeIndexed; }
-    public void setGenomeUnpacked() { this.genomeUnpacked=true;}
-    public void setGenomeIndexed() { this.genomeIndexed=true;}
+    public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
+    public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
+    public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
+    public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
 
     public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
 
 
-    public String genomeURL = null;
 
-    public String getGenomeURL() {
-        return this.genomeURL;
-    }
+
+//    public String getGenomeURL() { return this.genome.getGenomeURL(); }
 
     public String genomeBasename = DEFAULT_GENOME_BASENAME;
     /** The complete URL of the chosen transcript definition from UCSC. */
