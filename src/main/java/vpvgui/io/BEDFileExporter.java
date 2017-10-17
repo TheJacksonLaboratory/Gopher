@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * This class exports BEDfiles that can be used to check the results and for ordering probes. We export three files
  * <ol>
@@ -29,16 +28,11 @@ import java.util.Set;
 public class BEDFileExporter {
 
     private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
-    private String viewpointBEDfile=null;
     private String allTracksBEDfile =null;
-    //private String fragmentMarginsBEDfile=null;
-    private String genomicPositionsBEDfile=null;
-    /** The unique fragment margins (final probe design). */
     private String targetRegionBEDfile =null;
-    private String ucscURLfile=null;
+    private String vpvSummaryTSVfile=null;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private String directoryPath=null;
-
 
     public BEDFileExporter(String dirpath, String outPrefix){
         initFileNames(outPrefix);
@@ -50,18 +44,14 @@ public class BEDFileExporter {
     }
 
     private void initFileNames(String prefix) {
-        this.viewpointBEDfile=String.format("%s_viewpoints.bed",prefix);
         this.allTracksBEDfile =String.format("%s_allTracks.bed",prefix);
-       // this.fragmentMarginsBEDfile=String.format("%s_fragment_margins.bed",prefix);
-       // this.genomicPositionsBEDfile=String.format("%s_genomic_positions.bed",prefix);
-        this.targetRegionBEDfile =String.format("%s_target_regions.bed",prefix);
-        this.ucscURLfile=String.format("%s_ucscURLs.tsv",prefix);
+        this.targetRegionBEDfile =String.format("%s_targetRegions.bed",prefix);
+        this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",prefix);
     }
 
     private String getFullPath(String fname) {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
     }
-
 
     /**
      * This function is responsible for outputting data in the form of BED files and also a TSV file with URLs and some
@@ -71,66 +61,76 @@ public class BEDFileExporter {
      * @throws FileNotFoundException
      */
     public void printRestFragsToBed(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
-        PrintStream out_allTracks = new PrintStream(new FileOutputStream(getFullPath(allTracksBEDfile)));
-        out_allTracks.println("track name='" + allTracksBEDfile + "' description='" + allTracksBEDfile + "'");
 
         PrintStream out_targetRegions = new PrintStream(new FileOutputStream(getFullPath(targetRegionBEDfile)));
         out_targetRegions.println("track name='" + targetRegionBEDfile + "' description='" + targetRegionBEDfile + "'");
 
-        PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(ucscURLfile)));
-        out_ucscURL.println("Gene\tTSS\tURL");
+        // print tsv file that can be used to share the results of VPV
+        // -----------------------------------------------------------
 
-        Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragments.
+        PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryTSVfile)));
+        out_ucscURL.println("Gene\tGENOMIC_POS\tURL\t#SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH");
 
         for (ViewPoint vp : viewpointlist) {
-                String referenceSequenceID = vp.getReferenceID();
-                Integer vpStaPos = vp.getStartPos();
-                Integer vpEndPos = vp.getEndPos();
-                Integer vpGenomicPos = vp.getGenomicPos();
-                String geneSymbol =  vp.getTargetName();
-                Integer viewPointScore=0;
-                if(vp.getResolved()) {
-                    viewPointScore=1;
-                }
-                viewPointScore=vp.getNumOfSelectedFrags();
-                out_allTracks.println(String.format("%s\t%d\t%d\t%s[Viewpoint]\t%d",
-                    referenceSequenceID,
-                        (vpStaPos-1),
-                        vpEndPos,
-                    geneSymbol,
-                    viewPointScore));
-                out_allTracks.println(String.format("%s\t%d\t%d\t%s[TSS]\t%d",
-                        referenceSequenceID,
-                        vpGenomicPos,
-                        (vpGenomicPos+1),
-                        geneSymbol,
-                        viewPointScore));
-
-                // print selected fragments of the viewpoint
-                int k=0; // index of selected fragment
-                for (Segment segment : vp.getActiveSegments()) {
-                    k++;
-                    Integer rsStaPos = segment.getStartPos();
-                    Integer rsEndPos = segment.getEndPos();
-                    out_allTracks.println(referenceSequenceID + "\t" + (rsStaPos-1) + "\t" + rsEndPos + "\t" + geneSymbol + "_fragment_" + k + "\t"+ viewPointScore);
-
-                    // print margins of selected fragments
-                    for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
-                        Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
-                        Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
-                        out_allTracks.println(referenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol + "_fragment_" + k + "_margin"+ "\t"+ viewPointScore);
-                        uniqueFragmentMargins.add(referenceSequenceID + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + geneSymbol);
-                    }
-                }
             String url= getDefaultURL(vp,genomeBuild);
-                out_ucscURL.println(String.format("%s\t%s\t%s",vp.getTargetName(),vp.getGenomicLocationString(),url));
-            }
-        out_allTracks.close();
+            int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
+            String SCORE = String.format("%.2f", vp.getScore());
+            out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments()));
+        }
         out_ucscURL.close();
 
-        /* print out unique set of margins for enrichment (and calculate the total length of all  margins) */
+        // print file for all tracks that can be uploaded to the UCSC genome browser
+        // print file for target regions that can be used as input for the SureDesign wizard
+        // ---------------------------------------------------------------------------------
+
+        PrintStream out_allTracks = new PrintStream(new FileOutputStream(getFullPath(allTracksBEDfile)));
+
+        // print genomic positions
+        out_allTracks.println("track name='" + "VPV: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
+        for (ViewPoint vp : viewpointlist) {
+            out_allTracks.println(String.format("%s\t%d\t%d\t%s",
+                    vp.getReferenceID(),
+                    vp.getGenomicPos(),
+                    (vp.getGenomicPos() + 1),
+                    vp.getTargetName()));
+        }
+
+        // print viewpoints
+        out_allTracks.println("track name='" + "VPV: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
+        for (ViewPoint vp : viewpointlist) {
+            out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
+                    vp.getReferenceID(),
+                    (vp.getStartPos()-1),
+                    vp.getEndPos(),
+                    vp.getTargetName(),
+                    (int) Math.round(vp.getScore()*1000)));
+        }
+
+        // print restriction fragments and get unique fragment margins
+        out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
+        Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragments
+        for (ViewPoint vp : viewpointlist) {
+            int k=0; // index of selected fragment
+            for (Segment segment : vp.getActiveSegments()) {
+                k++;
+                Integer rsStaPos = segment.getStartPos();
+                Integer rsEndPos = segment.getEndPos();
+                out_allTracks.println(vp.getReferenceID() + "\t" + (rsStaPos-1) + "\t" + rsEndPos + "\t" + vp.getTargetName());
+
+                // get unique margins of selected fragments
+                for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
+                    Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
+                    Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
+                    uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_fragment_" + k + "_margin_" + l);
+                }
+            }
+        }
+
+        // print out unique set of margins as targets for enrichment
+        out_allTracks.println("track name='" + "VPV: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
         Integer totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
+            out_allTracks.println(s);
             out_targetRegions.println(s);
             String[] parts = s.split("\t");
             Integer sta = Integer.parseInt(parts[1]);
@@ -138,9 +138,11 @@ public class BEDFileExporter {
             Integer len = end - sta;
             totalLengthOfMargins = totalLengthOfMargins + len;
         }
+        out_allTracks.close();
         out_targetRegions.close();
 
         logger.trace("Done output of BED files. Total Length of Margins: " + totalLengthOfMargins);
+
     }
 
 
