@@ -132,7 +132,7 @@ public class Downloader extends Task<Void> {
                 totalBytesRead += bytesRead;
                 if (size>0 && totalBytesRead > threshold) {
                     //System.err.print("=");
-                    if (progress!=null) { progress.setProgress((double)totalBytesRead/size); }
+                    //if (progress!=null) { progress.setProgress((double)totalBytesRead/size); }
                     threshold += block;
                 }
             }
