@@ -3,6 +3,7 @@ package vpvgui.io;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.gui.ErrorWindow;
 
 import java.io.File;
@@ -96,7 +97,7 @@ public class Downloader extends Task<Void> {
      * message and does nothing.
      */
     @Override
-    protected Void call()  {
+    protected Void call() throws VPVException {
         if (progress!=null)
             progress.setProgress(1.000); /* show progress as 100% */
         logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
@@ -139,15 +140,17 @@ public class Downloader extends Task<Void> {
             logger.info("Successful download from "+urlstring+": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
-            err = String.format("Could not interpret url: \"%s\"\n%s", urlstring, e.toString());
+            progress.setProgress(0.00);
+            err = String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString());
+            throw new VPVException(err);
         } catch (IOException e) {
             progress.setProgress(0.00);
-            ErrorWindow.display("Error downloading","um");
+           // ErrorWindow.display("Error downloading","um");
             err = String.format("IO Exception reading from URL: \"%s\"\n%s", urlstring, e.toString());
-            System.err.println("err"+err);
-            ErrorWindow.display("Error downloading",err);
+            throw new VPVException(err);
         } catch (Exception e){
-            err = e.getMessage();
+            progress.setProgress(0.00);
+            throw new VPVException(e.getMessage());
         }
         if (err != null) {
             logger.error("Failure to download from \""+urlstring+"\"");

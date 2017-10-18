@@ -54,9 +54,9 @@ public class HumanHg19 extends Genome implements Serializable {
         if (missingChromosomes.size()==0) {
             return true; // we found all expected chromosomes
         } else {
-            String errmsg = missingChromosomes.stream().collect(Collectors.joining("; "));
-            ErrorWindow.display("Could not extract all chromosomes",
-                    String.format("Unable to extract %s ",errmsg));
+//            String errmsg = missingChromosomes.stream().collect(Collectors.joining("; "));
+//            ErrorWindow.display("Could not extract all chromosomes",
+//                    String.format("Unable to extract %s ",errmsg));
             return false; // at least one chromosome was not extracted.
         }
     }

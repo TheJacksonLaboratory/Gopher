@@ -8,6 +8,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
+import vpvgui.gui.ErrorWindow;
 import vpvgui.model.genome.Genome;
 
 import java.io.*;
@@ -67,7 +68,7 @@ public class GenomeGunZipper extends Task<Void>  {
     /** This function uses the apache library to transform the chromFa.tar.gz file into the individual chromosome files.
      * It is packaged as a Task to allow concurrency. */
     @Override
-    protected Void call() {
+    protected Void call() throws IOException {
         logger.debug("entering extractTarGZ");
         if (alreadyExtracted()) {
             logger.debug("Found already extracted files, returning.");
@@ -124,6 +125,8 @@ public class GenomeGunZipper extends Task<Void>  {
             logger.error(e,e);
             progress.setProgress(0.0);
             this.status="extraction could not be completed.";
+            throw e;
+            //ErrorWindow.displayException("Error extracting genome",String.format("\"Unable to decompress %s",INPUT_GZIP_FILE),e);
         }
         return null;
     }
