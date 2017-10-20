@@ -8,6 +8,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.genome.Genome;
 
@@ -16,7 +17,7 @@ import java.io.*;
 /**
  * This class is responsible for g-unzipping and untarring a downloaded genome file.
  * @author Peter Robinson
- * @version 0.0.4 (5 October, 2017)
+ * @version 0.2.1 (2017-10-20)
  */
 public class GenomeGunZipper extends Task<Void>  {
     static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
@@ -72,13 +73,12 @@ public class GenomeGunZipper extends Task<Void>  {
         logger.debug("entering extractTarGZ");
         if (alreadyExtracted()) {
             logger.debug("Found already extracted files, returning.");
-            this.progress.setProgress(100.0);
+            updateProgress(100.0);
             this.status="extraction previously completed.";
             OK=true;
             return null;
         }
-        if (this.progress != null)
-            this.progress.setProgress(0.01); /* show progress as 1% to start off with */
+        updateProgress(0.01); /* show progress as 1% to start off with */
         String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
         try {
@@ -112,10 +112,10 @@ public class GenomeGunZipper extends Task<Void>  {
                         percentDone +=1.0d;
                     else
                         percentDone += 0.1d;
-                    progress.setProgress(percentDone/100.0);
+                    updateProgress(percentDone/100);
                 }
             }
-            progress.setProgress(1.0);
+            updateProgress(1.0);
             OK=true;
             tarIn.close();
             logger.info("Untar completed successfully for "+INPUT_GZIP_FILE);
@@ -123,12 +123,26 @@ public class GenomeGunZipper extends Task<Void>  {
         } catch (IOException e) {
             logger.error("Unable to decompress "+INPUT_GZIP_FILE);
             logger.error(e,e);
-            progress.setProgress(0.0);
+            updateProgress(0.0);
             this.status="extraction could not be completed.";
             throw e;
-            //ErrorWindow.displayException("Error extracting genome",String.format("\"Unable to decompress %s",INPUT_GZIP_FILE),e);
         }
         return null;
+    }
+
+    /** Update the progress bar of the GUI in a separate thread.
+     * @param pr Current progress.
+     */
+    private void updateProgress(double pr) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override public void run() {
+                if (progress==null) {
+                    logger.error("NULL pointer to download progress indicator");
+                    return;
+                }
+                progress.setProgress(pr);
+            }
+        });
     }
 
 }

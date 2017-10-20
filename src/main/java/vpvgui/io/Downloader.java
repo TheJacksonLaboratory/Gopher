@@ -14,21 +14,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * This class is used to download files to the local file system of the user (chromFa.tar.gz and refGene.txt.gz).
+ * @author Peter Robinson
+ * @version 0.2.0 (2017-10-20)
+ */
 public class Downloader extends Task<Void> {
 
     static Logger logger = Logger.getLogger(Downloader.class.getName());
-
-    /** An error message, if an error occured */
-    protected String errorMessage=null;
-
     /**
-     * This is the absolute path to the place (directory) where the downloaded file will be
-     * saved in the local filesystem.
-     */
+     * The absolute path to the place (directory) where the downloaded file will be
+     * saved in the local filesystem.*/
     private File localDir=null;
 
     /**
-     * This is the full local path of the file we will download. It should be set to be identical
+     * The full local path of the file we will download. It should be set to be identical
      * to {@link #localDir} except for the final file base name.
      */
     private File localFilePath=null;
@@ -71,16 +71,6 @@ public class Downloader extends Task<Void> {
         logger.debug("setLocalFilepath for download to: "+localFilePath);
     }
 
-
-
-    public boolean hasError() {
-        return this.errorMessage != null;
-    }
-
-    public String getError() {
-        return this.errorMessage;
-    }
-
     /**
      * @param url Subclasses need to set this to the URL of the resource to be downloaded. Alternatively,
      * client code needs to set it.
@@ -89,22 +79,13 @@ public class Downloader extends Task<Void> {
         this.urlstring=url;
     }
 
-
-
-
     /**
      * This method downloads a file to the specified local file path. If the file already exists, it emits a warning
      * message and does nothing.
      */
     @Override
     protected Void call() throws VPVException {
-        if (progress!=null)
-            progress.setProgress(1.000); /* show progress as 100% */
         logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
-
-        // The error handling can be improved with Java 7.
-        String err = null;
-
         InputStream reader;
         FileOutputStream writer;
 
@@ -125,49 +106,41 @@ public class Downloader extends Task<Void> {
             logger.trace("Size of file to be downloaded: "+size);
             if (size >= 0)
                 block = size /100;
-            //System.err.println("0%       50%      100%");
             while ((bytesRead = reader.read(buffer)) > 0) {
-                //System.out.println("bytesRead="+bytesRead + ", size="+size + ", threshold="+threshold +", totalBytesRead="+totalBytesRead + " gt?=+" + ( totalBytesRead > threshold));
                 writer.write(buffer, 0, bytesRead);
                 buffer = new byte[153600];
                 totalBytesRead += bytesRead;
                 if (size>0 && totalBytesRead > threshold) {
                     updateProgress((double)totalBytesRead/size);
-                    //if (progress!=null) { progress.setProgress((double)totalBytesRead/size); }
                     threshold += block;
                 }
             }
             logger.info("Successful download from "+urlstring+": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
-            progress.setProgress(0.00);
-            err = String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString());
-            throw new VPVException(err);
+            updateProgress(0.00);
+            throw new VPVException(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
         } catch (IOException e) {
-            progress.setProgress(0.00);
-           // ErrorWindow.display("Error downloading","um");
-            err = String.format("IO Exception reading from URL: \"%s\"\n%s", urlstring, e.toString());
-            throw new VPVException(err);
+            updateProgress(0.00);
+            throw new VPVException(String.format("IO Exception reading from URL: \"%s\"\n%s", urlstring, e.toString()));
         } catch (Exception e){
-            progress.setProgress(0.00);
+            updateProgress(0.00);
             throw new VPVException(e.getMessage());
         }
-        if (err != null) {
-            logger.error("Failure to download from \""+urlstring+"\"");
-            logger.error(err);
-            ErrorWindow.display("Error downloading",err);
-            progress.setProgress(0.00);
-            return null;
-
-        }
-        if (progress!=null) { progress.setProgress(1.000);/* show 100% completion */ }
+        progress.setProgress(1.000);/* show 100% completion */
         return null;
     }
 
-
+    /** Update the progress bar of the GUI in a separate thread.
+     * @param pr Current progress.
+     */
     private void updateProgress(double pr) {
         javafx.application.Platform.runLater(new Runnable() {
             @Override public void run() {
+                if (progress==null) {
+                    logger.error("NULL pointer to download progress indicator");
+                    return;
+                }
                 progress.setProgress(pr);
             }
         });
@@ -189,6 +162,5 @@ public class Downloader extends Task<Void> {
             this.localDir.mkdir();
         }
     }
-
 
 }

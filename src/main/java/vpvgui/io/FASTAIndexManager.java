@@ -3,6 +3,7 @@ package vpvgui.io;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.model.Model;
 import vpvgui.model.genome.Genome;
 
@@ -12,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The purpose of this class is to encapsulte the FASTA Indexer in a Task.
+ * The purpose of this class is to encapsulate the FASTA Indexer in a Task.
+ * @author Peter Robinson
+ * @version 0.2.0 (2017-10-20)
  */
 public class FASTAIndexManager extends Task<Void> {
 
@@ -37,11 +40,9 @@ public class FASTAIndexManager extends Task<Void> {
     private Map<String,Integer> contigLengths;
     /** The progress indicator on the GUI that will show progress of indexing. */
     private ProgressIndicator progress=null;
-    /** The label on the GUI that will show the status/result of the indexing operation. */
 
 
     public Map<String,String> getIndexedFastaFiles() { return this.indexedFastaFiles; }
-
 
     public String getContigName(File file) {
         String name=file.getName();
@@ -55,12 +56,12 @@ public class FASTAIndexManager extends Task<Void> {
     /** Create FAI indices for all FASTA files in {@link #genomeDirectoryPath} (only if needed).
      * It is packaged as a Task to allow concurrency*/
     @Override
-    protected Void call() throws Exception{
+    protected Void call() throws VPVException {
         final File genomeDirectory = new File(this.genomeDirectoryPath);
         int n=genomeDirectory.listFiles().length;
         double blocksize=1.0/(double)n;
         double totalprogress=0d;
-        this.progress.setProgress(0.0);
+        updateProgress(0.0);
         for (final File fileEntry : genomeDirectory.listFiles()) {
             String contigname=null;
             if (fileEntry.isDirectory()) {
@@ -87,24 +88,38 @@ public class FASTAIndexManager extends Task<Void> {
                     long len=indexer.getN_bases();
                     this.contigLengths.put(contigname,(int)len);
                     totalprogress+=blocksize;
-                    progress.setProgress(totalprogress);
+                    updateProgress(totalprogress);
                 } catch (IOException e) {
                     logger.error("Error encountered while indexing FASTA files");
                     logger.error(e,e);
-                    throw e;
+                    updateProgress(0.00);
+                    throw new VPVException(e.getMessage());
                 }
                 logger.trace("Adding map entry: "+contigname+": "+fileEntry.getAbsolutePath());
                 this.indexedFastaFiles.put(contigname,fileEntry.getAbsolutePath());
             }
         }
-        progress.setProgress(1.0);
+        updateProgress(1.0);
         return null;
     }
 
 
+    /** Update the progress bar of the GUI in a separate thread.
+     * @param pr Current progress.
+     */
+    private void updateProgress(double pr) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override public void run() {
+                if (progress==null) {
+                    logger.error("NULL pointer to download progress indicator");
+                    return;
+                }
+                progress.setProgress(pr);
+            }
+        });
+    }
+
     public Map<String,Integer> getContigLengths () { return this.contigLengths; }
-
-
 
 
     /** Return true if the FASTA index is found already -- no need to repeat! */
