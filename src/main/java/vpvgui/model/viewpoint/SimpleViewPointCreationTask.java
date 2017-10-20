@@ -4,6 +4,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.VPVGene;
@@ -62,7 +63,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             String path = this.model.getIndexFastaFilePath(referenceSequenceID);
             if (path == null) {
                 logger.error("Could not retrieve faidx file for " + referenceSequenceID);
-                continue;
+                throw new VPVException(String.format("Could not retrieve FASTA index file for ",referenceSequenceID));
             }
             logger.trace("Got RefID="+referenceSequenceID);
             for (VPVGene vpvgene : group.getGenes()) {

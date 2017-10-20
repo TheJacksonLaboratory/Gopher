@@ -54,7 +54,7 @@ import static vpvgui.io.Platform.getVPVDir;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.0.5 (2017-07-23)
+ * @version 0.0.6 (2017-10-14)
  */
 public class VPVMainPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
@@ -94,7 +94,6 @@ public class VPVMainPresenter implements Initializable {
     private Label transcriptsLabel;
     /** Show which design approach */
     @FXML private Label approachLabel;
-
     /**
      * Clicking this button will download some combination of genome and (compatible) gene definition files.
      * A file chooser will appear and the user can decide where to download everything. The paths will be stored
@@ -141,20 +140,17 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Button enterGeneListButton;
     @FXML private Button createCaptureProbesButton;
 
-    //@FXML
-    //private Label textLabel;
-
     @FXML private TabPane tabpane;
     @FXML private AnchorPane analysisPane;
     @FXML private Tab setuptab;
-
-    @FXML MenuItem showSettingsCurrentProject;
-    @FXML MenuItem helpMenuItem;
-    @FXML MenuItem openHumanGeneWindow;
-    @FXML MenuItem openMouseGeneWindow;
-    @FXML MenuItem openRatGeneWindow;
-    @FXML MenuItem openFlyGeneWindow;
-    @FXML MenuItem exportBEDFilesMenuItem;
+    @FXML private Menu helpMenu;
+    @FXML private MenuItem showSettingsCurrentProject;
+    @FXML private MenuItem helpMenuItem;
+    @FXML private MenuItem openHumanGeneWindow;
+    @FXML private MenuItem openMouseGeneWindow;
+    @FXML private MenuItem openRatGeneWindow;
+    @FXML private MenuItem openFlyGeneWindow;
+    @FXML private MenuItem exportBEDFilesMenuItem;
     /** The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints. */
     @FXML private Tab analysistab;
     /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
@@ -550,6 +546,9 @@ public class VPVMainPresenter implements Initializable {
             selectionModel.select(this.analysistab);
             logger.trace("Finished factory.createViewPoints()");
             pbpresent.closeWindow();
+        });
+        task.setOnFailed(eh -> {
+            ErrorWindow.display("Exception encountered while attempting to create viewpoints","TODO");
         });
         logger.trace("About to run task");
         new Thread(task).start();

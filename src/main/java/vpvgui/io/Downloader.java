@@ -132,7 +132,7 @@ public class Downloader extends Task<Void> {
                 buffer = new byte[153600];
                 totalBytesRead += bytesRead;
                 if (size>0 && totalBytesRead > threshold) {
-                    //System.err.print("=");
+                    updateProgress((double)totalBytesRead/size);
                     //if (progress!=null) { progress.setProgress((double)totalBytesRead/size); }
                     threshold += block;
                 }
@@ -162,6 +162,15 @@ public class Downloader extends Task<Void> {
         }
         if (progress!=null) { progress.setProgress(1.000);/* show 100% completion */ }
         return null;
+    }
+
+
+    private void updateProgress(double pr) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override public void run() {
+                progress.setProgress(pr);
+            }
+        });
     }
 
     /**

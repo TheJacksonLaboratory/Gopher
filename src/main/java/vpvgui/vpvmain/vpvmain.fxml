@@ -81,7 +81,7 @@
                      </padding></Region>
                   <MenuBar nodeOrientation="RIGHT_TO_LEFT">
                     <menus>
-                      <Menu mnemonicParsing="false" text="Help">
+                      <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
                         <items>
                               <MenuItem fx:id="helpMenuItem" mnemonicParsing="false" onAction="#showHelpWindow" text="Help" />
                               <Menu mnemonicParsing="false" text="Example gene sets">
