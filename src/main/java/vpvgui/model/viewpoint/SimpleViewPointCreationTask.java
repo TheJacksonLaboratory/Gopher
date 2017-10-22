@@ -24,6 +24,11 @@ import java.util.Map;
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
+
+    private int total;
+    private int i;
+
+
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
@@ -38,7 +43,43 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
+    private void doIt(VPVGene vpvgene, String referenceSequenceID,String path  ) {
+            try {
+                IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
+                int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+                logger.trace(String.format("Length of %s is %d", referenceSequenceID,chromosomeLength));
+                logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+                List<Integer> gPosList = vpvgene.getTSSlist();
+                for (Integer gPos : gPosList) {
+                    ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+                            targetName(vpvgene.getGeneSymbol()).
+                            maxDistToGenomicPosUp(model.getMaxSizeUp()).
+                            maxDistToGenomicPosDown(model.getMaxSizeDown()).
+                            minimumSizeDown(model.getMinSizeDown()).
+                            maximumSizeDown(model.getMaxSizeDown()).
+                            fastaReader(fastaReader).
+                            minimumSizeUp(model.getMinSizeUp()).
+                            maximumSizeUp(model.getMaxSizeUp()).
+                            minimumFragmentSize(model.getMinFragSize()).
+                            maximumRepeatContent(model.getMaxRepeatContent()).
+                            marginSize(model.getMarginSize()).
+                            build();
+                    updateProgress(i++, total); /* this will update the progress bar */
+                    updateLabelText(this.currentVP, vpvgene.toString());
+                    vp.generateViewpointSimple();
+                    if (vp.getResolved()) {
+                        viewpointlist.add(vp);
+                        logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
+                    } else {
+                        logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
+                    }
 
+                }
+            } catch (FileNotFoundException e) {
+                logger.error("[ERROR] could not open/find faidx file for " + referenceSequenceID);
+                logger.error(e, e);
+            }
+    }
 
 
 
@@ -54,8 +95,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
         }
-        int total = getTotalGeneCount();
-        int i = 0;
+        this.total = getTotalGeneCount();
+       this.i = 0;
         logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
         long milli=System.currentTimeMillis();
         for (ChromosomeGroup group : chromosomes.values()) {
@@ -66,46 +107,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 throw new VPVException(String.format("Could not retrieve FASTA index file for ",referenceSequenceID));
             }
             logger.trace("Got RefID="+referenceSequenceID);
-            for (VPVGene vpvgene : group.getGenes()) {
-                try {
-                    IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-                    int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
-                    logger.trace(String.format("Length of %s is %d", referenceSequenceID,chromosomeLength));
-                    logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
-                    List<Integer> gPosList = vpvgene.getTSSlist();
-                    for (Integer gPos : gPosList) {
-                        ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
-                                targetName(vpvgene.getGeneSymbol()).
-                                maxDistToGenomicPosUp(model.getMaxSizeUp()).
-                                maxDistToGenomicPosDown(model.getMaxSizeDown()).
-                                minimumSizeDown(model.getMinSizeDown()).
-                                maximumSizeDown(model.getMaxSizeDown()).
-                                fastaReader(fastaReader).
-                                minimumSizeUp(model.getMinSizeUp()).
-                                maximumSizeUp(model.getMaxSizeUp()).
-                                minimumFragmentSize(model.getMinFragSize()).
-                                maximumRepeatContent(model.getMaxRepeatContent()).
-                                marginSize(model.getMarginSize()).
-                                build();
-                        updateProgress(i++, total); /* this will update the progress bar */
-                        updateLabelText(this.currentVP, vpvgene.toString());
-                        vp.generateViewpointSimple();
-                        if (vp.getResolved()) {
-                            viewpointlist.add(vp);
-                            logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
-                        } else {
-                            logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
-                        }
 
-                    }
-                } catch (FileNotFoundException e) {
-                    logger.error("[ERROR] could not open/find faidx file for " + referenceSequenceID);
-                    logger.error(e, e);
-                }
-            }
+            group.getGenes().parallelStream().forEach(vpvGene -> {doIt(vpvGene,referenceSequenceID,path);});
+           // group.getGenes().stream().forEach(vpvGene -> {doIt(vpvGene,referenceSequenceID,path);});
+
         }
         long end=milli-System.currentTimeMillis();
-        logger.trace(String.format("It took %.1f sec",end/1000.0 ));
+        logger.trace(String.format("Parallel It took %.1f sec",end/1000.0 ));
         this.model.setViewPoints(viewpointlist);
         return null;
     }
