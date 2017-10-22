@@ -220,31 +220,31 @@ public class VPAnalysisPresenter implements Initializable {
             return new ReadOnlyObjectWrapper<>(btn);
         });
 
-        // the second column
+        // the third column
         targetTableColumn.setSortable(true);
         targetTableColumn.setEditable(false);
 
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
 
 
-        // the third column--position, e.g.,chr4:622712
+        // fourth column--position, e.g.,chr4:622712
         genomicLocationColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGenomicLocationString()));
         genomicLocationColumn.setComparator(new GenomicLocationComparator());
 
 
-        // fourth column--number of selected fragments
+        //  fifth column--number of selected fragments
         nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
 
 
-        // fifth column--score of fragments.
+        // sixth column--score of fragments.
         viewpointScoreColumn.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScoreAsPercentString())));
         viewpointScoreColumn.setComparator(new PercentComparator());
 
-        // sixth column--total length of active segments
+        // seventh column--total length of active segments
         viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
         viewpointTotalLengthOfActiveSegments.setComparator(new IntegerComparator());
 
-        // seventh column--total length viewpoint
+        // eight column--total length viewpoint
         viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
 
