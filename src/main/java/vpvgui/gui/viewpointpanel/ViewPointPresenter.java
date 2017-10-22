@@ -1,5 +1,7 @@
 package vpvgui.gui.viewpointpanel;
 
+import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
+import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -21,6 +23,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.model.Model;
 import vpvgui.model.viewpoint.Segment;
 import vpvgui.model.viewpoint.ViewPoint;
@@ -37,14 +40,16 @@ import java.util.stream.Collectors;
 import static vpvgui.util.Utils.join;
 
 /**
- * This class acts as a controller of the TabPanes which display individual ViewPoints. Created by peter on 16.07.17.
+ * This class acts as a controller of the TabPanes which display individual ViewPoints.
+ * @author Peter Robinson
+ * @version 0.2.1 (2017-10-21)
  */
 public class ViewPointPresenter implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ViewPointPresenter.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
-            "Browser to visualized view point...</i></p></body></html>";
+            "Browser to visualize view point...</i></p></body></html>";
 
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
     private static final int OFFSET = 250;
@@ -105,6 +110,8 @@ public class ViewPointPresenter implements Initializable {
     private Tab tab;
 
     private Model model;
+    /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
+    private VPAnalysisPresenter analysisPresenter=null;
 
     /**
      * Instance of {@link ViewPoint} presented by this presenter.
@@ -135,11 +142,10 @@ public class ViewPointPresenter implements Initializable {
     }
 
     @FXML private void deleteThisViewPoint(Event e) {
-        logger.error("TODO CODE TO DELETE THIS VIEWPOINT GO BACK TO MODEL");
-       // e.g., this.model.deleteThisViewPoint(this.vp);
-        // e.g., analysisTab->refreshTable()
-        // e.g., close this viewpoint Tab
-
+        this.model.deleteViewpoint(this.vp);
+        this.tab.getTabPane().getTabs().remove(this.tab);
+        this.analysisPresenter.refreshVPTable();
+        e.consume();
     }
 
     @FXML
@@ -187,6 +193,10 @@ public class ViewPointPresenter implements Initializable {
                         .toList());
         logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
                 (Collectors.joining(","))));
+    }
+
+    public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
+        this.analysisPresenter=vpAnalysisPresenter;
     }
 
     /** class for sorting chromosome locations like chr5:43679423 */

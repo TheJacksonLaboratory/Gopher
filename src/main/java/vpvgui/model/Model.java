@@ -7,11 +7,9 @@ import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.viewpoint.ViewPoint;
 
+import javax.swing.text.View;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
@@ -402,5 +400,17 @@ public class Model implements Serializable {
 
     public String getVersion() {
         return VERSION;
+    }
+
+    /** Remove a ViewPoint from the list {@link #viewpointList}. */
+    public void deleteViewpoint(ViewPoint vp) {
+        Iterator<ViewPoint> it = viewpointList.listIterator();
+        while (it.hasNext()) {
+            ViewPoint vpit = it.next();
+            if (vpit.equals(vp)) {
+                it.remove();
+                break;
+            }
+        }
     }
 }

@@ -222,11 +222,11 @@ public class VPVMainPresenter implements Initializable {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
         ToggleGroup tGroup = new ToggleGroup();
         tGroup.getToggles().addAll(tiling1,tiling2,tiling3,tiling4,tiling5);
-        tiling1.setOnAction(e->{this.model.setTilingFactor(1);e.consume(); });
-        tiling2.setOnAction(e->{this.model.setTilingFactor(2);e.consume(); });
-        tiling3.setOnAction(e->{this.model.setTilingFactor(3);e.consume(); });
-        tiling4.setOnAction(e->{this.model.setTilingFactor(4);e.consume(); });
-        tiling5.setOnAction(e->{this.model.setTilingFactor(5);e.consume(); });
+        tiling1.setOnAction(e->{this.model.setTilingFactor(1);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+        tiling2.setOnAction(e->{this.model.setTilingFactor(2);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+        tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+        tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+        tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
     }
 
     private void setInitializedValuesInGUI() {
@@ -759,6 +759,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         this.model.setProbeLength(len);
+        this.vpanalysispresenter.refreshVPTable();
         logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
     }
 
@@ -772,6 +773,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         this.model.setMaximumAllowedRepeatOverlap(len);
+        this.vpanalysispresenter.refreshVPTable();
         logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d", model.getMaximumAllowedRepeatOverlap()));
     }
 
@@ -785,6 +787,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         this.model.setMarginSize(msize);
+        this.vpanalysispresenter.refreshVPTable();
         logger.trace(String.format("We just set MarginSize to %d", model.getMarginSize()));
     }
 

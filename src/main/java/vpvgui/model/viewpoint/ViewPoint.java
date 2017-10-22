@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import vpvgui.model.Default;
 import vpvgui.model.RestrictionEnzyme;
 
+import javax.swing.text.View;
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.*;
@@ -703,6 +704,16 @@ public class ViewPoint implements Serializable {
             if (s.getEndPos()>max) max=s.getEndPos();
         }
         return max - min + 1;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (! (other instanceof ViewPoint)) return false;
+        ViewPoint othervp = (ViewPoint)other;
+        return (targetName.equals(othervp.targetName) &&
+        genomicPos.equals(othervp.genomicPos) &&
+        referenceSequenceID.equals(othervp.referenceSequenceID));
+
     }
 
 

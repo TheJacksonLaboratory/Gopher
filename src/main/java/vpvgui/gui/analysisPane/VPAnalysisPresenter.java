@@ -1,5 +1,6 @@
 package vpvgui.gui.analysisPane;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,9 +43,10 @@ public class VPAnalysisPresenter implements Initializable {
 
     @FXML
     private TableView<ViewPoint> viewPointTableView;
-
     @FXML
     private TableColumn<ViewPoint, Button> actionTableColumn;
+    @FXML
+    private TableColumn<ViewPoint, Button> deleteTableColumn;
 
     @FXML
     private TableColumn<ViewPoint, String> targetTableColumn;
@@ -190,7 +192,7 @@ public class VPAnalysisPresenter implements Initializable {
     private void initTable() {
         // The first column with buttons that open new tab for the ViewPoint
         actionTableColumn.setSortable(false);
-        actionTableColumn.setCellValueFactory((cdf -> {
+        actionTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
             // create Button here & set the action
             Button btn = new Button("Show viewpoint");
@@ -201,7 +203,22 @@ public class VPAnalysisPresenter implements Initializable {
             });
             // wrap it so it can be displayed in the TableView
             return new ReadOnlyObjectWrapper<>(btn);
-        }));
+        });
+
+        deleteTableColumn.setSortable(false);
+        deleteTableColumn.setCellValueFactory(cdf -> {
+            ViewPoint vp = cdf.getValue();
+            // create Button here & set the action
+            Button btn = new Button("Delete viewpoint");
+            btn.setOnAction(e -> {
+                logger.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
+                        vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(),vp.getActiveSegments().size()));
+                model.deleteViewpoint(vp);
+                refreshVPTable();
+            });
+            // wrap it so it can be displayed in the TableView
+            return new ReadOnlyObjectWrapper<>(btn);
+        });
 
         // the second column
         targetTableColumn.setSortable(true);
@@ -252,6 +269,7 @@ public class VPAnalysisPresenter implements Initializable {
         ViewPointView view = new ViewPointView();
         ViewPointPresenter presenter = (ViewPointPresenter) view.getPresenter();
         presenter.setModel(this.model);
+        presenter.setCallback(this);
         presenter.setTab(tab);
         presenter.setViewPoint(vp);
         tab.setContent(presenter.getPane());
@@ -288,21 +306,24 @@ public class VPAnalysisPresenter implements Initializable {
         }
         // update WebView with N loaded ViewPoints
         ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
-        contentWebEngine.loadContent(htmlgen.getHTML());
+        javafx.application.Platform.runLater(() -> {
+            contentWebEngine.loadContent(htmlgen.getHTML());
 
-        ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
-        if (model==null) {
-            logger.error("model was null while trying to refresh VP table, should never happen" );
-            return;
-        }
-        List<ViewPoint> vpl = this.model.getViewPointList();
-        logger.trace("In showVPTable: got a total of "+vpl.size() + " VPVGenes");
-        for (ViewPoint v : vpl) {
-            viewpointlist.add(v);
-        }
-        viewPointTableView.getItems().clear(); /* clear previous rows, if any */
-        viewPointTableView.getItems().addAll(vpl);
-        viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
+            if (model==null) {
+                logger.error("model was null while trying to refresh VP table, should never happen" );
+                return;
+            }
+            List<ViewPoint> vpl = this.model.getViewPointList();
+            logger.trace("refreshVPTable: got a total of "+vpl.size() + " ViewPoint objects");
+            for (ViewPoint v : vpl) {
+                viewpointlist.add(v);
+            }
+            viewPointTableView.getItems().clear(); /* clear previous rows, if any */
+            viewPointTableView.getItems().addAll(vpl);
+            viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        });
+
     }
 
 }
