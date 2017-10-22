@@ -40,20 +40,6 @@ public class Segment implements Serializable {
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
     private static DecimalFormat formatter = new DecimalFormat("#,###");
 
-
-//    /* constructor -- we will move to the builder. */
-//    @Deprecated
-//    public Segment(String referenceSequenceID, Integer startPos, Integer endPos, boolean selected, IndexedFastaSequenceFile fastaReader) {
-//        this.referenceSequenceID = referenceSequenceID;
-//        this.startPos = startPos; // absolute coordinate
-//        this.endPos = endPos;     // absolute coordinate
-//        setSelected(selected);
-//        calculateGCandRepeatContent(fastaReader);
-//        this.marginSize=150; /* todo--deprecated */
-//        calculateRepeatContentMargins(fastaReader);
-//    }
-
-
     private Segment(Builder builder) {
         this.referenceSequenceID=builder.referenceSequenceID;
         this.startPos=builder.startPos;
@@ -95,56 +81,38 @@ public class Segment implements Serializable {
 
     }
 
-    /* getter and setter methods */
-
     /**
-     * Set the absolute coordinate of the starting position of the Segment.
-     *
      * @param startPos absolute coordinate of the starting position of the Segment.
      */
     public void setStartPos(Integer startPos) { this.startPos=startPos; }
 
-    /**
-     * @return Starting position of the Segment.
-     */
+    /** @return Starting position of the Segment. */
     public Integer getStartPos() {
         return startPos;
     }
 
-    /**
-     * Set the absolute coordinate of the end position of the Segment.
-     *
-     * @param endPos absolute coordinate of the end position of the Segment.
-     */
+    /** @param endPos absolute coordinate of the end position of the Segment. */
     public void setEndPos(Integer endPos) {
         this.startPos=endPos;
     }
 
-    /**
-     * @return End position of the Segment.
-     */
+    /** @return End position of the Segment. */
     public Integer getEndPos() {
         return endPos;
     }
 
-    /**
-     * @param selected true if the segment is to be included in a viewpoint.
-     */
+    /** @param selected true if the segment is to be included in a viewpoint. */
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
-    /**
-     * @return true, if the Segment is selected, otherwise false.
-     */
+    /** @return true, if the Segment is selected, otherwise false. */
     public boolean isSelected() {
         return selected;
     }
 
 
-    /**
-     * @return Length of the segment.
-     */
+    /** @return Length of the segment. */
     public Integer length() {
         return endPos - startPos + 1;
     }
@@ -201,7 +169,7 @@ public class Segment implements Serializable {
             String s = fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
 
             /* determine repeat content */
-            Integer lowerCase = 0, upperCase = 0;
+            int lowerCase = 0, upperCase = 0;
             for (int j = 0; j < s.length(); j++) {
                 if (Character.isLowerCase(s.charAt(j))) lowerCase++;
                 if (Character.isUpperCase(s.charAt(j))) upperCase++;

@@ -7,7 +7,9 @@ import java.util.Properties;
 
 
 /**
- * Created by peter on 01.07.17.
+ * Class to display the current user-chosen settings for analysis.
+ * @author Peter Robinson
+ * @version 0.0.3 (2017-10-20).
  */
 public class SettingsViewFactory {
 
@@ -38,21 +40,6 @@ public class SettingsViewFactory {
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
     }
-
-    /*
-     * Formats the list properties in human-readable format, checking for an empty list.
-    private static String joinEnzymes(ObservableList<String> lst) {
-        if (lst==null || lst.isEmpty()) {
-            return (String.format("not initialized"));
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(lst.get(0));
-        for (int i=0; i<lst.size();i++) {
-            sb.append(String.format("; %s", lst.get(i)));
-        }
-        return sb.toString();
-    }
-    */
 
     /**
      * @param properties
@@ -91,9 +78,7 @@ public class SettingsViewFactory {
             sb.append(String.format("<li>%s: %s</li>",numericPropNames[i],
                     properties.getProperty(numericProps[i])));
         }
-//        for (String prop: properties.stringPropertyNames()) {
-//            sb.append(String.format("<li>%s: %s</li>",prop,properties.getProperty(prop)));
-//        }
+
         sb.append("</ul></p>");
         sb.append("</body></html>");
         return sb.toString();

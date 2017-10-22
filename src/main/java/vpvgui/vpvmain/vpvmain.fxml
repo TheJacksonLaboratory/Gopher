@@ -75,10 +75,7 @@
                         </Menu>
                     </menus>
                   </MenuBar>
-                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="399.0" styleClass="menu-bar" HBox.hgrow="SOMETIMES">
-                     <padding>
-                        <Insets left="0.666667" right="0.666667" />
-                     </padding></Region>
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="399.0" styleClass="menu-bar" HBox.hgrow="SOMETIMES" />
                   <MenuBar nodeOrientation="RIGHT_TO_LEFT">
                     <menus>
                       <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
