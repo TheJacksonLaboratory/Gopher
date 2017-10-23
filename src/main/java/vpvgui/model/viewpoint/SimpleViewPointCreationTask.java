@@ -39,44 +39,39 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
-    private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, String path  ) {
-            try {
-                IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-                int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
-                logger.trace(String.format("Length of %s is %d", referenceSequenceID,chromosomeLength));
-                logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
-                List<Integer> gPosList = vpvgene.getTSSlist();
-                for (Integer gPos : gPosList) {
-                    ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
-                            targetName(vpvgene.getGeneSymbol()).
-                            maxDistToGenomicPosUp(model.getMaxSizeUp()).
-                            maxDistToGenomicPosDown(model.getMaxSizeDown()).
-                            minimumSizeDown(model.getMinSizeDown()).
-                            maximumSizeDown(model.getMaxSizeDown()).
-                            fastaReader(fastaReader).
-                            minimumSizeUp(model.getMinSizeUp()).
-                            maximumSizeUp(model.getMaxSizeUp()).
-                            minimumFragmentSize(model.getMinFragSize()).
-                            maximumRepeatContent(model.getMaxRepeatContent()).
-                            marginSize(model.getMarginSize()).
-                            build();
-                    updateProgress(i++, total); /* this will update the progress bar */
-                    updateLabelText(this.currentVP, vpvgene.toString());
-                    vp.generateViewpointSimple();
-                    if (vp.getResolved()) {
-                        viewpointlist.add(vp);
-                        logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
-                    } else {
-                        logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
-                    }
+    private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
 
-                }
-            } catch (FileNotFoundException e) {
-                logger.error("[ERROR] could not open/find faidx file for " + referenceSequenceID);
-                logger.error(e, e);
+        int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
+        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
+        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+        List<Integer> gPosList = vpvgene.getTSSlist();
+        for (Integer gPos : gPosList) {
+            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+                    targetName(vpvgene.getGeneSymbol()).
+                    maxDistToGenomicPosUp(model.getMaxSizeUp()).
+                    maxDistToGenomicPosDown(model.getMaxSizeDown()).
+                    minimumSizeDown(model.getMinSizeDown()).
+                    maximumSizeDown(model.getMaxSizeDown()).
+                    fastaReader(fastaReader).
+                    minimumSizeUp(model.getMinSizeUp()).
+                    maximumSizeUp(model.getMaxSizeUp()).
+                    minimumFragmentSize(model.getMinFragSize()).
+                    maximumRepeatContent(model.getMaxRepeatContent()).
+                    marginSize(model.getMarginSize()).
+                    build();
+            updateProgress(i++, total); /* this will update the progress bar */
+            updateLabelText(this.currentVP, vpvgene.toString());
+            vp.generateViewpointSimple();
+            if (vp.getResolved()) {
+                viewpointlist.add(vp);
+                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
+            } else {
+                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
             }
-    }
 
+        }
+
+    }
 
 
     /**
@@ -92,25 +87,27 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             return null;
         }
         this.total = getTotalGeneCount();
-       this.i = 0;
+        this.i = 0;
         logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
-        long milli=System.currentTimeMillis();
+        long milli = System.currentTimeMillis();
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
             String path = this.model.getIndexFastaFilePath(referenceSequenceID);
+            IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             if (path == null) {
                 logger.error("Could not retrieve faidx file for " + referenceSequenceID);
-                throw new VPVException(String.format("Could not retrieve FASTA index file for ",referenceSequenceID));
+                throw new VPVException(String.format("Could not retrieve FASTA index file for ", referenceSequenceID));
             }
-            logger.trace("Got RefID="+referenceSequenceID);
+            logger.trace("Got RefID=" + referenceSequenceID);
 
             group.getGenes().parallelStream().forEach(vpvGene -> {
-                calculateViewPoints(vpvGene,referenceSequenceID,path);});
-           // group.getGenes().stream().forEach(vpvGene -> {calculateViewPoints(vpvGene,referenceSequenceID,path);});
+                calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
+            });
+            // group.getGenes().stream().forEach(vpvGene -> {calculateViewPoints(vpvGene,referenceSequenceID,fastaReader);});
 
         }
-        long end=milli-System.currentTimeMillis();
-        logger.trace(String.format("Parallel It took %.1f sec",end/1000.0 ));
+        long end = milli - System.currentTimeMillis();
+        logger.trace(String.format("Parallel It took %.1f sec", end / 1000.0));
         this.model.setViewPoints(viewpointlist);
         return null;
     }
