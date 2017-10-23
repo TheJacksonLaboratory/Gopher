@@ -420,7 +420,7 @@ public class ViewPoint implements Serializable {
         }
 
         // starting from the centralized fragment containing 'genomicPos' (included)
-        // openExistingProject fragment-wise in UPSTREAM direction
+        // extend viewpoint fragment-wise in UPSTREAM direction
 
         Integer fragCountUp = 0;
         for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
@@ -433,14 +433,13 @@ public class ViewPoint implements Serializable {
             }
 
             // set fragments to 'false' that are not entirely within the allowed range
-            Integer upLen = genomicPos - segment.getStartPos();
-            if (maxSizeUp < upLen) {
+            if (maxSizeUp < genomicPos - segment.getEndPos()) {
                 segment.setSelected(false);
             }
 
             // set fragment to 'false', if required number of fragments has already been found
             if (fragNumUp + 1 <= fragCountUp) {
-                segment.setSelected(false);
+                //segment.setSelected(false);
             }
 
             // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
@@ -474,14 +473,13 @@ public class ViewPoint implements Serializable {
             }
 
             // set fragments to 'false' that are not entirely within the allowed range
-            Integer downLen = genomicPos - segment.getEndPos();
-            if (maxSizeDown < -downLen) {
+            if (maxSizeDown < segment.getStartPos()-genomicPos) {
                 segment.setSelected(false);
             }
 
             // set fragment to 'false', if required number of fragments has already been found
             if (fragNumDown <= fragCountDown) {
-                segment.setSelected(false);
+                //segment.setSelected(false);
             }
 
             // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
