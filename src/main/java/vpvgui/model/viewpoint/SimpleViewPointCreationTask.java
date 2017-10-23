@@ -6,15 +6,11 @@ import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
 import vpvgui.exception.VPVException;
 import vpvgui.model.Model;
-import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.VPVGene;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -43,7 +39,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
-    private void doIt(VPVGene vpvgene, String referenceSequenceID,String path  ) {
+    private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, String path  ) {
             try {
                 IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
                 int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
@@ -108,8 +104,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             }
             logger.trace("Got RefID="+referenceSequenceID);
 
-            group.getGenes().parallelStream().forEach(vpvGene -> {doIt(vpvGene,referenceSequenceID,path);});
-           // group.getGenes().stream().forEach(vpvGene -> {doIt(vpvGene,referenceSequenceID,path);});
+            group.getGenes().parallelStream().forEach(vpvGene -> {
+                calculateViewPoints(vpvGene,referenceSequenceID,path);});
+           // group.getGenes().stream().forEach(vpvGene -> {calculateViewPoints(vpvGene,referenceSequenceID,path);});
 
         }
         long end=milli-System.currentTimeMillis();
