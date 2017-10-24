@@ -410,9 +410,9 @@ public class ViewPointPresenter implements Initializable {
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
-            int maxSizeUp = (int) (vp.getMaxUpstreamGenomicPos() * factor);
-            int maxSizeDown = (int) (vp.getMaxDownstreamGenomicPos() * factor);
-            newVP.generateViewpointExtendedApproach(maxSizeUp, maxSizeDown);
+            int sizeUp = (int) (vp.getUpstreamNucleotideLength() * factor);
+            int sizeDown = (int) (vp.getDownstreamNucleotideLength() * factor);
+            newVP.generateViewpointExtendedApproach(sizeUp, sizeDown);
             logger.trace(String.format("Zooming ViewPoint for %s at factor %.1f. Old length %d new length %d",vp.getTargetName(),factor,
                     vp.getEndPos()-vp.getStartPos(),newVP.getEndPos()-newVP.getStartPos()));
             segmentsTableView.getItems().clear();

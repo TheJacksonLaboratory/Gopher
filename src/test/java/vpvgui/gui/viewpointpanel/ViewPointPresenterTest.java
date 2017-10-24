@@ -37,8 +37,8 @@ public class ViewPointPresenterTest extends ApplicationTest {
 //        ViewPoint vp = new ViewPoint(testReferenceSequenceID, testGenomicPos, testMaxUpstreamGenomicPos,
 //                testMaxDownstreamPos, fai);
         ViewPoint vp = new ViewPoint.Builder(testReferenceSequenceID,testGenomicPos).
-                maximumSizeUp(testMaxUpstreamGenomicPos).
-                maximumSizeDown(testMaxDownstreamPos).
+                downstreamLength(testMaxUpstreamGenomicPos).
+                upstreamLength(testMaxDownstreamPos).
                 fastaReader(fai).
                 build();
         vp.setTargetName("HRAS");

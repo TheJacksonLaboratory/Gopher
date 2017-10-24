@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
+import vpvgui.model.genome.HumanHg38;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
@@ -24,12 +25,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 5L;
-
     private static final String VERSION="0.2.11";
     private static final String LAST_CHANGE_DATE="10/24/2017, 4:22 PM";
-
-    /** This is the name of the file we download from UCSC for any of the genomes. */
-    private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -38,7 +35,7 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
-    /** Key:Name of a chromosome (or in general, of a contig). Value: length in nucleotides */
+    /** Key:Name of a chromosome (or in general, of a contig); Value: length in nucleotides */
     private Map<String,Integer> contigLengths;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
@@ -60,6 +57,8 @@ public class Model implements Serializable {
     public void setGenomeBuild(String newDatabase) {
         if (newDatabase.equals("hg19")) {
             this.genome = new HumanHg19();
+        } else if (newDatabase.equals("hg38")) {
+            this.genome = new HumanHg38();
         } else {
             ErrorWindow.display("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
             return;
@@ -77,7 +76,7 @@ public class Model implements Serializable {
 
     private int sizeDown;
     public final int getSizeDown() { return sizeDown;}
-    public final void setSizeDown(int sd) { sizeUp=sd;}
+    public final void setSizeDown(int sd) { sizeDown=sd;}
 
 
     /** Minimum size of the view point upstream of the anchor (transcription start site, usually). */
@@ -97,7 +96,7 @@ public class Model implements Serializable {
 //    public int getMaxSizeDown() {return maxSizeDown;}
 //    public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
     /** Minimum allowable size of a restriction fragment within a ViewPoint chosen for capture Hi C enrichment. */
-    private Integer minFragSize;
+    private int minFragSize;
     public int getMinFragSize() { return minFragSize; }
     public void setMinFragSize(int i) { this.minFragSize=i;}
 
@@ -105,11 +104,11 @@ public class Model implements Serializable {
     private double maxRepeatContent;
     public  double getMaxRepeatContent() {return maxRepeatContent;}
     public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
-
+    /** Minimum allowable GC content in a selected fragment. */
     private double minGCcontent;
     public  double getMinGCcontent() { return minGCcontent;}
     public  void setMinGCcontent(double mgc) { minGCcontent=mgc;}
-
+    /** Maximum allowable GC content in a selected fragment. */
     private double maxGCcontent;
     public  double getMaxGCcontent() { return maxGCcontent;}
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
@@ -118,7 +117,7 @@ public class Model implements Serializable {
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
     /** The length of a probe that will be used to enrich a restriction fragment within a viewpoint. */
-    private Integer probeLength =null;
+    private int probeLength;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
 
@@ -149,38 +148,19 @@ public class Model implements Serializable {
 
 
 
-
-//    public String getGenomeURL() { return this.genome.getGenomeURL(); }
-
-    public String genomeBasename = DEFAULT_GENOME_BASENAME;
     /** The complete URL of the chosen transcript definition from UCSC. */
-    public String transcriptsURL = null;
+    private String transcriptsURL = null;
 
 
-    public String getGenomeBasename() {
-        return this.genomeBasename;
-    }
+    public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
     public void setTargetGenesPath(String path){this.targetGenesPath=path; }
     public String getTargetGenesPath() { return this.targetGenesPath; }
-
-    /** @return array of enzyme cutting sites. */
-    public String[] getCuttingPatterns() {
-        int n = this.enzymelist.size();
-        String patterns[]=new String[n];
-        for (int i=0;i<n;i++) {
-            RestrictionEnzyme re = enzymelist.get(i);
-            patterns[i]=re.getSite();
-        }
-        return patterns;
-    }
-
-
     public String getTranscriptsURL() {
         return transcriptsURL;
     }
     public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
 
-    public String transcriptsBasename = null;
+    private String transcriptsBasename = null;
     public String getTranscriptsBasename() {
         return transcriptsBasename;
     }
@@ -197,7 +177,6 @@ public class Model implements Serializable {
     /** This method should be called when we create a new Model and want to use default settings.
      */
     public void setDefaultValues() {
-
         setSizeUp(Default.SIZE_UPSTREAM);
         setSizeDown(Default.SIZE_DOWNSTREAM);
         setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
@@ -209,22 +188,9 @@ public class Model implements Serializable {
         setGenomeBuild(Default.GENOME_BUILD);
     }
 
-
-
-
-
-
-
-
-    /**
-     * @return List of enzymes for the user to choose from.
-     */
+    /** @return List of enzymes for the user to choose from. */
     public List<RestrictionEnzyme> getRestrictionEnymes() {
         return enzymelist;
-    }
-
-    public void setRestrictionEnzymes(List<RestrictionEnzyme> lst){
-        this.enzymelist=lst;
     }
 
     public void setGenomeDirectoryPath(String p) { this.genome.setPathToGenomeDirectory(p); }
@@ -246,7 +212,6 @@ public class Model implements Serializable {
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
             String line;
             while ((line = br.readLine()) != null) {
-                //System.err.println(line);
                 if (line.startsWith("#"))
                     continue; /* skip header*/
                 String a[] = line.split("\\s+");
@@ -258,10 +223,6 @@ public class Model implements Serializable {
             e.printStackTrace();
         }
     }
-
-
-
-
 
     public void setVPVGenes(List<VPVGene> vpvgenelist) {
         this.geneList = vpvgenelist;

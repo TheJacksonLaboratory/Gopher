@@ -61,7 +61,8 @@ public class FASTAIndexManager extends Task<Void> {
         int n=genomeDirectory.listFiles().length;
         double blocksize=1.0/(double)n;
         double totalprogress=0d;
-        updateProgress(0.0);
+        updateProgress(totalprogress);
+        this.progress.setProgress(0.0);
         for (final File fileEntry : genomeDirectory.listFiles()) {
             String contigname=null;
             if (fileEntry.isDirectory()) {

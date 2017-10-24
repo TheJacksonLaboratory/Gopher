@@ -68,6 +68,9 @@ public class SegmentFactory implements Serializable {
                           Integer maxDistToGenomicPosUp,
                           Integer maxDistToGenomicPosDown,
                           List<RestrictionEnzyme> chosenEnzymeList) {
+
+        logger.error(String.format("Seg Fact up:%d down %d",maxDistToGenomicPosUp,maxDistToGenomicPosDown));
+
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);

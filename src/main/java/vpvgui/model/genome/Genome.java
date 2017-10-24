@@ -4,12 +4,16 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This is a superclass of a hierarchy of genome classes that know what chromosomes we want to parse and
  * keep track of the chromosome lengths and whether the genome has been downloaded, unpacked, and indesed.
  * @author Peter Robinson
- * @version 0.0.1
+ * @version 0.0.2 (2017-10-24)
  */
 public abstract class Genome implements Serializable {
     static Logger logger = Logger.getLogger(Genome.class.getName());
@@ -19,7 +23,11 @@ public abstract class Genome implements Serializable {
     protected String pathToGenomeDirectory=null;
     /** Basename of the compressed genome file that we will store to disk */
     protected static final String localFilename = "chromFa.tar.gz";
-
+    /** The valid chromosomes for the current genome build. (will be initialized from the subclasses).*/
+    protected  Set<String> valid=null;
+    /** This is the name of the file we download from UCSC for any of the genomes. */
+    private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
+    private String genomeBasename = DEFAULT_GENOME_BASENAME;
 
     /** Does the directory indicated by {@link #pathToGenomeDirectory} contain either the chromFa.tar.gz file or
      * the corresponding unpacked chromosome files (note: we require only the canonical files; other files can be deleted
@@ -52,12 +60,15 @@ public abstract class Genome implements Serializable {
 
     public String getGenomeURL() { return this.genomeURL;}
 
+    public String getGenomeBasename() { return this.genomeBasename;}
+
     /**
      * The default constructor is called when the {@link vpvgui.model.Model} object is initialized.
      * It is expected that the {@link #pathToGenomeDirectory} will be set for the first time
      * when the genome is downloaded (or a path to a pre-existing file is provided).
      */
     public Genome() {
+        valid=new HashSet<>();
     }
 
     /**
@@ -84,7 +95,18 @@ public abstract class Genome implements Serializable {
      * @param path Path to the directory where the chromFa.tar.gz file will be downloaed.
      * @return true if the genome file(s) have been completely downloaded.
      */
-    public abstract boolean checkDownloadComplete(String path);
+    /**
+     * @return true if the genome files have been previously downloaded to the indicated path.
+     */
+    public boolean checkDownloadComplete(String path) {
+        this.pathToGenomeDirectory = path;
+        if (gZippedGenomeFileDownloaded()) {
+            return true; // i.e., we found the chromFa.tar.gz file
+        }
+        logger.trace("Did not find chromFa.tar.gz. Will check for individual unpacked files.");
+        // Now look for the unpacked files (the user may have deleted chromFa.tar.gz)
+        return alreadyExtracted();
+    }
 
     /**
      * We use this method to check if we need to g-unzip the genome files. (We only check for the
@@ -96,6 +118,37 @@ public abstract class Genome implements Serializable {
         return f.exists();
     }
 
-    public abstract boolean isCanonical(String file);
+    /**
+     * We use this method to check if we need to g-unzip the genome files. (We only check for the
+     * presence of chr1.fa--this will break if species without chr1 are analyzed).
+     *
+     * @return true if the chromFGa.tar.gz file has been previously extracted
+     */
+    public boolean alreadyExtracted() {
+        List<String> missingChromosomes = new ArrayList<>();
+        for (String chr : valid) {
+            File f = new File(this.pathToGenomeDirectory + File.separator + chr);
+            if (!f.exists()) {
+                missingChromosomes.add(f.getAbsolutePath());
+            }
+        }
+        return (missingChromosomes.size() == 0); // true if we found all expected chromosomes
+    }
+
+
+    /**
+     * This funtion is called by the FASTAIndexManager, and it expects to receive the results
+     * of file.getName(), i.e., the basename of a chromosome file, which is something like {@code chr1.fa}.
+     * The function should return true for the canonical chromosomes such as {@code chr1.fa}
+     * and should return false for non-canonidal chromosomes such as {@code chr18_gl000207_random.fa}.
+     * @param chromosomeFileBasename
+     * @return true for canonical chromosome files.
+     */
+    public boolean isCanonical(String chromosomeFileBasename) {
+        chromosomeFileBasename=chromosomeFileBasename.replaceAll(".fa", "");
+        boolean ok = this.valid.contains(chromosomeFileBasename);
+        logger.trace(String.format("%s was %s",chromosomeFileBasename,ok));
+        return ok;
+    }
 
 }

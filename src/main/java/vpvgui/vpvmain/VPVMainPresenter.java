@@ -163,16 +163,15 @@ public class VPVMainPresenter implements Initializable {
     /** View for the second tab. */
     private VPAnalysisView vpanalysisview;
 
-    transient private IntegerProperty sizeUpP = new SimpleIntegerProperty();
-    public final int getSizeUpP() { return sizeUpP.get();}
-    public final void setSizeUpP(int su) {
-        sizeUpP.set(su);}
+    transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
+    public final int getSizeUp() { return sizeUp.get();}
+    public final void setSizeUp(int su) { sizeUp.set(su);}
     public IntegerProperty sizeDownProperty() { return sizeDown; }
 
     transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
     public final int getSizeDown() { return sizeDown.get();}
-    public final void setSizeDown(int sd) { sizeUpP.set(sd);}
-    public IntegerProperty sizeUpPProperty() { return sizeUpP; }
+    public final void setSizeDown(int sd) { sizeUp.set(sd);}
+    public IntegerProperty sizeUpProperty() { return sizeUp; }
 
     transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
     public int getMinFragSize() { return minFragSize.get(); }
@@ -328,7 +327,7 @@ public class VPVMainPresenter implements Initializable {
     private void setBindings() {
         StringConverter<Number> converter = new NumberStringConverter();
         Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
-        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(),sizeUpPProperty(),converter);
+        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),converter);
         Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
         Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxRepeatContentProperty(),converter);
         Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
@@ -341,7 +340,7 @@ public class VPVMainPresenter implements Initializable {
      */
     private void updateModel() {
         this.model.setSizeDown(getSizeDown());
-        this.model.setSizeUp(getSizeUpP());
+        this.model.setSizeUp(getSizeUp());
         this.model.setMinFragSize(getMinFragSize());
         this.model.setMaxRepeatContent(getMaxRepeatContent());
         this.model.setMinGCcontent(getMinGCcontent());
@@ -609,7 +608,10 @@ public class VPVMainPresenter implements Initializable {
             pbpresent.closeWindow();
         });
         task.setOnFailed(eh -> {
-            ErrorWindow.display("Exception encountered while attempting to create viewpoints","TODO");
+            Exception exc = (Exception)eh.getSource().getException();
+            ErrorWindow.displayException("Error",
+                    "Exception encountered while attempting to create viewpoints",
+                    exc);
         });
         logger.trace("About to run task");
         new Thread(task).start();
