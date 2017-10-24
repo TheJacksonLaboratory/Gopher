@@ -48,13 +48,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
-                    maxDistToGenomicPosUp(model.getMaxSizeUp()).
-                    maxDistToGenomicPosDown(model.getMaxSizeDown()).
-                    minimumSizeDown(model.getMinSizeDown()).
-                    maximumSizeDown(model.getMaxSizeDown()).
+//                    maxDistToGenomicPosUp(model.getMaxSizeUp()).
+//                    maxDistToGenomicPosDown(model.getMaxSizeDown()).
+//                    maximumSizeDown(model.getMaxSizeDown()).
                     fastaReader(fastaReader).
-                    minimumSizeUp(model.getMinSizeUp()).
-                    maximumSizeUp(model.getMaxSizeUp()).
+//                    maximumSizeUp(model.getMaxSizeUp()).
                     minimumFragmentSize(model.getMinFragSize()).
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).

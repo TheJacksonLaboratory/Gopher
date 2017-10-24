@@ -214,16 +214,14 @@ public class TestViewPointCreation {
                         maxDistToGenomicPosDown(maxDistToGenomicPosDown).
                       //  cuttingPatterns(cuttingPatterns).
                         fastaReader(fastaReader).
-                        minimumSizeUp(minSizeUp).
                         maximumSizeUp(maxSizeUp).
                         maximumSizeDown(maxSizeDown).
-                        minimumSizeDown(minSizeDown).
                         minimumFragmentSize(minFragSize).
                         maximumRepeatContent(maxRepFrag).
                         marginSize(marginSize).
                         build();
 
-                vp.generateViewpointExtendedApproach(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
+                vp.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
                 //vpvgene.addViewPoint(vp);
                 vpvgene.setChromosome(referenceSequenceID);
                // System.out.println(symbol + "\t*" + vp.getViewpointScore("GATC",marginSize) + "\t" + (vp.getEndPos() - vp.getStartPos()) + "\t" + vp.getViewpointScore("GATC",marginSize)/(vp.getEndPos() - vp.getStartPos())) ;

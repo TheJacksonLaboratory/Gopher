@@ -1,13 +1,16 @@
 package vpvgui.model;
 
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.viewpoint.ViewPoint;
 
-import javax.swing.text.View;
 import java.io.*;
 import java.util.*;
 
@@ -15,17 +18,15 @@ import java.util.*;
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.0.3 (2017-09-04)
+ * @version 0.2.11 (2017-10-24)
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 4L;
+    static final long serialVersionUID = 5L;
 
-    private static final String VERSION="0.1.14";
-    private static final String LAST_CHANGE_DATE="10/04/2017, 4:22 PM";
-
-
+    private static final String VERSION="0.2.11";
+    private static final String LAST_CHANGE_DATE="10/24/2017, 4:22 PM";
 
     /** This is the name of the file we download from UCSC for any of the genomes. */
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
@@ -45,10 +46,6 @@ public class Model implements Serializable {
     private String httpPort=null;
     /** the name of the viewpoint that will be used to write the settings file (default: vpvgui). */
     private String projectName=null;
-    /** Has the UCSC Genome build been unpacked yet? :*/
-    //private boolean genomeUnpacked=false;
-    /** Has the downloaded genome been FASTA indexed yet? */
-    //private boolean genomeIndexed=false;
     /** Path to the file with the uploaded target genes. */
     private String targetGenesPath=null;
     /** An object to coordinate the genome build as well as the status of download, unpacking, and indexing. */
@@ -70,38 +67,54 @@ public class Model implements Serializable {
     }
 
     public Genome getGenome() { return this.genome; }
+
+    /** This integer property is declared transient because properties cannot be serialized. We keep it in synch with
+     * a corresponding normal integer variable that can be
+     */
+    private int sizeUp;
+    public final int getSizeUp() { return sizeUp;}
+    public final void setSizeUp(int su) {  sizeUp=su;}
+
+    private int sizeDown;
+    public final int getSizeDown() { return sizeDown;}
+    public final void setSizeDown(int sd) { sizeUp=sd;}
+
+
     /** Minimum size of the view point upstream of the anchor (transcription start site, usually). */
-    private Integer minSizeUp = null;
-    public int getMinSizeUp() {return minSizeUp;}
-    public void setMinSizeUp(Integer i) { this.minSizeUp=i;}
-    /** Minimum size of the view point downstream of the anchor (transcription start site, usually). */
-    private Integer minSizeDown=null;
-    public int getMinSizeDown() {return minSizeDown;}
-    public void setMinSizeDown(Integer i) { this.minSizeDown=i;}
-    /** Maximum size of the view point upstream of the anchor (transcription start site, usually). */
-    private Integer maxSizeUp=null;
-    public int getMaxSizeUp() {return maxSizeUp;}
-    public void setMaxSizeUp(Integer i) { this.maxSizeUp=i;}
-    /** Maximum size of the view point downstream of the anchor (transcription start site, usually). */
-    private Integer maxSizeDown = null;
-    public int getMaxSizeDown() {return maxSizeDown;}
-    public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
+//    private Integer minSizeUp = null;
+//    public int getMinSizeUp() {return minSizeUp;}
+//    public void setMinSizeUp(Integer i) { this.minSizeUp=i;}
+//    /** Minimum size of the view point downstream of the anchor (transcription start site, usually). */
+//    private Integer minSizeDown=null;
+//    public int getMinSizeDown() {return minSizeDown;}
+//    public void setMinSizeDown(Integer i) { this.minSizeDown=i;}
+//    /** Maximum size of the view point upstream of the anchor (transcription start site, usually). */
+//    private Integer maxSizeUp=null;
+//    public int getMaxSizeUp() {return maxSizeUp;}
+//    public void setMaxSizeUp(Integer i) { this.maxSizeUp=i;}
+//    /** Maximum size of the view point downstream of the anchor (transcription start site, usually). */
+//    private Integer maxSizeDown = null;
+//    public int getMaxSizeDown() {return maxSizeDown;}
+//    public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
     /** Minimum allowable size of a restriction fragment within a ViewPoint chosen for capture Hi C enrichment. */
-    private Integer minFragSize = null;
+    private Integer minFragSize;
     public int getMinFragSize() { return minFragSize; }
-    public void setMinFragSize(Integer i) { this.minFragSize=i;}
-    /** TODO exact definition. */
-    private Integer fragNumUp = null;
-    public int getFragNumUp() { return fragNumUp; }
-    public void setFragNumUp(Integer i) { this.fragNumUp=i;}
-    /** TODO exact definition. */
-    private Integer fragNumDown = null;
-    public int fragNumDown() { return fragNumDown; }
-    public void setFragNumDown(Integer i) { this.fragNumDown=i;}
+    public void setMinFragSize(int i) { this.minFragSize=i;}
+
     /** Maximum allowable repeat content in the margin of a selected fragment. */
-    private Double maxRepeatContent = null;
-    public double getMaxRepeatContent() {return maxRepeatContent;}
-    public void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
+    private double maxRepeatContent;
+    public  double getMaxRepeatContent() {return maxRepeatContent;}
+    public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
+
+    private double minGCcontent;
+    public  double getMinGCcontent() { return minGCcontent;}
+    public  void setMinGCcontent(double mgc) { minGCcontent=mgc;}
+
+    private double maxGCcontent;
+    public  double getMaxGCcontent() { return maxGCcontent;}
+    public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
+
+
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
     /** The length of a probe that will be used to enrich a restriction fragment within a viewpoint. */
@@ -184,12 +197,9 @@ public class Model implements Serializable {
     /** This method should be called when we create a new Model and want to use default settings.
      */
     public void setDefaultValues() {
-        setFragNumUp(Default.NUMBER_OF_FRAGMENTS_UPSTREAM);
-        setFragNumDown(Default.NUMBER_OF_FRAGMENTS_DOWNSTREAM);
-        setMinSizeUp(Default.MINIMUM_SIZE_UPSTREAM);
-        setMinSizeDown(Default.MINIMUM_SIZE_DOWNSTREAM);
-        setMaxSizeUp(Default.MAXIMUM_SIZE_UPSTREAM);
-        setMaxSizeDown(Default.MAXIMUM_SIZE_DOWNSTREAM);
+
+        setSizeUp(Default.SIZE_UPSTREAM);
+        setSizeDown(Default.SIZE_DOWNSTREAM);
         setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
         setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
         setProbeLength(Default.PROBE_LENGTH);
@@ -382,12 +392,10 @@ public class Model implements Serializable {
         properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());
         String tgpath=model.getTargetGenesPath()!=null?model.getTargetGenesPath():"null";
         properties.setProperty("target_genes_path",tgpath);
-        properties.setProperty("getFragNumUp",String.format("%d",model.getFragNumUp()));
-        properties.setProperty("fragNumDown",String.format("%d",model.fragNumDown()));
-        properties.setProperty("getMinSizeUp",String.format("%d",model.getMinSizeUp()));
-        properties.setProperty("getMinSizeDown",String.format("%d",model.getMinSizeDown()));
-        properties.setProperty("getMaxSizeUp",String.format("%d",model.getMaxSizeUp()));
-        properties.setProperty("getMaxSizeDown",String.format("%d",model.getMaxSizeDown()));
+        properties.setProperty("min GC content",String.format("%.2f",model.getMinGCcontent()));
+        properties.setProperty("max GC content",String.format("%.2f",model.getMaxGCcontent()));
+        properties.setProperty("SizeUp",String.format("%d",model.getSizeUp()));
+        properties.setProperty("SizeDown",String.format("%d",model.getSizeDown()));
         properties.setProperty("getMinFragSize",String.format("%d",model.getMinFragSize()));
         properties.setProperty("maxRepeatContent",String.format("%f",model.getMaxRepeatContent()));
         return properties;

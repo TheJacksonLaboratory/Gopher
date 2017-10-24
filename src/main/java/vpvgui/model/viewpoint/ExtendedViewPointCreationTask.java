@@ -67,20 +67,18 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     for (Integer gPos : gPosList) {
                         ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                                 targetName(vpvgene.getGeneSymbol()).
-                                maxDistToGenomicPosUp(model.getMaxSizeUp()).
-                                maxDistToGenomicPosDown(model.getMaxSizeDown()).
-                                minimumSizeDown(model.getMinSizeDown()).
-                                maximumSizeDown(model.getMaxSizeDown()).
+//                                maxDistToGenomicPosUp(model.getMaxSizeUp()).
+//                                maxDistToGenomicPosDown(model.getMaxSizeDown()).
+//                                maximumSizeDown(model.getMaxSizeDown()).
                                 fastaReader(fastaReader).
-                                minimumSizeUp(model.getMinSizeUp()).
-                                maximumSizeUp(model.getMaxSizeUp()).
+//                                maximumSizeUp(model.getMaxSizeUp()).
                                 minimumFragmentSize(model.getMinFragSize()).
                                 maximumRepeatContent(model.getMaxRepeatContent()).
                                 marginSize(model.getMarginSize()).
                                 build();
                         updateProgress(i++, total); /* this will update the progress bar */
                         updateLabelText(this.currentVP, vpvgene.toString());
-                        vp.generateViewpointExtendedApproach(model.getFragNumUp(), model.fragNumDown(), model.getMaxSizeUp(), model.getMaxSizeDown());
+                       // vp.generateViewpointExtendedApproach(model.getFragNumUp(), model.fragNumDown(), model.getMaxSizeUp(), model.getMaxSizeDown());
                         viewpointlist.add(vp);
                     }
                 } catch (FileNotFoundException e) {

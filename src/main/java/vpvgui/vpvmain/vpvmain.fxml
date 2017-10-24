@@ -230,27 +230,22 @@
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" />
-                                  <RowConstraints minHeight="10.0" />
-                                  <RowConstraints minHeight="10.0" />
                                     <RowConstraints minHeight="10.0" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="# Fragments upstream" />
-                                    <TextField fx:id="fragNumUpTextField" promptText="4" GridPane.columnIndex="1" />
-                                    <Label text="# Fragments downstream" GridPane.columnIndex="2" />
-                                    <Label text="Minimum size upstream" GridPane.rowIndex="1" />
-                                    <Label text="Maximum size upstream" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                    <Label text="Minimum size downstream" GridPane.rowIndex="2" />
-                                    <Label text="Maximum size downstream" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <Label text="Minimum fragment size" GridPane.rowIndex="3" />
-                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                    <TextField fx:id="minSizeUpTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <TextField fx:id="minSizeDownTextField" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <TextField fx:id="minFragSizeTextField" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <TextField fx:id="fragNumDownTextField" promptText="4" GridPane.columnIndex="3" />
-                                    <TextField fx:id="maxSizeUpTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <TextField fx:id="maxSizeDownTextField" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                                    <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                    <Label text="Upstream size" />
+                                    <Label text="Downstream size" GridPane.columnIndex="2" />
+                                    <Label text="Minimum fragment size" GridPane.rowIndex="1" />
+                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <TextField fx:id="sizeUpTextField" promptText="1500" GridPane.columnIndex="1" />
+                                    <TextField fx:id="minFragSizeTextField" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="sizeDownTextField" promptText="5000" GridPane.columnIndex="3" />
+                                    <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                    <Label text="Minimum GC content" GridPane.rowIndex="2" />
+                                    <Label text="Maximum GC Content" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="minGCContentTextField" prefHeight="31.0" prefWidth="177.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <TextField fx:id="maxGCContentTextField" prefHeight="30.0" prefWidth="177.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                  </children>
                               </GridPane>
                            </children>

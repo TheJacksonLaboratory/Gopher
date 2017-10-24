@@ -76,15 +76,13 @@ public class DesignConsoleTest {
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
               //  cuttingPatterns(testCuttingPatterns).
                 fastaReader(testFastaReader).
-                minimumSizeUp(minSizeUp).
-                minimumSizeDown(minSizeDown).
                 maximumSizeUp(maxSizeUp).
                 maximumSizeDown(maxSizeDown).
                 minimumFragmentSize(minFragSize).
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_1.generateViewpointExtendedApproach(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez_1.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_1);
 
         // second viewpoint with identical parameters
@@ -93,15 +91,13 @@ public class DesignConsoleTest {
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
                // cuttingPatterns(testCuttingPatterns).
                 fastaReader(testFastaReader).
-                minimumSizeUp(minSizeUp).
-                minimumSizeDown(minSizeDown).
                 maximumSizeUp(maxSizeUp).
                 maximumSizeDown(maxSizeDown).
                 minimumFragmentSize(minFragSize).
                 maximumRepeatContent(minRepFrag).
                 marginSize(marginSize).
                 build();
-        testViewpointLupianez_2.generateViewpointExtendedApproach(fragNumUp,fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez_2.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
         viewPointList.add(testViewpointLupianez_2);
 
         testModel.setViewPoints(viewPointList);

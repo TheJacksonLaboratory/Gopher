@@ -235,8 +235,6 @@ ViewPoint testViewpoint = new ViewPoint.Builder(testReferenceSequenceID,testGeno
                 maxDistToGenomicPosUp(maxDistToGenomicPosUp).
                 maxDistToGenomicPosDown(maxDistToGenomicPosDown).
                 fastaReader(FastaReader).
-                minimumSizeUp(minSizeUp).
-                minimumSizeDown(minSizeDown).
                 maximumSizeUp(maxSizeUp).
                 maximumSizeDown(maxSizeDown).
                 minimumFragmentSize(minFragSize).
@@ -244,7 +242,7 @@ ViewPoint testViewpoint = new ViewPoint.Builder(testReferenceSequenceID,testGeno
                 marginSize(marginSize).
                 build();
 
-        testViewpointLupianez.generateViewpointExtendedApproach(fragNumUp, fragNumDown,maxSizeUp,maxSizeDown);
+        testViewpointLupianez.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
 
 
 

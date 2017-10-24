@@ -1,7 +1,7 @@
 package vpvgui.vpvmain;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +14,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 import vpvgui.gui.ConfirmWindow;
@@ -46,8 +48,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import static vpvgui.io.Platform.getVPVDir;
 
 
 /**
@@ -110,14 +110,17 @@ public class VPVMainPresenter implements Initializable {
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
 
-    @FXML private TextField fragNumUpTextField;
-    @FXML private TextField fragNumDownTextField;
-    @FXML private TextField minSizeUpTextField;
-    @FXML private TextField maxSizeUpTextField;
-    @FXML private TextField minSizeDownTextField;
-    @FXML private TextField maxSizeDownTextField;
+    //@FXML private TextField fragNumUpTextField;
+    //@FXML private TextField fragNumDownTextField;
+    @FXML private TextField sizeUpTextField;
+    //@FXML private TextField maxSizeUpTextField;
+    @FXML private TextField sizeDownTextField;
+//    @FXML private TextField maxSizeDownTextField;
     @FXML private TextField minFragSizeTextField;
     @FXML private TextField maxRepContentTextField;
+    @FXML private TextField minGCContentTextField;
+    @FXML private TextField maxGCContentTextField;
+
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
     /** Show how many valid genes were uploaded by user. */
@@ -159,6 +162,37 @@ public class VPVMainPresenter implements Initializable {
     private VPAnalysisPresenter vpanalysispresenter;
     /** View for the second tab. */
     private VPAnalysisView vpanalysisview;
+
+    transient private IntegerProperty sizeUpP = new SimpleIntegerProperty();
+    public final int getSizeUpP() { return sizeUpP.get();}
+    public final void setSizeUpP(int su) {
+        sizeUpP.set(su);}
+    public IntegerProperty sizeDownProperty() { return sizeDown; }
+
+    transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
+    public final int getSizeDown() { return sizeDown.get();}
+    public final void setSizeDown(int sd) { sizeUpP.set(sd);}
+    public IntegerProperty sizeUpPProperty() { return sizeUpP; }
+
+    transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
+    public int getMinFragSize() { return minFragSize.get(); }
+    public void setMinFragSize(int i) { this.minFragSize.set(i);}
+    public IntegerProperty minFragSizeProperty() { return minFragSize; }
+
+    transient private DoubleProperty maxRepeatContent = new SimpleDoubleProperty();
+    public final double getMaxRepeatContent() {return maxRepeatContent.get();}
+    public final void setMaxRepeatContent(double r) { this.maxRepeatContent.set(r);}
+    public DoubleProperty maxRepeatContentProperty() { return maxRepeatContent;  }
+
+    transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
+    public final double getMinGCcontent() { return minGCcontent.get();}
+    public final void setMinGCcontent(double mgc) { minGCcontent.set(mgc);}
+    public DoubleProperty minGCcontentProperty() { return minGCcontent; }
+
+    transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
+    public final double getMaxGCcontent() { return maxGCcontent.get();}
+    public final void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
+    public DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
     @FXML
     void exitButtonClicked(ActionEvent e) {
@@ -213,8 +247,10 @@ public class VPVMainPresenter implements Initializable {
             this.approachLabel.setText(newValue);
         });
         this.approachLabel.setText(approachChoiceBox.getValue());
-        initializePromptTextsToDefaultValues();
         this.initializer=new Initializer(model);
+        initializePromptTextsToDefaultValues();
+
+
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
@@ -227,6 +263,7 @@ public class VPVMainPresenter implements Initializable {
         tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+
     }
 
     private void setInitializedValuesInGUI() {
@@ -267,6 +304,7 @@ public class VPVMainPresenter implements Initializable {
         this.model=mod;
         logger.trace(String.format("Setting model to %s",mod.toString()));
         setInitializedValuesInGUI();
+        setBindings();
     }
 
 
@@ -278,14 +316,36 @@ public class VPVMainPresenter implements Initializable {
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
-        this.fragNumUpTextField.setPromptText(String.format("%d",Default.NUMBER_OF_FRAGMENTS_UPSTREAM));
-        this.fragNumDownTextField.setPromptText(String.format("%d",Default.NUMBER_OF_FRAGMENTS_DOWNSTREAM));
-        this.minSizeUpTextField.setPromptText(String.format("%d",Default.MINIMUM_SIZE_UPSTREAM));
-        this.minSizeDownTextField.setPromptText(String.format("%d",Default.MINIMUM_SIZE_DOWNSTREAM));
-        this.maxSizeUpTextField.setPromptText(String.format("%d",Default.MAXIMUM_SIZE_UPSTREAM));
-        this.maxSizeDownTextField.setPromptText(String.format("%d",Default.MAXIMUM_SIZE_DOWNSTREAM));
+        this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
+        this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
+        this.minGCContentTextField.setPromptText(String.format("%.2f",Default.MIN_GC_CONTENT));
+        this.maxGCContentTextField.setPromptText(String.format("%.2f",Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxRepContentTextField.setPromptText(String.format("%.1f",Default.MAXIMUM_REPEAT_CONTENT));
+    }
+
+    /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
+    private void setBindings() {
+        StringConverter<Number> converter = new NumberStringConverter();
+        Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
+        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(),sizeUpPProperty(),converter);
+        Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
+        Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxRepeatContentProperty(),converter);
+        Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
+        Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxGCcontentProperty(),converter);
+    }
+
+    /** This method should be called before we create viewpoints. It updates all of the variables in our model object
+     * to have the values specified in the user for the GUI, including the values of the six fields we show in the GUI
+     * and that are bound in {@link #setBindings()}.
+     */
+    private void updateModel() {
+        this.model.setSizeDown(getSizeDown());
+        this.model.setSizeUp(getSizeUpP());
+        this.model.setMinFragSize(getMinFragSize());
+        this.model.setMaxRepeatContent(getMaxRepeatContent());
+        this.model.setMinGCcontent(getMinGCcontent());
+        this.model.setMaxGCcontent(getMaxGCcontent());
     }
 
 
@@ -495,6 +555,7 @@ public class VPVMainPresenter implements Initializable {
         if (! checkDataValidity()) {
             return;
         }
+        updateModel();
 
         String approach = this.approachChoiceBox.getValue();
         boolean doSimple=false;
@@ -556,6 +617,8 @@ public class VPVMainPresenter implements Initializable {
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
     }
+
+
 
     /**
      * @param e Event triggered by close command.

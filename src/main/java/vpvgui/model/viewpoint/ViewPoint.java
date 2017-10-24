@@ -56,10 +56,6 @@ public class ViewPoint implements Serializable {
     private Integer maxDistToGenomicPosUp;
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private Integer maxDistToGenomicPosDown;
-    /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}. */
-    private Integer minDistToGenomicPosUp;
-    /** The viewpoint must be at least as large as the interval [{@link #minDistToGenomicPosUp},{@link #minDistToGenomicPosDown}] with respect to {@link #startPos}*/
-    private Integer minDistToGenomicPosDown;
     /** start position of the viewpoint */
     private Integer startPos;
     /** end position of the viewpoint */
@@ -86,7 +82,7 @@ public class ViewPoint implements Serializable {
     /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
     private String warnings;
     /** Overall score of this Viewpoint.*/
-    private Double score;
+    private double score;
     /** Minimum allowable fragment size for the simple approach */
     private static final int SIMPLE_APPROACH_MINSIZE=146;
     /** Maximim allowable fragment size for simple approach */
@@ -216,12 +212,11 @@ public class ViewPoint implements Serializable {
         private  String targetName="";
         // Optional parameters - initialized to default values
         /* ToDo Check is this correct for maxDistToGenomicPosUp etc. ?*/
-        private Integer maxDistToGenomicPosUp  = Default.MAXIMUM_SIZE_UPSTREAM+2000;
-        private Integer maxDistToGenomicPosDown  = Default.MAXIMUM_SIZE_DOWNSTREAM+2000;
-        private Integer minSizeUp=Default.MINIMUM_SIZE_UPSTREAM;
-        private Integer maxSizeUp=Default.MAXIMUM_SIZE_UPSTREAM;
-        private Integer minSizeDown=Default.MINIMUM_SIZE_DOWNSTREAM;
-        private Integer maxSizeDown=Default.MAXIMUM_SIZE_DOWNSTREAM;
+        private Integer maxDistToGenomicPosUp  = Default.SIZE_UPSTREAM+2000;
+        private Integer maxDistToGenomicPosDown  = Default.SIZE_DOWNSTREAM+2000;
+
+        private Integer maxSizeUp=Default.SIZE_UPSTREAM;
+        private Integer maxSizeDown=Default.SIZE_DOWNSTREAM;
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
         private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
@@ -249,15 +244,11 @@ public class ViewPoint implements Serializable {
         public Builder fastaReader(IndexedFastaSequenceFile val) {
             this.fastaReader=val; return this;
         }
-        public Builder minimumSizeUp(int val) {
-            this.minSizeUp=val; return this;
-        }
+
         public Builder maximumSizeUp(int val) {
             this.maxSizeUp=val; return this;
         }
-        public Builder minimumSizeDown(int val) {
-            this.minSizeDown=val; return this;
-        }
+
         public Builder maximumSizeDown(int val) {
             this.maxSizeDown=val; return this;
         }
@@ -382,13 +373,10 @@ public class ViewPoint implements Serializable {
      * In this approach, the viewpoint is seen as a set of selected fragments within a given range around {@link #genomicPos}.
      * Fragments can be discarded because they shorter, or because their margins a higher repetitive content than a given thresholds.
      *
-     * @param fragNumUp    required number of fragments upstream of the fragment that contains {@link #genomicPos} (e.g. 4).
-     * @param fragNumDown  required number of fragments downstream of the fragment that contains {@link #genomicPos} (e.g. 4).
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    public void generateViewpointExtendedApproach(Integer fragNumUp,
-                                                  Integer fragNumDown,
+    public void generateViewpointExtendedApproach(
                                                   Integer maxSizeUp,
                                                   Integer maxSizeDown) {
 
@@ -438,9 +426,9 @@ public class ViewPoint implements Serializable {
             }
 
             // set fragment to 'false', if required number of fragments has already been found
-            if (fragNumUp + 1 <= fragCountUp) {
-                //segment.setSelected(false);
-            }
+//            if (fragNumUp + 1 <= fragCountUp) {
+//                //segment.setSelected(false);
+//            }
 
             // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
             if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
@@ -455,10 +443,10 @@ public class ViewPoint implements Serializable {
             }
         }
 
-        if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
-            warnings += "WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
-            resolved = false;
-        }
+//        if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
+//            warnings += "WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+//            resolved = false;
+//        }
 
         // originating from the centralized fragment containing 'genomicPos' (excluded) openExistingProject fragment-wise in DOWNSTREAM direction
 
@@ -478,9 +466,9 @@ public class ViewPoint implements Serializable {
             }
 
             // set fragment to 'false', if required number of fragments has already been found
-            if (fragNumDown <= fragCountDown) {
-                //segment.setSelected(false);
-            }
+//            if (fragNumDown <= fragCountDown) {
+//                //segment.setSelected(false);
+//            }
 
             // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
             if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
@@ -495,10 +483,10 @@ public class ViewPoint implements Serializable {
             }
         }
 
-        if (fragCountDown < fragNumDown) {
-            warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
-            resolved = false;
-        }
+//        if (fragCountDown < fragNumDown) {
+//            warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
+//            resolved = false;
+//        }
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
         Segment firstSelectedSegment = restrictionSegmentList.stream().filter(segment -> segment.isSelected()).findFirst().orElse(null);
         if (firstSelectedSegment != null) {
