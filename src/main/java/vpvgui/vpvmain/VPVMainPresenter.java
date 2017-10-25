@@ -310,6 +310,36 @@ public class VPVMainPresenter implements Initializable {
     public void setModelInMainAndInAnalysisPresenter(Model mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
+        if (model.getMaxGCcontent()>0){
+            this.maxGCContentTextField.setText(String.format("%.2f",model.getMaxGCcontent()));
+        } else {
+            this.maxGCContentTextField.setPromptText(String.format("%.2f",Default.MAX_GC_CONTENT));
+        }
+        if (model.getMinGCcontent()>0) {
+            this.minGCContentTextField.setText(String.format("%.2f",model.getMinGCcontent()));
+        } else {
+            this.minGCContentTextField.setPromptText(String.format("%.2f",Default.MIN_GC_CONTENT));
+        }
+        if (model.getMinFragSize()>0) {
+            this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
+        } else {
+            this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
+        }
+        if (model.getMaxRepeatContent()>0) {
+            this.maxRepContentTextField.setText(String.format("%.2f",model.getMaxRepeatContent()));
+        } else {
+            this.maxRepContentTextField.setPromptText(String.format("%.2f",Default.MAXIMUM_REPEAT_CONTENT));
+        }
+        if (model.getSizeUp()>0) {
+            this.sizeUpTextField.setText(String.format("%d",model.getSizeUp()));
+        } else {
+            this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
+        }
+        if (model.getSizeDown()>0) {
+            this.sizeDownTextField.setText(String.format("%d",model.getSizeDown()));
+        } else {
+            this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
+        }
     }
 
 
@@ -816,8 +846,15 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML
     public void setProbeLength(ActionEvent e) {
+        int probelen;
+        if (model.getProbeLength()>0) {
+            probelen=model.getProbeLength();
+        } else {
+            probelen=Default.PROBE_LENGTH;
+        }
+
         Integer len = Popups.getIntegerFromUser("Enter Probe Length",
-                Default.PROBE_LENGTH,
+                probelen,
                 "Enter probe length:");
         if (len == null) {
             ErrorWindow.display("Could not get probe length", "enter an integer value!");

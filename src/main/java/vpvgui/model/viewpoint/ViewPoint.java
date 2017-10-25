@@ -1,10 +1,8 @@
 package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import javafx.beans.property.IntegerProperty;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
-import vpvgui.exception.VPVException;
 import vpvgui.model.Default;
 import vpvgui.model.RestrictionEnzyme;
 
@@ -68,6 +66,8 @@ public class ViewPoint implements Serializable {
     private double maxGcContent;
     /** Minimum allowable GC content */
     private double minGcContent;
+    /** Is the gene on the forward (positive) strand). */
+    private boolean isPositiveStrand;
     /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointExtendedApproach}. */
     private boolean resolved;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
@@ -146,6 +146,7 @@ public class ViewPoint implements Serializable {
         this.minGcContent=vp.minGcContent;
         this.minFragSize=vp.minFragSize;
         this.marginSize= vp.marginSize;
+        this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(fastaReader);
@@ -169,6 +170,7 @@ public class ViewPoint implements Serializable {
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
+        this.isPositiveStrand=builder.isPositiveStrand;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
@@ -186,11 +188,19 @@ public class ViewPoint implements Serializable {
         setResolved(false);
         warnings="";
         /* Create segmentFactory */
+        int genomicUp,genomicDown;
+        if (isPositiveStrand) {
+            genomicUp=this.upstreamNucleotideLength;
+            genomicDown=this.downstreamNucleotideLength;
+        } else {
+            genomicDown=this.upstreamNucleotideLength;
+            genomicUp=this.downstreamNucleotideLength;
+        }
         segmentFactory = new SegmentFactory(this.referenceSequenceID,
                 this.genomicPos,
                 fastaReader,
-                this.upstreamNucleotideLength,
-                this.downstreamNucleotideLength,
+                genomicUp,
+                genomicDown,
                 ViewPoint.chosenEnzymes);
         logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
         initRestrictionFragments(fastaReader);
@@ -217,8 +227,8 @@ public class ViewPoint implements Serializable {
         private Integer upstreamNtLength = Default.SIZE_UPSTREAM+2000;
         /* downstream nucleotide length for fragment generation (downstream of genomic pos).*/
         private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM+2000;
-
-
+        /** Need to choose a default strand, but this will always be overwritten. */
+        private boolean isPositiveStrand =true;
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
         private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
         private double maxGcContent=Default.MAX_GC_CONTENT;
@@ -242,6 +252,10 @@ public class ViewPoint implements Serializable {
         }
         public Builder maximumGcContent(double maxGC) {
             maxGcContent=maxGC; return this;
+        }
+        public Builder isForwardStrand(boolean strand) {
+           this.isPositiveStrand = strand;
+            return this;
         }
         public Builder minimumGcContent(double minGC) {
             this.minGcContent=minGC; return this;
@@ -293,25 +307,6 @@ public class ViewPoint implements Serializable {
     }
     /** @return a string like chr4:29,232,796 */
     public String getGenomicLocationString() { return String.format("%s:%s",referenceSequenceID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
-
-
-//    public final void setMaxUpstreamGenomicPos(Integer maxDistToGenomicPosUp) {
-//        this.upstreamNucleotideLength = maxDistToGenomicPosUp;
-//    }
-//
-//    public final Integer getMaxUpstreamGenomicPos() {
-//        return upstreamNucleotideLength;
-//    }
-//
-//
-//    public final void setMaxDownstreamGenomicPos(Integer maxDistToGenomicPosDown) {
-//        this.downstreamNucleotideLength = maxDistToGenomicPosDown;
-//    }
-//
-//    public final Integer getMaxDownstreamGenomicPos() {
-//        return downstreamNucleotideLength;
-//    }
-
     /** @return overall score of this ViewPoint. TODO what about simple?     */
     public final double getScore() {
         return score;

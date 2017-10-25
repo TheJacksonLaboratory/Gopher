@@ -83,11 +83,6 @@ public class SwitchScreens {
             logger.fatal("Presenter was null ponter");
             return;
         }
-
-        if (model==null) {
-            logger.fatal("Model was null ponter");
-            return;
-        }
         if (model.viewpointsInitialized()) {
             presenter.refreshViewPoints();
         }

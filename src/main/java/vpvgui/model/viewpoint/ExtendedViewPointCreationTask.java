@@ -20,12 +20,13 @@ import java.util.List;
  * The class implements the extended probe design strategy with multiple fragments per ViewPoint.
  *
  * @author Peter Robinson
- * @version 0.0.3 (2017-09-27)
+ * @version 0.2.1 (2017-09-27)
  */
 public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(ExtendedViewPointCreationTask.class.getName());
-
+    /** Total number of created viewpoints (this variable is used for the progress indicator) . */
     private int total;
+    /** Current number of created viewpoints (this variable is used for the progress indicator) . */
     private int i;
 
 
@@ -53,6 +54,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     maximumGcContent(model.getMaxGCcontent()).
                     minimumGcContent(model.getMinGCcontent()).
                     fastaReader(fastaReader).
+                    isForwardStrand(vpvgene.isForward()).
                     minimumFragmentSize(model.getMinFragSize()).
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).
