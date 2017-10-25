@@ -51,6 +51,9 @@ public class ViewPointPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
+    private static final String ERROR_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Unable to connect to UCSC " +
+            "</i></p><p>%s</p></body></html>";
+
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
     private static final int OFFSET = 250;
 
@@ -247,6 +250,10 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
+    private void setHtmlContent(String msg) {
+        this.ucscWebEngine.loadContent(String.format(ERROR_HTML_CONTENT,msg));
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
@@ -363,6 +370,13 @@ public class ViewPointPresenter implements Initializable {
         String url= maker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("INITIAL: %s",url));
         ucscWebEngine.load(url);
+        ucscWebEngine.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
+            @Override
+            public void changed(ObservableValue<? extends Throwable> ov, Throwable t, Throwable t1) {
+                logger.error("Received exception: "+t1.getMessage());
+                setHtmlContent(t1.toString());
+            }
+        });
 
     }
 

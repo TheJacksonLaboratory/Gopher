@@ -51,7 +51,8 @@ public class ViewPoint implements Serializable {
     private String targetName;
     /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
     private int genomicPos;
-    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
+    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).
+     * Note that this is defined with respect to the strand -- it is "reversed" for genes on the - strand. */
     private int upstreamNucleotideLength;
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private int downstreamNucleotideLength;
@@ -164,13 +165,18 @@ public class ViewPoint implements Serializable {
         this.referenceSequenceID=builder.referenceSequenceID;
         this.genomicPos=builder.genomicPos;
         this.targetName=builder.targetName;
-        this.upstreamNucleotideLength =builder.upstreamNtLength;
-        this.downstreamNucleotideLength =builder.downstreamNtLength;
+        this.isPositiveStrand=builder.isPositiveStrand;
+        if (isPositiveStrand) {
+            this.upstreamNucleotideLength = builder.upstreamNtLength;
+            this.downstreamNucleotideLength = builder.downstreamNtLength;
+        } else { // SWITCH for neg
+            this.upstreamNucleotideLength = builder.downstreamNtLength;
+            this.downstreamNucleotideLength = builder.upstreamNtLength;
+        }
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
-        this.isPositiveStrand=builder.isPositiveStrand;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
@@ -188,19 +194,11 @@ public class ViewPoint implements Serializable {
         setResolved(false);
         warnings="";
         /* Create segmentFactory */
-        int genomicUp,genomicDown;
-        if (isPositiveStrand) {
-            genomicUp=this.upstreamNucleotideLength;
-            genomicDown=this.downstreamNucleotideLength;
-        } else {
-            genomicDown=this.upstreamNucleotideLength;
-            genomicUp=this.downstreamNucleotideLength;
-        }
         segmentFactory = new SegmentFactory(this.referenceSequenceID,
                 this.genomicPos,
                 fastaReader,
-                genomicUp,
-                genomicDown,
+                this.upstreamNucleotideLength,
+                this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
         logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
         initRestrictionFragments(fastaReader);
@@ -213,7 +211,7 @@ public class ViewPoint implements Serializable {
      *  int gpos=48937985;
      *  ViewPoint vp = new ViewPoint.Builder(refID,gpos).targetName("FBN1").upstreamNtLength(1500).build();
      * </pre>
-     * adding setters for each parameter with a non-default value.
+     * and add Builders for each parameter with a non-default value.
      */
     public static class Builder {
         //  parameters required in the constructor
@@ -224,9 +222,9 @@ public class ViewPoint implements Serializable {
         private String targetName="";
         // Optional parameters - initialized to default values
         /* upstream nucleotide length for fragment generation (upstream of genomic pos).*/
-        private Integer upstreamNtLength = Default.SIZE_UPSTREAM+2000;
+        private Integer upstreamNtLength = Default.SIZE_UPSTREAM;
         /* downstream nucleotide length for fragment generation (downstream of genomic pos).*/
-        private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM+2000;
+        private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM;
         /** Need to choose a default strand, but this will always be overwritten. */
         private boolean isPositiveStrand =true;
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
