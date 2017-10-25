@@ -79,6 +79,7 @@ public class URLMaker {
         int posFrom, posTo;
         posFrom = vp.getStartPos() - offset;
         posTo = vp.getEndPos() + offset;
+        logger.error(String.format("VP [%s] %d -- %d -- %d",vp.getTargetName(),posFrom,vp.getGenomicPos(),posTo));
         String chrom = vp.getReferenceID();
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */

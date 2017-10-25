@@ -143,6 +143,8 @@ public class ViewPoint implements Serializable {
         this.targetName=vp.targetName;
         this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
         this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
+        setStartPos(genomicPos - upstreamNucleotideLength);
+        setEndPos(genomicPos + downstreamNucleotideLength);
         this.maxGcContent=vp.maxGcContent;
         this.minGcContent=vp.minGcContent;
         this.minFragSize=vp.minFragSize;
@@ -173,6 +175,9 @@ public class ViewPoint implements Serializable {
             this.upstreamNucleotideLength = builder.downstreamNtLength;
             this.downstreamNucleotideLength = builder.upstreamNtLength;
         }
+        setStartPos(genomicPos - upstreamNucleotideLength);
+        setEndPos(genomicPos + downstreamNucleotideLength);
+        logger.error(String.format("VP [%s] %d -- %d -- %d",getTargetName(),getStartPos(),genomicPos,getEndPos()));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -188,8 +193,6 @@ public class ViewPoint implements Serializable {
      * @param fastaReader
      */
     private void init(IndexedFastaSequenceFile fastaReader) {
-        setStartPos(genomicPos - upstreamNucleotideLength);
-        setEndPos(genomicPos + downstreamNucleotideLength);
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         warnings="";
@@ -312,14 +315,13 @@ public class ViewPoint implements Serializable {
     public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
 
-    public final void setStartPos(Integer startPos) {
+    private final void setStartPos(Integer startPos) {
         this.startPos = startPos;
     }
 
     public final Integer getStartPos() {
         return startPos;
     }
-
 
     public final Integer getEndPos() {
         return endPos;
@@ -328,7 +330,6 @@ public class ViewPoint implements Serializable {
     public final void setEndPos(Integer endPos) {
         this.endPos = endPos;
     }
-
 
     public final String getDerivationApproach() {
         return approach.toString();
@@ -386,22 +387,6 @@ public class ViewPoint implements Serializable {
             logger.error("center segment NUll for " + getTargetName());
         }
 
-        // find the index of the fragment that contains genomicPos
-//        Integer genomicPosFragIdx = -1;
-//        for (int i=0;i< restrictionSegmentList.size();i++) {
-//            Segment segment = restrictionSegmentList.get(i);
-//            if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
-//                genomicPosFragIdx = i;
-//                centerSegment=segment;
-//                break;
-//            }
-//        }
-//
-//        if (genomicPosFragIdx == -1) {
-//            logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
-//            resolved = false;
-//            return;
-//        }
 
         for (Segment segment:restrictionSegmentList) {
             if (segment.length() < this.minFragSize) {
@@ -421,104 +406,23 @@ public class ViewPoint implements Serializable {
             }
         }
 
-
-
-        // starting from the central fragment containing 'genomicPos' (included)
-        // extend viewpoint fragment-wise in UPSTREAM direction
-
-        //Integer fragCountUp = 0;
-//        for (int i = genomicPosFragIdx; 0 <= i; i--) { // upstream
-//            Segment segment = restrictionSegmentList.get(i);
-//
-//            if (segment.length() < this.minFragSize) {
-//                restrictionSegmentList.get(i).setSelected(false);
-//            }
-//            //TODO check this!!!
-//            //TODO I changed getEndPos to get StartPos!!!
-//            // set fragments to 'false' that are not entirely within the allowed range
-//            if (maxSizeUp < genomicPos - segment.getStartPos()) {
-//                segment.setSelected(false);
-//            }
-//
-//            // set fragment to 'false', if required number of fragments has already been found
-////            if (fragNumUp + 1 <= fragCountUp) {
-////                //segment.setSelected(false);
-////            }
-//
-//            // set fragment to false, if one of the margins has a repeat content is higher than the threshold
-//            if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
-//                segment.setSelected(false);
-//            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
-//                segment.setSelected(false);
-//            }
-//
-//            // if after all this the fragment is still selected, increase count
-////            if (segment.isSelected()) {
-////                fragCountUp++;
-////            }
-//        }
-
-//        if (fragCountUp < fragNumUp + 1) { // fragment containing 'genomicPos' is included in upstream direction, hence '+1'
-//            warnings += "WARNING: Could not find the required number of fragments (" + (fragNumUp + 1) + ") in upstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
-//            resolved = false;
-//        }
-
-        // originating from the centralized fragment containing 'genomicPos' (excluded) openExistingProject fragment-wise in DOWNSTREAM direction
-
-//        Integer fragCountDown = 0;
-//        for (int i = genomicPosFragIdx + 1; i < restrictionSegmentList.size(); i++) { // downstream
-//
-//            Segment segment = restrictionSegmentList.get(i);
-//
-//            // set fragment to 'false', if it is shorter than 'getMinFragSize'
-//            if (segment.length() < minFragSize) {
-//                segment.setSelected(false);
-//            }
-//
-//            // set fragments to 'false' that are not entirely within the allowed range
-//            if (maxSizeDown < segment.getStartPos()-genomicPos) {
-//                segment.setSelected(false);
-//            }
-//
-//            // set fragment to 'false', if required number of fragments has already been found
-////            if (fragNumDown <= fragCountDown) {
-////                //segment.setSelected(false);
-////            }
-//
-//            // set fragment to false, if one of the margins have a repeat content is higher than a given threshold
-//            if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
-//                segment.setSelected(false);
-//            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
-//                segment.setSelected(false);
-//            }
-
-            // if after all this the fragment is still selected, increase count
-//            if (segment.isSelected()) {
-//                fragCountDown++;
-//            }
-//        }
-
-//        if (fragCountDown < fragNumDown) {
-//            warnings += "WARNING: Could not find the required number of fragments (" + fragNumDown + ") in downstream direction, only " + fragCountUp + " fragments were found at " + referenceSequenceID + ":" + startPos + "-" + endPos + ".";
-//            resolved = false;
-//        }
         // set start position of the viewpoint to start position of the most upstream SELECTED fragment
-        Segment firstSelectedSegment = restrictionSegmentList.stream().filter(segment -> segment.isSelected()).findFirst().orElse(null);
-        if (firstSelectedSegment != null) {
-            setStartPos(firstSelectedSegment.getStartPos());
+        int start=Integer.MAX_VALUE;
+        int end=Integer.MIN_VALUE;
+
+        for (Segment seg:restrictionSegmentList) {
+            if (!seg.isSelected()) continue;
+            if (start >seg.getStartPos()) start=seg.getStartPos();
+            if (end < seg.getEndPos()) end=seg.getEndPos();
         }
-        this.startPos=Integer.MAX_VALUE;
-        this.endPos= Integer.MIN_VALUE;
-        int centerpos=genomicPos;
-        if (this.startPos>centerpos) setStartPos(centerpos);
-        // set end position of the viewpoint to end position of the most downstream fragment
-        // Get the last active segment (i.e., most 3'/most downstream
-        Segment lastSelectedSegment = restrictionSegmentList.stream().filter(segment->segment.isSelected()).reduce((a, b) -> b).orElse(null);
-        if (lastSelectedSegment != null) {
-            setEndPos(lastSelectedSegment.getEndPos());
-        }
-        centerpos=genomicPos;
-        if (this.endPos<centerpos) setEndPos(centerpos);
+        setStartPos(start);
+        setEndPos(end);
+
+        restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> {
+
+
+        });
+
 
         // discard fragments except for the selecxted fragments and their immediate neighbors, i.e.,
         // retain one unselected fragment on each end
