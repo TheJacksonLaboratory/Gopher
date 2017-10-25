@@ -78,23 +78,6 @@ public class Model implements Serializable {
     public final int getSizeDown() { return sizeDown;}
     public final void setSizeDown(int sd) { sizeDown=sd;}
 
-
-    /** Minimum size of the view point upstream of the anchor (transcription start site, usually). */
-//    private Integer minSizeUp = null;
-//    public int getMinSizeUp() {return minSizeUp;}
-//    public void setMinSizeUp(Integer i) { this.minSizeUp=i;}
-//    /** Minimum size of the view point downstream of the anchor (transcription start site, usually). */
-//    private Integer minSizeDown=null;
-//    public int getMinSizeDown() {return minSizeDown;}
-//    public void setMinSizeDown(Integer i) { this.minSizeDown=i;}
-//    /** Maximum size of the view point upstream of the anchor (transcription start site, usually). */
-//    private Integer maxSizeUp=null;
-//    public int getMaxSizeUp() {return maxSizeUp;}
-//    public void setMaxSizeUp(Integer i) { this.maxSizeUp=i;}
-//    /** Maximum size of the view point downstream of the anchor (transcription start site, usually). */
-//    private Integer maxSizeDown = null;
-//    public int getMaxSizeDown() {return maxSizeDown;}
-//    public void setMaxSizeDown(Integer i) { this.maxSizeDown=i;}
     /** Minimum allowable size of a restriction fragment within a ViewPoint chosen for capture Hi C enrichment. */
     private int minFragSize;
     public int getMinFragSize() { return minFragSize; }
@@ -382,4 +365,5 @@ public class Model implements Serializable {
             }
         }
     }
+
 }

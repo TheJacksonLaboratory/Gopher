@@ -1,6 +1,7 @@
 package vpvgui.gui.analysisPane;
 
 import org.apache.log4j.Logger;
+import vpvgui.model.Design;
 import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
@@ -30,47 +31,36 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
             logger.error("model was null");
             return "";
         }
-        List<ViewPoint> vplist=model.getViewPointList();
-        if (vplist==null) {
-            logger.error("vplist was null");
-            return "";
-        }
-        int nviewpoints=vplist.size();
-        int ngenes=model.getVPVGeneList().size();
-        long total_size=0;
-        long total_active_frags=0;
-        long total_margin_size=0;
-        double total_score=0d;
-        for (ViewPoint vp:vplist) {
-            if (vp==null) {
-                logger.error("VP object was null, skipping.");
-                continue;
-            }
-            total_size += vp.getEndPos()-vp.getStartPos();
-            total_active_frags += vp.getNumOfSelectedFrags();
-            total_score += vp.getScore();
-            total_margin_size += vp.getTotalMarginSize();
-            /* todo -- other quality parameters!! */
-        }
-        double avg_n_frag=(double)total_active_frags/nviewpoints;
-        double avg_size=(double)total_size/nviewpoints;
-        double avg_score=(double)100*total_score/nviewpoints;
-        String totalEffectiveNucleotides=getTotalEffectiveNucleotides(total_margin_size,model.getTilingFactor());
+        Design design = new Design(this.model);
+        design.calculateDesignParameters();
+        int nviewpoints=design.getN_viewpoints();
+        int ngenes=design.getN_genes();
+
+        long total_active_frags=design.getN_unique_fragments();
+        double avg_n_frag=design.getAvgFragmentsPerVP();
+        double avg_size=design.getAvgVPsize();
+        double avg_score=design.getAvgVPscore();
+        int n_totalNucleotidesInProbes=design.getN_nucleotides_in_probes();
+        int totalEffectiveNucleotides=design.totalEffectiveSize();
         String lst = String.format("<ul><li>Number of genes: %d</li>" +
                         "<li>Number of viewpoints: %d</li>" +
+                        "<li>Number of unique fragments: %d</li>" +
                         "<li>Average number of active fragments per viewpoint: %.1f</li>" +
                         "<li>Average viewpoint score: %.2f%%</li>" +
                         "<li>Average viewpoint size: %.1f nucleotides</li>" +
                         "<li>Total margin size: %s nucleotides</li>" +
-                        "<li>Total effective size: %s</li>" +
+                        "<li>Tiling factor: %d x</li>" +
+                        "<li>Total effective size: %s kb</li>" +
                         "</ul>",
                 ngenes,
                 nviewpoints,
+                total_active_frags,
                 avg_n_frag,
-                avg_score,
+                100*avg_score,
                 avg_size,
-                dformater.format(total_margin_size),
-                totalEffectiveNucleotides);
+                dformater.format(n_totalNucleotidesInProbes),
+                model.getTilingFactor(),
+                dformater.format(totalEffectiveNucleotides/100));
 
         return String.format("%s\n%s\n%s\n", HTML_HEADER, lst, HTML_FOOTER);
     }
