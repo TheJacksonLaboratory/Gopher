@@ -370,6 +370,13 @@ public class ViewPoint implements Serializable {
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
     public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown) {
+
+        if(!this.isPositiveStrand) {
+            Integer tmp=maxSizeUp;
+            maxSizeUp=maxSizeDown;
+            maxSizeDown=tmp;
+        }
+
         boolean resolved = true;
         approach=Approach.EXTENDED;
         logger.trace("entering generateViewpointExtendedApproach");
