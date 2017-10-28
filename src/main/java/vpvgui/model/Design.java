@@ -1,5 +1,6 @@
 package vpvgui.model;
 
+import org.apache.log4j.Logger;
 import vpvgui.model.viewpoint.Segment;
 import vpvgui.model.viewpoint.ViewPoint;
 
@@ -7,8 +8,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+/**
+ * A class that is intended to be used by the ViewPointAnalysis presenter to calculate the statistics for the
+ * intended probe design across all viewpoints.
+ * @author Peter Robinson
+ * @version 0.0.2 (2017-10-17)
+ */
 public class Design {
+    static Logger logger = Logger.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
 
@@ -78,10 +87,6 @@ public class Design {
         List<ViewPoint> viewPointList = model.getViewPointList();
         //System.out.println(viewPointList.size());
         int probeLength = model.getProbeLength();
-        int maximumAllowedOverlap = model.getMaximumAllowedRepeatOverlap();
-        int tilingFactor = model.getTilingFactor();
-
-        /* TODO calculate total number of nucleotides in model */
 
         Set<Segment> uniqueRestrictionFragments=new HashSet<>();
         Set<String> uniqueGeneSymbols=new HashSet<>();
@@ -116,6 +121,8 @@ public class Design {
             this.avgVPscore = 0;
 
         }
+
+//        logger.trace(String.format("Calculate params, n genes=%d [%s]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; "))));
     }
 
 }
