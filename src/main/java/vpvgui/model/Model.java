@@ -132,16 +132,16 @@ public class Model implements Serializable {
 
 
     /** The complete URL of the chosen transcript definition from UCSC. */
-    private String transcriptsURL = null;
+//    private String transcriptsURL = null;
 
 
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
     public void setTargetGenesPath(String path){this.targetGenesPath=path; }
     public String getTargetGenesPath() { return this.targetGenesPath; }
-    public String getTranscriptsURL() {
-        return transcriptsURL;
-    }
-    public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
+//    public String getTranscriptsURL() {
+//        return transcriptsURL;
+//    }
+//    public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
 
     private String transcriptsBasename = null;
     public String getTranscriptsBasename() {
@@ -329,8 +329,6 @@ public class Model implements Serializable {
         properties.setProperty("genome_unpacked",unpacked);
         String indexed=model.isGenomeIndexed()?"true":"false";
         properties.setProperty("genome_indexed",indexed);
-        String transcURL=model.getTranscriptsURL()!=null?model.getTranscriptsURL():"null";
-        properties.setProperty("transcript_url",transcURL);
         String refgenep=model.getRefGenePath()!=null?model.getRefGenePath():"null";
         properties.setProperty("refgene_path",refgenep);
         properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());

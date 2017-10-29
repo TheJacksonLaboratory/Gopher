@@ -32,6 +32,7 @@ import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.logviewer.LogViewerFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
+import vpvgui.gui.qcCheckPane.QCCheckFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.*;
@@ -554,20 +555,6 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
-    private boolean checkDataValidity() {
-        if (this.model.getVPVGeneList()==null|| this.model.getVPVGeneList().size()==0) {
-            ErrorWindow.display("Error","Viewpoints cannot be created before a gene list has been chosen."+
-                    "\nPlease enter a gene list and try again.");
-            return false;
-        }
-        if (this.model.getChosenEnzymelist()==null || this.model.getChosenEnzymelist().isEmpty()) {
-            ErrorWindow.display("Error","Viewpoints cannot be created before a restriction enzyme has been chosen."+
-                    "\nPlease choose a restriction enzyme and try again.");
-            return false;
-        }
-        //TODO check other parameters.
-        return true;
-    }
 
 
 
@@ -581,7 +568,8 @@ public class VPVMainPresenter implements Initializable {
      */
     public void createViewPoints() {
         logger.trace("Entering createViewPoints");
-        if (! checkDataValidity()) {
+        boolean OK=QCCheckFactory.showQCCheck(model);
+        if (! OK ) {
             return;
         }
         updateModel();
