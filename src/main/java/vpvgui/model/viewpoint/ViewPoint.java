@@ -327,6 +327,15 @@ public class ViewPoint implements Serializable {
         return endPos;
     }
 
+    public final int getDisplayStart() {
+        return Math.min(genomicPos-upstreamNucleotideLength,startPos);
+    }
+    public final int getDisplayEnd() {
+        return Math.max(genomicPos-downstreamNucleotideLength,endPos);
+    }
+
+
+
     public final void setEndPos(Integer endPos) {
         this.endPos = endPos;
     }

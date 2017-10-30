@@ -51,9 +51,6 @@ public class ViewPointPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
-    private static final String ERROR_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Unable to connect to UCSC " +
-            "</i></p><p>%s</p></body></html>";
-
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
     private static final int OFFSET = 250;
 
@@ -250,10 +247,6 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
-    private void setHtmlContent(String msg) {
-        this.ucscWebEngine.loadContent(String.format(ERROR_HTML_CONTENT,msg));
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
@@ -370,13 +363,6 @@ public class ViewPointPresenter implements Initializable {
         String url= maker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("INITIAL: %s",url));
         ucscWebEngine.load(url);
-        ucscWebEngine.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
-            @Override
-            public void changed(ObservableValue<? extends Throwable> ov, Throwable t, Throwable t1) {
-                logger.error("Received exception: "+t1.getMessage());
-                setHtmlContent(t1.toString());
-            }
-        });
 
     }
 
@@ -424,11 +410,9 @@ public class ViewPointPresenter implements Initializable {
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
-            int sizeUp = (int) (vp.getUpstreamNucleotideLength() * factor);
-            int sizeDown = (int) (vp.getDownstreamNucleotideLength() * factor);
-            newVP.generateViewpointExtendedApproach(sizeUp, sizeDown);
-            logger.trace(String.format("Zooming ViewPoint for %s at factor %.1f. Old length %d new length %d",vp.getTargetName(),factor,
-                    vp.getEndPos()-vp.getStartPos(),newVP.getEndPos()-newVP.getStartPos()));
+            int maxSizeUp = (int) (vp.getUpstreamNucleotideLength() * factor);
+            int maxSizeDown = (int) (vp.getDownstreamNucleotideLength() * factor);
+            newVP.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
             segmentsTableView.getItems().clear();
             this.coloredsegments.clear();
             setViewPoint(newVP);
@@ -482,10 +466,8 @@ public class ViewPointPresenter implements Initializable {
      * Container for binding Segment
      */
     private class ColoredSegment {
-
+        /** Color for highlighting an active segment. */
         private String color;
-
-//        private final static String VERYLIGHTGREY="E8E8EE";
 
         private Segment segment;
 

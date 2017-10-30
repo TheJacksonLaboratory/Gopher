@@ -77,9 +77,8 @@ public class URLMaker {
      */
     public String getDefaultURL(ViewPoint vp, String trackType,String highlights) {
         int posFrom, posTo;
-        posFrom = vp.getStartPos() - offset;
-        posTo = vp.getEndPos() + offset;
-        logger.error(String.format("VP [%s] %d -- %d -- %d",vp.getTargetName(),posFrom,vp.getGenomicPos(),posTo));
+        posFrom = vp.getDisplayStart() - offset;
+        posTo = vp.getDisplayEnd() + offset;
         String chrom = vp.getReferenceID();
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
