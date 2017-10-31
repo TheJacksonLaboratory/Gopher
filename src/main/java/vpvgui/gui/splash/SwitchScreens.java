@@ -53,7 +53,7 @@ public class SwitchScreens {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-//        setStageDimensions();
+        setStageDimensions();
         this.primarystage.show();
     }
 

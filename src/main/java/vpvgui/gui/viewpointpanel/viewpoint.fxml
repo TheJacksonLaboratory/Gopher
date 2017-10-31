@@ -13,15 +13,15 @@
    <content>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-               <children>
-                  <WebView fx:id="ucscContentWebView" minHeight="500.0" minWidth="800.0" prefHeight="800.0" prefWidth="1600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
+            <WebView fx:id="ucscContentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
                   <Label fx:id="viewpointScoreLabel" styleClass="mylabel" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="5.0" />
-                  <Button mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="zoomOutButton" layoutX="324.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" AnchorPane.rightAnchor="430.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="zoomInButton" layoutX="415.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="deleteButton" layoutX="303.0" layoutY="8.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="5.0" />
+                  <Button fx:id="copyToClipboardButton" layoutX="452.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="5.0" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
                   <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
                     <columns>
                       <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
@@ -34,10 +34,6 @@
                         <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
                     </columns>
                   </TableView>
-                  <Button fx:id="copyToClipboardButton" layoutX="452.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="deleteButton" layoutX="303.0" layoutY="8.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="zoomInButton" layoutX="415.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="zoomOutButton" layoutX="324.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" AnchorPane.rightAnchor="430.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
         </items>

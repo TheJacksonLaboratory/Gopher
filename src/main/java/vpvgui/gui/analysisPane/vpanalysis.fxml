@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
+
+<StackPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
    <children>
-      <WebView fx:id="contentWebView" minHeight="200.0" minWidth="1900.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
-
-      <TableView fx:id="viewPointTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0">
-         <columns>
-            <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" text="Viewpoint" />
-            <TableColumn fx:id="deleteTableColumn" prefWidth="150.0" text="Delete" />
-            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
-            <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
-            <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
-            <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
-            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active length" />
-            <TableColumn fx:id="viewpointTotalLength" minWidth="100.0" prefWidth="120.0" text="Total length" />
-         </columns>
-      </TableView>
-
-                 <!-- maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" minWidth="-Infinity"
-                 prefHeight="-1.0" prefWidth="-1.0" >
-            </TableView>-->
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+         <items>
+            <VBox alignment="CENTER">
+               <children>
+                  <WebView fx:id="contentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+            
+                                         <!-- maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" minWidth="-Infinity"
+                             prefHeight="-1.0" prefWidth="-1.0" >
+                                    </TableView>-->
+               </children>
+            </VBox>
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+               <content>
+            
+                                    <TableView fx:id="viewPointTableView" minHeight="200.0" minWidth="1100.0">
+                     <columns>
+                        <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" text="Viewpoint" />
+                        <TableColumn fx:id="deleteTableColumn" prefWidth="150.0" text="Delete" />
+                        <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
+                        <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
+                        <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
+                        <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
+                        <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active length" />
+                        <TableColumn fx:id="viewpointTotalLength" minWidth="100.0" prefWidth="120.0" text="Total length" />
+                     </columns>
+                  </TableView>
+               </content>
+            </ScrollPane>
+         </items>
+      </SplitPane>
    </children>
-</VBox>
+</StackPane>

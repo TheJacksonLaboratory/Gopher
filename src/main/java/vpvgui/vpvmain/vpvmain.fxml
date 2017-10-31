@@ -20,11 +20,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@vpvmain.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.vpvmain.VPVMainPresenter">
+<BorderPane fx:id="rootNode" stylesheets="@vpvmain.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.vpvmain.VPVMainPresenter">
    <top>
-      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
          <children>
             <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <children>
@@ -74,7 +75,7 @@
                         </Menu>
                     </menus>
                   </MenuBar>
-                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="399.0" styleClass="menu-bar" HBox.hgrow="SOMETIMES" />
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />
                   <MenuBar nodeOrientation="RIGHT_TO_LEFT">
                     <menus>
                       <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
@@ -98,20 +99,20 @@
       </VBox>
    </top>
    <center>
-      <TabPane fx:id="tabpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabMaxHeight="30.0" tabMaxWidth="200.0">
+      <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0" BorderPane.alignment="CENTER">
         <tabs>
           <Tab id="setuptab" fx:id="setuptab" closable="false" text="Set up">
             <content>
-              <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+              <AnchorPane>
                      <children>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <VBox AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <GridPane hgap="8.0" styleClass="grid" vgap="8.0" VBox.vgrow="NEVER">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="NEVER" maxWidth="275.0" minWidth="176.0" prefWidth="200.0" />
-                                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="195.0" minWidth="65.0" prefWidth="181.0" />
-                                    <ColumnConstraints hgrow="NEVER" maxWidth="169.0" minWidth="0.0" />
-                                    <ColumnConstraints hgrow="NEVER" maxWidth="371.0" minWidth="10.0" prefWidth="300.0" />
+                                  <ColumnConstraints hgrow="NEVER" minWidth="176.0" prefWidth="200.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="65.0" prefWidth="181.0" />
+                                    <ColumnConstraints hgrow="NEVER" minWidth="0.0" />
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="10.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                     <RowConstraints minHeight="20.0" />
@@ -230,7 +231,7 @@
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" />
                                     <RowConstraints minHeight="10.0" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                                    <RowConstraints minHeight="10.0" />
                                 </rowConstraints>
                                  <children>
                                     <Label text="Upstream size">
@@ -274,7 +275,7 @@
           </Tab>
           <Tab id="analysistab" fx:id="analysistab" closable="false" text="Analysis">
             <content>
-              <AnchorPane fx:id="analysisPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" snapToPixel="false" />
+                  <StackPane fx:id="analysisPane" />
             </content>
           </Tab>
         </tabs>

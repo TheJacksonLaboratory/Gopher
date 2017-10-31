@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -145,7 +146,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Button createCaptureProbesButton;
 
     @FXML private TabPane tabpane;
-    @FXML private AnchorPane analysisPane;
+    @FXML private StackPane analysisPane;
     @FXML private Tab setuptab;
     @FXML private Menu helpMenu;
     @FXML private MenuItem showSettingsCurrentProject;
