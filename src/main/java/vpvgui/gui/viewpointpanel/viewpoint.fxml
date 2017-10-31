@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
 <ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="1000.0" pannable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
@@ -14,28 +18,51 @@
       <SplitPane dividerPositions="0.5" orientation="VERTICAL">
         <items>
             <WebView fx:id="ucscContentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+            <VBox>
                <children>
-                  <Label fx:id="viewpointScoreLabel" styleClass="mylabel" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="zoomOutButton" layoutX="324.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" AnchorPane.rightAnchor="430.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="zoomInButton" layoutX="415.0" layoutY="9.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="deleteButton" layoutX="303.0" layoutY="8.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="5.0" />
-                  <Button fx:id="copyToClipboardButton" layoutX="452.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="5.0" />
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
-                  <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
-                    <columns>
-                      <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
-                        <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="220.0" text="Location" />
-                        <TableColumn fx:id="segmentLengthColumn" prefWidth="75.0" text="Length" />
-                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Repeat content" />
-                        <TableColumn fx:id="repeatContentUp" prefWidth="175.0" text="Repeat content (up)" />
-                        <TableColumn fx:id="repeatContentDown" prefWidth="200.0" text="Repeat content (down)" />
-                        <TableColumn fx:id="gcContentTableColumn" prefWidth="125.0" text="GC Content" />
-                        <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
-                    </columns>
-                  </TableView>
+                  <GridPane prefHeight="60.0" VBox.vgrow="NEVER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label fx:id="viewpointScoreLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" />
+                        <Button fx:id="zoomOutButton" minHeight="30.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" GridPane.rowIndex="1">
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Button>
+                        <Button fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Button fx:id="copyToClipboardButton" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+                  <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+                     <content>
+                        <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="1000.0">
+                          <columns>
+                            <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
+                              <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="220.0" text="Location" />
+                              <TableColumn fx:id="segmentLengthColumn" prefWidth="75.0" text="Length" />
+                              <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Repeat content" />
+                              <TableColumn fx:id="repeatContentUp" prefWidth="175.0" text="Repeat content (up)" />
+                              <TableColumn fx:id="repeatContentDown" prefWidth="200.0" text="Repeat content (down)" />
+                              <TableColumn fx:id="gcContentTableColumn" prefWidth="125.0" text="GC Content" />
+                              <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
+                          </columns>
+                        </TableView>
+                     </content>
+                  </ScrollPane>
                </children>
-            </AnchorPane>
+            </VBox>
         </items>
       </SplitPane>
    </content>
