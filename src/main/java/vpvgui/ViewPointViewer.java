@@ -2,8 +2,10 @@ package vpvgui;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.log4j.LogManager;
@@ -55,7 +57,7 @@ public class ViewPointViewer extends Application {
     @Override
     public void stop() throws Exception {
         //logger.info("Closing VPV Gui");
-        System.err.println("CLOSING STYOP()");
+        System.err.println("CLOSING STOP()");
         Injector.forgetAll();
     }
 
@@ -91,7 +93,10 @@ public class ViewPointViewer extends Application {
         SplashView splashview = new SplashView();
         SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
         splashpresenter.setSwitchScreen(switchscreen);
-
+        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        int xdim=(int)primScreenBounds.getWidth();
+        int ydim=(int)primScreenBounds.getHeight();
+        splashpresenter.setBounds(xdim,ydim);
         Scene scene = new Scene(splashview.getView());
         this.primarystage.setTitle("ViewPoint Viewer");
 
