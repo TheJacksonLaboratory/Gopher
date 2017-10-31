@@ -42,7 +42,7 @@ import static vpvgui.util.Utils.join;
 /**
  * This class acts as a controller of the TabPanes which display individual ViewPoints.
  * @author Peter Robinson
- * @version 0.2.1 (2017-10-21)
+ * @version 0.2.5 (2017-10-31)
  */
 public class ViewPointPresenter implements Initializable {
 
@@ -51,10 +51,7 @@ public class ViewPointPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
-    /* Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int OFFSET = 250;
 
-    private static final int UCSC_WIDTH = 1600;
 
     private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA","E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5"};
@@ -134,7 +131,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML private void copyToClipboard(Event e) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
-        URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
+        URLMaker urlmaker = new URLMaker(this.model);
         String url= urlmaker.getURL(vp,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
@@ -150,7 +147,7 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML
     void refreshUCSCButtonAction() {
-        URLMaker urlmaker = new URLMaker(this.model.getGenomeBuild());
+        URLMaker urlmaker = new URLMaker(this.model);
         for (ColoredSegment cseg : coloredsegments) {
             logger.trace("Color segment for " + cseg.segment.toString() +", which is selected?="+cseg.segment.isSelected());
         }
@@ -357,7 +354,7 @@ public class ViewPointPresenter implements Initializable {
             genome = genome.substring(5);
 
         // create url & load content from UCSC
-        URLMaker maker = new URLMaker(genome);
+        URLMaker maker = new URLMaker(this.model);
         String re=this.model.getRestrictionEnzymeString().replaceAll("^","");
         maker.setEnzyme(re);
         String url= maker.getImageURL(vp,getHighlightRegions());

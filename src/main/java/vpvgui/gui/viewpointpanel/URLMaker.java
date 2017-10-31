@@ -2,6 +2,7 @@ package vpvgui.gui.viewpointpanel;
 
 
 import org.apache.log4j.Logger;
+import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
 /**
@@ -17,9 +18,20 @@ public class URLMaker {
 
     private String restrictionenzyme=null;
 
+    private int xdim;
+    private int ydim;
+    /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
+    private static final int UCSC_DEFAULT_WIDTH = 1600;
+    /* Number of nucleotides to show before and after first and last base of viewpoint. */
+    private static final int OFFSET = 250;
 
-    public URLMaker(String genome){
-        this.genomebuild=genome;
+
+
+
+    public URLMaker(Model model){
+        this.genomebuild=model.getGenomeBuild();
+        xdim=Math.min(UCSC_DEFAULT_WIDTH,model.getXdim());
+        ydim=model.getYdim();
         logger.trace(String.format("setting genomebuild to %s",genomebuild));
     }
 
@@ -49,11 +61,11 @@ public class URLMaker {
     }
     /** These are the things to hide and show to get a nice hg19 image. */
     public String getURLFragmentHg19() {
-        return "snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+        return "snp147Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&g=gc5base";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     public String getURLFragmentMm9() {
-        return "knownGene=hide&refGene=full&stsMapMouseNew=hide&hgFind.matches=Slc12a1&pix=1400&xenoRefGene=hide&blastHg18KG=hide&ensGene=hide&pubs=hide&intronEST=hide&snp128=hide&oreganno=full";
+        return "knownGene=hide&refGene=full&stsMapMouseNew=hide&hgFind.matches=Slc12a1&xenoRefGene=hide&blastHg18KG=hide&ensGene=hide&pubs=hide&intronEST=hide&snp128=hide&oreganno=full";
     }
 
 
@@ -83,8 +95,8 @@ public class URLMaker {
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
         String targetItem = vp.getTargetName();
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=1800",
-                trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights);
+        String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=%d",
+                trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights,xdim);
         if (restrictionenzyme!=null) {
             url=String.format("%s&oligoMatch=pack&hgt.oligoMatch=GATC",url,restrictionenzyme);
         }

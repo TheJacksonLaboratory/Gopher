@@ -41,8 +41,8 @@ public class SwitchScreens {
     public void createNewProject(String name){
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
-        this.primarystage.setMinWidth(1000);
-        this.primarystage.setWidth(1600);
+//        this.primarystage.setMinWidth(1000);
+//        this.primarystage.setWidth(1600);
         Model model = new Model();
         model.setProjectName(name);
         model.setDefaultValues();
@@ -53,7 +53,7 @@ public class SwitchScreens {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-        setStageDimensions();
+//        setStageDimensions();
         this.primarystage.show();
     }
 
@@ -83,10 +83,10 @@ public class SwitchScreens {
         if (this.model.getHttpProxy() != null) {
             Utils.setSystemProxyAndPort(model.getHttpProxy(),model.getHttpProxyPort());
         }
-        this.primarystage.setMinWidth(800);
-        this.primarystage.setWidth(screenWidth);
-        this.primarystage.setMinHeight(600);
-        this.primarystage.setHeight(screenHeight);
+//        this.primarystage.setMinWidth(800);
+//        this.primarystage.setWidth(screenWidth);
+//        this.primarystage.setMinHeight(600);
+//        this.primarystage.setHeight(screenHeight);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
         if (presenter==null){
@@ -99,18 +99,18 @@ public class SwitchScreens {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-        setStageDimensions();
+//        setStageDimensions();
         this.primarystage.show();
     }
 
     private void setStageDimensions() {
         if (this.primarystage==null) return;
-        this.primarystage.setMinWidth(1000);
-        this.primarystage.setWidth(1400);
-        this.primarystage.setMaxWidth(1800);
-        this.primarystage.setMinHeight(800);
-        this.primarystage.setHeight(1000);
-        this.primarystage.setMaxHeight(1200);
+//        this.primarystage.setMinWidth(1000);
+//        this.primarystage.setWidth(1400);
+//        this.primarystage.setMaxWidth(1800);
+//        this.primarystage.setMinHeight(800);
+//        this.primarystage.setHeight(1000);
+//        this.primarystage.setMaxHeight(1200);
     }
 
     public void setBounds(int x, int y) {

@@ -24,9 +24,9 @@
 
 <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@vpvmain.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.vpvmain.VPVMainPresenter">
    <top>
-      <VBox BorderPane.alignment="CENTER">
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
          <children>
-            <HBox>
+            <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <children>
                   <MenuBar>
                     <menus>
@@ -98,13 +98,13 @@
       </VBox>
    </top>
    <center>
-      <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0">
+      <TabPane fx:id="tabpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabMaxHeight="30.0" tabMaxWidth="200.0">
         <tabs>
           <Tab id="setuptab" fx:id="setuptab" closable="false" text="Set up">
             <content>
               <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
-                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <GridPane hgap="8.0" styleClass="grid" vgap="8.0" VBox.vgrow="NEVER">
                                 <columnConstraints>
@@ -233,16 +233,34 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="Upstream size" />
-                                    <Label text="Downstream size" GridPane.columnIndex="2" />
-                                    <Label text="Minimum fragment size" GridPane.rowIndex="1" />
-                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Label text="Upstream size">
+                                       <tooltip>
+                                          <Tooltip text="Number of nucleotides 5' of the target start position in which fragments will be sought" wrapText="true" />
+                                       </tooltip></Label>
+                                    <Label text="Downstream size" GridPane.columnIndex="2">
+                                       <tooltip>
+                                          <Tooltip text="Number of nucleotides 3' of the target start position in which fragments will be sought" />
+                                       </tooltip></Label>
+                                    <Label text="Minimum fragment size" GridPane.rowIndex="1">
+                                       <tooltip>
+                                          <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
+                                       </tooltip></Label>
+                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                       <tooltip>
+                                          <Tooltip text="Maximum repeat content for a fragment to be selected" />
+                                       </tooltip></Label>
                                     <TextField fx:id="sizeUpTextField" promptText="1500" GridPane.columnIndex="1" />
                                     <TextField fx:id="minFragSizeTextField" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <TextField fx:id="sizeDownTextField" promptText="5000" GridPane.columnIndex="3" />
                                     <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <Label text="Minimum GC content" GridPane.rowIndex="2" />
-                                    <Label text="Maximum GC Content" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <Label text="Minimum GC content" GridPane.rowIndex="2">
+                                       <tooltip>
+                                          <Tooltip text="Minimum percent GC content for a fragment to be selected" />
+                                       </tooltip></Label>
+                                    <Label text="Maximum GC Content" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                       <tooltip>
+                                          <Tooltip text="Maximum percent GC content for a fragment to be selected" />
+                                       </tooltip></Label>
                                     <TextField fx:id="minGCContentTextField" prefHeight="31.0" prefWidth="177.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <TextField fx:id="maxGCContentTextField" prefHeight="30.0" prefWidth="177.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                  </children>
