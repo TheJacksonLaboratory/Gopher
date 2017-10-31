@@ -116,13 +116,6 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getMarginSize()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Maximum repeat overlap</td>");
-        if (model.getMaximumAllowedRepeatOverlap()>250 || model.getMaximumAllowedRepeatOverlap()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMaximumAllowedRepeatOverlap()));
-            dataValid=false;
-        } else {
-            sb.append(String.format("<td>%d</td>",model.getMaximumAllowedRepeatOverlap()));
-        }
         sb.append("</tbody>\n</table>");
 
         return sb.toString();

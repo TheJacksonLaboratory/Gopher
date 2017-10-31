@@ -48,7 +48,12 @@ public class ViewPointViewer extends Application {
         Image image = new Image(ViewPointViewer.class.getResourceAsStream("/img/vpvicon.png"));
         primaryStage.setTitle("ViewPoint Viewer");
         primaryStage.getIcons().add(image);
+        // get dimensions of users screens to use as Maximum width/height
+        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        int xdim=(int)primScreenBounds.getWidth();
+        int ydim=(int)primScreenBounds.getHeight();
         SwitchScreens switchscreens=new SwitchScreens(this.primarystage);
+        switchscreens.setBounds(xdim,ydim);
         loadSplashScreen(switchscreens);
 
     }
@@ -93,10 +98,6 @@ public class ViewPointViewer extends Application {
         SplashView splashview = new SplashView();
         SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
         splashpresenter.setSwitchScreen(switchscreen);
-        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        int xdim=(int)primScreenBounds.getWidth();
-        int ydim=(int)primScreenBounds.getHeight();
-        splashpresenter.setBounds(xdim,ydim);
         Scene scene = new Scene(splashview.getView());
         this.primarystage.setTitle("ViewPoint Viewer");
 

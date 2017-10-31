@@ -95,6 +95,16 @@ public class Model implements Serializable {
     private double maxGCcontent;
     public  double getMaxGCcontent() { return maxGCcontent;}
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
+    /** Total horizontal dimension  of the user's screen. */
+    private int xdim;
+
+    public int getXdim() { return xdim; }
+    public void setXdim(int xdim) {this.xdim = xdim; }
+    public int getYdim() { return ydim; }
+    public void setYdim(int ydim) { this.ydim = ydim; }
+
+    /** Total vertical dimension the user's screen. */
+    private int ydim;
 
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */

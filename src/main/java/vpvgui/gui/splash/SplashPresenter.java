@@ -38,12 +38,7 @@ public class SplashPresenter implements Initializable {
     @FXML private AnchorPane pane;
     @FXML private ImageView openFileView;
     @FXML private ImageView newFileView;
-    /** The width of the current screen, which is calculated in {@link vpvgui.gui.viewpointpanel.ViewPointView}. 800 is a default value,
-     * but the variable will always be set to the current value of the user's screen.*/
-    private int screenWidth=800;
-    /** The height of the current screen, which is calculated in {@link vpvgui.gui.viewpointpanel.ViewPointView}. 600 is a default value,
-     * but the variable will always be set to the current value of the user's screen.*/
-    private int screenHeight=600;
+
 
 
     /** This object is responsible for closing the splash screen and opening the main analysis GUI. */
@@ -114,10 +109,4 @@ public class SplashPresenter implements Initializable {
         switchscreen.openExistingModel(selected);
         e.consume();
     }
-
-    public void setBounds(int x, int y) {
-        this.screenHeight=y;
-        this.screenWidth=x;
-    }
-
 }

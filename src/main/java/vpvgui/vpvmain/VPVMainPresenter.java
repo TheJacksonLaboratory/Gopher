@@ -568,11 +568,12 @@ public class VPVMainPresenter implements Initializable {
      */
     public void createViewPoints() {
         logger.trace("Entering createViewPoints");
+        updateModel();
         boolean OK=QCCheckFactory.showQCCheck(model);
         if (! OK ) {
             return;
         }
-        updateModel();
+
 
         String approach = this.approachChoiceBox.getValue();
         boolean doSimple=false;
@@ -853,19 +854,6 @@ public class VPVMainPresenter implements Initializable {
         logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
     }
 
-    @FXML
-    public void setMaximumAllowedRepeatOverlap(ActionEvent e) {
-        Integer len = Popups.getIntegerFromUser("Enter Maximum allowed repeat overlap",
-                Default.MAXIMUM_ALLOWED_REPEAT_OVERLAP,
-                "Maximum allowed repeat overlap:");
-        if (len == null) {
-            ErrorWindow.display("Could not get Maximum allowed repeat length", "enter an integer value!");
-            return;
-        }
-        this.model.setMaximumAllowedRepeatOverlap(len);
-        this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("We just set MaximumAllowedRepeatOverlap to %d", model.getMaximumAllowedRepeatOverlap()));
-    }
 
     @FXML
     public void setMarginSize(ActionEvent e) {

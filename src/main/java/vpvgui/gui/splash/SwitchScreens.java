@@ -26,7 +26,12 @@ public class SwitchScreens {
     private Stage primarystage = null;
     /** A reference to the model of the application. */
     private Model model=null;
-
+    /** The width of the current screen, which is calculated in {@link vpvgui.gui.viewpointpanel.ViewPointView}. 800 is a default value,
+     * but the variable will always be set to the current value of the user's screen.*/
+    private int screenWidth=800;
+    /** The height of the current screen, which is calculated in {@link vpvgui.gui.viewpointpanel.ViewPointView}. 600 is a default value,
+     * but the variable will always be set to the current value of the user's screen.*/
+    private int screenHeight=600;
 
 
     public SwitchScreens(Stage stage){
@@ -41,6 +46,9 @@ public class SwitchScreens {
         Model model = new Model();
         model.setProjectName(name);
         model.setDefaultValues();
+        model.setXdim(screenWidth);
+        model.setYdim(screenHeight);
+        logger.error(String.format("Setting dimensions to x=%d y=%d",screenWidth,screenHeight ));
         presenter.setModel(model);
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
@@ -75,8 +83,10 @@ public class SwitchScreens {
         if (this.model.getHttpProxy() != null) {
             Utils.setSystemProxyAndPort(model.getHttpProxy(),model.getHttpProxyPort());
         }
-        this.primarystage.setMinWidth(1000);
-        this.primarystage.setWidth(1600);
+        this.primarystage.setMinWidth(800);
+        this.primarystage.setWidth(screenWidth);
+        this.primarystage.setMinHeight(600);
+        this.primarystage.setHeight(screenHeight);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
         if (presenter==null){
@@ -101,6 +111,11 @@ public class SwitchScreens {
         this.primarystage.setMinHeight(800);
         this.primarystage.setHeight(1000);
         this.primarystage.setMaxHeight(1200);
+    }
+
+    public void setBounds(int x, int y) {
+        this.screenHeight=y;
+        this.screenWidth=x;
     }
 
 

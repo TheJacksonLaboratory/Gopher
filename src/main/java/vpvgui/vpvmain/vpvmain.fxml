@@ -60,7 +60,6 @@
                                 </items>
                               </Menu>
                               <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
-                              <MenuItem mnemonicParsing="false" onAction="#setMaximumAllowedRepeatOverlap" text="Set maximum allowed repeat overlap" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Proxy">
