@@ -258,7 +258,7 @@
                                        <tooltip>
                                           <Tooltip text="Minimum percent GC content for a fragment to be selected" />
                                        </tooltip></Label>
-                                    <Label text="Maximum GC Content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                    <Label text="Maximum GC content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                        <tooltip>
                                           <Tooltip text="Maximum percent GC content for a fragment to be selected" />
                                        </tooltip></Label>
