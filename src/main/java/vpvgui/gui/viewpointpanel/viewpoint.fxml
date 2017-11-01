@@ -35,15 +35,34 @@
                     </rowConstraints>
                      <children>
                         <Label fx:id="viewpointScoreLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" />
-                        <Button fx:id="zoomOutButton" minHeight="30.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" GridPane.rowIndex="2">
+                        <Button fx:id="zoomOutButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" prefWidth="90.0" text="Zoom out" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
+                           <GridPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </GridPane.margin>
                         </Button>
-                        <Button fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                        <Button fx:id="copyToClipboardButton" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                        <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Button fx:id="zoomInButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" prefWidth="90.0" text="Zoom In" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </GridPane.margin>
+                        </Button>
+                        <Button fx:id="deleteButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" prefWidth="90.0" text="Delete" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </GridPane.margin>
+                        </Button>
+                        <Button fx:id="copyToClipboardButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" prefWidth="90.0" text="Copy URL" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </GridPane.margin>
+                        </Button>
+                        <Button maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" prefWidth="90.0" text="Close" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </GridPane.margin>
+                        </Button>
                         <Label fx:id="viewpointExplanationLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>

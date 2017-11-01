@@ -128,7 +128,12 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML
     void closeButtonAction() {
-        tab.getTabPane().getTabs().remove(tab);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tab.getTabPane().getTabs().remove(tab);
+            }
+        });
     }
 
     @FXML private void copyToClipboard(Event e) {
