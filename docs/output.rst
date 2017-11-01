@@ -7,7 +7,7 @@ to do
 
 
 Examing VPV's output in the UCSC Genome Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 VPV outputs a series of BED files. Here are the first three lines of a typical file::
 
 	chr11	3814753	3815000	NUP98

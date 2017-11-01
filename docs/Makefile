@@ -7,6 +7,7 @@ SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = VPV
 SOURCEDIR     = .
 BUILDDIR      = _build
+html_static_path = ['..']
 
 # Put it first so that "make" without argument is like "make help".
 help:
