@@ -59,14 +59,17 @@ public class ViewPointPresenter implements Initializable {
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
     private ScrollPane contentScrollPane;
-
     /** The graphical element where the UCSC browser content is displayed.*/
     @FXML
     private WebView ucscContentWebView;
-    /** This will be dynamically set to the name of the gene and the score of the viewpoint. TODO also set name of promoter */
+    /** This will be dynamically set to the name of the gene and the score of the viewpoint. */
     @FXML private Label viewpointScoreLabel;
-    /** This is use to mediate between {@link #viewpointScoreLabel} and the ViewPoint object and score . */
+    /** This will be dynamically set with details about the view point. */
+    @FXML private Label viewpointExplanationLabel;
+    /** This is use to mediate between {@link #viewpointScoreLabel} and the ViewPoint object and score. */
     private StringProperty vpScoreProperty;
+    /** This is used to mediate between the {@link #viewpointExplanationLabel} and the ViewPoint object. */
+    private StringProperty vpExplanationProperty;
     /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
 
@@ -316,7 +319,9 @@ public class ViewPointPresenter implements Initializable {
                 getSegment().getGCcontentAsPercent())));
         gcContentTableColumn.setComparator(new PercentComparator());
         vpScoreProperty=new SimpleStringProperty();
+        vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
+        viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
         /* the following will start us off with a different color each time. */
         this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }
@@ -328,6 +333,23 @@ public class ViewPointPresenter implements Initializable {
                 100*vp.getScore(),
                 vp.getGenomicLocationString(),
                 vp.getActiveLengthInKilobases()));
+        if (vp.hasNoActiveSegment()) {
+            this.vpExplanationProperty.setValue("No selected fragments");
+        } else {
+            int upstreamSpan=vp.getUpstreamSpan();
+            int downstreamSpan=vp.getDownstreamSpan();
+            int total = vp.getTotalPromoterCount();
+            String promoterCount="";
+            if (total==1) {
+                promoterCount=String.format("Only promoter of %s gene",vp.getTargetName());
+            } else {
+                 promoterCount = String.format("Promoter %d of %d of %s gene",
+                        vp.getPromoterNumber(),
+                        total, vp.getTargetName());
+            }
+            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s. %s",
+                    upstreamSpan,downstreamSpan,promoterCount,vp.getStrandAsString()));
+        }
     }
 
     public void setModel(Model m) {
@@ -341,7 +363,6 @@ public class ViewPointPresenter implements Initializable {
      */
     public void setViewPoint(ViewPoint vp) {
         this.vp = vp;
-        //this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s]",vp.getTargetName(),100*vp.getScore(), vp.getGenomicLocationString()));
         updateScore();
         this.coloredsegments = vp.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor(s.isSelected())))

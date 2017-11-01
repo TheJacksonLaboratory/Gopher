@@ -34,8 +34,8 @@ import java.util.zip.GZIPInputStream;
  * <p> The class produces a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
  * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
  * included, which is the way the data are shown on the UCSC browser).</p>
- * @author Peter Robinson
- * @version 0.0.4 (2017-10-02)
+ * @author Peter Robinson, Peter Hansen
+ * @version 0.1.1 (2017-10-31)
  */
 public class RefGeneParser {
 
@@ -43,6 +43,7 @@ public class RefGeneParser {
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.*/
     private Map<String, VPVGene> genemap=null;
+    /** This second map is used to allow for cases where one gene symbol has multiple positions in the genome. */
     private Map<String, VPVGene> genemap_2=null;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/

@@ -12,6 +12,7 @@ import vpvgui.model.VPVGene;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,6 +47,11 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         List<Integer> gPosList = vpvgene.getTSSlist();
+        if (! vpvgene.isForward()) {
+            Collections.reverse(gPosList);
+        }
+        int n=0; // we will order the promoters from first (most upstream) to last
+        // Note we do this differently according to strand.
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
@@ -58,7 +64,9 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     minimumFragmentSize(model.getMinFragSize()).
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).
+                    isForwardStrand(vpvgene.isForward()).
                     build();
+            vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
             vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown());

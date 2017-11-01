@@ -52,8 +52,9 @@ public class SwitchScreens {
         presenter.setModel(model);
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
+        this.primarystage.centerOnScreen();
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-        setStageDimensions();
+        setModelXYBounds();
         this.primarystage.show();
     }
 
@@ -83,10 +84,7 @@ public class SwitchScreens {
         if (this.model.getHttpProxy() != null) {
             Utils.setSystemProxyAndPort(model.getHttpProxy(),model.getHttpProxyPort());
         }
-//        this.primarystage.setMinWidth(800);
-//        this.primarystage.setWidth(screenWidth);
-//        this.primarystage.setMinHeight(600);
-//        this.primarystage.setHeight(screenHeight);
+
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.toString());
         if (presenter==null){
@@ -98,24 +96,25 @@ public class SwitchScreens {
         }
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
+        this.primarystage.centerOnScreen();
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-//        setStageDimensions();
+        setModelXYBounds();
         this.primarystage.show();
     }
 
-    private void setStageDimensions() {
-        if (this.primarystage==null) return;
-//        this.primarystage.setMinWidth(1000);
-//        this.primarystage.setWidth(1400);
-//        this.primarystage.setMaxWidth(1800);
-//        this.primarystage.setMinHeight(800);
-//        this.primarystage.setHeight(1000);
-//        this.primarystage.setMaxHeight(1200);
-    }
-
+    /**
+     *
+     * @param x X dimension of the user's screen
+     * @param y Y dimension of the user's screen
+     */
     public void setBounds(int x, int y) {
         this.screenHeight=y;
         this.screenWidth=x;
+    }
+
+    private void setModelXYBounds() {
+        model.setXdim(screenWidth);
+        model.setYdim(screenHeight);
     }
 
 

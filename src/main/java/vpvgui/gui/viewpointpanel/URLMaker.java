@@ -17,9 +17,9 @@ public class URLMaker {
     private static final int offset = 200;
 
     private String restrictionenzyme=null;
-
+    /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
     private int xdim;
-    private int ydim;
+
     /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
     private static final int UCSC_DEFAULT_WIDTH = 1600;
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
@@ -31,8 +31,7 @@ public class URLMaker {
     public URLMaker(Model model){
         this.genomebuild=model.getGenomeBuild();
         xdim=Math.min(UCSC_DEFAULT_WIDTH,model.getXdim());
-        ydim=model.getYdim();
-        logger.trace(String.format("setting genomebuild to %s",genomebuild));
+        logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 
 
@@ -89,8 +88,8 @@ public class URLMaker {
      */
     public String getDefaultURL(ViewPoint vp, String trackType,String highlights) {
         int posFrom, posTo;
-        posFrom = vp.getDisplayStart() - offset;
-        posTo = vp.getDisplayEnd() + offset;
+        posFrom = vp.getMinimumSelectedPosition() - offset;
+        posTo = vp.getMaximumSelectedPosition() + offset;
         String chrom = vp.getReferenceID();
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */

@@ -254,11 +254,7 @@ public class Segment implements Serializable {
      * @return The total size of the margin(s) of this {@link Segment}.
      */
     public int getMarginSize() {
-        if (2 * marginSize < length()) { // return a pair of Segment objects
-            return 2*this.marginSize;
-        } else { // return a single Segment object with identical coordinates as the original Segment object
-            return (endPos-startPos+1);
-        }
+        return Math.min(2*marginSize,length());
     }
 
 

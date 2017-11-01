@@ -268,7 +268,7 @@
                               </GridPane>
                            </children>
                         </VBox>
-                        <Button fx:id="createCaptureProbesButton" layoutX="287.0" layoutY="420.0" mnemonicParsing="false" onAction="#createViewPoints" text="Create Viewpoints!" AnchorPane.bottomAnchor="20.0" AnchorPane.topAnchor="590.0" />
+                        <Button fx:id="createCaptureProbesButton" layoutX="287.0" layoutY="420.0" mnemonicParsing="false" onAction="#createViewPoints" prefHeight="30.0" text="Create Viewpoints!" AnchorPane.bottomAnchor="20.0" AnchorPane.topAnchor="590.0" />
                      </children>
                   </AnchorPane>
             </content>

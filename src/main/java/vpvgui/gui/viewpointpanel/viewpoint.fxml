@@ -30,19 +30,21 @@
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Label fx:id="viewpointScoreLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" />
-                        <Button fx:id="zoomOutButton" minHeight="30.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" GridPane.rowIndex="1">
+                        <Button fx:id="zoomOutButton" minHeight="30.0" mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" text="Zoom out" GridPane.rowIndex="2">
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Button>
-                        <Button fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Button fx:id="copyToClipboardButton" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <Button fx:id="zoomInButton" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" text="Zoom In" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteThisViewPoint" prefHeight="30.0" text="Delete" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Button fx:id="copyToClipboardButton" mnemonicParsing="false" onAction="#copyToClipboard" prefHeight="30.0" text="Copy URL to Clipboard" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#closeButtonAction" prefHeight="30.0" text="Close" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Label fx:id="viewpointExplanationLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                   <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">

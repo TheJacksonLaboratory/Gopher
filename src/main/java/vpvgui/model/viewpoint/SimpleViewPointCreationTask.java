@@ -45,6 +45,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
         logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
+        int n=0; // we will order the promoters from first (most upstream) to last
+        // Note we do this differently according to strand.
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
@@ -56,7 +58,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     minimumFragmentSize(model.getMinFragSize()).
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).
+                    isForwardStrand(vpvgene.isForward()).
                     build();
+            vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
             vp.generateViewpointSimple();

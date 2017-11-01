@@ -77,6 +77,15 @@ public class ViewPoint implements Serializable {
     private List<Segment> restrictionSegmentList;
     /** List of restriction enzymes chosen by the User. */
     static List<RestrictionEnzyme> chosenEnzymes=null;
+    /** The "number" of the promoter for the gene in question. */
+    private int promoterNumber;
+    /** Total number of promoters associated with this gene. */
+    private int totalPromoters;
+
+    public void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
+
+    public int getPromoterNumber(){return promoterNumber;}
+    public int getTotalPromoterCount(){return totalPromoters;}
 
     public int getDownstreamNucleotideLength() {
         return downstreamNucleotideLength;
@@ -151,7 +160,6 @@ public class ViewPoint implements Serializable {
         this.marginSize= vp.marginSize;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
-        logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(fastaReader);
     }
 
@@ -183,7 +191,6 @@ public class ViewPoint implements Serializable {
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
-        logger.trace(String.format("Constructing ViewPoint from Builder at Genomic Pos = %d",this.genomicPos));
         init(builder.fastaReader);
         logger.error(String.format("ViewPoint CTOR upstream %d down %d",upstreamNucleotideLength,downstreamNucleotideLength));
     }
@@ -295,7 +302,6 @@ public class ViewPoint implements Serializable {
                     fastaReader(fastaReader).marginSize(marginSize).build();
             restrictionSegmentList.add(restFrag);
         }
-        logger.error(String.format("CTOR rest # %d",restrictionSegmentList.size()));
     }
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
@@ -369,6 +375,11 @@ public class ViewPoint implements Serializable {
         return String.format("%s  [%s:%d-%d]",getTargetName(),getReferenceID(),getStartPos(),getEndPos());
     }
 
+    public String getStrandAsString() {
+        if (this.isPositiveStrand) return "+ strand";
+        else return "- strand";
+    }
+
 
     /**
      * This function can be used to reshape the viewpoint according to rules that were developed in consultation with bench scientists.
@@ -388,8 +399,7 @@ public class ViewPoint implements Serializable {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        logger.trace("entering generateViewpointExtendedApproach");
-        logger.error(String.format("Extended #frags = %d",restrictionSegmentList.size()));
+        logger.trace(String.format("Extended #frags = %d",restrictionSegmentList.size()));
         Segment centerSegment=null; // the fragment that contains the TSS. Always show it!
 
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
@@ -435,8 +445,6 @@ public class ViewPoint implements Serializable {
         setEndPos(end);
 
         restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> {
-
-
         });
 
 
@@ -484,7 +492,6 @@ public class ViewPoint implements Serializable {
     public void generateViewpointSimple() {
         boolean resolved = true;
         approach = Approach.SIMPLE;
-        logger.trace("entering generateViewpointSimple");
         // find the fragment that contains genomicPos
         logger.error(String.format("GenerateVPSimple, size of restrictionFragmentSegmentList is %d",restrictionSegmentList.size()));
         Segment centerSegment = restrictionSegmentList.stream().
@@ -615,6 +622,49 @@ public class ViewPoint implements Serializable {
     }
 
     /**
+     * This function is intended to help display the right
+     * portion of the viewpoint in the UCSC browser.
+     * It is either the start position of the first selected segment or the
+     * deafult upstream position if no segment was selected.
+     * @return the 5' position that we want to display.
+     */
+    public int getMinimumSelectedPosition() {
+        return getActiveSegments().stream().mapToInt(s -> s.getStartPos()).min().orElse(this.genomicPos-upstreamNucleotideLength);
+    }
+    /**
+     * This function is intended to help display the right
+     * portion of the viewpoint in the UCSC browser.
+     * It is either the end position of the last selected segment or the
+     * deafult downstream position if no segment was selected.
+     * @return the 5' position that we want to display.
+     */
+    public int getMaximumSelectedPosition() {
+        return getActiveSegments().stream().mapToInt(s -> s.getEndPos()).max().orElse(this.genomicPos+downstreamNucleotideLength);
+    }
+
+
+
+    public int getUpstreamSpan() {
+        if (hasNoActiveSegment()) return 0;
+        if (isPositiveStrand) {
+            return genomicPos - getMinimumSelectedPosition();
+        } else {
+            return getMaximumSelectedPosition() - genomicPos;
+        }
+    }
+
+    public int getDownstreamSpan() {
+        if (hasNoActiveSegment()) return 0;
+        if (isPositiveStrand) {
+            return getMaximumSelectedPosition() - genomicPos;
+        } else {
+            return genomicPos - getMinimumSelectedPosition();
+        }
+    }
+
+
+
+    /**
      * If no segments are active/selected, then return zero. Otherwise return the length between the 5' end of the
      * first selected segment and the 3' end of the last selected segment.
      * @return
@@ -638,6 +688,10 @@ public class ViewPoint implements Serializable {
         genomicPos == othervp.genomicPos &&
         referenceSequenceID.equals(othervp.referenceSequenceID));
 
+    }
+
+    public boolean hasNoActiveSegment() {
+        return this.getActiveSegments().size()==0;
     }
 
 
