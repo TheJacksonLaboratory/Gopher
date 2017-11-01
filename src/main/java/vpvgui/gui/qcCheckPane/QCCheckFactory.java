@@ -153,24 +153,24 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Minimum GC content</td>");
-        if (model.getMinGCcontent()<25.0) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMinGCcontent()));
+        if (model.getMinGCcontent()<0.25) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMinGCContentPercent()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMinGCcontent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMinGCContentPercent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum GC content</td>");
-        if (model.getMaxGCcontent()>70.0) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxGCcontent()));
+        if (model.getMaxGCcontent()>0.70) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxGCContentPercent()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCcontent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCContentPercent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum repeat content</td>");
-        if (model.getMaxGCcontent()>65.0) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContent()));
+        if (model.getMaxGCcontent()>0.65) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContentPercent()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContentPercent()));
         }
 
         sb.append("</tbody>\n</table>");

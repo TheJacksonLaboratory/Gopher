@@ -87,14 +87,17 @@ public class Model implements Serializable {
     private double maxRepeatContent;
     public  double getMaxRepeatContent() {return maxRepeatContent;}
     public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
+    public double getMaxRepeatContentPercent(){return 100*maxRepeatContent; }
     /** Minimum allowable GC content in a selected fragment. */
     private double minGCcontent;
     public  double getMinGCcontent() { return minGCcontent;}
     public  void setMinGCcontent(double mgc) { minGCcontent=mgc;}
+    public double getMinGCContentPercent() { return 100*minGCcontent; }
     /** Maximum allowable GC content in a selected fragment. */
     private double maxGCcontent;
     public  double getMaxGCcontent() { return maxGCcontent;}
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
+    public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Total horizontal dimension  of the user's screen. */
     private int xdim;
 
@@ -120,9 +123,9 @@ public class Model implements Serializable {
         logger.trace(String.format("Setting tiling factor to %d",tilingFactor));
         this.tilingFactor=tilingFactor;
     }
-    public Integer maximumAllowedRepeatOverlap =null;
-    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
-    public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }
+//    public Integer maximumAllowedRepeatOverlap =null;
+//    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
+//    public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }
 
     public Integer marginSize =null;
     public int getMarginSize(){return marginSize;}
@@ -138,11 +141,6 @@ public class Model implements Serializable {
     public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
 
     public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
-
-
-
-    /** The complete URL of the chosen transcript definition from UCSC. */
-//    private String transcriptsURL = null;
 
 
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
@@ -176,7 +174,6 @@ public class Model implements Serializable {
         setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
         setProbeLength(Default.PROBE_LENGTH);
         setTilingFactor(Default.TILING_FACTOR);
-        setMaximumAllowedRepeatOverlap(Default.MAXIMUM_ALLOWED_REPEAT_OVERLAP);
         setMarginSize(Default.MARGIN_SIZE);
         setGenomeBuild(Default.GENOME_BUILD);
     }

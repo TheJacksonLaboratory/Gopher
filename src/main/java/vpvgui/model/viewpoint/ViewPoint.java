@@ -158,6 +158,7 @@ public class ViewPoint implements Serializable {
         this.marginSize= vp.marginSize;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
+        logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
         init(fastaReader);
     }
 
@@ -188,6 +189,7 @@ public class ViewPoint implements Serializable {
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
+        logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
         init(builder.fastaReader);
     }
 
@@ -205,7 +207,6 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        logger.trace("The segment factory was initialized for genomic Pos "+ segmentFactory.getGenomicPos());
         initRestrictionFragments(fastaReader);
     }
 
@@ -384,7 +385,6 @@ public class ViewPoint implements Serializable {
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
     public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown) {
-
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
             maxSizeUp=maxSizeDown;
@@ -393,14 +393,12 @@ public class ViewPoint implements Serializable {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        logger.trace(String.format("Number of Extendedfragment candidates = %d",restrictionSegmentList.size()));
         Segment centerSegment=null; // the fragment that contains the TSS. Always show it!
-
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
 
         for (Segment segment : restrictionSegmentList) {
             if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
-                centerSegment = segment;
+                centerSegment = segment; break;
             }
         }
         if (centerSegment==null) {
@@ -456,7 +454,7 @@ public class ViewPoint implements Serializable {
                 map(i -> LEN - i - 1).
                 filter(i->restrictionSegmentList.get(i).isSelected())
                .findFirst().orElse(0);
-        logger.trace(String.format("Reducing indices from (0,%d) to (%d,%d)",LEN,firstSelectedIndex,lastSelectedIndex));
+
 
         if (firstSelectedIndex+lastSelectedIndex==0) {
             logger.trace("Skipping trimming Segment List because no segments are selected for "+getTargetName());

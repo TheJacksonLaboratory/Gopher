@@ -192,6 +192,7 @@ public class VPVMainPresenter implements Initializable {
 
     transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
     public final double getMaxGCcontent() { return maxGCcontent.get();}
+    /** Note we expect the user to enter a percentage, and we convert it here to proportion. */
     public final void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
     public DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
@@ -314,12 +315,12 @@ public class VPVMainPresenter implements Initializable {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
         if (model.getMaxGCcontent()>0){
-            this.maxGCContentTextField.setText(String.format("%.2f",model.getMaxGCcontent()));
+            this.maxGCContentTextField.setText(String.format("%.2f",model.getMaxGCContentPercent()));
         } else {
             this.maxGCContentTextField.setPromptText(String.format("%.2f",Default.MAX_GC_CONTENT));
         }
         if (model.getMinGCcontent()>0) {
-            this.minGCContentTextField.setText(String.format("%.2f",model.getMinGCcontent()));
+            this.minGCContentTextField.setText(String.format("%.2f",model.getMinGCContentPercent()));
         } else {
             this.minGCContentTextField.setPromptText(String.format("%.2f",Default.MIN_GC_CONTENT));
         }
@@ -329,7 +330,7 @@ public class VPVMainPresenter implements Initializable {
             this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         }
         if (model.getMaxRepeatContent()>0) {
-            this.maxRepContentTextField.setText(String.format("%.2f",model.getMaxRepeatContent()));
+            this.maxRepContentTextField.setText(String.format("%.2f",model.getMaxRepeatContentPercent()));
         } else {
             this.maxRepContentTextField.setPromptText(String.format("%.2f",Default.MAXIMUM_REPEAT_CONTENT));
         }
@@ -342,6 +343,16 @@ public class VPVMainPresenter implements Initializable {
             this.sizeDownTextField.setText(String.format("%d",model.getSizeDown()));
         } else {
             this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
+        }
+        if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
+            this.restrictionEnzymeLabel.setText(model.getRestrictionEnzymeString());
+        } else {
+            this.restrictionEnzymeLabel.setText("not initialized");
+        }
+        if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
+            this.nValidGenesLabel.setText(String.format("%d valid target genes",model.getVPVGeneList().size() ));
+        } else {
+            this.nValidGenesLabel.setText("not initialized");
         }
     }
 
@@ -375,9 +386,9 @@ public class VPVMainPresenter implements Initializable {
         this.model.setSizeDown(getSizeDown());
         this.model.setSizeUp(getSizeUp());
         this.model.setMinFragSize(getMinFragSize());
-        this.model.setMaxRepeatContent(getMaxRepeatContent());
-        this.model.setMinGCcontent(getMinGCcontent());
-        this.model.setMaxGCcontent(getMaxGCcontent());
+        this.model.setMaxRepeatContent(getMaxRepeatContent()/100);
+        this.model.setMinGCcontent(getMinGCcontent()/100);
+        this.model.setMaxGCcontent(getMaxGCcontent()/100);
     }
 
 
@@ -554,14 +565,9 @@ public class VPVMainPresenter implements Initializable {
         /** The following command is just for debugging. We now have all VPVGenes, but still need to
          * add information about the restriction enzymes and the indexed FASTA file.
          */
-        //this.model.debugPrintVPVGenes();
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
         e.consume();
     }
-
-
-
-
 
 
     /**
