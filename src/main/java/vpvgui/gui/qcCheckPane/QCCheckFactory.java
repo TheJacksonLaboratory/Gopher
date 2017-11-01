@@ -13,11 +13,10 @@ public class QCCheckFactory {
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
-    private static boolean dataValid=true;
 
     public static boolean showQCCheck(Model model) {
         Stage window;
-        String windowTitle = "VPV Quality Check";
+        String windowTitle = "VPV Parameter Check";
         window = new Stage();
         window.setOnCloseRequest( event -> {window.close();} );
         window.setTitle(windowTitle);
@@ -100,7 +99,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Probe length</td>");
         if (model.getProbeLength()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d</td>",model.getProbeLength()));
         }
@@ -111,7 +109,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Margin size</td>");
         if (model.getMarginSize()>250 || model.getMarginSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d</td>",model.getMarginSize()));
         }
@@ -133,7 +130,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Upstream size</td>");
         if (model.getSizeUp()<100) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeUp()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d</td>",model.getSizeUp()));
         }
@@ -141,7 +137,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Downstream size</td>");
         if (model.getSizeDown()<100) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeDown()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d</td>",model.getSizeDown()));
         }
@@ -149,7 +144,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Minimum fragment size</td>");
         if (model.getMinFragSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d</td>",model.getMinFragSize()));
         }
@@ -157,7 +151,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Minimum GC content</td>");
         if (model.getMinGCcontent()<0.25) {
             sb.append(String.format("<td class=\"red\">%.2f%%.</td>",model.getMinGCcontent()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%.2f%%</td>",model.getMinGCcontent()));
         }
@@ -165,7 +158,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Maximum GC content</td>");
         if (model.getMaxGCcontent()>0.65) {
             sb.append(String.format("<td class=\"red\">%.2f%%.</td>",model.getMaxGCcontent()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%.2f%%</td>",100*model.getMaxGCcontent()));
         }
@@ -173,7 +165,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Maximum repeat content</td>");
         if (model.getMaxGCcontent()>0.65) {
             sb.append(String.format("<td class=\"red\">%.2f%%.</td>",100*model.getMaxRepeatContent()));
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%.2f%%</td>",100*model.getMaxRepeatContent()));
         }
@@ -197,7 +188,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Genome</td>");
         if (model.getGenomeDirectoryPath()==null) {
             sb.append("<td class=\"red\">Path to genome directory not initialized.</td>");
-            dataValid=false;
         } else {
             String g = String.format("%s (at %s).",model.getGenomeBuild(),model.getGenomeDirectoryPath());
             sb.append(String.format("<td>%s</td>",g));
@@ -214,13 +204,11 @@ public class QCCheckFactory {
                 msg="Genome has not been unpacked";
             }
             sb.append(String.format("<td class=\"red\">%s</td>",msg));
-            dataValid=false;
         }
         sb.append("</tr>");
         sb.append("<tr><td>Gene list</td>");
         if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%d genes</td>",model.getVPVGeneList().size()));
         }
@@ -228,7 +216,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Restriction enzyme</td>");
         if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
             sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getRestrictionEnzymeString()));
         }
@@ -236,7 +223,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Transcripts</td>");
         if (model.getTargetGenesPath()==null) {
             sb.append("<td class=\"red\">Transcript list not initialized.</td>");
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
         }
@@ -244,7 +230,6 @@ public class QCCheckFactory {
         sb.append("<tr><td>Project file</td>");
         if (model.getProjectName()==null) {
             sb.append("<td class=\"red\">Project file name not initialized.</td>");
-            dataValid=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getProjectName()));
         }

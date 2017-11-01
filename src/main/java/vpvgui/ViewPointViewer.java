@@ -58,11 +58,8 @@ public class ViewPointViewer extends Application {
 
     }
 
-    /** ToDo probably need to write settings in the VPVMainPresenter class! */
     @Override
     public void stop() throws Exception {
-        //logger.info("Closing VPV Gui");
-        System.err.println("CLOSING STOP()");
         Injector.forgetAll();
     }
 
@@ -100,10 +97,6 @@ public class ViewPointViewer extends Application {
         splashpresenter.setSwitchScreen(switchscreen);
         Scene scene = new Scene(splashview.getView());
         this.primarystage.setTitle("ViewPoint Viewer");
-
-//        this.primarystage.setMinWidth(400);
-//        this.primarystage.setWidth(600);
-//        this.primarystage.setMaxWidth(600);
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
