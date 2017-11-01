@@ -145,17 +145,32 @@ ViewPoint Windows
  For the simple approach, viewpoints will have a single fragment if the fragment overlapping the TSS passes the selection criteria explained above.
 
 
- 
-
 
 
  .. figure:: img/VPVsimple.png
    :scale: 100 %
    :alt: VPV Simple RALGDS
 
-VPV viewpoint for promoter 2 of the RALGDS gene.
+	 VPV viewpoint for promoter 2 of the RALGDS gene.
 
-ToDO --explain extended approach, design params, and export of BED file functions.
- 
+
+For the extended approach, promoters can have multiple fragments. In the following example, VPV has selected 	 7 fragments for the 5th (most 3') of five promoters of hte ZBTB16 gene. Several of the candidate
+fragments were rejected because they were too small (89 nt, 77 nt, 20 nt, and 0 nt). One 715 nt fragment was rejected because it GC content was above threshold (71.33%), and one 320 nt fragment was rejected because
+of a repeat content of 73.75%. None of the reject fragments would be expected to perform well in a capture Hi-C experiment. 
+
+
+ .. figure:: img/VPVextended.png
+   :scale: 100 %
+   :alt: VPV Extended ZBTB16
+
+	 VPV viewpoint for promoter 5 of the ZBTB16 gene.
+
+
+Export BED file
+~~~~~~~~~~~~~~~
+
+Current "wizards" for enrichment probe design expect a BED file as input. Users of VPV can export a BED file from the File menu (``File|Export BED File`` ). 
+
+
 
 	     
