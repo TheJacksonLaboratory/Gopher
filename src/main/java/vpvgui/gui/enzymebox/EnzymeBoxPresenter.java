@@ -46,29 +46,28 @@ public class EnzymeBoxPresenter implements Initializable {
         Platform.runLater( ()-> {this.okButton.requestFocus(); } );
     }
 
-    public void initializeEnzymes(List<RestrictionEnzyme> enzymes) {
+    /** Initialize the list of enyzmes that will be shown in the dialog. If one or more enzymes has been
+     * previously chosen by the user and was stored in the {@link vpvgui.model.Model} object, then show
+     * it as selected.
+     * @param enzymes List of all enzymes
+     * @param chosenEnzymes List of enzymes previously chosen by the user (if any)
+     */
+    public void initializeEnzymes(List<RestrictionEnzyme> enzymes, List<RestrictionEnzyme> chosenEnzymes) {
         for (RestrictionEnzyme re :  enzymes) {
             String label = re.getLabel();
             CheckBox cb = new CheckBox(label);
             enzymemap.put(re.getName(),re);
             cb.setOnAction( e -> handle(re.getName()));
             cb.setAllowIndeterminate(false);
-           cb.setId("checkbx");
-           /* cb.setStyle(
-                    "-fx-border-color: lightblue; "
-                            + "-fx-font-size: 18;"
-                            + "-fx-border-insets: -2; "
-                            + "-fx-border-radius: 5;"
-                            + "-fx-border-style: dotted;"
-                            + "-fx-border-width: 2;"
-                            + "-fx-alignment: top-left;"
-            );*/
+            if (chosenEnzymes.contains(re)) {
+                cb.setSelected(true);
+            }
+            cb.setId("checkbx");
             boxlist.add(cb);
             this.restrictionVBox.getChildren().addAll(cb);
             this.restrictionVBox.setSpacing(8);
         }
         logger.trace("We added " + boxlist.size() + " enzymes to boxlist");
-
     }
 
 

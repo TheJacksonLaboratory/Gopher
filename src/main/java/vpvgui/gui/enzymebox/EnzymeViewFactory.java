@@ -3,6 +3,7 @@ package vpvgui.gui.enzymebox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 
 import java.util.List;
@@ -11,14 +12,17 @@ public class EnzymeViewFactory {
     static Logger logger = Logger.getLogger(EnzymeViewFactory.class.getName());
 
     /**
-     *
-     * @param enzymes List of all restrictions enzymes from which the user needs to choose one or more.
+     * Initialize the Enyzme list to show any previously chosen enzyme with a check,
+     * and return the enzymes that the user chooses.
+     * @param model
      */
-    public static List<RestrictionEnzyme> getChosenEnzymes(List<RestrictionEnzyme> enzymes) {
+    public static List<RestrictionEnzyme> getChosenEnzymes(Model model) {
+        List<RestrictionEnzyme> allEnzymes = model.getRestrictionEnymes();
+        List<RestrictionEnzyme> chosenEnzymes = model.getChosenEnzymelist();
         logger.trace("Getting chosen enzymes");
         EnzymeBoxView view = new EnzymeBoxView();
         EnzymeBoxPresenter presenter = (EnzymeBoxPresenter) view.getPresenter();
-        presenter.initializeEnzymes(enzymes);
+        presenter.initializeEnzymes(allEnzymes,chosenEnzymes);
 
         Stage window;
         String windowTitle = "Restriction Enzymes";

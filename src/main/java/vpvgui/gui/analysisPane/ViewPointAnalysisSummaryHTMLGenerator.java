@@ -27,7 +27,6 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
     public ViewPointAnalysisSummaryHTMLGenerator(Model model) {
         this.model=model;
-        logger.trace("Constructing HTML generator with model="+this.model.toString());
     }
 
 
@@ -82,7 +81,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
 
     public String getHTML() {
-        logger.trace(String.format("Getting HTML ViewPoint summary code for model=%s",this.model.toString()));
+        logger.trace(String.format("Getting HTML ViewPoint summary code for model=%s",this.model.getProjectName()));
         if (model==null){
             logger.error("model was null");
             return "";

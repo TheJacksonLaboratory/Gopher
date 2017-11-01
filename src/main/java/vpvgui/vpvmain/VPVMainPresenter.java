@@ -272,7 +272,6 @@ public class VPVMainPresenter implements Initializable {
         if (genomebuild!=null)
             this.genomeBuildLabel.setText(genomebuild);
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
-        boolean genomeDownloaded=false;
         if (path_to_downloaded_genome_directory!= null) {
             this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
@@ -291,6 +290,8 @@ public class VPVMainPresenter implements Initializable {
         if (refGenePath!=null) {
             this.downloadedTranscriptsLabel.setText(refGenePath);
             this.transcriptDownloadPI.setProgress(1.0);
+        } else {
+            this.downloadedTranscriptsLabel.setText("...");
         }
     }
 
@@ -303,7 +304,7 @@ public class VPVMainPresenter implements Initializable {
      */
     public void setModel(Model mod) {
         this.model=mod;
-        logger.trace(String.format("Setting model to %s",mod.toString()));
+        logger.trace(String.format("Setting model to %s",mod.getProjectName()));
         setInitializedValuesInGUI();
         setBindings();
     }
@@ -349,10 +350,10 @@ public class VPVMainPresenter implements Initializable {
     private void initializePromptTextsToDefaultValues() {
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
-        this.minGCContentTextField.setPromptText(String.format("%.2f",Default.MIN_GC_CONTENT));
-        this.maxGCContentTextField.setPromptText(String.format("%.2f",Default.MAX_GC_CONTENT));
+        this.minGCContentTextField.setPromptText(String.format("%.1f %%",Default.MIN_GC_CONTENT));
+        this.maxGCContentTextField.setPromptText(String.format("%.1f %%",Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
-        this.maxRepContentTextField.setPromptText(String.format("%.1f",Default.MAXIMUM_REPEAT_CONTENT));
+        this.maxRepContentTextField.setPromptText(String.format("%.1f %%",Default.MAXIMUM_REPEAT_CONTENT));
     }
 
     /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
@@ -529,8 +530,7 @@ public class VPVMainPresenter implements Initializable {
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
      * objects to the {@link Model}.*/
     @FXML public void chooseEnzymes() {
-        List<RestrictionEnzyme> enzymes = this.model.getRestrictionEnymes();
-        List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(enzymes);
+        List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(this.model);
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
         this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }

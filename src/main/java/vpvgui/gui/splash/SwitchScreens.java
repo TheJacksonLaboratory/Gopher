@@ -61,9 +61,7 @@ public class SwitchScreens {
     public void openExistingModel(String name) {
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
-
         String filepath = Platform.getAbsoluteProjectPath(name);
-        logger.trace("About to deserialize model at "+ filepath);
         try {
             this.model = SerializationManager.deserializeModel(filepath);
         } catch (IOException e) {
@@ -86,7 +84,7 @@ public class SwitchScreens {
         }
 
         presenter.setModelInMainAndInAnalysisPresenter(model);
-        logger.trace("Deserialized model "+ model.toString());
+        logger.trace("Deserialized model "+ model.getProjectName());
         if (presenter==null){
             logger.fatal("Presenter was null ponter");
             return;

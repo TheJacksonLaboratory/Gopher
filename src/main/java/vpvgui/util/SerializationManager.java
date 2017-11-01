@@ -2,10 +2,13 @@ package vpvgui.util;
 
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
-import vpvgui.model.viewpoint.Segment;
+
 
 import java.io.*;
 
+/**
+ * This class is responsible for serializing and deserializing the {@link Model} object that represents the project.
+ */
 public class SerializationManager {
     private static final Logger logger = Logger.getLogger(SerializationManager.class.getName());
     /** This serializes the Model object. It replaces any spaces in the filename with underscores. */
@@ -20,7 +23,6 @@ public class SerializationManager {
     }
 
     public static Model deserializeModel(String fileName) throws IOException,ClassNotFoundException {
-        logger.trace(String.format("Deserializing model \"%s\"",fileName ));
         Object obj=null;
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);

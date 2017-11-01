@@ -8,7 +8,11 @@ import vpvgui.model.Model;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-
+/**
+ * This class coordinates the creation of the HTML code for the parameter check window.
+ * @author Peter Robinson
+ * @version 0.0.2 (2017-11-01)
+ */
 public class QCCheckFactory {
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
@@ -149,24 +153,24 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Minimum GC content</td>");
-        if (model.getMinGCcontent()<0.25) {
-            sb.append(String.format("<td class=\"red\">%.2f%%.</td>",model.getMinGCcontent()));
+        if (model.getMinGCcontent()<25.0) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMinGCcontent()));
         } else {
-            sb.append(String.format("<td>%.2f%%</td>",model.getMinGCcontent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMinGCcontent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum GC content</td>");
-        if (model.getMaxGCcontent()>0.65) {
-            sb.append(String.format("<td class=\"red\">%.2f%%.</td>",model.getMaxGCcontent()));
+        if (model.getMaxGCcontent()>70.0) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxGCcontent()));
         } else {
-            sb.append(String.format("<td>%.2f%%</td>",100*model.getMaxGCcontent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCcontent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum repeat content</td>");
-        if (model.getMaxGCcontent()>0.65) {
-            sb.append(String.format("<td class=\"red\">%.2f%%.</td>",100*model.getMaxRepeatContent()));
+        if (model.getMaxGCcontent()>65.0) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContent()));
         } else {
-            sb.append(String.format("<td>%.2f%%</td>",100*model.getMaxRepeatContent()));
+            sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContent()));
         }
 
         sb.append("</tbody>\n</table>");

@@ -246,7 +246,7 @@
                                        <tooltip>
                                           <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
                                        </tooltip></Label>
-                                    <Label text="Maximum repeat content" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <Label text="Maximum repeat content (%)" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                        <tooltip>
                                           <Tooltip text="Maximum repeat content for a fragment to be selected" />
                                        </tooltip></Label>
@@ -254,11 +254,11 @@
                                     <TextField fx:id="minFragSizeTextField" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <TextField fx:id="sizeDownTextField" promptText="5000" GridPane.columnIndex="3" />
                                     <TextField fx:id="maxRepContentTextField" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <Label text="Minimum GC content" GridPane.rowIndex="2">
+                                    <Label text="Minimum GC content (%)" GridPane.rowIndex="2">
                                        <tooltip>
                                           <Tooltip text="Minimum percent GC content for a fragment to be selected" />
                                        </tooltip></Label>
-                                    <Label text="Maximum GC Content" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                    <Label text="Maximum GC Content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                        <tooltip>
                                           <Tooltip text="Maximum percent GC content for a fragment to be selected" />
                                        </tooltip></Label>
@@ -268,7 +268,7 @@
                               </GridPane>
                            </children>
                         </VBox>
-                        <Button fx:id="createCaptureProbesButton" layoutX="287.0" layoutY="420.0" mnemonicParsing="false" onAction="#createViewPoints" prefHeight="30.0" text="Create Viewpoints!" AnchorPane.bottomAnchor="20.0" AnchorPane.topAnchor="590.0" />
+                        <Button fx:id="createCaptureProbesButton" layoutX="287.0" layoutY="420.0" maxHeight="30.0" minHeight="30.0" mnemonicParsing="false" onAction="#createViewPoints" prefHeight="30.0" text="Create Viewpoints!" AnchorPane.bottomAnchor="20.0" AnchorPane.topAnchor="590.0" />
                      </children>
                   </AnchorPane>
             </content>
