@@ -634,6 +634,16 @@ public class ViewPoint implements Serializable {
         return getActiveSegments().stream().mapToInt(s -> s.getEndPos()).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
+    /** Returns the leftmost position to display in the UCSC browser. This is either the boundary of the initial search region, or
+     * in the case where a selected fragment overlaps that boundary, the start pos of that fragment.
+     * @return leftmost display position
+     */
+    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
+    /** Returns the rightmost position to display in the UCSC browser. This is either the boundary of the initial search region, or
+     * in the case where a selected fragment overlaps that boundary, the end pos of that fragment.
+     * @return rightmost display position
+     */
+    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
 
 
     public int getUpstreamSpan() {

@@ -294,6 +294,13 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.downloadedTranscriptsLabel.setText("...");
         }
+        if (model.isGenomeIndexed()) {
+            this.indexGenomeLabel.setText("Genome files successfully indexed");
+            this.genomeIndexPI.setProgress(1.00);
+        } else {
+            this.indexGenomeLabel.setText("...");
+            this.genomeIndexPI.setProgress(0.00);
+        }
     }
 
     /**

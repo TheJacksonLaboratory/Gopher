@@ -13,17 +13,14 @@ import vpvgui.model.viewpoint.ViewPoint;
 public class URLMaker {
     private static final Logger logger = Logger.getLogger(URLMaker.class.getName());
     private String genomebuild=null;
-    /** Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int offset = 200;
-
-    private String restrictionenzyme=null;
+      private String restrictionenzyme=null;
     /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
     private int xdim;
 
     /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
     private static final int UCSC_DEFAULT_WIDTH = 1600;
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
-    private static final int OFFSET = 250;
+    private static final int OFFSET = 200;
 
 
 
@@ -88,8 +85,8 @@ public class URLMaker {
      */
     public String getDefaultURL(ViewPoint vp, String trackType,String highlights) {
         int posFrom, posTo;
-        posFrom = vp.getMinimumSelectedPosition() - offset;
-        posTo = vp.getMaximumSelectedPosition() + offset;
+        posFrom = vp.getMinimumDisplayPosition() - OFFSET;
+        posTo = vp.getMaximumDisplayPosition() + OFFSET;
         String chrom = vp.getReferenceID();
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
