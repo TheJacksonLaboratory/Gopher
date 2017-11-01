@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.1.1 (2017-10-24)
+ * @version 0.1.3 (2017-11-01)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -98,8 +98,6 @@ public class ViewPoint implements Serializable {
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** A list of restriction enzymes (at least one) as chosen by the user. */
     public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
-    /** Warnings that occur during automatic generation of the viewpoint can be written to this variable. */
-    private String warnings;
     /** Overall score of this Viewpoint.*/
     private double score;
     /** Minimum allowable fragment size for the simple approach */
@@ -185,14 +183,12 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
-        logger.error(String.format("VP [%s] %d -- %d -- %d",getTargetName(),getStartPos(),genomicPos,getEndPos()));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         init(builder.fastaReader);
-        logger.error(String.format("ViewPoint CTOR upstream %d down %d",upstreamNucleotideLength,downstreamNucleotideLength));
     }
 
     /**
@@ -202,7 +198,6 @@ public class ViewPoint implements Serializable {
     private void init(IndexedFastaSequenceFile fastaReader) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
-        warnings="";
         /* Create segmentFactory */
         segmentFactory = new SegmentFactory(this.referenceSequenceID,
                 this.genomicPos,
@@ -251,7 +246,6 @@ public class ViewPoint implements Serializable {
         public Builder(String refID, int pos) {
             this.referenceSequenceID = refID;
             this.genomicPos    = pos;
-            logger.trace(String.format("Builder for refID=%s at pos=%d",refID,pos));
         }
         public Builder targetName(String val)
         { targetName = val;  return this; }
@@ -399,7 +393,7 @@ public class ViewPoint implements Serializable {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        logger.trace(String.format("Extended #frags = %d",restrictionSegmentList.size()));
+        logger.trace(String.format("Number of Extendedfragment candidates = %d",restrictionSegmentList.size()));
         Segment centerSegment=null; // the fragment that contains the TSS. Always show it!
 
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));

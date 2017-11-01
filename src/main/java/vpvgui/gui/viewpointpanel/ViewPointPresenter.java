@@ -352,7 +352,7 @@ public class ViewPointPresenter implements Initializable {
                         vp.getPromoterNumber(),
                         total, vp.getTargetName());
             }
-            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s. %s",
+            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s (%s)",
                     upstreamSpan,downstreamSpan,promoterCount,vp.getStrandAsString()));
         }
     }

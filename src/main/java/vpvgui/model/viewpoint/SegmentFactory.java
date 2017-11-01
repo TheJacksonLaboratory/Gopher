@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
  * In addition to the usual getter and setter function, the class provides a functions that allow to query the <i>HashMap</i>.
  *
  * @author Peter Hansen
+ * @version 0.1.1 (2017-11-01)
  */
 public class SegmentFactory implements Serializable {
     private static final Logger logger = Logger.getLogger(SegmentFactory.class.getName());
@@ -37,8 +38,6 @@ public class SegmentFactory implements Serializable {
     /** Map of the positions where the enzymes cut. Key: a site, such as GATC, value: list of cutting site positions
      * relative to {@link #genomicPos}. */
     private HashMap<String, ArrayList<Integer>> cuttingPositionMap;
-    /** Position of the "^", which indicates the cutting site, e.g., 0 for ^GATC and 2 for GA^TC */
-   // private HashMap<String, Integer> cuttingPositionMapOffsets;
     /** TODO what is key?. Value, the corresponding {@link RestrictionEnzyme} object. */
     static Map<String, RestrictionEnzyme> restrictionEnzymeMap;
 
@@ -68,9 +67,6 @@ public class SegmentFactory implements Serializable {
                           Integer maxDistToGenomicPosUp,
                           Integer maxDistToGenomicPosDown,
                           List<RestrictionEnzyme> chosenEnzymeList) {
-
-        logger.error(String.format("Seg Fact up:%d down %d",maxDistToGenomicPosUp,maxDistToGenomicPosDown));
-
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
@@ -152,72 +148,6 @@ public class SegmentFactory implements Serializable {
     }
 
 
-
-    /**
-     * Given a position within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown],
-     * this function returns the next cutting position in up or downstream direction.
-     *
-     * TODO -- this is only used in the console test class and will be removed
-     *
-     * @param pos       Position relative to 'genomicPos'.
-     * @param direction Direction in which the next cutting site will be searched.
-     * @return Position of the next cutting position relative to 'genomicPos'.
-     * @throws IllegalArgumentException                  if a value different than 'up' or 'down' is passed as 'direction' parameter.
-     * @throws IntegerOutOfRangeException                if 'pos' is not within the interval [-maxDistToGenomicPosUp,maxDistToGenomicPosDown].
-     * @throws NoCuttingSiteFoundUpOrDownstreamException if there is no cutting position up or downstream of 'pos'. Exception is handled by returning the position of outermost cutting site up or downstream.
-     */
-    @Deprecated
-    public Integer getNextCutPosOLD(Integer pos, String direction) throws IllegalArgumentException, IntegerOutOfRangeException, NoCuttingSiteFoundUpOrDownstreamException {
-        if (!(direction.equals("up") || direction.equals("down"))) {
-            logger.error(String.format("direction object must be up or down but was \"%s\"",direction ));
-            throw new IllegalArgumentException("Please pass either 'up' or 'down' for 'direction'.");
-        }
-        if (pos < -maxDistToGenomicPosUp || pos > maxDistToGenomicPosDown) {
-            logger.error("pos was not within the interval [-maxDistToGenomicPosUp=" + -maxDistToGenomicPosUp + ",maxDistToGenomicPosDown=" + maxDistToGenomicPosDown + "].");
-            throw new IntegerOutOfRangeException("pos was not within the interval [-maxDistToGenomicPosUp=" + -maxDistToGenomicPosUp + ",maxDistToGenomicPosDown=" + maxDistToGenomicPosDown + "].");
-        }
-
-        // get array with cutting positions
-        ArrayList<Integer> cutPosArray = cuttingPositionMap.get("ALL");
-        Integer returnCutPos = cutPosArray.get(cutPosArray.size() - 1);
-
-        // reverse array, if the functions is called with 'up'
-        if (direction == "up") {
-            Collections.reverse(cutPosArray);
-        }
-
-        // find the next cutting site in up or downstream direction
-        try {
-            Iterator<Integer> cutPosArrayIt = cutPosArray.iterator();
-            while (cutPosArrayIt.hasNext()) {
-                Integer nextCutPos = cutPosArrayIt.next();
-                if (direction == "down" && (pos <= nextCutPos)) {
-                    returnCutPos = nextCutPos;
-                    break;
-                } else if (direction == "up" && (pos >= nextCutPos)) {
-                    returnCutPos = nextCutPos;
-                    break;
-                } else {
-                    returnCutPos = cutPosArray.get(cutPosArray.size() - 1);
-                    throw new NoCuttingSiteFoundUpOrDownstreamException("EXCEPTION in function 'getNextCutPosOLD': No cutting site " + direction + "stream of position " + pos + ". Will return the " +
-                            "outermost cutting site in " + direction + "stream direction.");
-                }
-            }
-        } catch (NoCuttingSiteFoundUpOrDownstreamException e) {
-            System.out.println(e.getMessage());
-        } finally {
-
-        }
-
-        // reverse the array for future calls
-        if (direction == "up") {
-            Collections.reverse(cutPosArray);
-        }
-
-        return returnCutPos;
-    }
-
-
     public Integer getUpstreamCut(int j) {
         // replaces return relToAbsPos(getAllCuts().get(j));
         return getAllCuts().get(j);
@@ -228,18 +158,6 @@ public class SegmentFactory implements Serializable {
         // replaces return relToAbsPos(getAllCuts().get(j+1));
         return getAllCuts().get(j+1);
     }
-
-    /**
-     * This function converts coordinates relative to <i>genomicPos</i> to absolute coordinates in the genomic sequence.
-     *
-     * @param relPos   position relative to <i>genomicPos</i>.
-     * @return         absolute genomic position.
-     */
-//   // public Integer relToAbsPos(Integer relPos) {
-//        return relPos + genomicPos;
-//    }
-
-
 
 
 }

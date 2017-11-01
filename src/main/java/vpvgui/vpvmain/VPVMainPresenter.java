@@ -531,6 +531,10 @@ public class VPVMainPresenter implements Initializable {
      * objects to the {@link Model}.*/
     @FXML public void chooseEnzymes() {
         List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(this.model);
+        if (chosenEnzymes==null || chosenEnzymes.size()==0) {
+            ErrorWindow.display("Warning","Warning -- no restriction enzyme chosen!");
+            return;
+        }
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
         this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
     }

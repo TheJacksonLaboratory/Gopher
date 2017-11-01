@@ -45,6 +45,7 @@ public class EnzymeViewFactory {
 
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
+        logger.trace(String.format("Presented n chosen %d", presenter.getChosenEnzymes().size()));
         return presenter.getChosenEnzymes();
     }
 
