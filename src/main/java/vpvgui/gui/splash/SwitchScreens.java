@@ -54,7 +54,10 @@ public class SwitchScreens {
         this.primarystage.setScene(scene);
         this.primarystage.centerOnScreen();
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-        setModelXYBounds();
+        // The commented line is causing null pointer during creation of the new project when the hidden file is not
+        // yet present in the user's home directory.
+        // This is not necessary, since we're adjusting the bounds 7 lines above this one. Is that correct?
+        // setModelXYBounds();
         this.primarystage.show();
     }
 
