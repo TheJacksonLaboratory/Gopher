@@ -82,7 +82,7 @@ public class GenomeDownloader {
         } else if (gb.equals("mm9")) {
             return DataSource.createUCSCmm9().getGenomeURL();
         } else if (gb.equals("mm10")) {
-            return  DataSource.createUCSCmm10().getGenomeURL();
+            return DataSource.createUCSCmm10().getGenomeURL();
         } else {
             throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
         }

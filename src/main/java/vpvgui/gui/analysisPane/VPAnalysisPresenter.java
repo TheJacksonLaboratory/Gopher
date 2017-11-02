@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
  * This is the Tab that shows a table with all of the viewpoints created together with a sumnmary of the overall
  * quality of the results
  * @author Peter Robinson
- * @version 0.0.4 (2017-08-26).
+ * @version 0.1.2 (2017-11-02).
  */
 public class VPAnalysisPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
@@ -190,11 +190,9 @@ public class VPAnalysisPresenter implements Initializable {
      * Set up the table that will show the ViewPoints.
      */
     private void initTable() {
-        // The first column with buttons that open new tab for the ViewPoint
         actionTableColumn.setSortable(false);
         actionTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
-            // create Button here & set the action
             Button btn = new Button("Show viewpoint");
             btn.setOnAction(e -> {
                 logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
@@ -208,15 +206,13 @@ public class VPAnalysisPresenter implements Initializable {
         deleteTableColumn.setSortable(false);
         deleteTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
-            // create Button here & set the action
-            Button btn = new Button("Delete viewpoint");
+            Button btn = new Button("Delete");
             btn.setOnAction(e -> {
                 logger.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(),vp.getActiveSegments().size()));
                 model.deleteViewpoint(vp);
                 refreshVPTable();
             });
-            // wrap it so it can be displayed in the TableView
             return new ReadOnlyObjectWrapper<>(btn);
         });
 
@@ -248,6 +244,7 @@ public class VPAnalysisPresenter implements Initializable {
         viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
 
+        viewPointTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
 

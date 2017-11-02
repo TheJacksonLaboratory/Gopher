@@ -33,7 +33,6 @@ public class Downloader extends Task<Void> {
      */
     private File localFilePath=null;
 
-
     /** A reference to a ProgressIndicator that must have be
      * initialized in the GUI and not within this class.
      */
@@ -102,7 +101,7 @@ public class Downloader extends Task<Void> {
             int totalBytesRead = 0;
             int bytesRead = 0;
             int size = urlc.getContentLength();
-            if (progress!=null) { progress.setProgress(0.01); }
+            if (progress!=null) { updateProgress(0.01); }
             logger.trace("Size of file to be downloaded: "+size);
             if (size >= 0)
                 block = size /100;
@@ -127,7 +126,7 @@ public class Downloader extends Task<Void> {
             updateProgress(0.00);
             throw new VPVException(e.getMessage());
         }
-        progress.setProgress(1.000);/* show 100% completion */
+        updateProgress(1.000); /* show 100% completion */
         return null;
     }
 

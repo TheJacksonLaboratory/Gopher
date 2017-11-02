@@ -42,7 +42,7 @@ import static vpvgui.util.Utils.join;
 /**
  * This class acts as a controller of the TabPanes which display individual ViewPoints.
  * @author Peter Robinson
- * @version 0.2.5 (2017-10-31)
+ * @version 0.2.6 (2017-11-02)
  */
 public class ViewPointPresenter implements Initializable {
 
@@ -72,26 +72,15 @@ public class ViewPointPresenter implements Initializable {
     private StringProperty vpExplanationProperty;
     /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
-
-
+    /** By how much do we change the width of the UCSC display when zooming? */
     private static double ZOOMFACTOR =1.5;
-
-
     /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     @FXML
     private TableView<ColoredSegment> segmentsTableView;
-
-    @FXML
-    private TableColumn<ColoredSegment, String> colorTableColumn;
-
-    @FXML
-    private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
-
-    @FXML
-    private TableColumn<ColoredSegment, String> locationTableColumn;
-
-    @FXML
-    private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
+    @FXML private TableColumn<ColoredSegment, String> colorTableColumn;
+    @FXML private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
+    @FXML private TableColumn<ColoredSegment, String> locationTableColumn;
+    @FXML private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
     @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
     @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
     @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
@@ -99,7 +88,6 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML private Button deleteButton;
     @FXML private Button copyToClipboardButton;
-
     @FXML private Button zoomInButton;
     @FXML private Button zoomOutButton;
 
@@ -327,6 +315,7 @@ public class ViewPointPresenter implements Initializable {
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
+        this.segmentsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         /* the following will start us off with a different color each time. */
         this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }

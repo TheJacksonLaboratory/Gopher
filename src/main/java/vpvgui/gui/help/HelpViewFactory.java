@@ -1,10 +1,13 @@
 package vpvgui.gui.help;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import vpvgui.gui.ErrorWindow;
 
@@ -15,45 +18,19 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 /**
- * Created by peterrobinson on 7/3/17.
+ * A helper class that displays the Read-the-docs documentation for VPV in a JavaFX webview browser
+ * @author Peter Robinson
+ * @version 0.2.1 (2017-11-02)
  */
 public class HelpViewFactory {
     private static final Logger logger = Logger.getLogger(HelpViewFactory.class.getName());
-    private static final String READTHEDOCS_SITE = "https://readthedocs.org/projects/vpv/";
+    private static final String READTHEDOCS_SITE = "http://vpv.readthedocs.io/en/latest/";
 
 
     public static void display() {
         openHelpDialog();
-        /*Stage window;
-        String windowTitle = "VPV Settings";
-        window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
-        window.setTitle(windowTitle);
-
-        HelpView view = new HelpView();
-        HelpPresenter presenter = (HelpPresenter) view.getPresenter();
-
-        String html=getHTML();
-        presenter.setData(html);
-
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();*/
     }
 
-    /*
-        * Formats the list properties in human-readable format, checking for an empty list.
-        */
-    private static String toStringHelper(String listName, ObservableList<String> lst) {
-        if (lst==null || lst.isEmpty()) {
-            return ("");
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s: (%d)\n", listName, lst.size()));
-        for (String s : lst) {
-            sb.append(String.format("\t%s\n", s));
-        }
-        return sb.toString();
-    }
 
     private static String getHTML() {
         String sb = "<html><body><h3>VPV Help</h3>" +
@@ -84,25 +61,29 @@ public class HelpViewFactory {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonTypeOne){
-            if( Desktop.isDesktopSupported() )
-            {
-                new Thread(() -> {
-                    try {
-                        logger.trace(String.format("Opening Website at %s",READTHEDOCS_SITE));
-                        Desktop.getDesktop().browse( new URI( READTHEDOCS_SITE ) );
-                    } catch (IOException | URISyntaxException e1) {
-                        e1.printStackTrace();
-                    }
-                }).start();
-            } else {
-                ErrorWindow.display("Could not open read the docs",
-                        String.format("The documentation is available at %s",READTHEDOCS_SITE));
-            }
-
-
-            alert.close();
+          openBrowser();
+          alert.close();
         } else {
             alert.close();
+        }
+    }
+
+
+    /**
+     * Open a JavaFW Webview window and display our read the docs help documentation in it.
+     */
+    private static void openBrowser() {
+        try{
+            Stage window;
+            window = new Stage();
+            WebView web = new WebView();
+            web.getEngine().load(READTHEDOCS_SITE);
+            Scene scene = new Scene(web);
+            window.setScene(scene);
+            window.show();
+        } catch (Exception e){
+            logger.error(String.format("Could not open browser to show RTD: %s",e.toString()));
+            e.printStackTrace();
         }
     }
 

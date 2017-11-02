@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-
 <StackPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.analysisPane.VPAnalysisPresenter">
    <children>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL">
@@ -27,10 +26,10 @@
             
                                     <TableView fx:id="viewPointTableView" minHeight="200.0" minWidth="1100.0">
                      <columns>
-                        <TableColumn fx:id="actionTableColumn" editable="false" prefWidth="150.0" text="Viewpoint" />
-                        <TableColumn fx:id="deleteTableColumn" prefWidth="150.0" text="Delete" />
+                        <TableColumn fx:id="actionTableColumn" editable="false" minWidth="90.0" prefWidth="150.0" text="Viewpoint" />
+                        <TableColumn fx:id="deleteTableColumn" minWidth="50.0" prefWidth="100.0" text="Delete" />
                         <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
-                        <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="60.0" prefWidth="220.0" text="Genomic location" />
+                        <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="200.0" prefWidth="220.0" text="Genomic location" />
                         <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
                         <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
                         <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active length" />
