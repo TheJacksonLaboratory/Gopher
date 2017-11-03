@@ -19,7 +19,7 @@ import java.util.*;
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.2.11 (2017-10-24)
+ * @version 0.2.12 (2017-11-04)
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
@@ -123,9 +123,6 @@ public class Model implements Serializable {
         logger.trace(String.format("Setting tiling factor to %d",tilingFactor));
         this.tilingFactor=tilingFactor;
     }
-//    public Integer maximumAllowedRepeatOverlap =null;
-//    public int getMaximumAllowedRepeatOverlap(){return maximumAllowedRepeatOverlap;}
-//    public void setMaximumAllowedRepeatOverlap(Integer maximumAllowedRepeatOverlap) {this.maximumAllowedRepeatOverlap=maximumAllowedRepeatOverlap; }
 
     public Integer marginSize =null;
     public int getMarginSize(){return marginSize;}
@@ -146,10 +143,6 @@ public class Model implements Serializable {
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
     public void setTargetGenesPath(String path){this.targetGenesPath=path; }
     public String getTargetGenesPath() { return this.targetGenesPath; }
-//    public String getTranscriptsURL() {
-//        return transcriptsURL;
-//    }
-//    public void setTranscriptsURL(String url) {this.transcriptsURL=url; }
 
     private String transcriptsBasename = null;
     public String getTranscriptsBasename() {
@@ -160,6 +153,7 @@ public class Model implements Serializable {
 
     public Model() {
         this.genome=new HumanHg19(); /* the default genome */
+        this.chosenEnzymelist=new ArrayList<>(); /* empty list for enzymes that have been chosen by user */
         initializeEnzymesFromFile();
     }
 

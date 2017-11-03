@@ -46,11 +46,8 @@ public class SwitchScreens {
         model.setYdim(screenHeight);
         logger.trace(String.format("Setting dimensions to x=%d y=%d",screenWidth,screenHeight ));
         presenter.setModel(model);
-        Scene scene = new Scene(appView.getView());
-        this.primarystage.setScene(scene);
-        this.primarystage.centerOnScreen();
-        this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
-        this.primarystage.show();
+        setupStage(appView,name);
+
     }
 
     public void openExistingModel(String name) {
@@ -82,19 +79,27 @@ public class SwitchScreens {
         model.setYdim(screenHeight);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.getProjectName());
-        if (presenter==null){
-            logger.fatal("Presenter was null ponter");
-            return;
-        }
         if (model.viewpointsInitialized()) {
             presenter.refreshViewPoints();
         }
+        setupStage(appView,name);
+    }
+
+
+
+    private void setupStage(VPVMainView appView, String name) {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.centerOnScreen();
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
         this.primarystage.show();
     }
+
+
+
+
+
+
 
     /**
      * This function needs to be called before creating a new model or opening an old one. The dimensions of the

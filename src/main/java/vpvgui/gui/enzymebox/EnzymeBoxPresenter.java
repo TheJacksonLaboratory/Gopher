@@ -60,6 +60,10 @@ public class EnzymeBoxPresenter implements Initializable {
      * @param chosenEnzymes List of enzymes previously chosen by the user (if any)
      */
     public void initializeEnzymes(List<RestrictionEnzyme> enzymes, List<RestrictionEnzyme> chosenEnzymes) {
+        if (chosenEnzymes==null) {
+            logger.error("chosen enzyme list not initialized. Will set it to an empty list");
+            chosenEnzymes=new ArrayList<>();
+        }
         for (RestrictionEnzyme re : enzymes) {
             String label = re.getLabel();
             CheckBox cb = new CheckBox(label);
