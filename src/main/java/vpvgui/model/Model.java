@@ -113,18 +113,18 @@ public class Model implements Serializable {
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
     /** The length of a probe that will be used to enrich a restriction fragment within a viewpoint. */
-    private int probeLength;
+    private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
-
-    private Integer tilingFactor =null;
+    /** This is the number of times we will tile the target regions with probes. */
+    private Integer tilingFactor =Default.TILING_FACTOR;
     public int getTilingFactor(){return tilingFactor; }
     public void setTilingFactor(Integer tilingFactor) {
         logger.trace(String.format("Setting tiling factor to %d",tilingFactor));
         this.tilingFactor=tilingFactor;
     }
 
-    public Integer marginSize =null;
+    public Integer marginSize =Default.MARGIN_SIZE;
     public int getMarginSize(){return marginSize;}
     public void setMarginSize(Integer s) {this.marginSize=s; }
 
@@ -162,14 +162,14 @@ public class Model implements Serializable {
     /** This method should be called when we create a new Model and want to use default settings.
      */
     public void setDefaultValues() {
-        setSizeUp(Default.SIZE_UPSTREAM);
-        setSizeDown(Default.SIZE_DOWNSTREAM);
-        setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
-        setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
-        setProbeLength(Default.PROBE_LENGTH);
-        setTilingFactor(Default.TILING_FACTOR);
-        setMarginSize(Default.MARGIN_SIZE);
-        setGenomeBuild(Default.GENOME_BUILD);
+//        setSizeUp(Default.SIZE_UPSTREAM);
+//        setSizeDown(Default.SIZE_DOWNSTREAM);
+//        setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
+//        setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
+//        setProbeLength(Default.PROBE_LENGTH);
+//        setTilingFactor(Default.TILING_FACTOR);
+//        setMarginSize(Default.MARGIN_SIZE);
+//        setGenomeBuild(Default.GENOME_BUILD);
     }
 
     /** @return List of enzymes for the user to choose from. */
