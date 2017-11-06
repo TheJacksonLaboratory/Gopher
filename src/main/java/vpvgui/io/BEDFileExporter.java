@@ -92,6 +92,7 @@ public class BEDFileExporter {
         // print genomic positions
         out_allTracks.println("track name='" + "VPV: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
+            if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s",
                     vp.getReferenceID(),
                     vp.getGenomicPos(),
@@ -102,6 +103,7 @@ public class BEDFileExporter {
         // print viewpoints
         out_allTracks.println("track name='" + "VPV: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
+            if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
                     vp.getReferenceID(),
                     (vp.getStartPos()-1),
@@ -114,6 +116,7 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
         Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragments
         for (ViewPoint vp : viewpointlist) {
+            if(vp.getNumOfSelectedFrags()==0) {continue;}
             int k=0; // index of selected fragment
             for (Segment segment : vp.getActiveSegments()) {
                 k++;
