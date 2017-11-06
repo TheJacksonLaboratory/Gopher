@@ -18,16 +18,16 @@ public class Default {
 
 
     /** Minimum allowable GC content (in percent) */
-    public final static double MIN_GC_CONTENT=25.0;
+    public final static double MIN_GC_CONTENT=0.25;
     /** Maximum allowable GC content (in percent) */
-    public final static double MAX_GC_CONTENT=65.0;
+    public final static double MAX_GC_CONTENT=0.65;
 
 
     public final static int TILING_FACTOR = 1;
 
     public final static int MINIMUM_FRAGMENT_SIZE = 120;
     /** Maximum allowable repeat content (in percent). */
-    public final static double MAXIMUM_REPEAT_CONTENT = 70.0;
+    public final static double MAXIMUM_REPEAT_CONTENT = 0.70;
 
     public final static int MARGIN_SIZE = 250;
 

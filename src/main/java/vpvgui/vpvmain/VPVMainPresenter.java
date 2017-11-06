@@ -321,15 +321,16 @@ public class VPVMainPresenter implements Initializable {
     public void setModelInMainAndInAnalysisPresenter(Model mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
+        logger.trace("setModelInMainAndInAnalysisPresenter");
         if (model.getMaxGCcontent()>0){
-            this.maxGCContentTextField.setText(String.format("%.2f",model.getMaxGCContentPercent()));
+            this.maxGCContentTextField.setText(String.format("%.1f%%",model.getMaxGCContentPercent()));
         } else {
-            this.maxGCContentTextField.setPromptText(String.format("%.2f",Default.MAX_GC_CONTENT));
+            this.maxGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAX_GC_CONTENT));
         }
         if (model.getMinGCcontent()>0) {
-            this.minGCContentTextField.setText(String.format("%.2f",model.getMinGCContentPercent()));
+            this.minGCContentTextField.setText(String.format("%.f%%",model.getMinGCContentPercent()));
         } else {
-            this.minGCContentTextField.setPromptText(String.format("%.2f",Default.MIN_GC_CONTENT));
+            this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
         }
         if (model.getMinFragSize()>0) {
             this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
@@ -337,9 +338,9 @@ public class VPVMainPresenter implements Initializable {
             this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         }
         if (model.getMaxRepeatContent()>0) {
-            this.maxRepContentTextField.setText(String.format("%.2f",model.getMaxRepeatContentPercent()));
+            this.maxRepContentTextField.setText(String.format("%.1f%%",model.getMaxRepeatContentPercent()));
         } else {
-            this.maxRepContentTextField.setPromptText(String.format("%.2f",Default.MAXIMUM_REPEAT_CONTENT));
+            this.maxRepContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAXIMUM_REPEAT_CONTENT));
         }
         if (model.getSizeUp()>0) {
             this.sizeUpTextField.setText(String.format("%d",model.getSizeUp()));
@@ -366,12 +367,13 @@ public class VPVMainPresenter implements Initializable {
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
+        logger.trace("Initializing prompts");
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
-        this.minGCContentTextField.setPromptText(String.format("%.1f %%",Default.MIN_GC_CONTENT));
-        this.maxGCContentTextField.setPromptText(String.format("%.1f %%",Default.MAX_GC_CONTENT));
+        this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
+        this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
-        this.maxRepContentTextField.setPromptText(String.format("%.1f %%",Default.MAXIMUM_REPEAT_CONTENT));
+        this.maxRepContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAXIMUM_REPEAT_CONTENT));
     }
 
     /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
@@ -382,20 +384,31 @@ public class VPVMainPresenter implements Initializable {
         Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
         Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxRepeatContentProperty(),converter);
         Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
-        Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxGCcontentProperty(),converter);
+        Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
+        sizeDownTextField.clear();
+        sizeUpTextField.clear();
+        minFragSizeTextField.clear();
+        maxRepContentTextField.clear();
+        minGCContentTextField.clear();
+        maxGCContentTextField.clear();
+
     }
 
     /** This method should be called before we create viewpoints. It updates all of the variables in our model object
      * to have the values specified in the user for the GUI, including the values of the six fields we show in the GUI
-     * and that are bound in {@link #setBindings()}.
+     * and that are bound in {@link #setBindings()}. Note that we store GC and repeat content as a proportion in
+     * {@link Model} but display it as a proportion in the GUI.
      */
     private void updateModel() {
         this.model.setSizeDown(getSizeDown());
         this.model.setSizeUp(getSizeUp());
         this.model.setMinFragSize(getMinFragSize());
-        this.model.setMaxRepeatContent(getMaxRepeatContent()/100);
-        this.model.setMinGCcontent(getMinGCcontent()/100);
-        this.model.setMaxGCcontent(getMaxGCcontent()/100);
+        double repeatProportion=getMaxRepeatContent()/100;
+        this.model.setMaxRepeatContent(repeatProportion);
+        double minGCproportion = getMinGCcontent()/100;
+        this.model.setMinGCcontent(minGCproportion);
+        double maxGCproportion = getMaxGCcontent()/100;
+        this.model.setMaxGCcontent(maxGCproportion);
     }
 
 
@@ -934,6 +947,9 @@ public class VPVMainPresenter implements Initializable {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open VPV project file");
         File file = chooser.showOpenDialog(null);
+        if (file==null) { /** Null pointer returned if user clicks on cancel. In this case, just do nothing. */
+            return;
+        }
         try {
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
             setModelInMainAndInAnalysisPresenter(this.model);
