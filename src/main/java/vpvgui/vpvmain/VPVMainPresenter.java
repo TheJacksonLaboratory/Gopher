@@ -139,22 +139,22 @@ public class VPVMainPresenter implements Initializable {
     @FXML RadioMenuItem tiling3;
     @FXML RadioMenuItem tiling4;
     @FXML RadioMenuItem tiling5;
-    @FXML private Button showButton;
-    @FXML private Button exitButton;
-    @FXML private Button enterGeneListButton;
-    @FXML private Button createCaptureProbesButton;
+//    @FXML private Button showButton;
+//    @FXML private Button exitButton;
+//    @FXML private Button enterGeneListButton;
+//    @FXML private Button createCaptureProbesButton;
 
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
-    @FXML private Tab setuptab;
-    @FXML private Menu helpMenu;
-    @FXML private MenuItem showSettingsCurrentProject;
-    @FXML private MenuItem helpMenuItem;
-    @FXML private MenuItem openHumanGeneWindow;
-    @FXML private MenuItem openMouseGeneWindow;
-    @FXML private MenuItem openRatGeneWindow;
-    @FXML private MenuItem openFlyGeneWindow;
-    @FXML private MenuItem exportBEDFilesMenuItem;
+//    @FXML private Tab setuptab;
+//    @FXML private Menu helpMenu;
+//    @FXML private MenuItem showSettingsCurrentProject;
+//    @FXML private MenuItem helpMenuItem;
+//    @FXML private MenuItem openHumanGeneWindow;
+//    @FXML private MenuItem openMouseGeneWindow;
+//    @FXML private MenuItem openRatGeneWindow;
+//    @FXML private MenuItem openFlyGeneWindow;
+//    @FXML private MenuItem exportBEDFilesMenuItem;
     /** The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints. */
     @FXML private Tab analysistab;
     /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
@@ -672,6 +672,8 @@ public class VPVMainPresenter implements Initializable {
 
 
     /**
+     * This method is run after user clicks on 'Close' item of File|Menu. User is prompted to confirm the closing and
+     * window is closed if 'yes' is selected.
      * @param e Event triggered by close command.
      */
     public void closeWindow(ActionEvent e) {
@@ -679,8 +681,8 @@ public class VPVMainPresenter implements Initializable {
         if (answer) {
             logger.info("Closing VPV Gui");
             serialize();
+            javafx.application.Platform.exit();
         }
-        javafx.application.Platform.exit();
     }
 
     public void refreshViewPoints() {
