@@ -13,14 +13,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="1000.0" pannable="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
+
+<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vpvgui.gui.viewpointpanel.ViewPointPresenter">
    <content>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+      <SplitPane dividerPositions="0.5" minHeight="510.0" minWidth="1165.0" orientation="VERTICAL">
         <items>
             <WebView fx:id="ucscContentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
             <VBox>
                <children>
-                  <GridPane prefHeight="60.0" VBox.vgrow="NEVER">
+                  <GridPane>
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -29,9 +30,9 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints minHeight="40.0" percentHeight="0.0" />
                     </rowConstraints>
                      <children>
                         <Label fx:id="viewpointScoreLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" />
@@ -40,7 +41,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                            <GridPane.margin>
-                              <Insets left="10.0" right="10.0" />
+                              <Insets />
                            </GridPane.margin>
                         </Button>
                         <Button fx:id="zoomInButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#zoomIn" prefHeight="30.0" prefWidth="90.0" text="Zoom In" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
@@ -66,22 +67,18 @@
                         <Label fx:id="viewpointExplanationLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-                     <content>
-                        <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="1000.0">
-                          <columns>
-                            <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="90.0" text="Select" />
-                              <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="220.0" text="Location" />
-                              <TableColumn fx:id="segmentLengthColumn" prefWidth="75.0" text="Length" />
-                              <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Repeat content" />
-                              <TableColumn fx:id="repeatContentUp" prefWidth="175.0" text="Repeat content (up)" />
-                              <TableColumn fx:id="repeatContentDown" prefWidth="200.0" text="Repeat content (down)" />
-                              <TableColumn fx:id="gcContentTableColumn" prefWidth="125.0" text="GC Content" />
-                              <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
-                          </columns>
-                        </TableView>
-                     </content>
-                  </ScrollPane>
+                  <TableView fx:id="segmentsTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="1000.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" resizable="false" text="Select" />
+                        <TableColumn fx:id="locationTableColumn" editable="false" minWidth="250.0" prefWidth="250.0" text="Location" />
+                        <TableColumn fx:id="segmentLengthColumn" minWidth="160.0" prefWidth="160.0" text="Length" />
+                        <TableColumn fx:id="inRepetitiveTableColumn" editable="false" minWidth="175.0" prefWidth="175.0" text="Repeat content" />
+                        <TableColumn fx:id="repeatContentUp" minWidth="175.0" prefWidth="175.0" text="Repeat content (up)" />
+                        <TableColumn fx:id="repeatContentDown" minWidth="200.0" prefWidth="200.0" text="Repeat content (down)" />
+                        <TableColumn fx:id="gcContentTableColumn" minWidth="125.0" prefWidth="125.0" text="GC Content" />
+                        <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
+                    </columns>
+                  </TableView>
                </children>
             </VBox>
         </items>
