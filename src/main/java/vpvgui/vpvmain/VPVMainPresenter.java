@@ -327,7 +327,7 @@ public class VPVMainPresenter implements Initializable {
             this.maxGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAX_GC_CONTENT));
         }
         if (model.getMinGCcontent()>0) {
-            this.minGCContentTextField.setText(String.format("%.f%%",model.getMinGCContentPercent()));
+            this.minGCContentTextField.setText(String.format("%.1f%%",model.getMinGCContentPercent()));
         } else {
             this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
         }

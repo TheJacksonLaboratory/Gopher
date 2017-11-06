@@ -125,43 +125,43 @@
                                 </rowConstraints>
                                  <children>
                                     <Label text="Approach">
-                                       <padding>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </padding>
+                                       <GridPane.margin>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </GridPane.margin>
                                     </Label>
                                     <Label text="Genome build" GridPane.rowIndex="1">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Label prefHeight="16.0" prefWidth="121.0" text="Genome" GridPane.rowIndex="2">
+                                    <Label text="Genome" GridPane.rowIndex="2">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Label prefHeight="18.0" prefWidth="228.0" text="Decompress genome" GridPane.rowIndex="3">
+                                    <Label text="Decompress genome" GridPane.rowIndex="3">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label text="Index Genome FASTA" GridPane.rowIndex="4">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label text="Restriction enzyme(s)" GridPane.rowIndex="6">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label text="Target genes" GridPane.rowIndex="7">
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1">
@@ -240,6 +240,9 @@
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin></Label>
                                  </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
                               </GridPane>
                               <Separator minHeight="50.0" minWidth="830.0" styleClass="grid" />
                               <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
@@ -261,7 +264,7 @@
                                           <Tooltip text="Number of nucleotides 5' of the target start position in which fragments will be sought" wrapText="true" />
                                        </tooltip>
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label text="Minimum fragment size" GridPane.rowIndex="1">
@@ -269,7 +272,7 @@
                                           <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
                                        </tooltip>
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label text="Minimum GC content (%)" GridPane.rowIndex="2">
@@ -277,7 +280,7 @@
                                           <Tooltip text="Minimum percent GC content for a fragment to be selected" />
                                        </tooltip>
                                        <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500" GridPane.columnIndex="1">
