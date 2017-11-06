@@ -498,7 +498,7 @@ public class ViewPoint implements Serializable {
             restrictionSegmentList.clear(); /* no fragments */
         } else {
 
-            // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in upstream direction
+            // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
             double gc = centerSegment.getGCcontent();
             double repeatUp = centerSegment.getRepeatContentMarginUp();
             double repeatDown = centerSegment.getRepeatContentMarginDown();
