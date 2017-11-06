@@ -108,7 +108,8 @@ public class ViewPoint implements Serializable {
     private static final double SIMPLE_APPROACH_MIN_GC=0.25;
     /** Maximum allowable GC content for simple approach */
     private static final double SIMPLE_APPROACH_MAX_GC=0.65;
-
+    /** Maximum allowable repetitive content for simple approach */
+    private static final double SIMPLE_APPROACH_MAX_REPEAT=0.30;
 
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
@@ -499,11 +500,14 @@ public class ViewPoint implements Serializable {
 
             // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
             double gc = centerSegment.getGCcontent();
+            double repeatUp = centerSegment.getRepeatContentMarginUp();
+            double repeatDown = centerSegment.getRepeatContentMarginDown();
             int length = centerSegment.length();
             if (gc >= SIMPLE_APPROACH_MIN_GC
                     && gc <= SIMPLE_APPROACH_MAX_GC
                     && length >= SIMPLE_APPROACH_MINSIZE
-                    && length <= SIMPLE_APPROACH_MAXSIZE) {
+                    && length <= SIMPLE_APPROACH_MAXSIZE
+                    && repeatUp <= SIMPLE_APPROACH_MAX_REPEAT) {
                 List<Segment> newsegs = new ArrayList<>();
                 centerSegment.setSelected(true);
                 setEndPos(centerSegment.getEndPos());
