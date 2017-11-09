@@ -311,6 +311,20 @@ public class ViewPointPresenter implements Initializable {
         gcContentTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getGCcontentAsPercent())));
         gcContentTableColumn.setComparator(new PercentComparator());
+        gcContentTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+            // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) { // here, item is String like '40.00%'
+                    setText(item);
+                    double gc = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                    if (gc < model.getMinGCcontent() || gc > model.getMaxGCcontent()) { // GC content is like 0.25
+                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    }
+                }
+            }
+        });
         vpScoreProperty=new SimpleStringProperty();
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
