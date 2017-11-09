@@ -24,6 +24,8 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     /** The total number of genes for which we are making viewpoints. This number is only used for the progress
      * bar (Some genes have multiple transcription start sites and so one gene may have multiple ViewPoints)..*/
     private int n_totalGenes;
+
+    private int n_total_promoters;
     /** Referece to the model with all project data. */
     protected Model model = null;
     /** This is used to show the name of the current Gene on the viewpoint creation dialog. */
@@ -68,6 +70,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     protected void assignVPVGenesToChromosomes(List<VPVGene> vgenes) {
         this.chromosomes = new HashMap<>();
         n_totalGenes =0;
+        this.n_total_promoters=0;
         for (VPVGene g : vgenes) {
             String referenceseq = g.getContigID();
             ChromosomeGroup group = null;
@@ -79,6 +82,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
             }
             group.addVPVGene(g);
             n_totalGenes++;
+            n_total_promoters += g.n_viewpointstarts();
         }
     }
 
@@ -91,4 +95,6 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     protected int getTotalGeneCount() {
         return n_totalGenes;
     }
+
+    protected int getTotalPromoterCount() {return n_total_promoters; }
 }

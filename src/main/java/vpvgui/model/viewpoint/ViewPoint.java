@@ -105,11 +105,11 @@ public class ViewPoint implements Serializable {
     /** Maximim allowable fragment size for simple approach */
     private static final int SIMPLE_APPROACH_MAXSIZE=20000;
     /** Minimum allowable GC content for simple approach */
-    private static final double SIMPLE_APPROACH_MIN_GC=0.25;
-    /** Maximum allowable GC content for simple approach */
-    private static final double SIMPLE_APPROACH_MAX_GC=0.65;
-    /** Maximum allowable repetitive content for simple approach */
-    private static final double SIMPLE_APPROACH_MAX_REPEAT=0.30;
+//    private static final double SIMPLE_APPROACH_MIN_GC=0.25;
+//    /** Maximum allowable GC content for simple approach */
+//    private static final double SIMPLE_APPROACH_MAX_GC=0.65;
+//    /** Maximum allowable repetitive content for simple approach */
+//    private static final double SIMPLE_APPROACH_MAX_REPEAT=0.30;
 
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
@@ -503,11 +503,12 @@ public class ViewPoint implements Serializable {
             double repeatUp = centerSegment.getRepeatContentMarginUp();
             double repeatDown = centerSegment.getRepeatContentMarginDown();
             int length = centerSegment.length();
-            if (gc >= SIMPLE_APPROACH_MIN_GC
-                    && gc <= SIMPLE_APPROACH_MAX_GC
+            if (gc >= minGcContent
+                    && gc <= maxGcContent
                     && length >= SIMPLE_APPROACH_MINSIZE
                     && length <= SIMPLE_APPROACH_MAXSIZE
-                    && repeatUp <= SIMPLE_APPROACH_MAX_REPEAT) {
+                    && repeatUp <= maximumRepeatContent
+                    && repeatDown <= maximumRepeatContent) {
                 List<Segment> newsegs = new ArrayList<>();
                 centerSegment.setSelected(true);
                 setEndPos(centerSegment.getEndPos());

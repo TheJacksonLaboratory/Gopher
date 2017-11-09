@@ -20,8 +20,9 @@ import java.util.List;
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
-
+    /** Total number of viewpoints */
     private int total;
+    /** Index of current viewpoint */
     private int i;
 
 
@@ -70,9 +71,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             } else {
                 logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
             }
-
         }
-
     }
 
 
@@ -88,7 +87,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
         }
-        this.total = getTotalGeneCount();
+        this.total = getTotalPromoterCount();
         this.i = 0;
         logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
@@ -100,26 +99,22 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 logger.error("Could not retrieve faidx file for " + referenceSequenceID);
                 throw new VPVException(String.format("Could not retrieve FASTA index file for ", referenceSequenceID));
             }
-            logger.trace("Got RefID=" + referenceSequenceID);
-
             group.getGenes().parallelStream().forEach(vpvGene -> {
                 calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
             });
-            // group.getGenes().stream().forEach(vpvGene -> {calculateViewPoints(vpvGene,referenceSequenceID,fastaReader);});
-
         }
         long end = milli - System.currentTimeMillis();
-        logger.trace(String.format("Parallel It took %.1f sec", end / 1000.0));
+        logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
         this.model.setViewPoints(viewpointlist);
         return null;
     }
 
-
+    /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
     private void updateLabelText(StringProperty sb, String msg) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                sb.setValue(String.format("Creating view point for %s", msg));
+                sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg));
             }
         });
     }

@@ -2,6 +2,8 @@ package vpvgui.vpvmain;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -111,12 +113,10 @@ public class VPVMainPresenter implements Initializable {
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
 
-    //@FXML private TextField fragNumUpTextField;
-    //@FXML private TextField fragNumDownTextField;
+    @FXML private Label sizeUpLabel;
+    @FXML private Label sizeDownLabel;
     @FXML private TextField sizeUpTextField;
-    //@FXML private TextField maxSizeUpTextField;
     @FXML private TextField sizeDownTextField;
-//    @FXML private TextField maxSizeDownTextField;
     @FXML private TextField minFragSizeTextField;
     @FXML private TextField maxRepContentTextField;
     @FXML private TextField minGCContentTextField;
@@ -242,8 +242,10 @@ public class VPVMainPresenter implements Initializable {
         genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             setGenomeBuild(newValue);
         });
+        // The following will initialize the GUI to the simple approach
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
+        setGUItoSimple();
         approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             this.approachLabel.setText(newValue);
         });
@@ -265,7 +267,37 @@ public class VPVMainPresenter implements Initializable {
         tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
 
+        this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+                String selectedItem=approachChoiceBox.getItems().get((Integer) number2);
+                if (selectedItem.equals("Simple")) {
+                    setGUItoSimple();
+                } else if (selectedItem.equals("Extended")) {
+                    setGUItoExtended();
+                } else {
+                    logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
+                }
+            }
+        });
+
     }
+
+    /** makes the upstream and downstream size fields invisible because they are irrelevant to the simple approach.*/
+    private void setGUItoSimple() {
+        this.sizeUpTextField.setVisible(false);
+        this.sizeDownTextField.setVisible(false);
+        this.sizeDownLabel.setVisible(false);
+        this.sizeUpLabel.setVisible(false);
+    }
+    /** makes the upstream and downstream size fields visible because they are needed for the extended approach.*/
+    private void setGUItoExtended() {
+        this.sizeUpTextField.setVisible(true);
+        this.sizeDownTextField.setVisible(true);
+        this.sizeDownLabel.setVisible(true);
+        this.sizeUpLabel.setVisible(true);
+    }
+
 
     private void setInitializedValuesInGUI() {
         String genomebuild=model.getGenomeBuild();

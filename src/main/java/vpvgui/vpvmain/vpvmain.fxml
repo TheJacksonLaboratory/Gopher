@@ -259,7 +259,7 @@
                                     <RowConstraints minHeight="45.0" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="Upstream size">
+                                    <Label fx:id="sizeUpLabel" text="Upstream size">
                                        <tooltip>
                                           <Tooltip text="Number of nucleotides 5' of the target start position in which fragments will be sought" wrapText="true" />
                                        </tooltip>
@@ -286,11 +286,17 @@
                                     <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500" GridPane.columnIndex="1">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
+                                       </GridPane.margin>
+                                       <tooltip>
+                                          <Tooltip text="Range (5')  to search for fragments (only used in extended approach)" />
+                                       </tooltip></TextField>
                                     <TextField fx:id="sizeDownTextField" minHeight="30.0" promptText="5000" GridPane.columnIndex="3">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
+                                       </GridPane.margin>
+                                       <tooltip>
+                                          <Tooltip text="Range (3') to search for fragments (only used in extended approach)" />
+                                       </tooltip></TextField>
                                     <TextField fx:id="minFragSizeTextField" minHeight="30.0" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -307,7 +313,7 @@
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin></TextField>
-                                    <Label text="Downstream size" GridPane.columnIndex="2">
+                                    <Label fx:id="sizeDownLabel" text="Downstream size" GridPane.columnIndex="2">
                                        <tooltip>
                                           <Tooltip text="Number of nucleotides 3' of the target start position in which fragments will be sought" />
                                        </tooltip>
