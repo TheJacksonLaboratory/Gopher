@@ -493,7 +493,7 @@ public class ViewPoint implements Serializable {
                 orElse(null);
 
         if (centerSegment == null) {
-            logger.error("At least one fragment must contain 'genomicPos' (" + referenceSequenceID + ":" + startPos + "-" + endPos + ").");
+            logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), referenceSequenceID , startPos , endPos ));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
