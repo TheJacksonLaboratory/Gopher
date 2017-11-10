@@ -428,18 +428,19 @@ public class VPVMainPresenter implements Initializable {
     /** This method should be called before we create viewpoints. It updates all of the variables in our model object
      * to have the values specified in the user for the GUI, including the values of the six fields we show in the GUI
      * and that are bound in {@link #setBindings()}. Note that we store GC and repeat content as a proportion in
-     * {@link Model} but display it as a proportion in the GUI.
+     * {@link Model} but display it as a proportion in the GUI. The default values are used for any fields that have not
+     * been filled in by the user.
      */
     private void updateModel() {
-        this.model.setSizeDown(getSizeDown());
-        this.model.setSizeUp(getSizeUp());
-        this.model.setMinFragSize(getMinFragSize());
+        this.model.setSizeDown(getSizeDown()>0?getSizeDown():Default.SIZE_DOWNSTREAM);
+        this.model.setSizeUp(getSizeUp()>0?getSizeUp():Default.SIZE_UPSTREAM);
+        this.model.setMinFragSize(getMinFragSize()>0?getMinFragSize():Default.MINIMUM_FRAGMENT_SIZE);
         double repeatProportion=getMaxRepeatContent()/100;
-        this.model.setMaxRepeatContent(repeatProportion);
+        this.model.setMaxRepeatContent(repeatProportion>0?repeatProportion:Default.MAXIMUM_REPEAT_CONTENT);
         double minGCproportion = getMinGCcontent()/100;
-        this.model.setMinGCcontent(minGCproportion);
+        this.model.setMinGCcontent(minGCproportion>0?minGCproportion:Default.MIN_GC_CONTENT);
         double maxGCproportion = getMaxGCcontent()/100;
-        this.model.setMaxGCcontent(maxGCproportion);
+        this.model.setMaxGCcontent(maxGCproportion>0?maxGCproportion:Default.MAX_GC_CONTENT);
     }
 
 
@@ -694,9 +695,7 @@ public class VPVMainPresenter implements Initializable {
                     "Exception encountered while attempting to create viewpoints",
                     exc);
         });
-        logger.trace("About to run task");
         new Thread(task).start();
-        logger.trace("Past");
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
     }

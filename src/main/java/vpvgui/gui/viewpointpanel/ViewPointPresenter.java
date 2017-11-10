@@ -1,7 +1,5 @@
 package vpvgui.gui.viewpointpanel;
 
-import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
-import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -31,13 +29,10 @@ import vpvgui.model.viewpoint.ViewPoint;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
-import static vpvgui.util.Utils.join;
 
 /**
  * This class acts as a controller of the TabPanes which display individual ViewPoints.
@@ -81,8 +76,8 @@ public class ViewPointPresenter implements Initializable {
     @FXML private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
     @FXML private TableColumn<ColoredSegment, String> locationTableColumn;
     @FXML private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
-    @FXML private TableColumn<ColoredSegment, String> repeatContentUp;
-    @FXML private TableColumn<ColoredSegment, String> repeatContentDown;
+    @FXML private TableColumn<ColoredSegment, String> repeatContentUpColumn;
+    @FXML private TableColumn<ColoredSegment, String> repeatContentDownColumn;
     @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
     @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
@@ -296,18 +291,58 @@ public class ViewPointPresenter implements Initializable {
         locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getChromosomalPositionString())));
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
+
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepeatContentAsPercent())));
         inRepetitiveTableColumn.setComparator(new PercentComparator());
+        // the following causes the contents of the repeat cell to be shown in red if the repeat threshold is surpassed.
+        inRepetitiveTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item,empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                    if (rp > model.getMaxRepeatContent()) {
+                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    }
+                }
+            }
+        });
 
-        repeatContentUp.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+        repeatContentUpColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginUpAsPercent())));
-        repeatContentUp.setComparator(new PercentComparator());
-        repeatContentDown.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+        repeatContentUpColumn.setComparator(new PercentComparator());
+        repeatContentUpColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item,empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                    if (rp > model.getMaxRepeatContent()) {
+                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    }
+                }
+            }
+        });
+        repeatContentDownColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginDownAsPercent())));
-        repeatContentDown.setComparator(new PercentComparator());
-
+        repeatContentDownColumn.setComparator(new PercentComparator());
+        repeatContentDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item,empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                    if (rp > model.getMaxRepeatContent()) {
+                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    }
+                }
+            }
+        });
         gcContentTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getGCcontentAsPercent())));
         gcContentTableColumn.setComparator(new PercentComparator());

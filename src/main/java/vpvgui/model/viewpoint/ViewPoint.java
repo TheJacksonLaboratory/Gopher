@@ -101,15 +101,10 @@ public class ViewPoint implements Serializable {
     /** Overall score of this Viewpoint.*/
     private double score;
     /** Minimum allowable fragment size for the simple approach */
-    private static final int SIMPLE_APPROACH_MINSIZE=146;
+   // private static final int SIMPLE_APPROACH_MINSIZE=146;
     /** Maximim allowable fragment size for simple approach */
     private static final int SIMPLE_APPROACH_MAXSIZE=20000;
-    /** Minimum allowable GC content for simple approach */
-//    private static final double SIMPLE_APPROACH_MIN_GC=0.25;
-//    /** Maximum allowable GC content for simple approach */
-//    private static final double SIMPLE_APPROACH_MAX_GC=0.65;
-//    /** Maximum allowable repetitive content for simple approach */
-//    private static final double SIMPLE_APPROACH_MAX_REPEAT=0.30;
+
 
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
@@ -399,7 +394,7 @@ public class ViewPoint implements Serializable {
 
         for (Segment segment : restrictionSegmentList) {
             if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
-                centerSegment = segment; break;
+                centerSegment = segment; segment.setOverlapsTSS(true); break;
             }
         }
         if (centerSegment==null) {
@@ -492,23 +487,24 @@ public class ViewPoint implements Serializable {
                 findFirst().
                 orElse(null);
 
+
         if (centerSegment == null) {
             logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), referenceSequenceID , startPos , endPos ));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
-
+            centerSegment.setOverlapsTSS(true);
             // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
             double gc = centerSegment.getGCcontent();
             double repeatUp = centerSegment.getRepeatContentMarginUp();
             double repeatDown = centerSegment.getRepeatContentMarginDown();
             int length = centerSegment.length();
-            if (gc >= minGcContent
-                    && gc <= maxGcContent
-                    && length >= SIMPLE_APPROACH_MINSIZE
+            if (gc >= this.minGcContent
+                    && gc <= this.maxGcContent
+                    && length >= this.minFragSize
                     && length <= SIMPLE_APPROACH_MAXSIZE
-                    && repeatUp <= maximumRepeatContent
-                    && repeatDown <= maximumRepeatContent) {
+                    && repeatUp <= this.maximumRepeatContent
+                    && repeatDown <= this.maximumRepeatContent) {
                 List<Segment> newsegs = new ArrayList<>();
                 centerSegment.setSelected(true);
                 setEndPos(centerSegment.getEndPos());

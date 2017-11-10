@@ -17,8 +17,17 @@ import java.util.ArrayList;
  */
 public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
+
+    public boolean isOverlapsTSS() {
+        return overlapsTSS;
+    }
+
+    public void setOverlapsTSS(boolean overlapsTSS) {
+        this.overlapsTSS = overlapsTSS;
+    }
+
     /** serialization version ID */
-    static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 2L;
     /** The id of the larger sequence where this Segment is located (usually a chromosome).*/
     private String referenceSequenceID;
     /** The most 5' position of this Segment on the {@link #referenceSequenceID}. */
@@ -37,6 +46,8 @@ public class Segment implements Serializable {
     private double GCcontent;
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
+    /** Is this fragment overlapping the TSS, i.e., it is the center fragment? */
+    private boolean overlapsTSS=false;
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
     private static DecimalFormat formatter = new DecimalFormat("#,###");
 
@@ -219,7 +230,11 @@ public class Segment implements Serializable {
     public String getChromosomalPositionString() {
         String s=formatter.format(startPos);
         String e=formatter.format(endPos);
-        return String.format("%s:%s-%s",referenceSequenceID,s,e);
+        String location=String.format("%s:%s-%s",referenceSequenceID,s,e);
+        if (overlapsTSS)
+            return String.format("%s (*)",location);
+        else
+            return location;
     }
 
 
