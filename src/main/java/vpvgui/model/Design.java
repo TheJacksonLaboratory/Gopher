@@ -32,8 +32,10 @@ public class Design {
     private double avgVPscore;
 
     private double avgVPsize;
-
-
+    /** Number of successful (resolved) viewpoints, defined as having at least one active fragment. */
+    private int n_resolvedViewpoints;
+    /** Number of genes with at least one resolved viewpoint (see {@link #n_resolvedViewpoints}. */
+    private int n_resolvedGenes;
 
     private Model model=null;
 
@@ -65,6 +67,14 @@ public class Design {
         return avgVPsize;
     }
 
+    public int getN_resolvedViewpoints() {
+        return n_resolvedViewpoints;
+    }
+
+    public int getN_resolvedGenes() {
+        return n_resolvedGenes;
+    }
+
     public Design(Model mod) {
 
         this.model=mod;
@@ -79,11 +89,12 @@ public class Design {
 
     /**
      * Model has the list of ViewPoints and also the parameters for tiling, probe length etc.
-     * So we do not need to pass anything to this function
-     * @return
+     * So we do not need to pass anything to this functions.
      */
     public void calculateDesignParameters() {
-
+        Set<String> genesWithValidViewPoint = new HashSet<>(); // set of genes with at least one valid viewpoint
+        // valid is defined as with at least one active segment
+        n_resolvedViewpoints=0;
         List<ViewPoint> viewPointList = model.getViewPointList();
         //System.out.println(viewPointList.size());
         int probeLength = model.getProbeLength();
@@ -97,10 +108,18 @@ public class Design {
             uniqueGeneSymbols.add(vp.getTargetName());
             avgVPscore += vp.getScore();
             avgVPsize += vp.getTotalLengthOfViewpoint();
+            if (vp.getResolved()) {
+                uniqueGeneSymbols.add(vp.getTargetName());
+            }
+            if (vp.hasValidProbe()) {
+                n_resolvedViewpoints++;
+                genesWithValidViewPoint.add(vp.getTargetName());
+            }
         });
 
         this.n_genes=uniqueGeneSymbols.size();
         this.n_viewpoints=viewPointList.size();
+        this.n_resolvedGenes=genesWithValidViewPoint.size();
 
         this.n_unique_fragments=uniqueRestrictionFragments.size();
 
@@ -108,7 +127,6 @@ public class Design {
 
         uniqueRestrictionFragments.stream().forEach(segment -> {
                     n_nucleotides_in_probes += Math.min(2*probeLength,segment.length());
-
                 });
         if (n_viewpoints>0) {
             this.avgFragmentsPerVP = (double) n_unique_fragments / (double) n_viewpoints;

@@ -89,7 +89,8 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         Design design = new Design(this.model);
         design.calculateDesignParameters();
        String lst = getHTMLTable(design,model.getTilingFactor());
-        return String.format("%s\n%s\n%s\n", String.format(HTML_HEADER,getCSSblock()), lst, HTML_FOOTER);
+       String expl = getEvaluationHTML(design);
+        return String.format("%s\n%s\n%s\n%s\n", String.format(HTML_HEADER,getCSSblock()), lst,expl, HTML_FOOTER);
     }
 
 
@@ -124,7 +125,22 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
                 total_active_frags, avg_size,  dformater.format(totalEffectiveNucleotides/100)));
         sb.append("</tbody>\n</table>");
         return sb.toString();
+    }
 
+
+
+    private static String getEvaluationHTML(Design design) {
+        int resolvedVP = design.getN_resolvedViewpoints();
+        int resolvedGenes = design.getN_resolvedGenes();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<p>The table shows all Viewpoints that VPV attempted to create. If no restriction fragments " +
+                "were found that satisfy the selection criteria, the Viewpoint is empty (has no fragments) " +
+                "and will not be represented in the final set of probes for the capture Hi-C panel design. " +
+                "Users can manually choose fragments in the panels for individual viewpoints. " +
+                "Additionally, users can deselect fragments or delete viewpoints as desired.</p>");
+        sb.append(String.format("<ul><li>Number of valid viewpoints (with at least one fragment): %d of %d</li>" ,resolvedVP,design.getN_viewpoints()) );
+        sb.append(String.format("<li>Number of genes with at least one valid viewpoint: %d of %d</li></ul>" ,resolvedGenes,design.getN_genes() ) );
+        return sb.toString();
 
     }
 

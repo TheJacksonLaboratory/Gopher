@@ -13,8 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.apache.log4j.Logger;
 import vpvgui.framework.Signal;
-import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.Popups;
+import vpvgui.gui.popupdialog.PopupFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -64,9 +63,12 @@ public class SplashPresenter implements Initializable {
 
 
     public void newProject(ActionEvent e) {
-        String projectname=Popups.getStringFromUser("New Project Name","name of project","Enter name of new project");
-        if (projectname==null) {
-            ErrorWindow.display("Error","Please enter a valid project name!");
+        PopupFactory factory = new PopupFactory();
+        String projectname = factory.getProjectName();
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (projectname == null || projectname.length() <1) {
+            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
             return;
         } else {
             this.switchscreen.createNewProject(projectname);

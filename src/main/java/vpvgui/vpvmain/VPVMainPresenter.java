@@ -20,9 +20,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
-import vpvgui.gui.ConfirmWindow;
-import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.Popups;
+
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
@@ -32,6 +30,7 @@ import vpvgui.gui.entrezgenetable.EntrezGeneViewFactory;
 import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.logviewer.LogViewerFactory;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.qcCheckPane.QCCheckFactory;
@@ -57,14 +56,12 @@ import java.util.ResourceBundle;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.0.6 (2017-10-14)
+ * @version 0.2.6 (2017-11-11)
  */
 public class VPVMainPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
     /** The Model for the entire analysis. */
     private Model model = null;
-    /** Convenience class that knows about the required order of operations and dependencies.*/
-    private Initializer initializer=null;
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
      * obtain a reference to the primary scene, which is needed by FileChooser, etc. It is set in the FXML
@@ -78,30 +75,19 @@ public class VPVMainPresenter implements Initializable {
     /** List of genome builds. Used by genomeChoiceBox*/
     @FXML
     private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
-    @FXML
-    private ChoiceBox<String> genomeChoiceBox;
-    @FXML
-    private ChoiceBox<String> approachChoiceBox;
+    @FXML private ChoiceBox<String> genomeChoiceBox;
+    @FXML private ChoiceBox<String> approachChoiceBox;
     /** Clicking this button downloads the genome build and unpacks it.*/
-    @FXML
-    private Button downloadGenome;
-    @FXML
-    private Button decompressGenomeButton;
-    @FXML
-    private Button indexGenomeButton;
+    @FXML private Button downloadGenome;
+    @FXML private Button decompressGenomeButton;
+    @FXML private Button indexGenomeButton;
     /** Label for the genome build we want to download. */
-    @FXML
-    private Label genomeBuildLabel;
+    @FXML private Label genomeBuildLabel;
     /** Label for the transcripts we want to download.*/
-    @FXML
-    private Label transcriptsLabel;
+    @FXML private Label transcriptsLabel;
     /** Show which design approach */
     @FXML private Label approachLabel;
-    /**
-     * Clicking this button will download some combination of genome and (compatible) gene definition files.
-     * A file chooser will appear and the user can decide where to download everything. The paths will be stored
-     * in the viewpoint settings file.
-     */
+    /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
     /** Show progress in downloading the Genome and corresponding transcript definition file.  */
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
@@ -139,22 +125,9 @@ public class VPVMainPresenter implements Initializable {
     @FXML RadioMenuItem tiling3;
     @FXML RadioMenuItem tiling4;
     @FXML RadioMenuItem tiling5;
-//    @FXML private Button showButton;
-//    @FXML private Button exitButton;
-//    @FXML private Button enterGeneListButton;
-//    @FXML private Button createCaptureProbesButton;
-
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
-//    @FXML private Tab setuptab;
-//    @FXML private Menu helpMenu;
-//    @FXML private MenuItem showSettingsCurrentProject;
-//    @FXML private MenuItem helpMenuItem;
-//    @FXML private MenuItem openHumanGeneWindow;
-//    @FXML private MenuItem openMouseGeneWindow;
-//    @FXML private MenuItem openRatGeneWindow;
-//    @FXML private MenuItem openFlyGeneWindow;
-//    @FXML private MenuItem exportBEDFilesMenuItem;
+
     /** The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints. */
     @FXML private Tab analysistab;
     /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
@@ -207,7 +180,7 @@ public class VPVMainPresenter implements Initializable {
     public boolean serialize() {
         String projectname=this.model.getProjectName();
         if (projectname==null) {
-            ErrorWindow.display("Error","Could not get viewpoint name (should never happen). Will save with default");
+            PopupFactory.displayError("Error","Could not get viewpoint name (should never happen). Will save with default");
             projectname="default";
         }
         String serializedFilePath=Platform.getAbsoluteProjectPath(projectname);
@@ -220,13 +193,13 @@ public class VPVMainPresenter implements Initializable {
      */
     private boolean serializeToLocation(String path) {
         if (path==null) {
-            ErrorWindow.display("Error","Could not get file name for saving project file.");
+            PopupFactory.displayError("Error","Could not get file name for saving project file.");
             return false;
         }
         try {
             SerializationManager.serializeModel(this.model, path);
         } catch (IOException e) {
-            ErrorWindow.displayException("Error","Unable to serialize VPV viewpoint",e);
+            PopupFactory.displayException("Error","Unable to serialize VPV viewpoint",e);
             return false;
         }
         logger.trace("Serialization successful to file "+path);
@@ -250,10 +223,8 @@ public class VPVMainPresenter implements Initializable {
             this.approachLabel.setText(newValue);
         });
         this.approachLabel.setText(approachChoiceBox.getValue());
-        this.initializer=new Initializer(model);
+
         initializePromptTextsToDefaultValues();
-
-
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
@@ -428,7 +399,7 @@ public class VPVMainPresenter implements Initializable {
     /** This method should be called before we create viewpoints. It updates all of the variables in our model object
      * to have the values specified in the user for the GUI, including the values of the six fields we show in the GUI
      * and that are bound in {@link #setBindings()}. Note that we store GC and repeat content as a proportion in
-     * {@link Model} but display it as a proportion in the GUI. The default values are used for any fields that have not
+     * {@link Model} but confirmDialog it as a proportion in the GUI. The default values are used for any fields that have not
      * been filled in by the user.
      */
     private void updateModel() {
@@ -467,7 +438,8 @@ public class VPVMainPresenter implements Initializable {
      * {@link #decompressGenome(ActionEvent)} which is called after the corresponding button
      * is clicked in the GUI.
      */
-    @FXML public void downloadGenome() {
+    @FXML public void downloadGenome(ActionEvent e) {
+        e.consume();
         String build = this.model.getGenomeBuild();
         logger.info("About to download genome for "+build +" (if necessary)");
         GenomeDownloader gdownloader = new GenomeDownloader(build);
@@ -476,7 +448,7 @@ public class VPVMainPresenter implements Initializable {
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath()=="") {
             logger.error("Could not set genome download path from Directory Chooser");
-            ErrorWindow.display("Error","Could not get path to download genome.");
+            PopupFactory.displayError("Error","Could not get path to download genome.");
             return;
         }
         logger.info("downloadGenome to directory  "+file.getAbsolutePath());
@@ -504,14 +476,14 @@ public class VPVMainPresenter implements Initializable {
         try {
             url = rgd.getURL();
         } catch (DownloadFileNotFoundException dfne) {
-            ErrorWindow.display("Could not identify RefGene file for genome",dfne.getMessage());
+            PopupFactory.displayError("Could not identify RefGene file for genome",dfne.getMessage());
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
-            ErrorWindow.display("Error","Could not get path to download transcript file.");
+            PopupFactory.displayError("Error","Could not get path to download transcript file.");
             return;
         }
         if (! rgd.needToDownload(file.getAbsolutePath())) {
@@ -555,7 +527,7 @@ public class VPVMainPresenter implements Initializable {
         });
         gindexer.setOnFailed(eventh -> {
             decompressGenomeLabel.setText("Decompression failed");
-            ErrorWindow.display("Could not decompress genome file" ,gindexer.getException().getMessage());
+            PopupFactory.displayError("Could not decompress genome file" ,gindexer.getException().getMessage());
         });
         Thread th = new Thread(gindexer);
         th.setDaemon(true);
@@ -579,7 +551,7 @@ public class VPVMainPresenter implements Initializable {
         } );
         manager.setOnFailed(event-> {
             indexGenomeLabel.setText("FASTA indexing failed");
-            ErrorWindow.display("Failure to extract FASTA files.",
+            PopupFactory.displayError("Failure to extract FASTA files.",
                     manager.getException().getMessage());
         });
         Thread th = new Thread(manager);
@@ -595,7 +567,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void chooseEnzymes() {
         List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(this.model);
         if (chosenEnzymes==null || chosenEnzymes.size()==0) {
-            ErrorWindow.display("Warning","Warning -- no restriction enzyme chosen!");
+            PopupFactory.displayError("Warning","Warning -- no restriction enzyme chosen!");
             return;
         }
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
@@ -604,7 +576,7 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
-     * The effect of the command <pre>EntrezGeneViewFactory.display(this.model);</pre>
+     * The effect of the command <pre>EntrezGeneViewFactory.confirmDialog(this.model);</pre>
      * is to pass a list of {@link VPVGene} objects to the {@link Model}.
      * These objects are used with other information in the Model to create {@link vpvgui.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
@@ -614,9 +586,6 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-        /** The following command is just for debugging. We now have all VPVGenes, but still need to
-         * add information about the restriction enzymes and the indexed FASTA file.
-         */
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
         e.consume();
     }
@@ -691,7 +660,7 @@ public class VPVMainPresenter implements Initializable {
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
-            ErrorWindow.displayException("Error",
+            PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create viewpoints",
                     exc);
         });
@@ -708,7 +677,7 @@ public class VPVMainPresenter implements Initializable {
      * @param e Event triggered by close command.
      */
     public void closeWindow(ActionEvent e) {
-        boolean answer = ConfirmWindow.display("Alert", "Are you sure you want to quit?");
+        boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
         if (answer) {
             logger.info("Closing VPV Gui");
             serialize();
@@ -743,7 +712,6 @@ public class VPVMainPresenter implements Initializable {
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
         this.model=new Model();
-        this.model.setDefaultValues();
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
@@ -826,7 +794,7 @@ public class VPVMainPresenter implements Initializable {
         String port=presenter.getPort();
         String proxy=presenter.getProxy();
         if (proxy==null) {
-            ErrorWindow.display("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
+            PopupFactory.displayError("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
             return;
         }
         this.model.setHttpProxy(proxy);
@@ -839,7 +807,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void openGeneWindowWithExampleHumanGenes() {
         File file = new File(getClass().getClassLoader().getResource("humangenesymbols.txt").getFile());
         if (file==null) {
-            ErrorWindow.display("Could not open example human gene list","Please report to developers");
+            PopupFactory.displayError("Could not open example human gene list","Please report to developers");
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
@@ -848,7 +816,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void openGeneWindowWithExampleFlyGenes() {
         File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
         if (file==null) {
-            ErrorWindow.display("Could not open example fly gene list","Please report to developers");
+            PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
@@ -857,7 +825,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void openGeneWindowWithExampleMouseGenes() {
         File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
         if (file==null) {
-            ErrorWindow.display("Could not open example mouse gene list","Please report to developers");
+            PopupFactory.displayError("Could not open example mouse gene list","Please report to developers");
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
@@ -866,7 +834,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void openGeneWindowWithExampleRatGenes() {
         File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
         if (file==null) {
-            ErrorWindow.display("Could not open example rat gene list","Please report to developers");
+            PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
@@ -876,14 +844,14 @@ public class VPVMainPresenter implements Initializable {
     @FXML public void exportBEDFiles(ActionEvent e) {
         List<ViewPoint> vplist=this.model.getViewPointList();
         if (vplist==null || vplist.isEmpty()) {
-            ErrorWindow.display("Attempt to export empty BED files","Complete generation and analysis of ViewPoints before exporting to BED!");
+            PopupFactory.displayError("Attempt to export empty BED files","Complete generation and analysis of ViewPoints before exporting to BED!");
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for exporting BED files.");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath()=="") {
-            ErrorWindow.display("Error","Could not get path to export BED files.");
+            PopupFactory.displayError("Error","Could not get path to export BED files.");
             return;
         }
         String prefix=model.getProjectName();
@@ -891,45 +859,40 @@ public class VPVMainPresenter implements Initializable {
         try {
             exporter.printRestFragsToBed(this.model.getViewPointList(),this.model.getGenomeBuild());
         } catch (Exception exc) {
-            ErrorWindow.displayException("Could not save data to BED files", exc.getMessage(),exc);
+            PopupFactory.displayException("Could not save data to BED files", exc.getMessage(),exc);
         }
         e.consume();
     }
 
     @FXML
     public void setProbeLength(ActionEvent e) {
-        int probelen;
-        if (model.getProbeLength()>0) {
-            probelen=model.getProbeLength();
-        } else {
-            probelen=Default.PROBE_LENGTH;
-        }
-
-        Integer len = Popups.getIntegerFromUser("Enter Probe Length",
-                probelen,
-                "Enter probe length:");
-        if (len == null) {
-            ErrorWindow.display("Could not get probe length", "enter an integer value!");
+        PopupFactory factory = new PopupFactory();
+        Integer len= factory.setProbeLength(model.getProbeLength());
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (len == null || len <=0) {
+            PopupFactory.displayError("Could not get probe length", "enter a positive integer value!");
             return;
         }
         this.model.setProbeLength(len);
         this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("We just set probe length to %d", model.getProbeLength()));
+        logger.trace(String.format("probe length set to %d", model.getProbeLength()));
     }
 
 
     @FXML
     public void setMarginSize(ActionEvent e) {
-        Integer msize = Popups.getIntegerFromUser("Enter margin size",
-                Default.MARGIN_SIZE,
-                "Margin size for calculating repeat content");
-        if (msize==null) {
-            ErrorWindow.display("Could not get Margin size", "enter an integer value!");
+        PopupFactory factory = new PopupFactory();
+        Integer len= factory.setMarginSize(model.getMarginSize());
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (len == null || len <=0) {
+            PopupFactory.displayError("Could not get margin size length", "enter a positive integer value!");
             return;
         }
-        this.model.setMarginSize(msize);
+        this.model.setMarginSize(len);
         this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("We just set MarginSize to %d", model.getMarginSize()));
+        logger.trace(String.format("MarginSize set to %d", model.getMarginSize()));
     }
 
     @FXML
@@ -941,7 +904,7 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML
     public void about(ActionEvent e) {
-        Popups.showAbout(model.getVersion(), model.getLastChangeDate());
+        PopupFactory.showAbout(model.getVersion(), model.getLastChangeDate());
         e.consume();
     }
 
@@ -965,7 +928,7 @@ public class VPVMainPresenter implements Initializable {
         File file = chooser.showSaveDialog(null);
         String path = file.getAbsolutePath();
         if (path==null) {
-            ErrorWindow.display("Error","Could not retrieve path to export project file");
+            PopupFactory.displayError("Error","Could not retrieve path to export project file");
             return;
         }
         serializeToLocation(path);
@@ -987,9 +950,9 @@ public class VPVMainPresenter implements Initializable {
             setModelInMainAndInAnalysisPresenter(this.model);
             logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
         } catch (IOException ex) {
-            ErrorWindow.displayException("Error","I/O Error opening project file", ex);
+            PopupFactory.displayException("Error","I/O Error opening project file", ex);
         } catch (ClassNotFoundException clnf) {
-            ErrorWindow.displayException("Error","Deserialization error",clnf);
+            PopupFactory.displayException("Error","Deserialization error",clnf);
         }
         e.consume();
     }

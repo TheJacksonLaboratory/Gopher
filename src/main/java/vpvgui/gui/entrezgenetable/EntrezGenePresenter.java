@@ -13,7 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import vpvgui.framework.Signal;
-import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.RefGeneParser;
 import vpvgui.model.Model;
 import vpvgui.model.VPVGene;
@@ -118,7 +118,7 @@ public class EntrezGenePresenter implements Initializable {
         String path = this.model.getRefGenePath();
         if (path==null) {
             logger.error("attempt to validate gene symbols before refGene.txt.gz file was downloaded");
-            ErrorWindow.display("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
             return;
         }
         logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
@@ -126,7 +126,7 @@ public class EntrezGenePresenter implements Initializable {
             this.parser = new RefGeneParser(path);
             parser.checkGenes(this.symbols);
         } catch (Exception exc) {
-            ErrorWindow.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
             return;
         }
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
@@ -235,11 +235,11 @@ public class EntrezGenePresenter implements Initializable {
     /** This function closes the dialog for entering genes, and passes the VPVGene list to the model. */
     @FXML public void acceptGenes() {
         if (!isvalidated) {
-            ErrorWindow.display("Error","Please validate genes for accepting them!");
+            PopupFactory.displayError("Error","Please validate genes for accepting them!");
             return;
         }
         if (parser==null ) {
-            ErrorWindow.display("Error","Please validate genes for accepting them!");
+            PopupFactory.displayError("Error","Please validate genes for accepting them!");
             return;
         }
         this.model.setVPVGenes(this.parser.getVPVGeneList());

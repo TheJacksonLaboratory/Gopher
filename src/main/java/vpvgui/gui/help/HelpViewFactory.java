@@ -1,6 +1,5 @@
 package vpvgui.gui.help;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -9,12 +8,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
 
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 /**
@@ -70,7 +64,7 @@ public class HelpViewFactory {
 
 
     /**
-     * Open a JavaFW Webview window and display our read the docs help documentation in it.
+     * Open a JavaFW Webview window and confirmDialog our read the docs help documentation in it.
      */
     private static void openBrowser() {
         try{

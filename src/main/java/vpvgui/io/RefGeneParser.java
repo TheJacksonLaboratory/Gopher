@@ -2,7 +2,7 @@ package vpvgui.io;
 
 
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.VPVGene;
 
 import java.io.*;
@@ -142,7 +142,7 @@ public class RefGeneParser {
     public void checkGenes(List<String> genelst) {
         if (genelst==null) {
             logger.error("Attempt to check genelist with null pointer");
-            ErrorWindow.display("Unable to check gene list", "Attempt to check genelist with null pointer");
+            PopupFactory.displayError("Unable to check gene list", "Attempt to check genelist with null pointer");
             return;
         }
         this.invalidGeneSymbols = new HashSet<>();

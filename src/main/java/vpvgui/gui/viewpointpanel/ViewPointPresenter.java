@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * This class acts as a controller of the TabPanes which display individual ViewPoints.
+ * This class acts as a controller of the TabPanes which confirmDialog individual ViewPoints.
  * @author Peter Robinson
  * @version 0.2.6 (2017-11-02)
  */
@@ -67,7 +67,7 @@ public class ViewPointPresenter implements Initializable {
     private StringProperty vpExplanationProperty;
     /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
-    /** By how much do we change the width of the UCSC display when zooming? */
+    /** By how much do we change the width of the UCSC confirmDialog when zooming? */
     private static double ZOOMFACTOR =1.5;
     /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     @FXML

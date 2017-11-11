@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class EntrezGeneViewFactory {
 
-    /** This is intended to be used to display example sets of genes chosen from the Help menu. */
+    /** This is intended to be used to confirmDialog example sets of genes chosen from the Help menu. */
     public static void displayFromFile(Model model, File file){
         Stage window;
         String windowTitle = "Enter Gene List";

@@ -3,9 +3,8 @@ package vpvgui.gui.deletepane.delete;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.entrezgenetable.EntrezGenePresenter;
-import vpvgui.gui.entrezgenetable.EntrezGeneView;
+
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.Platform;
 import vpvgui.model.Model;
 
@@ -68,7 +67,7 @@ public class DeleteFactory {
         List<String> files = new ArrayList<>();
         File projectDir = Platform.getVPVDir();
         if (!projectDir.isDirectory()) {
-            ErrorWindow.display("Error",
+            PopupFactory.displayError("Error",
                     String.format("Could not get project directory. %s was not a directory", projectDir.getAbsolutePath()));
 
         } else {

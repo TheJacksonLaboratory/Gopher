@@ -13,7 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import vpvgui.gui.ErrorWindow;
+
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.Platform;
 
 import java.io.BufferedReader;
@@ -61,7 +62,7 @@ public class LogViewerFactory {
             }
             br.close();
         } catch (IOException e) {
-            ErrorWindow.displayException("Error opening logfile", "Could not open logfile",e);
+            PopupFactory.displayException("Error opening logfile", "Could not open logfile",e);
             return;
         }
 

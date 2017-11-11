@@ -1,18 +1,15 @@
 package vpvgui.gui.analysisPane;
 
-import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.gui.viewpointpanel.ViewPointPresenter;
 import vpvgui.gui.viewpointpanel.ViewPointView;
 import vpvgui.model.Model;
@@ -288,7 +285,7 @@ public class VPAnalysisPresenter implements Initializable {
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
             logger.warn("[View Points not initialized");
-            ErrorWindow.display("Could not display viewpoints","No initialiyed viewpoints were found");
+            PopupFactory.displayError("Could not confirmDialog viewpoints","No initialiyed viewpoints were found");
             return;
         }
         refreshVPTable();

@@ -349,6 +349,10 @@ public class ViewPoint implements Serializable {
     public final boolean getResolved() {
         return resolved;
     }
+    /** @return true if this viewpoint has at least one active (selected) probe and it is resolved. */
+    public final boolean hasValidProbe() {
+        return getNumOfSelectedFrags()>0 && resolved;
+    }
 
     public final void setResolved(boolean resolved) {
         this.resolved = resolved;
@@ -487,7 +491,6 @@ public class ViewPoint implements Serializable {
                 findFirst().
                 orElse(null);
 
-
         if (centerSegment == null) {
             logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), referenceSequenceID , startPos , endPos ));
             resolved = false;
@@ -615,34 +618,34 @@ public class ViewPoint implements Serializable {
     }
 
     /**
-     * This function is intended to help display the right
+     * This function is intended to help confirmDialog the right
      * portion of the viewpoint in the UCSC browser.
      * It is either the start position of the first selected segment or the
      * deafult upstream position if no segment was selected.
-     * @return the 5' position that we want to display.
+     * @return the 5' position that we want to confirmDialog.
      */
     public int getMinimumSelectedPosition() {
         return getActiveSegments().stream().mapToInt(s -> s.getStartPos()).min().orElse(this.genomicPos-upstreamNucleotideLength);
     }
     /**
-     * This function is intended to help display the right
+     * This function is intended to help confirmDialog the right
      * portion of the viewpoint in the UCSC browser.
      * It is either the end position of the last selected segment or the
      * deafult downstream position if no segment was selected.
-     * @return the 5' position that we want to display.
+     * @return the 5' position that we want to confirmDialog.
      */
     public int getMaximumSelectedPosition() {
         return getActiveSegments().stream().mapToInt(s -> s.getEndPos()).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
-    /** Returns the leftmost position to display in the UCSC browser. This is either the boundary of the initial search region, or
+    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected fragment overlaps that boundary, the start pos of that fragment.
-     * @return leftmost display position
+     * @return leftmost confirmDialog position
      */
     public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
-    /** Returns the rightmost position to display in the UCSC browser. This is either the boundary of the initial search region, or
+    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected fragment overlaps that boundary, the end pos of that fragment.
-     * @return rightmost display position
+     * @return rightmost confirmDialog position
      */
     public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
 

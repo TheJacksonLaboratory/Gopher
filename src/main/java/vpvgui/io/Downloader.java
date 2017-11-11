@@ -4,7 +4,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 import vpvgui.exception.VPVException;
-import vpvgui.gui.ErrorWindow;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,6 +1,6 @@
 package vpvgui.model.genome;
 
-import vpvgui.gui.ErrorWindow;
+
 
 import java.io.File;
 import java.io.Serializable;

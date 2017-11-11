@@ -8,8 +8,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
-import vpvgui.exception.VPVException;
-import vpvgui.gui.ErrorWindow;
+
+
 import vpvgui.model.genome.Genome;
 
 import java.io.*;

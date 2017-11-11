@@ -1,12 +1,8 @@
 package vpvgui.model;
 
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.genome.HumanHg38;
@@ -19,7 +15,7 @@ import java.util.*;
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.2.12 (2017-11-04)
+ * @version 0.2.14 (2017-11-10)
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
@@ -60,7 +56,7 @@ public class Model implements Serializable {
         } else if (newDatabase.equals("hg38")) {
             this.genome = new HumanHg38();
         } else {
-            ErrorWindow.display("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
+            PopupFactory.displayError("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
             return;
         }
     }
@@ -157,20 +153,6 @@ public class Model implements Serializable {
         initializeEnzymesFromFile();
     }
 
-
-
-    /** This method should be called when we create a new Model and want to use default settings.
-     */
-    public void setDefaultValues() {
-//        setSizeUp(Default.SIZE_UPSTREAM);
-//        setSizeDown(Default.SIZE_DOWNSTREAM);
-//        setMinFragSize(Default.MINIMUM_FRAGMENT_SIZE);
-//        setMaxRepeatContent(Default.MAXIMUM_REPEAT_CONTENT);
-//        setProbeLength(Default.PROBE_LENGTH);
-//        setTilingFactor(Default.TILING_FACTOR);
-//        setMarginSize(Default.MARGIN_SIZE);
-//        setGenomeBuild(Default.GENOME_BUILD);
-    }
 
     /** @return List of enzymes for the user to choose from. */
     public List<RestrictionEnzyme> getRestrictionEnymes() {

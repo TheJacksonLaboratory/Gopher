@@ -224,7 +224,7 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Transcripts</td>");
-        if (model.getTargetGenesPath()==null) {
+        if (model.getRefGenePath()==null) {
             sb.append("<td class=\"red\">Transcript list not initialized.</td>");
         } else {
             sb.append(String.format("<td>%s</td>",model.getRefGenePath()));

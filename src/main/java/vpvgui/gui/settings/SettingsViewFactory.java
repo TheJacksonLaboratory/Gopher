@@ -7,7 +7,7 @@ import java.util.Properties;
 
 
 /**
- * Class to display the current user-chosen settings for analysis.
+ * Class to confirmDialog the current user-chosen settings for analysis.
  * @author Peter Robinson
  * @version 0.0.3 (2017-10-20).
  */
@@ -43,7 +43,7 @@ public class SettingsViewFactory {
 
     /**
      * @param properties
-     * @return String containing HTML to display in WebView pane
+     * @return String containing HTML to confirmDialog in WebView pane
      */
     private static String getHTML(Properties properties) {
         String[] nonNumericProps = new String[] {

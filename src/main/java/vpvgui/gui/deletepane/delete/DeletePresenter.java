@@ -1,18 +1,13 @@
 package vpvgui.gui.deletepane.delete;
 
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import vpvgui.framework.Signal;
-import vpvgui.gui.ErrorWindow;
-import vpvgui.gui.analysisPane.VPAnalysisPresenter;
-import vpvgui.model.RestrictionEnzyme;
-import vpvgui.model.viewpoint.ViewPoint;
+
 
 import java.io.File;
 import java.net.URL;

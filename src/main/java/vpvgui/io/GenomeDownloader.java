@@ -3,7 +3,8 @@ package vpvgui.io;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
-import vpvgui.gui.ErrorWindow;
+
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.DataSource;
 
 import java.io.PrintWriter;
@@ -60,7 +61,7 @@ public class GenomeDownloader {
             downloadTask.getException().printStackTrace(pw);
             String sStackTrace = sw.toString(); // s
             logger.trace("Failed to download genome file. "+sStackTrace);
-            ErrorWindow.display("Error", sStackTrace);
+            PopupFactory.displayError("Error", sStackTrace);
         });
         Thread th = new Thread(downloadTask);
         th.setDaemon(true);

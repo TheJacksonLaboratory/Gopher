@@ -2,7 +2,7 @@ package vpvgui.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.IntPair;
 
 import java.io.Serializable;
@@ -167,7 +167,7 @@ public class Segment implements Serializable {
             this.repeatContentUp=this.repeatContent;
             return;
         } else if (margins.size()>2 || margins.size()==0) {
-            ErrorWindow.display("Error in Segment Class","Number of margin segments was neither 1 nor 2 (report to developers)");
+            PopupFactory.displayError("Error in Segment Class","Number of margin segments was neither 1 nor 2 (report to developers)");
             return;
         }
 

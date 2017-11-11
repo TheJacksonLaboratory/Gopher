@@ -4,7 +4,8 @@ package vpvgui.gui.splash;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import vpvgui.gui.ErrorWindow;
+
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.Platform;
 import vpvgui.model.Model;
 import vpvgui.util.SerializationManager;
@@ -41,7 +42,6 @@ public class SwitchScreens {
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
         Model model = new Model();
         model.setProjectName(name);
-        model.setDefaultValues();
         model.setXdim(screenWidth);
         model.setYdim(screenHeight);
         logger.trace(String.format("Setting dimensions to x=%d y=%d",screenWidth,screenHeight ));
@@ -59,18 +59,18 @@ public class SwitchScreens {
         try {
             model = SerializationManager.deserializeModel(filepath);
         } catch (IOException e) {
-            ErrorWindow.displayException("IOException",String.format("I/O problem while attempting to deserialize %s",filepath),e);
+            PopupFactory.displayException("IOException",String.format("I/O problem while attempting to deserialize %s",filepath),e);
             return;
         } catch (ClassNotFoundException e) {
-            ErrorWindow.displayException("ClassNotFoundException",String.format("Could not find class while attempting to deserialize %s",filepath),e);
+            PopupFactory.displayException("ClassNotFoundException",String.format("Could not find class while attempting to deserialize %s",filepath),e);
             return;
         } catch (Exception e) {
-            ErrorWindow.displayException("Exception",String.format("Exception while attempting to deserialize %s",filepath),e);
+            PopupFactory.displayException("Exception",String.format("Exception while attempting to deserialize %s",filepath),e);
             return;
         }
         if (model == null) {
             logger.error(String.format("Unable to deserialize model from %s at %s", name, filepath));
-            ErrorWindow.display("Null pointer", String.format("Unable to deserialize model from %s at %s", name, filepath));
+            PopupFactory.displayError("Null pointer", String.format("Unable to deserialize model from %s at %s", name, filepath));
             return;
         }
         if (model.getHttpProxy() != null) {
