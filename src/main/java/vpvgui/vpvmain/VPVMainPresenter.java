@@ -31,12 +31,14 @@ import vpvgui.gui.enzymebox.EnzymeViewFactory;
 import vpvgui.gui.help.HelpViewFactory;
 import vpvgui.gui.logviewer.LogViewerFactory;
 import vpvgui.gui.popupdialog.PopupFactory;
+import vpvgui.gui.progresspopup.ProgressPopup;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.qcCheckPane.QCCheckFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.*;
+import vpvgui.model.regulatoryexome.RegulatoryExomeBuilder;
 import vpvgui.model.viewpoint.SimpleViewPointCreationTask;
 import vpvgui.model.viewpoint.ViewPoint;
 import vpvgui.model.viewpoint.ExtendedViewPointCreationTask;
@@ -956,6 +958,59 @@ public class VPVMainPresenter implements Initializable {
         }
         e.consume();
     }
+
+    @FXML
+    public void downloadRegulationData(ActionEvent event) {
+        String genomeBuild=genomeChoiceBox.getValue();
+        RegulatoryBuildDownloader regbuildDownloader = new RegulatoryBuildDownloader(genomeBuild);
+        String basename=regbuildDownloader.getBaseName();
+        String url=null;
+        try {
+            url = regbuildDownloader.getURL();
+        } catch (DownloadFileNotFoundException dfne) {
+            PopupFactory.displayError(String.format("Cannot generate Regulatory Exome for genome",genomeBuild),dfne.getMessage());
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory to download regulatory build for " + genomeBuild + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().isEmpty()) {
+            PopupFactory.displayError("Error","Could not get path to download regulatory build file.");
+            return;
+        }
+        if (! regbuildDownloader.needToDownload(file.getAbsolutePath())) {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            PopupFactory.displayMessage("Regulatory Build",String.format("Found regulatory build file at %s. No need to download",file.getAbsolutePath()));
+            model.setRegulatoryBuildPath(abspath);
+            return;
+        }
+
+        ProgressPopup popup = new ProgressPopup("Download regulatory build");
+        ProgressIndicator progressIndicator = popup.getProgressIndicator();
+
+        Downloader downloadTask = new Downloader(file, url, basename, progressIndicator);
+        downloadTask.setOnSucceeded( e -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            model.setRegulatoryBuildPath(abspath);
+
+            popup.close();
+        });
+        try {
+            popup.startProgress(downloadTask);
+
+        } catch (InterruptedException e) {
+            PopupFactory.displayException("Error","Could not download regulatory build", e);
+        }
+        event.consume();
+    }
+
+    @FXML
+    public void buildRegulatoryExome(ActionEvent event) {
+        event.consume();
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder();
+        logger.trace("buildRegulatoryExome");
+    }
+
 
 
 }

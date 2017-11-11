@@ -139,9 +139,6 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
-        for (ColoredSegment cseg : coloredsegments) {
-            logger.trace("Color segment for " + cseg.segment.toString() +", which is selected?="+cseg.segment.isSelected());
-        }
         String url= urlmaker.getImageURL(vp,getHighlightRegions());
         logger.trace(String.format("Refresh: %s",url));
 
@@ -414,15 +411,11 @@ public class ViewPointPresenter implements Initializable {
 
         // prepare url parts
         String genome = this.model.getGenomeBuild();
-        if (genome.startsWith("UCSC-"))
-            genome = genome.substring(5);
-
         // create url & load content from UCSC
         URLMaker maker = new URLMaker(this.model);
         String re=this.model.getRestrictionEnzymeString().replaceAll("^","");
         maker.setEnzyme(re);
         String url= maker.getImageURL(vp,getHighlightRegions());
-        logger.trace(String.format("INITIAL: %s",url));
         ucscWebEngine.load(url);
 
     }

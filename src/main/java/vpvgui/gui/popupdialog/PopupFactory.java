@@ -273,6 +273,45 @@ public class PopupFactory {
     }
 
 
+    public static void displayMessage(String title, String message) {
+
+        Stage window = new Stage();
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle(title);
+
+        window.setMinWidth(250);
+        Label label = new Label();
+        label.setText(message);
+        label.setStyle(
+                "-fx-border-color: lightblue; "
+                        + "-fx-font-size: 14;"
+                        + "-fx-border-insets: -5; "
+                        + "-fx-border-radius: 5;"
+                        + "-fx-border-style: dotted;"
+                        + "-fx-border-width: 2;"
+                        + "-fx-alignment: top-left;"
+                        + "-fx-text-fill: blue;"
+        );
+
+        Button button = new Button("OK");
+
+        button.setOnAction(e -> {
+            window.close();
+        });
+
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10, 50, 50, 50));
+
+        layout.getChildren().addAll(label, button);
+        layout.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(layout);
+        window.setScene(scene);
+        window.showAndWait();
+    }
+
+
+
     public static void displayException(String title, String message, Exception e) {
         TextArea textArea = new TextArea(e.toString());
         textArea.setEditable(false);

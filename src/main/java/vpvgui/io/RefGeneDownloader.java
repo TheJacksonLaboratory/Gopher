@@ -8,7 +8,7 @@ import java.io.File;
  * This class stores the URLs for the RefSeq.txt.gz file for the
  * indicated species (mm9,mm10,hg19,hg38.
  * @author Peter Robinson
- * @version 0.0.2
+ * @version 0.1.2
  */
 public class RefGeneDownloader {
     final private static String hg19="http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";

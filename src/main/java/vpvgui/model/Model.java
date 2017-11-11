@@ -43,6 +43,12 @@ public class Model implements Serializable {
     private String targetGenesPath=null;
     /** An object to coordinate the genome build as well as the status of download, unpacking, and indexing. */
     private Genome genome;
+    /** Path on local file system of the downloaded regulatory build file from Ensembl. */
+    private String regulatoryBuildPath=null;
+
+    public String getRegulatoryBuildPath() { return regulatoryBuildPath; }
+    public void setRegulatoryBuildPath(String regulatoryBuildPath) { this.regulatoryBuildPath = regulatoryBuildPath; }
+
     /** @return true if the genome files have been previously downloaded to the indicated path. */
     public boolean checkDownloadComplete(String path) {
         return this.genome.checkDownloadComplete(path);

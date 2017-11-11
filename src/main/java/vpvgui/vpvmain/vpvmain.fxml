@@ -75,6 +75,12 @@
                             <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
                           </items>
                         </Menu>
+                        <Menu mnemonicParsing="false" text="Exome">
+                          <items>
+                              <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData" text="Download Regulation Data" />
+                            <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                   <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />
