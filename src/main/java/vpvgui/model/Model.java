@@ -48,7 +48,9 @@ public class Model implements Serializable {
     private String regulatoryBuildPath=null;
 
     public String getRegulatoryBuildPath() { return regulatoryBuildPath; }
-    public void setRegulatoryBuildPath(String regulatoryBuildPath) { this.regulatoryBuildPath = regulatoryBuildPath; }
+    public void setRegulatoryBuildPath(String regulatoryBuildPath) {
+        logger.trace("Setting reg buiold path in model to " + regulatoryBuildPath);
+        this.regulatoryBuildPath = regulatoryBuildPath; }
 
     /** @return true if the genome files have been previously downloaded to the indicated path. */
     public boolean checkDownloadComplete(String path) {

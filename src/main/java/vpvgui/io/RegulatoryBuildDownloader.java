@@ -11,10 +11,10 @@ import java.io.File;
  * This class is intended to be used with {@link Downloader}
  *
  * @author Peter Robinson
- * @version 0.1.2
+ * @version 0.1.3 (2017-11-12)
  */
 public class RegulatoryBuildDownloader {
-    //final private static String hg19="http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";
+    final private static String hg19="ftp://ftp.ensembl.org/pub/grch37/update/regulation/homo_sapiens/homo_sapiens.GRCh37.Regulatory_Build.regulatory_features.20161117.gff.gz";
     final private static String hg38 = "ftp://ftp.ensembl.org/pub/release-90/regulation/homo_sapiens/homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz";
 
 
@@ -32,9 +32,9 @@ public class RegulatoryBuildDownloader {
      */
     public String getURL() throws DownloadFileNotFoundException {
         String url = null;
-//        if (this.genome.equals("hg19"))
-//            url=hg19;
-        if (this.genome.equals("hg38"))
+        if (this.genome.equals("hg19"))
+            url=hg19;
+        else if (this.genome.equals("hg38"))
             url = hg38;
 //        else if (this.genome.equals("mm9"))
 //            url=mm9;
@@ -52,6 +52,8 @@ public class RegulatoryBuildDownloader {
     public String getBaseName() {
         if (this.genome.equals("hg38")) {
             return "homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz";
+        } else if (this.genome.equals("hg19") ) {
+            return "homo_sapiens.GRCh37.Regulatory_Build.regulatory_features.20161117.gff.gz";
         } else {
             return "?";
         }

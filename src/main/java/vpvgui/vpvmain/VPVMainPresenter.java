@@ -494,6 +494,7 @@ public class VPVMainPresenter implements Initializable {
             this.downloadedTranscriptsLabel.setText(transcriptName);
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
             this.model.setRefGenePath(abspath);
+            return;
         }
 
         Downloader downloadTask = new Downloader(file, url, basename, transcriptDownloadPI);
@@ -1007,7 +1008,12 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void buildRegulatoryExome(ActionEvent event) {
         event.consume();
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model.getRegulatoryBuildPath(),model.getRefGenePath());
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model);
+        try {
+          //  builder.extractRegulomeForTargetGenes(model);
+        } catch (Exception e) {
+            PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);
+        }
         logger.trace("buildRegulatoryExome");
     }
 

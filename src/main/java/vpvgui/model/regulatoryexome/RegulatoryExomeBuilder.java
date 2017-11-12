@@ -1,15 +1,20 @@
 package vpvgui.model.regulatoryexome;
 
+import javafx.concurrent.Task;
+import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
+import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class uses data from the Ensembl regulatory build as well as the UCSC refGene.txt.gz files to create
@@ -18,7 +23,7 @@ import java.util.Map;
  * @author Peter Robinson
  * @version 0.1.1 (2017-11-11)
  */
-public class RegulatoryExomeBuilder {
+public class RegulatoryExomeBuilder extends Task<Void> {
     static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
     /** Path to regulatory build file, e.g., homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz */
     private String pathToEnsemblRegulatoryBuild=null;
@@ -27,18 +32,27 @@ public class RegulatoryExomeBuilder {
 
     private Model model=null;
 
+    private List<RegulatoryElement> targetRegulomeElementList=null;
+
     private int threshold=50_000;
 
+    ProgressIndicator pi=null;
 
-    public RegulatoryExomeBuilder(String pathToRegulatoryBuild, String pathToRefGene) {
-        this.pathToEnsemblRegulatoryBuild=pathToRegulatoryBuild;
-        this.pathToRefGeneFile=pathToRefGene;
+
+    public RegulatoryExomeBuilder(Model model) {
+        this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
+        this.pathToRefGeneFile=model.getRefGenePath();
+        this.model=model;
+        targetRegulomeElementList=new ArrayList<>();
         logger.trace(String.format("Get regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
     }
 
+    public void setProgressIndicator(ProgressIndicator prog) {
+        this.pi=prog;
+    }
 
-    public void extractRegulomeForTargetGenes(Model model) {
-        this.model=model;
+
+    private Map<String,List<Integer>> getChrom2PosListMap(Model model) {
         // get all of the viewpoints with at least one selected fragment.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
@@ -54,7 +68,40 @@ public class RegulatoryExomeBuilder {
             }
             poslist.add(pos);
         });
-        //TODO continue -- read in the regulatory build and save the intervals that are in the right place.
+        return chrom2posListMap;
+    }
+
+
+    /** extractRegulomeForTargetGenes*/
+    @Override
+    protected Void call() {
+        this.model=model;
+        Map<String,List<Integer>> chrom2posListMap=getChrom2PosListMap(model);
+        //read in the regulatory build and save the intervals that are in the right place.
+        GeneRegGTFParser parser = new GeneRegGTFParser(model.getRegulatoryBuildPath());
+        try {
+            parser.initGzipReader();
+            while (parser.hasNext()) {
+                RegulatoryElement elem = parser.next();
+                String chrom=elem.getChrom();
+                if (! chrom2posListMap.containsKey(chrom)) {
+                    logger.error(String.format("Could not find chromosome %s in reg map",chrom));
+                    continue;
+                }
+                List<Integer> starts = chrom2posListMap.get(chrom);
+                // if the regulatory element is within threshold of any target gene, then keep the regulatory element
+                Integer keepers = starts.stream().filter(i -> elem.isLocatedWithinThreshold(i,threshold)).findAny().orElse(0);
+                if (keepers>0) {
+                    targetRegulomeElementList.add(elem);
+                }
+            }
+            parser.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        logger.trace(String.format("We got %d regulatory elemenets",targetRegulomeElementList.size()));
+        return null;
     }
 
 

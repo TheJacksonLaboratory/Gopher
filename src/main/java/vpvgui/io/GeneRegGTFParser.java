@@ -2,12 +2,12 @@ package vpvgui.io;
 
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
+import vpvgui.model.regulatoryexome.RegulatoryElement;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /** This class is responsible for parsing the Ensembl regulatory build GTF file. This can be used to
  * create a separate "exome" like panel that contains not only coding sequences but also the regulatory
@@ -30,56 +30,60 @@ import java.util.List;
 public class GeneRegGTFParser {
     static Logger logger = Logger.getLogger(GeneRegGTFParser.class.getName());
     private String pathToGTFfile=null;
-    private List<Element> regulatoryElements;
+
+
+    private BufferedReader reader=null;
+    private String currentLine=null;
 
 
 
     public GeneRegGTFParser(String path) {
         pathToGTFfile=path;
-        regulatoryElements=new ArrayList<>();
+    }
+
+    public void close() throws IOException {
+        reader.close();
     }
 
 
 
 
-
-
-    public void parse() {
-        int n_lines=0;
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader(pathToGTFfile));
-            String line=null;
-            while ((line=reader.readLine())!=null) {
-               // System.out.println(line);
-                String A[]=line.split("\t");
-                String chrom=A[0];
-                if (! A[1].equals("Regulatory_Build")){
-                    System.exit(1);
-                }
-                if (! A[2].equals("regulatory_region")) {
-                    logger.fatal(String.format("Unexpected element type %s",A[2]));
-                }
-                Integer from,to;
-                try {
-                    from=Integer.parseInt(A[3]);
-                    to=Integer.parseInt(A[4]);
-                    String annot = A[8];
-                    parseAnnot(chrom,from,to,annot);
-                    n_lines++;
-                } catch (NumberFormatException ne) {
-                    ne.printStackTrace();
-                }
-
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.trace("parsed " +n_lines + " regulatory elements");
-        logger.trace(String.format("%d are near target",regulatoryElements.size()));
-        for (Element e:regulatoryElements) {
-            System.out.println(e);
-        }
+    public void initGzipReader() throws IOException {
+        String encoding="UTF-8";
+        InputStream fileStream = new FileInputStream(this.pathToGTFfile);
+        InputStream gzipStream = new GZIPInputStream(fileStream);
+        Reader decoder = new InputStreamReader(gzipStream, encoding);
+        this.reader = new BufferedReader(decoder);
+        this.currentLine=reader.readLine();
     }
+
+    public boolean hasNext() {
+        return this.currentLine !=null;
+    }
+
+    public RegulatoryElement next() throws IOException {
+        String A[]=this.currentLine.split("\t");
+        this.currentLine=this.reader.readLine(); // advance iterator
+        RegulatoryElement elem=null;
+        String chrom=A[0];
+        if (! A[1].equals("Regulatory_Build")){
+            System.exit(1);
+        }
+        if (! A[2].equals("regulatory_region")) {
+            logger.error(String.format("Unexpected element type %s",A[2]));
+        }
+        Integer from,to;
+        try {
+            from=Integer.parseInt(A[3]);
+            to=Integer.parseInt(A[4]);
+            String annot = A[8];
+             elem = parseAnnot(chrom,from,to,annot);
+        } catch (NumberFormatException ne) {
+            ne.printStackTrace();
+        }
+        return elem;
+    }
+
 
 
     /**
@@ -96,7 +100,7 @@ public class GeneRegGTFParser {
      * @param to
      * @param annot
      */
-    private void parseAnnot(String chrom,int from, int to, String annot) {
+    private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
         System.out.println(annot);
         String B[]=annot.split(";");
         String id=null;
@@ -108,58 +112,19 @@ public class GeneRegGTFParser {
                 feature_type=b.substring(13);
             }
         }
-        Element elem = new Element(chrom,from,to,id,feature_type);
-        addIfRegulatoryElementNearToTarget(elem,100000);
+        RegulatoryElement elem = new RegulatoryElement(chrom,from,to,id,feature_type);
+        return elem;
     }
 
 
-
-    public void addIfRegulatoryElementNearToTarget(Element elem, int threshold) {
-        String chrom="17";
-        int pos=7_687_538; // TP53 for GRCh38
-        if (elem.chrom.equals(chrom) && Math.abs(elem.from-pos)<threshold) {
-            regulatoryElements.add(elem);
-        }
-    }
-
-
-    /** These are the categories of regulatory elements in the Ensembl GTF. */
-    enum RegulationCategory {ENHANCER, OPEN_CHROMATIN,PROMOTER_FLANKING_REGION, CTCF_BINDING_SITE, PROMOTER, TF_BINDING_SITE};
-
-    static class Element {
-
-        public RegulationCategory category;
-        public String chrom;
-        public int from;
-        public int to;
-        public String id;
-
-        public Element(String chrom,int f, int t, String identifier,String cat) {
-            if (cat.equals("Enhancer")) {
-                this.category=RegulationCategory.ENHANCER;
-            } else if (cat.equalsIgnoreCase("Open chromatin")) {
-                this.category=RegulationCategory.OPEN_CHROMATIN;
-            } else if (cat.equalsIgnoreCase("Promoter Flanking Region")) {
-                this.category=RegulationCategory.PROMOTER_FLANKING_REGION;
-            } else if (cat.equalsIgnoreCase("CTCF Binding Site")) {
-                this.category=RegulationCategory.CTCF_BINDING_SITE;
-            }else if (cat.equalsIgnoreCase("Promoter")) {
-                this.category=RegulationCategory.PROMOTER;
-            }else if (cat.equalsIgnoreCase("TF binding site")) {
-                this.category=RegulationCategory.TF_BINDING_SITE;
-            }  else{
-                logger.fatal("DID NOT RECOGNIZE CATEGORY "+cat);
-                System.exit(1);
-            }
-            this.chrom=chrom;
-            this.to=t;
-            this.from=f;
-            this.id=identifier;
-
-
-        }
-
-    }
+//
+//    public void addIfRegulatoryElementNearToTarget(Element elem, int threshold) {
+//        String chrom="17";
+//        int pos=7_687_538; // TP53 for GRCh38
+//        if (elem.chrom.equals(chrom) && Math.abs(elem.from-pos)<threshold) {
+//            regulatoryElements.add(elem);
+//        }
+//    }
 
 
 
