@@ -45,7 +45,6 @@ public class SwitchScreens {
         model.setXdim(screenWidth);
         model.setYdim(screenHeight);
         logger.trace(String.format("Setting dimensions to x=%d y=%d",screenWidth,screenHeight ));
-        //presenter.setModel(model);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         setupStage(appView,name);
 
@@ -80,6 +79,7 @@ public class SwitchScreens {
         model.setYdim(screenHeight);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.getProjectName());
+        logger.trace(String.format("That models genome was ",model.getGenome().getGenomeBasename()));
         if (model.viewpointsInitialized()) {
             presenter.refreshViewPoints();
         }

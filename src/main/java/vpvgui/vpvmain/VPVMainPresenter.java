@@ -325,7 +325,7 @@ public class VPVMainPresenter implements Initializable {
     public void setModelInMainAndInAnalysisPresenter(Model mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
-        logger.trace("setModelInMainAndInAnalysisPresenter");
+        logger.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",mod.getGenome().getGenomeBuild(),model.getGenome().getGenomeBasename()));
         if (model.getMaxGCcontent()>0){
             this.maxGCContentTextField.setText(String.format("%.1f%%",model.getMaxGCContentPercent()));
         } else {
@@ -520,18 +520,18 @@ public class VPVMainPresenter implements Initializable {
             model.setGenomeUnpacked();
             return;
         }
-        GenomeGunZipper gindexer = new GenomeGunZipper(this.model.getGenome(),
+        GenomeGunZipper genomeGunZipper = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
-        gindexer.setOnSucceeded( event -> {
-            decompressGenomeLabel.setText(gindexer.getStatus());
-            if (gindexer.OK())
+        genomeGunZipper.setOnSucceeded( event -> {
+            decompressGenomeLabel.setText(genomeGunZipper.getStatus());
+            if (genomeGunZipper.OK())
                 model.setGenomeUnpacked();
         });
-        gindexer.setOnFailed(eventh -> {
+        genomeGunZipper.setOnFailed(eventh -> {
             decompressGenomeLabel.setText("Decompression failed");
-            PopupFactory.displayError("Could not decompress genome file" ,gindexer.getException().getMessage());
+            PopupFactory.displayError("Could not decompress genome file" ,genomeGunZipper.getException().getMessage());
         });
-        Thread th = new Thread(gindexer);
+        Thread th = new Thread(genomeGunZipper);
         th.setDaemon(true);
         th.start();
     }
@@ -1007,7 +1007,7 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void buildRegulatoryExome(ActionEvent event) {
         event.consume();
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder();
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model.getRegulatoryBuildPath(),model.getRefGenePath());
         logger.trace("buildRegulatoryExome");
     }
 

@@ -6,6 +6,9 @@ import vpvgui.exception.DownloadFileNotFoundException;
 
 import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.DataSource;
+import vpvgui.model.genome.Genome;
+import vpvgui.model.genome.HumanHg19;
+import vpvgui.model.genome.HumanHg38;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -14,6 +17,8 @@ public class GenomeDownloader {
     static Logger logger = Logger.getLogger(GenomeDownloader.class.getName());
     /** genome build symbol, e.g., hg19, mm10. */
     private String genomebuild=null;
+    /** Representation of the genome we will download. */
+    private Genome genome=null;
     /** URL to download the genome from UCSC. */
     private String url=null;
 
@@ -28,6 +33,7 @@ public class GenomeDownloader {
         logger.debug("Constructor of GenomeDownloader, build="+build);
         try {
             this.url=getGenomeURL(build);
+            this.genome=getGenome(build);
             logger.debug("Setting url to "+url);
         } catch (DownloadFileNotFoundException e){
             logger.error(e,e);
@@ -87,6 +93,26 @@ public class GenomeDownloader {
         } else {
             throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
         }
+    }
+
+
+    private Genome getGenome(String genomebuild) throws DownloadFileNotFoundException {
+        if (genomebuild.equals("hg19")) {
+            return new HumanHg19();
+        } else if (genomebuild.equals("hg38")) {
+            return new HumanHg38();
+        } else if (genomebuild.equals("mm9")) {
+            throw new DownloadFileNotFoundException(String.format("Not yet implemented: genome for build: %s.", genomebuild));
+        } else if (genomebuild.equals("mm10")) {
+            throw new DownloadFileNotFoundException(String.format("Not yet implemented: genome for build: %s.", genomebuild));
+        } else {
+            throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
+        }
+    }
+
+
+    private String getGenomeBasename() {
+        return this.genome.getGenomeBasename();
     }
 
 }

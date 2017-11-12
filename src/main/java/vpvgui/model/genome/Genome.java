@@ -60,7 +60,7 @@ public abstract class Genome implements Serializable {
 
     public String getGenomeURL() { return this.genomeURL;}
 
-    public String getGenomeBasename() { return this.genomeBasename;}
+    public abstract String getGenomeBasename();
 
     /**
      * The default constructor is called when the {@link vpvgui.model.Model} object is initialized.
@@ -81,7 +81,7 @@ public abstract class Genome implements Serializable {
 
     /** @return true if the chromFar.tar.gz file is found in the indicated directory. */
     protected boolean gZippedGenomeFileDownloaded() {
-        File f = new File(this.pathToGenomeDirectory + File.separator + "chromFa.tar.gz");
+        File f = new File(this.pathToGenomeDirectory + File.separator + getGenomeBasename());
         logger.trace(String.format("Checking existing of file %s",f.getAbsolutePath()));
         return (f.exists() && !f.isDirectory());
     }
@@ -150,5 +150,7 @@ public abstract class Genome implements Serializable {
         logger.trace(String.format("%s was %s",chromosomeFileBasename,ok));
         return ok;
     }
+
+    public abstract int getNumberOfCanonicalChromosomes();
 
 }

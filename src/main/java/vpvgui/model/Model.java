@@ -10,6 +10,7 @@ import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
@@ -21,8 +22,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 5L;
-    private static final String VERSION="0.2.11";
-    private static final String LAST_CHANGE_DATE="10/24/2017, 4:22 PM";
+    private static final String VERSION="0.3.1";
+    private static final String LAST_CHANGE_DATE="11/11/2017, 20:36 PM";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -351,6 +352,11 @@ public class Model implements Serializable {
                 break;
             }
         }
+    }
+
+    /** @return A list of Viewpoints that contain at least one selected fragment. */
+    public List<ViewPoint> getActiveViewPointList() {
+       return this.viewpointList.stream().filter(viewPoint -> viewPoint.hasValidProbe()).collect(Collectors.toList());
     }
 
 }

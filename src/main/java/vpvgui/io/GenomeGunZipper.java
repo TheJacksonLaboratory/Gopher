@@ -1,7 +1,5 @@
 package vpvgui.io;
 
-//import htsjdk.samtools.reference.FastaSequenceIndexCreator;
-import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -16,8 +14,12 @@ import java.io.*;
 
 /**
  * This class is responsible for g-unzipping and untarring a downloaded genome file.
+ * Note that UCSC download files are not 100% consistent. The Hg38 file has a prefix (hg38.chromFa.tar.gz) and when it
+ * unpacks, it does so into a new "chroms" directory. We need to create that directory in code for the un-gzipping and
+ * un-tarring to work. We then also need to transmit back to the model that the genome download path has been extended
+ * by "/chroms".
  * @author Peter Robinson
- * @version 0.2.1 (2017-10-20)
+ * @version 0.2.2 (2017-11-11)
  */
 public class GenomeGunZipper extends Task<Void>  {
     static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
@@ -25,9 +27,9 @@ public class GenomeGunZipper extends Task<Void>  {
    // private String genomeDirectoryPath=null;
     private Genome genome=null;
     /** This is the basename of the compressed genome file that we download from UCSC. */
-    private static final String genomeFileNameTarGZ = "chromFa.tar.gz";
+    private String genomeFileNameTarGZ = "chromFa.tar.gz";
     /** This is the basename of the decompressed but still tar'd genome file that we download from UCSC. */
-    private static final String genomeFileNameTar = "chromFa.tar";
+    private String genomeFileNameTar = "chromFa.tar";
     /** Size of buffer for reading the g-zip'd files.*/
     private static final int BUFFER_SIZE=1024;
 
@@ -44,6 +46,10 @@ public class GenomeGunZipper extends Task<Void>  {
     public GenomeGunZipper(Genome genom, ProgressIndicator pi) {
         this.progress=pi;
         this.genome=genom;
+        this.genomeFileNameTarGZ=this.genome.getGenomeBasename();
+        logger.trace(String.format("genomeFileNameTarGZ=%s",genomeFileNameTarGZ));
+        this.genomeFileNameTar=this.genomeFileNameTarGZ;
+        this.genomeFileNameTar.replaceAll(".gz","");
     }
 
     public Genome getGenome() {
@@ -81,6 +87,7 @@ public class GenomeGunZipper extends Task<Void>  {
         updateProgress(0.01); /* show progress as 1% to start off with */
         String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
+        boolean needToCreateDirectory=true;
         try {
             InputStream in = new FileInputStream(INPUT_GZIP_FILE);
             GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
@@ -91,6 +98,7 @@ public class GenomeGunZipper extends Task<Void>  {
             we are done.
              */
             double percentDone=0.01d;
+            String dirpath =this.genome.getPathToGenomeDirectory();
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 /** If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway. **/
                 if (entry.isDirectory()) {
@@ -98,8 +106,27 @@ public class GenomeGunZipper extends Task<Void>  {
                 } else {
                     int count;
                     byte data[] = new byte[BUFFER_SIZE];
-                    File outfile = new File(this.genome.getPathToGenomeDirectory() + File.separator +entry.getName());
-                    logger.trace("ungzip'ping "+ entry.getName());
+                    // Note that for hg38, the tar archive expands into a subdirectory called chroms.
+                    // If the files begin with "chroms", the direc
+                    String filename=entry.getName();
+                    logger.trace("ungzip'ping "+ filename);
+                    filename=filename.replaceAll("^\\./","");
+                    logger.trace("2 ungzip'ping "+ filename);
+                    if (needToCreateDirectory && filename.startsWith("chroms")) {
+                        // create a chroms directory if needed, otherwise we cannot unpack to it
+                        // this means that the archive wants to unpack to chroms/chr1 etc.
+                        logger.trace(String.format("Creating directory for chroms: %s",filename));
+                        String createDirPath =String.format("%s%schroms",dirpath,File.separator);
+                        File directory = new File(createDirPath);
+                        if (! directory.exists()) {
+                            logger.trace(String.format("Creating directory for chroms: %s",createDirPath));
+                            directory.mkdir();
+                        }
+                        this.genome.setPathToGenomeDirectory(createDirPath);// this extends the genome path.
+                        needToCreateDirectory=false; // only need to do this the first time.
+                    }
+                    // Note that since filename may have the "chroms" subdirectory itself, we do not need to add it here.
+                    File outfile = new File( dirpath+ File.separator +filename);
                     FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
                     try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE)) {
                         while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {

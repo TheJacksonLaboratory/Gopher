@@ -120,7 +120,7 @@ public class Downloader extends Task<Void> {
             throw new VPVException(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
         } catch (IOException e) {
             updateProgress(0.00);
-            throw new VPVException(String.format("IO Exception reading from URL: \"%s\"\n%s", urlstring, e.toString()));
+            throw new VPVException(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));
         } catch (Exception e){
             updateProgress(0.00);
             throw new VPVException(e.getMessage());

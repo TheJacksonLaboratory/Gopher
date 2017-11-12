@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * The purpose of this class is to encapsulate the FASTA Indexer in a Task.
  * @author Peter Robinson
- * @version 0.2.0 (2017-10-20)
+ * @version 0.2.1 (2017-11-11)
  */
 public class FASTAIndexManager extends Task<Void> {
 
@@ -58,11 +58,10 @@ public class FASTAIndexManager extends Task<Void> {
     @Override
     protected Void call() throws VPVException {
         final File genomeDirectory = new File(this.genomeDirectoryPath);
-        int n=genomeDirectory.listFiles().length;
+        int n=this.genome.getNumberOfCanonicalChromosomes();
         double blocksize=1.0/(double)n;
         double totalprogress=0d;
-        updateProgress(totalprogress);
-        this.progress.setProgress(0.0);
+        updateProgress(0.01);
         for (final File fileEntry : genomeDirectory.listFiles()) {
             String contigname=null;
             if (fileEntry.isDirectory()) {

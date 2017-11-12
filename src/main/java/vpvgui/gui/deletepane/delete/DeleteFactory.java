@@ -51,7 +51,7 @@ public class DeleteFactory {
         List<String> projectfiles = getProjectFiles();
         for (String pf:projectfiles) {
             ProjectFile proj = new ProjectFile(pf);
-            logger.trace(String.format("Project file %s; active %s",pf,activeProject));
+            logger.trace(String.format("Project file %s; activeProject \"%s\"",pf,activeProject));
             if (pf.contains(activeProject)) {
                 proj.setActive();
             } else {

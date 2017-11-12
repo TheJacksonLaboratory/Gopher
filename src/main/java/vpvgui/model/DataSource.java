@@ -30,7 +30,7 @@ public class DataSource {
     /** Basename of the file that we will store to disk */
     private static final String basename = "chromFa.tar.gz";
 
-    private static final String UCSChg38url = "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/chromFa.tar.gz";
+    private static final String UCSChg38url = "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz";
 
 
     private static final String UCSCmm9url = "http://hgdownload.soe.ucsc.edu/goldenPath/mm9/bigZips/chromFa.tar.gz";
