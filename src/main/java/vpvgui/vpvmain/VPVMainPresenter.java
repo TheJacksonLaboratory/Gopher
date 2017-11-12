@@ -1011,6 +1011,22 @@ public class VPVMainPresenter implements Initializable {
         RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model);
         try {
           //  builder.extractRegulomeForTargetGenes(model);
+            builder.setOnFailed(e-> {
+                PopupFactory.displayError("Failure to build regulatory exome.",
+                        builder.getException().getMessage());
+            });
+            builder.setOnSucceeded(e -> {
+                logger.trace("SUCCEEDED REGULATORY BUILD PARSE TODO DO SOMETHING ELSE");
+                try {
+                    builder.outputRegulatoryExomeBedFile("regTest.bed");
+                } catch (IOException ioe) {
+                    PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
+                }
+            });
+            Thread th = new Thread(builder);
+            th.setDaemon(true);
+            th.start();
+
         } catch (Exception e) {
             PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);
         }
@@ -1020,7 +1036,6 @@ public class VPVMainPresenter implements Initializable {
 
 
 }
-
 
 
 

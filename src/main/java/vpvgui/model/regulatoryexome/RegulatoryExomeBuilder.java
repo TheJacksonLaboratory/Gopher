@@ -7,9 +7,7 @@ import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,16 +57,29 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         Map<String,List<Integer>> chrom2posListMap=new HashMap<>();
         activeVP.stream().forEach(viewPoint -> {
             String chrom=viewPoint.getReferenceID();
+            chrom=chrom.replaceAll("chr",""); // remove the chr from chr1 etc.
             int pos = viewPoint.getGenomicPos();
             List<Integer> poslist=null;
             if (chrom2posListMap.containsKey(chrom)) {
                 poslist=chrom2posListMap.get(chrom);
             } else {
                 poslist=new ArrayList<>();
+                chrom2posListMap.put(chrom,poslist);
             }
             poslist.add(pos);
         });
         return chrom2posListMap;
+    }
+
+    public void outputRegulatoryExomeBedFile(String path) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+            for (RegulatoryElement regelem : this.targetRegulomeElementList) {
+                String name = String.format("%s[%s]",regelem.getId(),regelem.getCategory());
+                String outline = String.format("%s\t%d\t%d\t%s", regelem.getChrom(), regelem.getFrom(), regelem.getTo(), name);
+                writer.write(outline + "\n");
+            }
+            writer.close();
+
     }
 
 
@@ -85,7 +96,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 RegulatoryElement elem = parser.next();
                 String chrom=elem.getChrom();
                 if (! chrom2posListMap.containsKey(chrom)) {
-                    logger.error(String.format("Could not find chromosome %s in reg map",chrom));
+                    logger.error(String.format("Could not find chromosome \"%s\" in reg map",chrom));
                     continue;
                 }
                 List<Integer> starts = chrom2posListMap.get(chrom);
@@ -99,12 +110,29 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        for (String c:chrom2posListMap.keySet()){
+            logger.trace(String.format("chrom map has \"%s\"",c));
+        }
         logger.trace(String.format("We got %d regulatory elemenets",targetRegulomeElementList.size()));
         return null;
     }
 
 
+
+    /** Update the progress bar of the GUI in a separate thread.
+     * @param pr Current progress.
+     */
+    private void updateProgress(double pr) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override public void run() {
+                if (pi==null) {
+                    // do nothing
+                    return;
+                }
+                pi.setProgress(pr);
+            }
+        });
+    }
 
 
 
