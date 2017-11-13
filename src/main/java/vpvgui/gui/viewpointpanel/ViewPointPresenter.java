@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 /**
  * This class acts as a controller of the TabPanes which confirmDialog individual ViewPoints.
  * @author Peter Robinson
- * @version 0.2.6 (2017-11-02)
+ * @version 0.2.7 (2017-11-12)
  */
 public class ViewPointPresenter implements Initializable {
 
@@ -140,8 +140,6 @@ public class ViewPointPresenter implements Initializable {
     void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
         String url= urlmaker.getImageURL(vp,getHighlightRegions());
-        logger.trace(String.format("Refresh: %s",url));
-
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
         this.ucscWebEngine = ucscContentWebView.getEngine();
@@ -247,7 +245,7 @@ public class ViewPointPresenter implements Initializable {
                 if (item != null && !empty) {
                     getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
                 } else {
-                    getTableRow().setStyle(String.format("-fx-background-color: transparent;"));
+                    getTableRow().setStyle("-fx-background-color: transparent;");
                 }
             }
         });
@@ -307,6 +305,7 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        inRepetitiveTableColumn.setEditable(false);
 
         repeatContentUpColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getRepeatContentMarginUpAsPercent())));
@@ -320,6 +319,8 @@ public class ViewPointPresenter implements Initializable {
                     double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (rp > model.getMaxRepeatContent()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    } else {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                     }
                 }
             }
@@ -336,6 +337,8 @@ public class ViewPointPresenter implements Initializable {
                     double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (rp > model.getMaxRepeatContent()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    } else {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                     }
                 }
             }
@@ -353,6 +356,8 @@ public class ViewPointPresenter implements Initializable {
                     double gc = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (gc < model.getMinGCcontent() || gc > model.getMaxGCcontent()) { // GC content is like 0.25
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    } else {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                     }
                 }
             }
@@ -368,8 +373,9 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         this.vp.calculateViewpointScore();
-        this.vpScoreProperty.setValue(String.format("%s - Score: %.2f%% [%s], Length: %s",
+        this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 vp.getTargetName(),
+                vp.getAccession(),
                 100*vp.getScore(),
                 vp.getGenomicLocationString(),
                 vp.getActiveLengthInKilobases()));
