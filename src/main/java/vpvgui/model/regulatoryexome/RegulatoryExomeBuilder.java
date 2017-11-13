@@ -3,16 +3,16 @@ package vpvgui.model.regulatoryexome;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
+import vpvgui.model.VPVGene;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 /**
  * This class uses data from the Ensembl regulatory build as well as the UCSC refGene.txt.gz files to create
@@ -30,7 +30,8 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
     private Model model=null;
 
-    private List<RegulatoryElement> targetRegulomeElementList=null;
+    private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
+
 
     private int threshold=50_000;
 
@@ -41,7 +42,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
-        targetRegulomeElementList=new ArrayList<>();
+        this.regulatoryElementSet=new HashSet<>();
         logger.trace(String.format("Get regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
     }
 
@@ -71,16 +72,75 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         return chrom2posListMap;
     }
 
-    public void outputRegulatoryExomeBedFile(String path) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
-            for (RegulatoryElement regelem : this.targetRegulomeElementList) {
-                String name = String.format("%s[%s]",regelem.getId(),regelem.getCategory());
-                String outline = String.format("%s\t%d\t%d\t%s", regelem.getChrom(), regelem.getFrom(), regelem.getTo(), name);
-                writer.write(outline + "\n");
+    public void outputRegulatoryExomeBedFile(String directoryPath) throws IOException {
+        String name = this.model.getProjectName();
+        String fullpath = String.format("%s%s%s-regulatoryExomePanel.bed", directoryPath, File.separator, name);
+        // sort the elements
+        List<RegulatoryBEDFileEntry> lst = new ArrayList<>();
+        lst.addAll(regulatoryElementSet);
+        Collections.sort(lst);
+
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fullpath));
+        for (RegulatoryBEDFileEntry rentry : lst) {
+            writer.write(rentry.toString() + "\n");
+        }
+        writer.close();
+    }
+
+    /**
+     * Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here.
+     */
+    private void collectExonsFromTargetGenes() throws Exception {
+        Map<String, ViewPoint> vpmap = new HashMap<>();
+        for (ViewPoint vp : this.model.getActiveViewPointList()) {
+            vpmap.put(vp.getAccession(), vp);
+        }
+
+
+        InputStream fileStream = new FileInputStream(this.pathToRefGeneFile);
+        InputStream gzipStream = new GZIPInputStream(fileStream);
+        Reader decoder = new InputStreamReader(gzipStream);
+        BufferedReader br = new BufferedReader(decoder);
+        String line;
+        while ((line = br.readLine()) != null) {
+            //System.out.println(line);
+            String A[] = line.split("\t");
+            String accession = A[1];
+            if (!vpmap.containsKey(accession)) {
+                continue; // this transcript is not contained in our active targets, so we can skip it.
             }
-            writer.close();
+            String chrom = A[2];
+            if (chrom.contains("_")) {
+                continue;
+            }
+            if (chrom.contains("random")) {
+                continue;
+            } /* do not take gene models on random contigs. */
+            String strand = A[3];
+            String[] beginnings = A[9].split(",");
+            String[] endings = A[10].split(","); // exon begins and ends.
+            String name2=A[12];
+            if (beginnings.length != endings.length) { // should never happen!
+                logger.error(String.format("beginnings length=%d and endlings length = %d",beginnings.length,endings.length));
+                throw new VPVException(String.format("Malformed line for gene %s (%s): number of exon starts/ends should be equal, but we found %d/%d",
+                        name2,accession,beginnings.length,endings.length));
+            }
+            for (int i=0;i<beginnings.length;++i) {
+                int b=Integer.parseInt(beginnings[i]);
+                int e=Integer.parseInt(endings[i]);
+                String name=String.format("%s-exon%d-%d",name2,b,e); // this name will take care of duplicates from different transcripts.
+                //String chrom, int from, int to, String name
+                RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
+                this.regulatoryElementSet.add(regentry);
+            }
+        }
+        br.close();
 
     }
+
+
+
 
 
     /** extractRegulomeForTargetGenes*/
@@ -103,17 +163,16 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 // if the regulatory element is within threshold of any target gene, then keep the regulatory element
                 Integer keepers = starts.stream().filter(i -> elem.isLocatedWithinThreshold(i,threshold)).findAny().orElse(0);
                 if (keepers>0) {
-                    targetRegulomeElementList.add(elem);
+                    RegulatoryBEDFileEntry rentry = new RegulatoryBEDFileEntry(elem);
+                    this.regulatoryElementSet.add(rentry);
                 }
             }
             parser.close();
-        } catch (IOException e) {
+            collectExonsFromTargetGenes();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        for (String c:chrom2posListMap.keySet()){
-            logger.trace(String.format("chrom map has \"%s\"",c));
-        }
-        logger.trace(String.format("We got %d regulatory elemenets",targetRegulomeElementList.size()));
+        logger.trace(String.format("We got %d regulatory elemenets",regulatoryElementSet.size()));
         return null;
     }
 

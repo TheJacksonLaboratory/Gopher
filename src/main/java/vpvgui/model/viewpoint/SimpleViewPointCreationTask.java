@@ -60,6 +60,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).
                     isForwardStrand(vpvgene.isForward()).
+                    accessionNr(vpvgene.getRefSeqID()).
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */

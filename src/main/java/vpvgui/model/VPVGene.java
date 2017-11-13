@@ -11,11 +11,11 @@ import java.util.*;
  * transcription start sites recorded in the set {@link #positions} is thus one-based and corresponds to
  * the positions seen in the UCSC browser.
  * @author Peter Robinson
- * @version 0.0.3 (2017-10-02)
+ * @version 0.1.3 (2017-10-02)
  */
 public class VPVGene implements Comparable<VPVGene>, Serializable {
     /** serialization version ID */
-    static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 2L;
     /** An NCBI RefSeq id such as NM_001353311. */
     private String refSeqID =null;
     /** A gene symbolsuch as IGSF11 */

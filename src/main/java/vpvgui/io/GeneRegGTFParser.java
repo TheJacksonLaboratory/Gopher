@@ -117,15 +117,5 @@ public class GeneRegGTFParser {
     }
 
 
-//
-//    public void addIfRegulatoryElementNearToTarget(Element elem, int threshold) {
-//        String chrom="17";
-//        int pos=7_687_538; // TP53 for GRCh38
-//        if (elem.chrom.equals(chrom) && Math.abs(elem.from-pos)<threshold) {
-//            regulatoryElements.add(elem);
-//        }
-//    }
-
-
 
 }

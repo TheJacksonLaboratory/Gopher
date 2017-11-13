@@ -58,7 +58,7 @@ import java.util.ResourceBundle;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.2.6 (2017-11-11)
+ * @version 0.2.8 (2017-11-12)
  */
 public class VPVMainPresenter implements Initializable {
     static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
@@ -1008,6 +1008,17 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void buildRegulatoryExome(ActionEvent event) {
         event.consume();
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory to store regulatory exome BED file.");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath()=="") {
+            logger.error("Could not set directory to write regulatory exome BED file.");
+            PopupFactory.displayError("Error","Could not get path to write regulatory exome BED file.");
+            return;
+        }
+        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
+
+
         RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model);
         try {
           //  builder.extractRegulomeForTargetGenes(model);
@@ -1016,9 +1027,8 @@ public class VPVMainPresenter implements Initializable {
                         builder.getException().getMessage());
             });
             builder.setOnSucceeded(e -> {
-                logger.trace("SUCCEEDED REGULATORY BUILD PARSE TODO DO SOMETHING ELSE");
                 try {
-                    builder.outputRegulatoryExomeBedFile("regTest.bed");
+                    builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
                 } catch (IOException ioe) {
                     PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
                 }

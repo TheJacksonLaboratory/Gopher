@@ -30,12 +30,12 @@ import java.util.stream.IntStream;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.1.3 (2017-11-01)
+ * @version 0.2.1 (2017-11-12)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 3L;
+    static final long serialVersionUID = 4L;
     /** The possible approaches used to generate this Viewpoint. */
     public static enum Approach {SIMPLE, EXTENDED};
     /* The approach used to generate this viewpoint */
@@ -46,7 +46,9 @@ public class ViewPoint implements Serializable {
      * if one of the margins has a higher repeat content.*/
     private double maximumRepeatContent;
     /** "Home" of the viewpoint, usually a chromosome */
-    private String referenceSequenceID;
+    private String chromosomeID;
+    /** Accession number of this gene, e.g., NM_0001234 .*/
+    private String accession=null;
     /** Name of the target of the viewpoint (often a gene).*/
     private String targetName;
     /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
@@ -100,11 +102,12 @@ public class ViewPoint implements Serializable {
     public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
     /** Overall score of this Viewpoint.*/
     private double score;
-    /** Minimum allowable fragment size for the simple approach */
-   // private static final int SIMPLE_APPROACH_MINSIZE=146;
     /** Maximim allowable fragment size for simple approach */
-    private static final int SIMPLE_APPROACH_MAXSIZE=20000;
+    private static final int SIMPLE_APPROACH_MAXSIZE=20_000;
 
+    public String getAccession() {
+        return accession;
+    }
 
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
@@ -141,7 +144,7 @@ public class ViewPoint implements Serializable {
      */
 
     public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
-        this.referenceSequenceID=vp.referenceSequenceID;
+        this.chromosomeID =vp.chromosomeID;
         this.genomicPos=vp.genomicPos;
         this.targetName=vp.targetName;
         this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
@@ -152,6 +155,7 @@ public class ViewPoint implements Serializable {
         this.minGcContent=vp.minGcContent;
         this.minFragSize=vp.minFragSize;
         this.marginSize= vp.marginSize;
+        this.accession=vp.accession;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
         logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
@@ -167,7 +171,7 @@ public class ViewPoint implements Serializable {
      * @param builder Builder class aimed to make constructing a ViewPoint object unambiguous.
      */
     private ViewPoint(Builder builder){
-        this.referenceSequenceID=builder.referenceSequenceID;
+        this.chromosomeID =builder.chromosomeID;
         this.genomicPos=builder.genomicPos;
         this.targetName=builder.targetName;
         this.isPositiveStrand=builder.isPositiveStrand;
@@ -184,6 +188,7 @@ public class ViewPoint implements Serializable {
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
         this.marginSize= builder.marginSize;
+        this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
         init(builder.fastaReader);
@@ -197,7 +202,7 @@ public class ViewPoint implements Serializable {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
-        segmentFactory = new SegmentFactory(this.referenceSequenceID,
+        segmentFactory = new SegmentFactory(this.chromosomeID,
                 this.genomicPos,
                 fastaReader,
                 this.upstreamNucleotideLength,
@@ -217,7 +222,8 @@ public class ViewPoint implements Serializable {
      */
     public static class Builder {
         //  parameters required in the constructor
-        private String referenceSequenceID=null;
+        private String chromosomeID =null;
+        private String accessionNr=null;
         private int genomicPos;
         // other params
         private IndexedFastaSequenceFile fastaReader;
@@ -241,7 +247,7 @@ public class ViewPoint implements Serializable {
          * @param pos central position of the viewpoint on the reference sequence
          */
         public Builder(String refID, int pos) {
-            this.referenceSequenceID = refID;
+            this.chromosomeID = refID;
             this.genomicPos    = pos;
         }
         public Builder targetName(String val)
@@ -258,6 +264,9 @@ public class ViewPoint implements Serializable {
         }
         public Builder minimumGcContent(double minGC) {
             this.minGcContent=minGC; return this;
+        }
+        public Builder accessionNr(String acc) {
+            this.accessionNr=acc;return this;
         }
         public Builder downstreamLength(int val) {
             this.downstreamNtLength=val; return this;
@@ -287,7 +296,7 @@ public class ViewPoint implements Serializable {
     private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
-            Segment restFrag = new Segment.Builder(referenceSequenceID,
+            Segment restFrag = new Segment.Builder(chromosomeID,
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
@@ -296,7 +305,7 @@ public class ViewPoint implements Serializable {
     }
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
-        return referenceSequenceID;
+        return chromosomeID;
     }
 
     /** @return the middle (anchor) position of this ViewPoint. */
@@ -304,7 +313,7 @@ public class ViewPoint implements Serializable {
         return genomicPos;
     }
     /** @return a string like chr4:29,232,796 */
-    public String getGenomicLocationString() { return String.format("%s:%s",referenceSequenceID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
+    public String getGenomicLocationString() { return String.format("%s:%s", chromosomeID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
     /** @return overall score of this ViewPoint. TODO what about simple?     */
     public final double getScore() {
         return score;
@@ -492,7 +501,7 @@ public class ViewPoint implements Serializable {
                 orElse(null);
 
         if (centerSegment == null) {
-            logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), referenceSequenceID , startPos , endPos ));
+            logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
@@ -692,7 +701,7 @@ public class ViewPoint implements Serializable {
         ViewPoint othervp = (ViewPoint)other;
         return (targetName.equals(othervp.targetName) &&
         genomicPos == othervp.genomicPos &&
-        referenceSequenceID.equals(othervp.referenceSequenceID));
+        chromosomeID.equals(othervp.chromosomeID));
 
     }
 
