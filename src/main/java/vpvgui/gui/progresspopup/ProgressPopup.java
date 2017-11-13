@@ -23,16 +23,18 @@ public class ProgressPopup {
 
     private String progressTitle=null;
 
+    private String progressLabel=null;
+
     private Stage window=null;
 
 
     public void startProgress(final Task task) throws InterruptedException {
-        Label label=new Label("Downloading Ensembl regulatory build file");
+        Label label=new Label(progressLabel);
         FlowPane root = new FlowPane();
         root.setPadding(new Insets(10));
         root.setHgap(10);
         root.getChildren().addAll(label,pb);
-        Scene scene = new Scene(root, 300, 100);
+        Scene scene = new Scene(root, 400, 100);
         window = new Stage();
         window.setTitle(this.progressTitle);
         window.setScene(scene);
@@ -45,10 +47,10 @@ public class ProgressPopup {
     }
 
 
-    public ProgressPopup(String title) {
+    public ProgressPopup(String title, String label) {
 
         progressTitle=title;
-
+        progressLabel=label;
     }
 
     public ProgressIndicator getProgressIndicator(){return  this.pb; }

@@ -986,19 +986,22 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
 
-        ProgressPopup popup = new ProgressPopup("Download regulatory build");
+        ProgressPopup popup = new ProgressPopup("Downloading...", "Downloading Ensembl regulatory build file");
         ProgressIndicator progressIndicator = popup.getProgressIndicator();
 
         Downloader downloadTask = new Downloader(file, url, basename, progressIndicator);
         downloadTask.setOnSucceeded( e -> {
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            logger.trace("Setting regulatory build path in model to "+abspath);
             model.setRegulatoryBuildPath(abspath);
 
             popup.close();
         });
+        downloadTask.setOnFailed(e -> {
+            logger.error("Download of regulatory build failed");
+        });
         try {
             popup.startProgress(downloadTask);
-
         } catch (InterruptedException e) {
             PopupFactory.displayException("Error","Could not download regulatory build", e);
         }
@@ -1019,7 +1022,22 @@ public class VPVMainPresenter implements Initializable {
         logger.info("downloadGenome to directory  "+file.getAbsolutePath());
 
 
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model);
+
+        ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
+        ProgressIndicator progressIndicator = popup.getProgressIndicator();
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
+        /*
+
+
+        Downloader downloadTask = new Downloader(file, url, basename, progressIndicator);
+        downloadTask.setOnSucceeded( e -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            model.setRegulatoryBuildPath(abspath);
+
+            popup.close();
+        });
+
+         */
         try {
           //  builder.extractRegulomeForTargetGenes(model);
             builder.setOnFailed(e-> {
@@ -1032,10 +1050,14 @@ public class VPVMainPresenter implements Initializable {
                 } catch (IOException ioe) {
                     PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
                 }
+                popup.close();
             });
-            Thread th = new Thread(builder);
-            th.setDaemon(true);
-            th.start();
+            try {
+                popup.startProgress(builder);
+
+            } catch (InterruptedException e) {
+                PopupFactory.displayException("Error","Could not download regulatory build", e);
+            }
 
         } catch (Exception e) {
             PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);

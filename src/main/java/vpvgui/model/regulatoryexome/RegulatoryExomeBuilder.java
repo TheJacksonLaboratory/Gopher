@@ -6,12 +6,10 @@ import org.apache.log4j.Logger;
 import vpvgui.exception.VPVException;
 import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
-import vpvgui.model.VPVGene;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -35,19 +33,20 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
     private int threshold=50_000;
 
-    ProgressIndicator pi=null;
+    ProgressIndicator progressInd =null;
 
 
-    public RegulatoryExomeBuilder(Model model) {
+    public RegulatoryExomeBuilder(Model model,ProgressIndicator pi) {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
         this.regulatoryElementSet=new HashSet<>();
+        this.progressInd=pi;
         logger.trace(String.format("Get regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
     }
 
     public void setProgressIndicator(ProgressIndicator prog) {
-        this.pi=prog;
+        this.progressInd =prog;
     }
 
 
@@ -93,6 +92,9 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      */
     private void collectExonsFromTargetGenes() throws Exception {
         Map<String, ViewPoint> vpmap = new HashMap<>();
+        updateProgress(0.50);
+        int j=0;
+        int totalgenes=vpmap.size();
         for (ViewPoint vp : this.model.getActiveViewPointList()) {
             vpmap.put(vp.getAccession(), vp);
         }
@@ -122,7 +124,6 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             String[] endings = A[10].split(","); // exon begins and ends.
             String name2=A[12];
             if (beginnings.length != endings.length) { // should never happen!
-                logger.error(String.format("beginnings length=%d and endlings length = %d",beginnings.length,endings.length));
                 throw new VPVException(String.format("Malformed line for gene %s (%s): number of exon starts/ends should be equal, but we found %d/%d",
                         name2,accession,beginnings.length,endings.length));
             }
@@ -134,6 +135,8 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
                 this.regulatoryElementSet.add(regentry);
             }
+            updateProgress((0.5 + (double)++j/(double)totalgenes));
+
         }
         br.close();
 
@@ -143,11 +146,13 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
 
 
-    /** extractRegulomeForTargetGenes*/
+    /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
     protected Void call() {
         this.model=model;
         Map<String,List<Integer>> chrom2posListMap=getChrom2PosListMap(model);
+        int n_genesTimesTen=model.getVPVGeneList().size()*10;
+        int j=0;
         //read in the regulatory build and save the intervals that are in the right place.
         GeneRegGTFParser parser = new GeneRegGTFParser(model.getRegulatoryBuildPath());
         try {
@@ -165,6 +170,9 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 if (keepers>0) {
                     RegulatoryBEDFileEntry rentry = new RegulatoryBEDFileEntry(elem);
                     this.regulatoryElementSet.add(rentry);
+                    if (++j%10==0) {
+                        updateProgress((double)j/(double)n_genesTimesTen);
+                    }
                 }
             }
             parser.close();
@@ -184,11 +192,11 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private void updateProgress(double pr) {
         javafx.application.Platform.runLater(new Runnable() {
             @Override public void run() {
-                if (pi==null) {
+                if (progressInd ==null) {
                     // do nothing
                     return;
                 }
-                pi.setProgress(pr);
+                progressInd.setProgress(pr);
             }
         });
     }

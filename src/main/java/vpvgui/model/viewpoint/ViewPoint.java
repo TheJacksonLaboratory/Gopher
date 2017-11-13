@@ -190,7 +190,6 @@ public class ViewPoint implements Serializable {
         this.marginSize= builder.marginSize;
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
-        logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
         init(builder.fastaReader);
     }
 
@@ -494,7 +493,6 @@ public class ViewPoint implements Serializable {
         boolean resolved = true;
         approach = Approach.SIMPLE;
         // find the fragment that contains genomicPos
-        logger.error(String.format("GenerateVPSimple, size of restrictionFragmentSegmentList is %d",restrictionSegmentList.size()));
         Segment centerSegment = restrictionSegmentList.stream().
                 filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
                 findFirst().
@@ -535,11 +533,8 @@ public class ViewPoint implements Serializable {
                 resolved = true;
             }
         }
-
         setDerivationApproach(Approach.SIMPLE);
         calculateViewpointScore();
-        logger.trace("Done calculating Simple viewpoint, start pos of view point is " + getStartPos() +
-                ", score=" + getScoreAsPercentString());
         setResolved(resolved);
     }
 
