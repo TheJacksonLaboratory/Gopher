@@ -317,7 +317,15 @@ public class VPAnalysisPresenter implements Initializable {
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         });
+    }
 
+
+    public void showNewAnalysis() {
+        logger.trace(String.format("Trying to clear the table view that has %d items", viewPointTableView.getItems().size()));
+        viewPointTableView.getItems().clear();
+        logger.trace(String.format("Trying to clear the table view that has %d items", viewPointTableView.getItems().size()));
+        this.viewPointTableView.getSelectionModel().clearSelection();
+        init();
     }
 
 }

@@ -297,6 +297,7 @@ public class VPVMainPresenter implements Initializable {
             this.transcriptDownloadPI.setProgress(1.0);
         } else {
             this.downloadedTranscriptsLabel.setText("...");
+            this.transcriptDownloadPI.setProgress(0.0);
         }
         if (model.isGenomeIndexed()) {
             this.indexGenomeLabel.setText("Genome files successfully indexed");
@@ -304,6 +305,16 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.indexGenomeLabel.setText("...");
             this.genomeIndexPI.setProgress(0.00);
+        }
+        if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
+            this.restrictionEnzymeLabel.setText(model.getRestrictionEnzymeString());
+        } else {
+            this.restrictionEnzymeLabel.setText(null);
+        }
+        if (this.model.getVPVGeneList()!=null && this.model.getVPVGeneList().size()>0) {
+            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getVPVGeneList().size() ));
+        } else {
+            this.nValidGenesLabel.setText(null);
         }
     }
 
@@ -371,13 +382,24 @@ public class VPVMainPresenter implements Initializable {
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
-        logger.trace("Initializing prompts");
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxRepContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAXIMUM_REPEAT_CONTENT));
+    }
+
+    /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
+     * will not see the values chosen for the previous model, but will instead see the grey prompt text default values.
+     */
+    private void removePreviousValuesFromTextFields() {
+        this.sizeUpTextField.setText(null);
+        this.sizeDownTextField.setText(null);
+        this.minGCContentTextField.setText(null);
+        this.maxGCContentTextField.setText(null);
+        this.minFragSizeTextField.setText(null);
+        this.maxRepContentTextField.setText(null);
     }
 
     /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
@@ -719,7 +741,9 @@ public class VPVMainPresenter implements Initializable {
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+        this.vpanalysispresenter.showNewAnalysis();
         setInitializedValuesInGUI();
+        removePreviousValuesFromTextFields();
         e.consume();
         /* TODO */
         logger.error("TODO -- also re-initialize first tab");
