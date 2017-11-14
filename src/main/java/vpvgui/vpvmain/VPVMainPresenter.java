@@ -1062,6 +1062,7 @@ public class VPVMainPresenter implements Initializable {
             builder.setOnFailed(e-> {
                 PopupFactory.displayError("Failure to build regulatory exome.",
                         builder.getException().getMessage());
+                popup.close();
             });
             builder.setOnSucceeded(e -> {
                 try {

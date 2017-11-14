@@ -27,12 +27,12 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private String pathToRefGeneFile=null;
 
     private Model model=null;
-
+    /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
+     * regulatory elements and exons of our target genes. */
     private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
-
-
+    /** Maximum distance to TSS (genomicPos) to be included as a regulatory element. TODO Make more sophisticated*/
     private int threshold=50_000;
-
+    /** Reference to the progress indicator that will be shown while we are creating the elements and the BED file. */
     ProgressIndicator progressInd =null;
 
 
@@ -42,14 +42,14 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         this.model=model;
         this.regulatoryElementSet=new HashSet<>();
         this.progressInd=pi;
-        logger.trace(String.format("Get regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
+        logger.trace(String.format("We will export regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
     }
 
-    public void setProgressIndicator(ProgressIndicator prog) {
-        this.progressInd =prog;
-    }
-
-
+    /** @return map of active viewpoints arranged according to chromosome so that we can quickly find them when we
+     * are screening regulatory elements (which are arranged according to chromosome.
+     * @param model
+     * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
+     */
     private Map<String,List<Integer>> getChrom2PosListMap(Model model) {
         // get all of the viewpoints with at least one selected fragment.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
@@ -148,7 +148,6 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
     protected Void call() {
-        this.model=model;
         Map<String,List<Integer>> chrom2posListMap=getChrom2PosListMap(model);
         int n_genesTimesTen=model.getVPVGeneList().size()*10;
         int j=0;

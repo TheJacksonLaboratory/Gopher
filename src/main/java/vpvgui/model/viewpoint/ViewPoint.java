@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.2.1 (2017-11-12)
+ * @version 0.2.2 (2017-11-12)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
@@ -465,7 +465,7 @@ public class ViewPoint implements Serializable {
 
 
         if (firstSelectedIndex+lastSelectedIndex==0) {
-            logger.trace("Skipping trimming Segment List because no segments are selected for "+getTargetName());
+            logger.error("Skipping trimming Segment List because no segments are selected for "+getTargetName());
         } else {
             int i = Math.max(0, firstSelectedIndex - 1);
             int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
@@ -478,8 +478,6 @@ public class ViewPoint implements Serializable {
 
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScore();
-        logger.trace("Done calculated extended viewpoint; start pos of view point is "+getStartPos()+
-                ", score="+getScoreAsPercentString());
         setResolved(resolved);
     }
 

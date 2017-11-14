@@ -26,6 +26,11 @@ import static vpvgui.io.Platform.getVPVDir;
 
 /**
  * App for calculating and displaying viewpoints for Capture Hi C.
+ * @author Peter Robinson
+ * @author Peter Hansen
+ * @author Daniel Danis
+ * @author Hannah Blau
+ * @version 0.3.1 (2017-11-12)
  */
 public class ViewPointViewer extends Application {
 
