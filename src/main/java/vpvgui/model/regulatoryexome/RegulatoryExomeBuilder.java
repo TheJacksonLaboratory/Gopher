@@ -30,8 +30,10 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
     private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
-    /** Maximum distance to TSS (genomicPos) to be included as a regulatory element. TODO Make more sophisticated*/
-    private int threshold=50_000;
+    /** Maximum distance 3' (downstream) to TSS (genomicPos) to be included as a regulatory element.*/
+    private int downstreamThreshold =10_000;
+    /** Maximum distance 5' (upstream) to TSS (genomicPos) to be included as a regulatory element.*/
+    private int upstreamThreshold=50_000;
     /** Reference to the progress indicator that will be shown while we are creating the elements and the BED file. */
     ProgressIndicator progressInd =null;
 
@@ -50,23 +52,22 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      * @param model
      * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
      */
-    private Map<String,List<Integer>> getChrom2PosListMap(Model model) {
+    private Map<String,List<ViewPoint>> getChrom2PosListMap(Model model) {
         // get all of the viewpoints with at least one selected fragment.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
-        Map<String,List<Integer>> chrom2posListMap=new HashMap<>();
+        Map<String,List<ViewPoint>> chrom2posListMap=new HashMap<>();
         activeVP.stream().forEach(viewPoint -> {
             String chrom=viewPoint.getReferenceID();
             chrom=chrom.replaceAll("chr",""); // remove the chr from chr1 etc.
-            int pos = viewPoint.getGenomicPos();
-            List<Integer> poslist=null;
+            List<ViewPoint> vplist=null;
             if (chrom2posListMap.containsKey(chrom)) {
-                poslist=chrom2posListMap.get(chrom);
+                vplist=chrom2posListMap.get(chrom);
             } else {
-                poslist=new ArrayList<>();
-                chrom2posListMap.put(chrom,poslist);
+                vplist=new ArrayList<>();
+                chrom2posListMap.put(chrom,vplist);
             }
-            poslist.add(pos);
+            vplist.add(viewPoint);
         });
         return chrom2posListMap;
     }
@@ -148,7 +149,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
     protected Void call() {
-        Map<String,List<Integer>> chrom2posListMap=getChrom2PosListMap(model);
+        Map<String,List<ViewPoint>> chrom2vpListMap=getChrom2PosListMap(model);
         int n_genesTimesTen=model.getVPVGeneList().size()*10;
         int j=0;
         //read in the regulatory build and save the intervals that are in the right place.
@@ -158,14 +159,14 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             while (parser.hasNext()) {
                 RegulatoryElement elem = parser.next();
                 String chrom=elem.getChrom();
-                if (! chrom2posListMap.containsKey(chrom)) {
-                    logger.error(String.format("Could not find chromosome \"%s\" in reg map",chrom));
+                if (! chrom2vpListMap.containsKey(chrom)) {
+                    //Very probably not an error but just a chromosome or scaffold that has not target gene for this panel
                     continue;
                 }
-                List<Integer> starts = chrom2posListMap.get(chrom);
-                // if the regulatory element is within threshold of any target gene, then keep the regulatory element
-                Integer keepers = starts.stream().filter(i -> elem.isLocatedWithinThreshold(i,threshold)).findAny().orElse(0);
-                if (keepers>0) {
+                List<ViewPoint> vpList = chrom2vpListMap.get(chrom);
+                // if the regulatory element is within downstreamThreshold of any target gene, then keep the regulatory element
+                ViewPoint keepers = vpList.stream().filter(vp -> elem.isLocatedWithinThreshold(vp, upstreamThreshold,downstreamThreshold)).findAny().orElse(null);
+                if (keepers!=null) {
                     RegulatoryBEDFileEntry rentry = new RegulatoryBEDFileEntry(elem);
                     this.regulatoryElementSet.add(rentry);
                     if (++j%10==0) {

@@ -384,6 +384,9 @@ public class ViewPoint implements Serializable {
     }
 
 
+    public boolean isPositiveStrand() { return isPositiveStrand; }
+
+
     /**
      * This function can be used to reshape the viewpoint according to rules that were developed in consultation with bench scientists.
      * In this approach, the viewpoint is seen as a set of selected fragments within a given range around {@link #genomicPos}.

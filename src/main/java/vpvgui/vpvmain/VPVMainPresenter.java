@@ -1066,6 +1066,7 @@ public class VPVMainPresenter implements Initializable {
             });
             builder.setOnSucceeded(e -> {
                 try {
+                    logger.trace(String.format("Will output regulatory panel BED file to %s",file.getAbsolutePath()));
                     builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
                 } catch (IOException ioe) {
                     PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
