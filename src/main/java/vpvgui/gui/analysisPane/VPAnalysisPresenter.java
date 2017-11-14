@@ -285,7 +285,7 @@ public class VPAnalysisPresenter implements Initializable {
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
             logger.warn("[View Points not initialized");
-            PopupFactory.displayError("Could not confirmDialog viewpoints","No initialiyed viewpoints were found");
+            PopupFactory.displayError("Could not confirmDialog viewpoints","No initialized viewpoints were found");
             return;
         }
         refreshVPTable();

@@ -69,14 +69,11 @@ public class VPVMainPresenter implements Initializable {
      * obtain a reference to the primary scene, which is needed by FileChooser, etc. It is set in the FXML
      * document to refer to the Anchor pane that is the root node of the GUI.
      */
-    @FXML
-    private Node rootNode;
+    @FXML private Node rootNode;
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML
-    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
+    @FXML private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML
-    private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
+    @FXML private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
     @FXML private ChoiceBox<String> genomeChoiceBox;
     @FXML private ChoiceBox<String> approachChoiceBox;
     /** Clicking this button downloads the genome build and unpacks it.*/
@@ -138,6 +135,8 @@ public class VPVMainPresenter implements Initializable {
     private VPAnalysisPresenter vpanalysispresenter;
     /** View for the second tab. */
     private VPAnalysisView vpanalysisview;
+    /** Reference to the primary stage. We use this to set the title when we switch models (new from File menu). */
+    private Stage primaryStage=null;
 
     transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
     public final int getSizeUp() { return sizeUp.get();}
@@ -724,7 +723,15 @@ public class VPVMainPresenter implements Initializable {
      * @param e Event triggered by new viewpoint command.
      */
     @FXML public void startNewProject(ActionEvent e) {
-        logger.trace("Start new viewpoint");
+        PopupFactory factory = new PopupFactory();
+        String projectname = factory.getProjectName();
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (projectname == null || projectname.length() <1) {
+            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
+            return;
+        }
+
         ObservableList<Tab> panes = this.tabpane.getTabs();
         /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
         List<Tab> tabsToBeRemoved=new ArrayList<>();
@@ -732,21 +739,21 @@ public class VPVMainPresenter implements Initializable {
         for (Tab tab : panes) {
             String id=tab.getId();
             if (id != null && (id.equals("analysistab") || id.equals("setuptab") )) { continue; }
-            logger.trace("Closing tab "+id);
             tabsToBeRemoved.add(tab);
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
         this.model=new Model();
+        this.model.setProjectName(projectname);
+        if (this.primaryStage!=null)
+            this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",projectname));
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        this.vpanalysispresenter.showNewAnalysis();
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
         removePreviousValuesFromTextFields();
         e.consume();
-        /* TODO */
-        logger.error("TODO -- also re-initialize first tab");
     }
 
     /** Display the settings (parameters) of the current viewpoint. */
@@ -1050,20 +1057,8 @@ public class VPVMainPresenter implements Initializable {
         ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
         ProgressIndicator progressIndicator = popup.getProgressIndicator();
         RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
-        /*
 
-
-        Downloader downloadTask = new Downloader(file, url, basename, progressIndicator);
-        downloadTask.setOnSucceeded( e -> {
-            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            model.setRegulatoryBuildPath(abspath);
-
-            popup.close();
-        });
-
-         */
         try {
-          //  builder.extractRegulomeForTargetGenes(model);
             builder.setOnFailed(e-> {
                 PopupFactory.displayError("Failure to build regulatory exome.",
                         builder.getException().getMessage());
@@ -1089,7 +1084,9 @@ public class VPVMainPresenter implements Initializable {
         logger.trace("buildRegulatoryExome");
     }
 
-
+    public void setPrimaryStageReference(Stage stage) {
+        this.primaryStage=stage;
+    }
 
 }
 
