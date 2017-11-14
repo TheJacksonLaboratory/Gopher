@@ -301,6 +301,8 @@ public class ViewPointPresenter implements Initializable {
                     double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (rp > model.getMaxRepeatContent()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    } else {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                     }
                 }
             }

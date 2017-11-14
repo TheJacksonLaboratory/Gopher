@@ -105,7 +105,6 @@ public class GeneRegGTFParser {
      * @param annot
      */
     private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
-        System.out.println(annot);
         String B[]=annot.split(";");
         String id=null;
                 String feature_type=null;

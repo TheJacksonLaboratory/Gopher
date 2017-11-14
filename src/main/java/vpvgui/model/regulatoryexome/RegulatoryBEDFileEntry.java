@@ -74,7 +74,6 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
             return this.fromPos - other.fromPos;
         } else {
            return this.chromAsInt() - other.chromAsInt();
-            //return this.chromosome.equals(other.chromosome);
         }
     }
 }
