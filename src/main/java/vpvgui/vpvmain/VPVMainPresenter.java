@@ -1101,7 +1101,16 @@ public class VPVMainPresenter implements Initializable {
     }
 
     @FXML public void exportReport(ActionEvent e) {
-        PopupFactory.displayMessage("ToDo","This function will be implemented after show display is 100%");
+        VPVReport report = new VPVReport(this.model);
+        String filename =String.format("%s-report.txt",model.getProjectName());
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialFileName(filename);
+        File file=chooser.showSaveDialog(this.primaryStage);
+        if (file==null) {
+            PopupFactory.displayError("Error","Could not get filename for saving report");
+            return;
+        }
+        report.outputRegulatoryReport(file.getAbsolutePath());
         e.consume();
     }
 

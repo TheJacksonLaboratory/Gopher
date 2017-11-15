@@ -7,8 +7,9 @@ import vpvgui.model.VPVGene;
 /** This class encapsulates one line in what will become the BED file to order the regulatory exome/gene panel. We
  * model this data with a class so that we can sort the BED file according to chromosomal location after we have
  * extracted all the areas to be enriched.
+ * ToDo This class is still a little inelegant with respect to the way it handles chromosomes.
  * @author Peter Robinson
- * @version 0.1.2 (2017-11-14)
+ * @version 0.1.3 (2017-11-14)
  */
 public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry>{
     static Logger logger = Logger.getLogger(RegulatoryBEDFileEntry.class.getName());
@@ -49,8 +50,15 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
     }
 
     public String toString() {
-        return String.format("%s\t%d\t%d\t%s", chromosome, fromPos, toPos, elementName);
+        return String.format("%s\t%d\t%d\t%s", chrom2string(chromosome), fromPos, toPos, elementName);
     }
+
+    /** Add a "chr" if needed to the beginning of the string.*/
+    public String chrom2string(String c) {
+        if (c.startsWith("chr")) return c;
+        else return (String.format("chr%s",c));
+    }
+
 
     public int chromAsInt() {
         String chr=chromosome.replaceAll("chr","");
