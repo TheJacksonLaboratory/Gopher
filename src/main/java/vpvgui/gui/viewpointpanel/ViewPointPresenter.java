@@ -108,9 +108,8 @@ public class ViewPointPresenter implements Initializable {
     private List<ColoredSegment> coloredsegments;
 
 
-
-    @FXML
-    void closeButtonAction() {
+    /** Remove the current tab from the App.  */
+    @FXML void closeButtonAction() {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -119,6 +118,7 @@ public class ViewPointPresenter implements Initializable {
         });
     }
 
+    /** Copy the UCSC URL to the clipboard (interactive instead of image only) */
     @FXML private void copyToClipboard(Event e) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
@@ -136,8 +136,7 @@ public class ViewPointPresenter implements Initializable {
         e.consume();
     }
 
-    @FXML
-    void refreshUCSCButtonAction() {
+    @FXML void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
         String url= urlmaker.getImageURL(vp,getHighlightRegions());
         StackPane sproot = new StackPane();

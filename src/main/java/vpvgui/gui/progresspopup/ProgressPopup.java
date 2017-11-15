@@ -39,9 +39,9 @@ public class ProgressPopup {
         window.setTitle(this.progressTitle);
         window.setScene(scene);
         window.show();
-        task.setOnSucceeded(event -> {
-            window.close();
-        });
+//        task.setOnSucceeded(event -> {
+//            window.close();
+//        });
         Thread thread = new Thread(task);
         thread.start();
     }

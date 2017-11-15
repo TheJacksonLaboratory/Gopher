@@ -81,6 +81,12 @@
                             <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
                           </items>
                         </Menu>
+                        <Menu mnemonicParsing="false" text="Report">
+                          <items>
+                            <MenuItem fx:id="displayReport" onAction="#displayReport" mnemonicParsing="false" text="Display report" />
+                              <MenuItem fx:id="exportReport" onAction="#exportReport" mnemonicParsing="false" text="Export report" />
+                          </items>
+                        </Menu>
                     </menus>
                   </MenuBar>
                   <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />

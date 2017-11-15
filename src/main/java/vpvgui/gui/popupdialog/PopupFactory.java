@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -413,6 +414,40 @@ public class PopupFactory {
                 "\tfont-size: 9;\n" +
                 "}\n" +
                 "</style>";
+    }
+
+
+
+    private static String getPreHTML(String text) {
+       return String.format("<html><body><h1>VPV Report</h1><pre>%s</pre></body></html>",text);
+    }
+
+    public static  void showSummaryDialog(String text) {
+        Stage window;
+        String windowTitle = "VPV Report";
+        window = new Stage();
+        window.setOnCloseRequest( event -> {window.close();} );
+        window.setTitle(windowTitle);
+
+        PopupView view = new PopupView();
+        PopupPresenter presenter = (PopupPresenter) view.getPresenter();
+        presenter.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+        presenter.setData(getPreHTML(text));
+        presenter.hideButtons();
+
+
+        window.setScene(new Scene(view.getView()));
+        window.showAndWait();
     }
 
 

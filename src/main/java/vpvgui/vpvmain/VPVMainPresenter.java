@@ -1,5 +1,6 @@
 package vpvgui.vpvmain;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 
@@ -1068,6 +1070,8 @@ public class VPVMainPresenter implements Initializable {
                 try {
                     logger.trace(String.format("Will output regulatory panel BED file to %s",file.getAbsolutePath()));
                     builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
+                    Properties regulatoryProperties = builder.getRegulatoryReport();
+                    this.model.setRegulatoryExomeProperties(regulatoryProperties);
                 } catch (IOException ioe) {
                     PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
                 }
@@ -1088,6 +1092,17 @@ public class VPVMainPresenter implements Initializable {
 
     public void setPrimaryStageReference(Stage stage) {
         this.primaryStage=stage;
+    }
+
+    @FXML public void displayReport(ActionEvent e) {
+        VPVReport report = new VPVReport(this.model);
+        PopupFactory.showSummaryDialog(report.getReport());
+        e.consume();
+    }
+
+    @FXML public void exportReport(ActionEvent e) {
+        PopupFactory.displayMessage("ToDo","This function will be implemented after show display is 100%");
+        e.consume();
     }
 
 }

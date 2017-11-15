@@ -8,7 +8,7 @@ import vpvgui.model.VPVGene;
  * model this data with a class so that we can sort the BED file according to chromosomal location after we have
  * extracted all the areas to be enriched.
  * @author Peter Robinson
- * @version 0.1.1 (2017-11-12)
+ * @version 0.1.2 (2017-11-14)
  */
 public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry>{
     static Logger logger = Logger.getLogger(RegulatoryBEDFileEntry.class.getName());
@@ -70,10 +70,12 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
 
     @Override
     public int compareTo(RegulatoryBEDFileEntry other) {
-        if (this.chromosome.equals(other.chromosome)) {
-            return this.fromPos - other.fromPos;
+        int chromcomp=this.chromAsInt() - other.chromAsInt();
+        int fromcomp = this.fromPos - other.fromPos;
+        if (chromcomp==0) {
+            return fromcomp;
         } else {
-           return this.chromAsInt() - other.chromAsInt();
+            return chromcomp;
         }
     }
 }
