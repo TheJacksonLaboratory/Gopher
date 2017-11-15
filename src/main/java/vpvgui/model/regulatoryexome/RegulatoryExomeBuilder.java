@@ -6,12 +6,10 @@ import org.apache.log4j.Logger;
 import vpvgui.exception.VPVException;
 import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
-import vpvgui.model.VPVGene;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -29,45 +27,50 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private String pathToRefGeneFile=null;
 
     private Model model=null;
-
+    /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
+     * regulatory elements and exons of our target genes. */
     private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
+    /** Maximum distance 3' (downstream) to TSS (genomicPos) to be included as a regulatory element.*/
+    private int downstreamThreshold =10_000;
+    /** Maximum distance 5' (upstream) to TSS (genomicPos) to be included as a regulatory element.*/
+    private int upstreamThreshold=50_000;
+    /** Reference to the progress indicator that will be shown while we are creating the elements and the BED file. */
+    ProgressIndicator progressInd =null;
 
+    private int totalRegulatoryElements;
+    private int chosenRegulatoryElements;
+    private int totalExons;
 
-    private int threshold=50_000;
-
-    ProgressIndicator pi=null;
-
-
-    public RegulatoryExomeBuilder(Model model) {
+    public RegulatoryExomeBuilder(Model model,ProgressIndicator pi) {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
         this.regulatoryElementSet=new HashSet<>();
-        logger.trace(String.format("Get regulatory build %s and refgene %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
+        this.progressInd=pi;
+        logger.trace(String.format("We will create regulatory build from %s and %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
     }
 
-    public void setProgressIndicator(ProgressIndicator prog) {
-        this.pi=prog;
-    }
-
-
-    private Map<String,List<Integer>> getChrom2PosListMap(Model model) {
+    /** @return map of active viewpoints arranged according to chromosome so that we can quickly find them when we
+     * are screening regulatory elements (which are arranged according to chromosome.
+     * @param model
+     * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
+     */
+    private Map<String,List<ViewPoint>> getChrom2PosListMap(Model model) {
         // get all of the viewpoints with at least one selected fragment.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
-        Map<String,List<Integer>> chrom2posListMap=new HashMap<>();
+        Map<String,List<ViewPoint>> chrom2posListMap=new HashMap<>();
         activeVP.stream().forEach(viewPoint -> {
             String chrom=viewPoint.getReferenceID();
             chrom=chrom.replaceAll("chr",""); // remove the chr from chr1 etc.
-            int pos = viewPoint.getGenomicPos();
-            List<Integer> poslist=null;
+            List<ViewPoint> vplist=null;
             if (chrom2posListMap.containsKey(chrom)) {
-                poslist=chrom2posListMap.get(chrom);
+                vplist=chrom2posListMap.get(chrom);
             } else {
-                poslist=new ArrayList<>();
-                chrom2posListMap.put(chrom,poslist);
+                vplist=new ArrayList<>();
+                chrom2posListMap.put(chrom,vplist);
             }
-            poslist.add(pos);
+            vplist.add(viewPoint);
         });
         return chrom2posListMap;
     }
@@ -80,7 +83,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         lst.addAll(regulatoryElementSet);
         Collections.sort(lst);
 
-
+        logger.trace(String.format("We will export reg build to %s",fullpath ));
         BufferedWriter writer = new BufferedWriter(new FileWriter(fullpath));
         for (RegulatoryBEDFileEntry rentry : lst) {
             writer.write(rentry.toString() + "\n");
@@ -93,6 +96,9 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      */
     private void collectExonsFromTargetGenes() throws Exception {
         Map<String, ViewPoint> vpmap = new HashMap<>();
+        updateProgress(0.50);
+        int j=0;
+        int totalgenes=vpmap.size();
         for (ViewPoint vp : this.model.getActiveViewPointList()) {
             vpmap.put(vp.getAccession(), vp);
         }
@@ -104,7 +110,6 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         BufferedReader br = new BufferedReader(decoder);
         String line;
         while ((line = br.readLine()) != null) {
-            //System.out.println(line);
             String A[] = line.split("\t");
             String accession = A[1];
             if (!vpmap.containsKey(accession)) {
@@ -122,18 +127,20 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             String[] endings = A[10].split(","); // exon begins and ends.
             String name2=A[12];
             if (beginnings.length != endings.length) { // should never happen!
-                logger.error(String.format("beginnings length=%d and endlings length = %d",beginnings.length,endings.length));
                 throw new VPVException(String.format("Malformed line for gene %s (%s): number of exon starts/ends should be equal, but we found %d/%d",
                         name2,accession,beginnings.length,endings.length));
             }
             for (int i=0;i<beginnings.length;++i) {
                 int b=Integer.parseInt(beginnings[i]);
                 int e=Integer.parseInt(endings[i]);
+                totalExons += beginnings.length;
                 String name=String.format("%s-exon%d-%d",name2,b,e); // this name will take care of duplicates from different transcripts.
                 //String chrom, int from, int to, String name
                 RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
                 this.regulatoryElementSet.add(regentry);
             }
+            updateProgress((0.5 + (double)++j/(double)totalgenes));
+
         }
         br.close();
 
@@ -143,28 +150,36 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
 
 
-    /** extractRegulomeForTargetGenes*/
+    /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
     protected Void call() {
-        this.model=model;
-        Map<String,List<Integer>> chrom2posListMap=getChrom2PosListMap(model);
+        Map<String,List<ViewPoint>> chrom2vpListMap=getChrom2PosListMap(model);
+        int n_genesTimesTen=model.getVPVGeneList().size()*10;
+        int j=0;
         //read in the regulatory build and save the intervals that are in the right place.
         GeneRegGTFParser parser = new GeneRegGTFParser(model.getRegulatoryBuildPath());
+        totalRegulatoryElements=0;
+        chosenRegulatoryElements=0;
         try {
             parser.initGzipReader();
             while (parser.hasNext()) {
                 RegulatoryElement elem = parser.next();
+                totalRegulatoryElements++;
                 String chrom=elem.getChrom();
-                if (! chrom2posListMap.containsKey(chrom)) {
-                    logger.error(String.format("Could not find chromosome \"%s\" in reg map",chrom));
+                if (! chrom2vpListMap.containsKey(chrom)) {
+                    //Very probably not an error but just a chromosome or scaffold that has not target gene for this panel
                     continue;
                 }
-                List<Integer> starts = chrom2posListMap.get(chrom);
-                // if the regulatory element is within threshold of any target gene, then keep the regulatory element
-                Integer keepers = starts.stream().filter(i -> elem.isLocatedWithinThreshold(i,threshold)).findAny().orElse(0);
-                if (keepers>0) {
+                List<ViewPoint> vpList = chrom2vpListMap.get(chrom);
+                // if the regulatory element is within downstreamThreshold of any target gene, then keep the regulatory element
+                ViewPoint keepers = vpList.stream().filter(vp -> elem.isLocatedWithinThreshold(vp, upstreamThreshold,downstreamThreshold)).findAny().orElse(null);
+                if (keepers!=null) {
                     RegulatoryBEDFileEntry rentry = new RegulatoryBEDFileEntry(elem);
                     this.regulatoryElementSet.add(rentry);
+                    chosenRegulatoryElements++;
+                    if (++j%10==0) {
+                        updateProgress((double)j/(double)n_genesTimesTen);
+                    }
                 }
             }
             parser.close();
@@ -184,16 +199,27 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private void updateProgress(double pr) {
         javafx.application.Platform.runLater(new Runnable() {
             @Override public void run() {
-                if (pi==null) {
+                if (progressInd ==null) {
                     // do nothing
                     return;
                 }
-                pi.setProgress(pr);
+                progressInd.setProgress(pr);
             }
         });
     }
 
 
-
+    public Properties getRegulatoryReport() {
+        Properties props = new Properties();
+        props.setProperty("Regulatory exome downstream distance threshold", String.valueOf(downstreamThreshold));
+        props.setProperty("Regulatory exome upstream distance threshold", String.valueOf(upstreamThreshold));
+        props.setProperty("pathToEnsemblRegulatoryBuild",pathToEnsemblRegulatoryBuild);
+        props.setProperty("totalRegulatoryElements", String.valueOf(totalRegulatoryElements));
+        props.setProperty("chosenRegulatoryElements",String.valueOf(chosenRegulatoryElements));
+        props.setProperty("totalExons", String.valueOf(totalExons));
+        int totalUniqueExons = this.regulatoryElementSet.size()-chosenRegulatoryElements;
+        props.setProperty("totalUniqueExons(ToDo check this calculation)", String.valueOf(totalUniqueExons));
+        return props;
+    }
 
 }

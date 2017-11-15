@@ -1,7 +1,16 @@
 package vpvgui.model.regulatoryexome;
 
 import org.apache.log4j.Logger;
+import vpvgui.model.viewpoint.ViewPoint;
 
+/**
+ * The purpose of this class is to store data from the Ensembl regulatory build and to calculate whether
+ * any given element is located close enough to the transcription start site of a target gene, a function
+ * called {@link #isLocatedWithinThreshold(ViewPoint, int, int)} that uses a potentially different distance
+ * threshold for upstream and downstream
+ * @author Peter Robinson
+ * @version 0.1.3 (2017-11-12)
+ */
 public class RegulatoryElement {
     static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
 
@@ -53,8 +62,19 @@ public class RegulatoryElement {
         return id;
     }
 
-    public boolean isLocatedWithinThreshold(int i,int threshold) {
-        return Math.abs(i-to)<threshold || Math.abs(i-from) < threshold;
+    public boolean isLocatedWithinThreshold(ViewPoint vp, int upstreamThreshold, int downstreamThreshold) {
+        int genomicPos=vp.getGenomicPos(); // the transcription start site (usually)--center point of the viewpoint
+        int upstreamBoundary,downstreamBoundary;
+        char strand='-';
+        if (vp. isPositiveStrand()) {
+            upstreamBoundary=genomicPos-upstreamThreshold;
+            downstreamBoundary=genomicPos+downstreamThreshold;
+        } else {
+            upstreamBoundary=genomicPos-downstreamThreshold;
+            downstreamBoundary=genomicPos+upstreamThreshold;
+        }
+
+        return (upstreamBoundary<=to && downstreamBoundary>=to) || (upstreamBoundary<=from && downstreamBoundary>=from);
     }
 }
 

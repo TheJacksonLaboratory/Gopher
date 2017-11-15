@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.2.14 (2017-11-10)
+ * @version 0.2.15 (2017-11-15)
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
@@ -46,6 +46,18 @@ public class Model implements Serializable {
     private Genome genome;
     /** Path on local file system of the downloaded regulatory build file from Ensembl. */
     private String regulatoryBuildPath=null;
+
+    public Properties getRegulatoryExomeProperties() {
+        return regulatoryExomeProperties;
+    }
+
+    public void setRegulatoryExomeProperties(Properties regulatoryExomeProperties) {
+        this.regulatoryExomeProperties = regulatoryExomeProperties;
+    }
+
+    /** A list of the analysis results for the regulatory exome. */
+
+    private Properties regulatoryExomeProperties=null;
 
     public String getRegulatoryBuildPath() { return regulatoryBuildPath; }
     public void setRegulatoryBuildPath(String regulatoryBuildPath) {
@@ -105,8 +117,8 @@ public class Model implements Serializable {
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Total horizontal dimension  of the user's screen. */
     private int xdim;
-
-    public int getXdim() { return xdim; }
+    /** Return the current X dimension of the user's screen, but a minimum of 1000 -- this will be the width of the UCSC image shown. */
+    public int getXdim() { return Math.max(1000,xdim); }
     public void setXdim(int xdim) {this.xdim = xdim; }
     public int getYdim() { return ydim; }
     public void setYdim(int ydim) { this.ydim = ydim; }

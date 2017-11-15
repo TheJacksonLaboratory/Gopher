@@ -285,7 +285,7 @@ public class VPAnalysisPresenter implements Initializable {
     public void showVPTable() {
         if (! this.model.viewpointsInitialized()) {
             logger.warn("[View Points not initialized");
-            PopupFactory.displayError("Could not confirmDialog viewpoints","No initialiyed viewpoints were found");
+            PopupFactory.displayError("Could not confirmDialog viewpoints","No initialized viewpoints were found");
             return;
         }
         refreshVPTable();
@@ -317,7 +317,15 @@ public class VPAnalysisPresenter implements Initializable {
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         });
+    }
 
+
+    public void showNewAnalysis() {
+        logger.trace(String.format("Trying to clear the table view that has %d items", viewPointTableView.getItems().size()));
+        viewPointTableView.getItems().clear();
+        logger.trace(String.format("Trying to clear the table view that has %d items", viewPointTableView.getItems().size()));
+        this.viewPointTableView.getSelectionModel().clearSelection();
+        init();
     }
 
 }

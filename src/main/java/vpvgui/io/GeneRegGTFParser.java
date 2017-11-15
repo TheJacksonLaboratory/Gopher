@@ -2,6 +2,7 @@ package vpvgui.io;
 
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
+import vpvgui.exception.VPVException;
 import vpvgui.model.regulatoryexome.RegulatoryElement;
 
 import java.io.*;
@@ -50,6 +51,9 @@ public class GeneRegGTFParser {
 
     public void initGzipReader() throws IOException {
         String encoding="UTF-8";
+        if (this.pathToGTFfile==null) {
+            throw new IOException("Regulatory build GTF file not initialized");
+        }
         InputStream fileStream = new FileInputStream(this.pathToGTFfile);
         InputStream gzipStream = new GZIPInputStream(fileStream);
         Reader decoder = new InputStreamReader(gzipStream, encoding);
@@ -101,7 +105,6 @@ public class GeneRegGTFParser {
      * @param annot
      */
     private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
-        System.out.println(annot);
         String B[]=annot.split(";");
         String id=null;
                 String feature_type=null;

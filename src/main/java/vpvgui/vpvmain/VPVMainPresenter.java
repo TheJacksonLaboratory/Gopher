@@ -1,5 +1,6 @@
 package vpvgui.vpvmain;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 
@@ -69,14 +71,11 @@ public class VPVMainPresenter implements Initializable {
      * obtain a reference to the primary scene, which is needed by FileChooser, etc. It is set in the FXML
      * document to refer to the Anchor pane that is the root node of the GUI.
      */
-    @FXML
-    private Node rootNode;
+    @FXML private Node rootNode;
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML
-    private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
+    @FXML private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML
-    private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
+    @FXML private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
     @FXML private ChoiceBox<String> genomeChoiceBox;
     @FXML private ChoiceBox<String> approachChoiceBox;
     /** Clicking this button downloads the genome build and unpacks it.*/
@@ -138,6 +137,8 @@ public class VPVMainPresenter implements Initializable {
     private VPAnalysisPresenter vpanalysispresenter;
     /** View for the second tab. */
     private VPAnalysisView vpanalysisview;
+    /** Reference to the primary stage. We use this to set the title when we switch models (new from File menu). */
+    private Stage primaryStage=null;
 
     transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
     public final int getSizeUp() { return sizeUp.get();}
@@ -297,6 +298,7 @@ public class VPVMainPresenter implements Initializable {
             this.transcriptDownloadPI.setProgress(1.0);
         } else {
             this.downloadedTranscriptsLabel.setText("...");
+            this.transcriptDownloadPI.setProgress(0.0);
         }
         if (model.isGenomeIndexed()) {
             this.indexGenomeLabel.setText("Genome files successfully indexed");
@@ -304,6 +306,16 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.indexGenomeLabel.setText("...");
             this.genomeIndexPI.setProgress(0.00);
+        }
+        if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
+            this.restrictionEnzymeLabel.setText(model.getRestrictionEnzymeString());
+        } else {
+            this.restrictionEnzymeLabel.setText(null);
+        }
+        if (this.model.getVPVGeneList()!=null && this.model.getVPVGeneList().size()>0) {
+            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getVPVGeneList().size() ));
+        } else {
+            this.nValidGenesLabel.setText(null);
         }
     }
 
@@ -371,13 +383,24 @@ public class VPVMainPresenter implements Initializable {
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
     private void initializePromptTextsToDefaultValues() {
-        logger.trace("Initializing prompts");
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxRepContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAXIMUM_REPEAT_CONTENT));
+    }
+
+    /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
+     * will not see the values chosen for the previous model, but will instead see the grey prompt text default values.
+     */
+    private void removePreviousValuesFromTextFields() {
+        this.sizeUpTextField.setText(null);
+        this.sizeDownTextField.setText(null);
+        this.minGCContentTextField.setText(null);
+        this.maxGCContentTextField.setText(null);
+        this.minFragSizeTextField.setText(null);
+        this.maxRepContentTextField.setText(null);
     }
 
     /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
@@ -702,7 +725,15 @@ public class VPVMainPresenter implements Initializable {
      * @param e Event triggered by new viewpoint command.
      */
     @FXML public void startNewProject(ActionEvent e) {
-        logger.trace("Start new viewpoint");
+        PopupFactory factory = new PopupFactory();
+        String projectname = factory.getProjectName();
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (projectname == null || projectname.length() <1) {
+            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
+            return;
+        }
+
         ObservableList<Tab> panes = this.tabpane.getTabs();
         /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
         List<Tab> tabsToBeRemoved=new ArrayList<>();
@@ -710,19 +741,21 @@ public class VPVMainPresenter implements Initializable {
         for (Tab tab : panes) {
             String id=tab.getId();
             if (id != null && (id.equals("analysistab") || id.equals("setuptab") )) { continue; }
-            logger.trace("Closing tab "+id);
             tabsToBeRemoved.add(tab);
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
         this.model=new Model();
+        this.model.setProjectName(projectname);
+        if (this.primaryStage!=null)
+            this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",projectname));
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
+        removePreviousValuesFromTextFields();
         e.consume();
-        /* TODO */
-        logger.error("TODO -- also re-initialize first tab");
     }
 
     /** Display the settings (parameters) of the current viewpoint. */
@@ -986,19 +1019,22 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
 
-        ProgressPopup popup = new ProgressPopup("Download regulatory build");
+        ProgressPopup popup = new ProgressPopup("Downloading...", "Downloading Ensembl regulatory build file");
         ProgressIndicator progressIndicator = popup.getProgressIndicator();
 
         Downloader downloadTask = new Downloader(file, url, basename, progressIndicator);
         downloadTask.setOnSucceeded( e -> {
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            logger.trace("Setting regulatory build path in model to "+abspath);
             model.setRegulatoryBuildPath(abspath);
 
             popup.close();
         });
+        downloadTask.setOnFailed(e -> {
+            logger.error("Download of regulatory build failed");
+        });
         try {
             popup.startProgress(downloadTask);
-
         } catch (InterruptedException e) {
             PopupFactory.displayException("Error","Could not download regulatory build", e);
         }
@@ -1019,23 +1055,34 @@ public class VPVMainPresenter implements Initializable {
         logger.info("downloadGenome to directory  "+file.getAbsolutePath());
 
 
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model);
+
+        ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
+        ProgressIndicator progressIndicator = popup.getProgressIndicator();
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
+
         try {
-          //  builder.extractRegulomeForTargetGenes(model);
             builder.setOnFailed(e-> {
                 PopupFactory.displayError("Failure to build regulatory exome.",
                         builder.getException().getMessage());
+                popup.close();
             });
             builder.setOnSucceeded(e -> {
                 try {
+                    logger.trace(String.format("Will output regulatory panel BED file to %s",file.getAbsolutePath()));
                     builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
+                    Properties regulatoryProperties = builder.getRegulatoryReport();
+                    this.model.setRegulatoryExomeProperties(regulatoryProperties);
                 } catch (IOException ioe) {
                     PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
                 }
+                popup.close();
             });
-            Thread th = new Thread(builder);
-            th.setDaemon(true);
-            th.start();
+            try {
+                popup.startProgress(builder);
+
+            } catch (InterruptedException e) {
+                PopupFactory.displayException("Error","Could not download regulatory build", e);
+            }
 
         } catch (Exception e) {
             PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);
@@ -1043,7 +1090,29 @@ public class VPVMainPresenter implements Initializable {
         logger.trace("buildRegulatoryExome");
     }
 
+    public void setPrimaryStageReference(Stage stage) {
+        this.primaryStage=stage;
+    }
 
+    @FXML public void displayReport(ActionEvent e) {
+        VPVReport report = new VPVReport(this.model);
+        PopupFactory.showSummaryDialog(report.getReport());
+        e.consume();
+    }
+
+    @FXML public void exportReport(ActionEvent e) {
+        VPVReport report = new VPVReport(this.model);
+        String filename =String.format("%s-report.txt",model.getProjectName());
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialFileName(filename);
+        File file=chooser.showSaveDialog(this.primaryStage);
+        if (file==null) {
+            PopupFactory.displayError("Error","Could not get filename for saving report");
+            return;
+        }
+        report.outputRegulatoryReport(file.getAbsolutePath());
+        e.consume();
+    }
 
 }
 

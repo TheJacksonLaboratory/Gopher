@@ -35,16 +35,16 @@ import java.util.zip.GZIPInputStream;
  * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
  * included, which is the way the data are shown on the UCSC browser).</p>
  * @author Peter Robinson, Peter Hansen
- * @version 0.1.1 (2017-10-31)
+ * @version 0.2.1 (2017-11-12)
  */
 public class RefGeneParser {
 
     static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.*/
-    private Map<String, VPVGene> genemap=null;
-    /** This second map is used to allow for cases where one gene symbol has multiple positions in the genome. */
-    private Map<String, VPVGene> genemap_2=null;
+    private Map<String, VPVGene> geneSymbolMap =null;
+    /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen. */
+    private Map<String, VPVGene> gene2chromosomePosMap =null;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
@@ -55,8 +55,8 @@ public class RefGeneParser {
      * @param path Path to the {@code refGene.txt.gz} file.
      */
     public RefGeneParser(String path) {
-        genemap=new HashMap<>();
-        genemap_2=new HashMap<>();
+        geneSymbolMap =new HashMap<>();
+        gene2chromosomePosMap =new HashMap<>();
         parse(path);
     }
 
@@ -85,11 +85,13 @@ public class RefGeneParser {
                     gPos = Integer.parseInt(A[5]);
                 }
                 String name2=A[12];
-                String key = name2.concat(chrom);
-                System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
+                //String key = name2.concat(chrom);
+                String key=String.format("%s_%s_%d",name2,chrom,gPos);
+                //System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
+                System.out.println(key);
                 VPVGene gene=null;
-                if (genemap_2.containsKey(key)) {
-                    gene = genemap_2.get(key);
+                if (gene2chromosomePosMap.containsKey(key)) {
+                    gene = gene2chromosomePosMap.get(key);
                 } else {
                     gene = new VPVGene(accession, name2);
                     gene.setChromosome(chrom);
@@ -101,8 +103,8 @@ public class RefGeneParser {
                         System.err.println("[ERROR] did not recognize strand \""+ strand + "\"");
                         System.exit(1); /* todo throw some exception. */
                     }
-                    genemap.put(name2,gene);
-                    genemap_2.put(key,gene);
+                    geneSymbolMap.put(name2,gene);
+                    gene2chromosomePosMap.put(key,gene);
                 }
                 gene.addGenomicPosition(gPos);
             }
@@ -134,7 +136,7 @@ public class RefGeneParser {
 
     /** The user uploads a list of gene symbols. This function checks this list against the gene symbols that
      * are contained in the corresponding {@code refGene.txt.gz} file. Each uploaded symbol that is found in the
-     * {@code refGene.txt.gz}  file is placed in {@link #genemap} as the key,
+     * {@code refGene.txt.gz}  file is placed in {@link #geneSymbolMap} as the key,
      * and the corresponding {@link VPVGene} object is placed in the Set {@link #validGeneSymbols},
      * and all uploaded gene symbols that are not found there are placed in the Set {@link #invalidGeneSymbols}.
      * @param genelst List of gene symbols uploaded by the user.
@@ -148,7 +150,7 @@ public class RefGeneParser {
         this.invalidGeneSymbols = new HashSet<>();
         this.validGeneSymbols = new HashSet<>();
         for (String sym:genelst) {
-            if (this.genemap.containsKey(sym)) { // it's only checked, if a gene is in refGene or not -> use genemap
+            if (this.geneSymbolMap.containsKey(sym)) { // it's only checked, if a gene is in refGene or not -> use geneSymbolMap
                 validGeneSymbols.add(sym);
             } else {
                 invalidGeneSymbols.add(sym);
@@ -163,15 +165,15 @@ public class RefGeneParser {
      */
     public List<VPVGene> getVPVGeneList() {
         List<VPVGene> genelist=new ArrayList<>();
-        for (VPVGene g: genemap_2.values()) {
+        for (VPVGene g: gene2chromosomePosMap.values()) {
             if (this.validGeneSymbols.contains(g.getGeneSymbol()))
             genelist.add(g);
         }
-        return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use genemap_2
+        return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use gene2chromosomePosMap
     }
 
     /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
-    public int n_totalRefGenes() { return this.genemap.size(); } // not sure if I should use genemap or genemap_2 -> use genemap
+    public int n_totalRefGenes() { return this.gene2chromosomePosMap.size(); } // not sure if I should use geneSymbolMap or gene2chromosomePosMap -> use geneSymbolMap
 
     /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
      * number of viewpoints we will design for this gene. Intended for unit testing.
@@ -179,7 +181,7 @@ public class RefGeneParser {
      */
     public int n_totalTSSstarts() {
         int n=0;
-        for (VPVGene vpg :genemap_2.values()) { // must contain all TSS -> use genemap_2
+        for (VPVGene vpg : gene2chromosomePosMap.values()) { // must contain all TSS -> use gene2chromosomePosMap
             n+=vpg.n_viewpointstarts();
         }
         return n;

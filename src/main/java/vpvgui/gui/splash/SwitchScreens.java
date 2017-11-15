@@ -40,6 +40,7 @@ public class SwitchScreens {
     public void createNewProject(String name){
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
+        presenter.setPrimaryStageReference(this.primarystage);
         Model model = new Model();
         model.setProjectName(name);
         model.setXdim(screenWidth);
@@ -53,6 +54,7 @@ public class SwitchScreens {
     public void openExistingModel(String name) {
         VPVMainView appView = new VPVMainView();
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
+        presenter.setPrimaryStageReference(this.primarystage);
         String filepath = Platform.getAbsoluteProjectPath(name);
         Model model=null;
         try {

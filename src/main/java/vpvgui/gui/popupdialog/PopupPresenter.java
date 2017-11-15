@@ -7,6 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
@@ -19,6 +21,8 @@ import java.util.function.Consumer;
 
 public class PopupPresenter  implements Initializable  {
     static Logger logger = Logger.getLogger(PopupPresenter.class.getName());
+    @FXML
+    AnchorPane apane;
     @FXML
     private WebView wview;
 
@@ -73,6 +77,14 @@ public class PopupPresenter  implements Initializable  {
 
     public void setLabelText(String labtext) {
         this.label.setText(labtext);
+    }
+
+
+    public void hideButtons() {
+        this.apane.getChildren().removeAll();
+        this.apane.getChildren().add(this.wview);
+        HBox hbox = new HBox();
+        hbox.getChildren().add(this.okButton);
     }
 
 }

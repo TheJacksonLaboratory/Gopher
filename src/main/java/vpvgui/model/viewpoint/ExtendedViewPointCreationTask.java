@@ -51,9 +51,6 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             Collections.reverse(gPosList);
         }
 
-        logger.trace(String.format("Calculating viewpoints for %d chosen enzymes",ViewPoint.chosenEnzymes.size() ));
-
-
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
         for (Integer gPos : gPosList) {
