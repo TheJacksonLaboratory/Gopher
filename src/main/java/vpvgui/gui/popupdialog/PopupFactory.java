@@ -125,7 +125,13 @@ public class PopupFactory {
 
     private static String getMarginSizeHTML() {
         String html = "<h1>Margin Size</h1>\n"+
-                "<p>The margin size is used to .</p>";
+                "<p>" +
+                "The margin size defines the width of the regions at the margins of restriction fragments " +
+                "that are exported as target regions in the end. " +
+                "The thresholds for repeats and GC content only refer to these margins." +
+                "</p>" +
+                "For the simple approach the margin size should equal the probe length." +
+                "</p>";
 
         return html;
     }
