@@ -50,7 +50,7 @@ public class BEDFileExporter {
 
     private void initFileNames(String prefix) {
         this.allTracksBEDfile =String.format("%s_allTracks.bed",prefix);
-        this.targetRegionBEDfile =String.format("%s_targetRegions.bed",prefix);
+        this.targetRegionBEDfile =String.format("%s_targetRegions.txt",prefix);
         this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",prefix);
     }
 
