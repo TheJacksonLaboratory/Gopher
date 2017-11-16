@@ -50,7 +50,7 @@ public class DataSourceTest {
         Assert.assertEquals(expected,ds.getGenomeName());
         expected = "chromFa.tar.gz";
         Assert.assertEquals(expected,ds.getGenomeBasename());
-        expected="http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/chromFa.tar.gz";
+        expected="http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz";
         Assert.assertEquals(expected,ds.getGenomeURL());
     }
 

@@ -32,6 +32,13 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
+
+
+
+    /** The number of unique gene symbols representing the genes in {@link #geneList} (note that {@link #geneList} has
+     * one entry for each transcription start site and chromosomal location of the target genes entered by the user).
+     */
+    private int n_validGeneSymbols;
     /** Key:Name of a chromosome (or in general, of a contig); Value: length in nucleotides */
     private Map<String,Integer> contigLengths;
     /** Proxy (null if not needed/not set) */
@@ -166,7 +173,8 @@ public class Model implements Serializable {
         return transcriptsBasename;
     }
 
-
+    public int getN_validGeneSymbols() { return n_validGeneSymbols; }
+    public void setN_validGeneSymbols(int n_validGeneSymbols) { this.n_validGeneSymbols = n_validGeneSymbols; }
 
     public Model() {
         this.genome=new HumanHg19(); /* the default genome */

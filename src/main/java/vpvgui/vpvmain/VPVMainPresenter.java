@@ -612,7 +612,7 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.getN_validGeneSymbols(),this.model.n_viewpointStarts()));
         e.consume();
     }
 

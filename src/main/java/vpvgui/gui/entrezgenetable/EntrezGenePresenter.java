@@ -134,6 +134,7 @@ public class EntrezGenePresenter implements Initializable {
         int n_transcripts = parser.n_totalTSSstarts();
         int n_genes=parser.n_totalRefGenes();
         String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, n_transcripts);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
         setData(html);
         isvalidated=true;
     }

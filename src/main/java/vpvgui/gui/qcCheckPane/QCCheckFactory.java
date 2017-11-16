@@ -213,7 +213,7 @@ public class QCCheckFactory {
         if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
         } else {
-            sb.append(String.format("<td>%d genes</td>",model.getVPVGeneList().size()));
+            sb.append(String.format("<td>%d genes</td>",model.getN_validGeneSymbols()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");

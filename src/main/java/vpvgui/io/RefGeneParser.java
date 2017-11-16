@@ -173,7 +173,7 @@ public class RefGeneParser {
     }
 
     /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
-    public int n_totalRefGenes() { return this.gene2chromosomePosMap.size(); } // not sure if I should use geneSymbolMap or gene2chromosomePosMap -> use geneSymbolMap
+    public int n_totalRefGenes() { return this.geneSymbolMap.size(); } // not sure if I should use geneSymbolMap or gene2chromosomePosMap -> use geneSymbolMap
 
     /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
      * number of viewpoints we will design for this gene. Intended for unit testing.
