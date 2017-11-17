@@ -216,6 +216,13 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d genes</td>",model.getN_validGeneSymbols()));
         }
         sb.append("</tr>");
+        sb.append("<tr><td>Unique TSS</td>");
+        if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
+            sb.append("<td class=\"red\">TSS list not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%d unique transcription starts</td>",model.getUniqueTranscriptionStartPositions()));
+        }
+        sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");
         if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
             sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");

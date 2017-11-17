@@ -720,8 +720,8 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * This is called when the user starts a new viewpoint. It should erase everything from
-     * the GUI as well (TODO check this!)
+     * This is called when the user starts a new viewpoint. It erases everything from
+     * the GUI as well
      * @param e Event triggered by new viewpoint command.
      */
     @FXML public void startNewProject(ActionEvent e) {

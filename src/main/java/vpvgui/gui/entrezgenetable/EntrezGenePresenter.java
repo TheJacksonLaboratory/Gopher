@@ -43,7 +43,7 @@ import java.util.function.Consumer;
  * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link VPVGene} objects to the model.
  * This list should then be used to create {@link vpvgui.model.viewpoint.ViewPoint} objects elsewhere in the code.
  * @author Peter Robinson
- * @version 0.0.2 (2017-07-22)
+ * @version 0.1.2 (2017-11-15)
  */
 public class EntrezGenePresenter implements Initializable {
     static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
@@ -74,6 +74,10 @@ public class EntrezGenePresenter implements Initializable {
 
 
     private Consumer<Signal> signal;
+    /** The total number of unique transcription start sites associated with the chosen genes. This will be
+     * equal to the number of ViewPoints that VPV attempts to create.
+     */
+    private int uniqueTSSpositions;
 
 
     private boolean isvalidated=false;
@@ -131,13 +135,16 @@ public class EntrezGenePresenter implements Initializable {
         }
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
         List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
-        int n_transcripts = parser.n_totalTSSstarts();
+        uniqueTSSpositions = parser.n_totalTSSstarts();
         int n_genes=parser.n_totalRefGenes();
-        String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, n_transcripts);
+        String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
         this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTranscriptionStartPositions(uniqueTSSpositions);
         setData(html);
         isvalidated=true;
     }
+
+
 
 
    /** Sets the text that will be shown in the HTML View. */

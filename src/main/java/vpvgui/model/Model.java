@@ -133,6 +133,16 @@ public class Model implements Serializable {
     /** Total vertical dimension the user's screen. */
     private int ydim;
 
+    public int getUniqueTranscriptionStartPositions() { return uniqueTranscriptionStartPositions; }
+
+    public void setUniqueTranscriptionStartPositions(int n) { this.uniqueTranscriptionStartPositions = n; }
+
+    /** Total number of Transcription start sites associated with the genes chosen by the user. Viewpoints will be chosen
+     * from these start sites.
+
+     */
+    private int uniqueTranscriptionStartPositions;
+
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
@@ -300,6 +310,10 @@ public class Model implements Serializable {
         if (this.geneList==null) return 0;
         else return this.geneList.size();
     }
+
+
+
+
     /** @return number of viewppoint starts (e.g., TSS) of the valid genes. */
     public int n_viewpointStarts() {
         if (this.geneList==null) return 0;
