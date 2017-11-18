@@ -379,6 +379,11 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.nValidGenesLabel.setText("not initialized");
         }
+        if (model.useSimpleApproach()) {
+            this.approachChoiceBox.setValue("Simple");
+        } else if (model.useExtendedApproach()){
+            this.approachChoiceBox.setValue("Extended");
+        }
     }
 
 
