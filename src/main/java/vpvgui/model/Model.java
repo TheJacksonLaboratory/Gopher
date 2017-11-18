@@ -33,6 +33,27 @@ public class Model implements Serializable {
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
 
+    public static enum Approach {
+        SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
+        public String toString() {
+            switch (this) {
+                case SIMPLE:
+                    return "simple";
+                case SIMPLE_WITH_MANUAL_REVISIONS:
+                    return "simple with manual revisions";
+                case EXTENDED:
+                    return "extended";
+                case EXTENDED_WITH_MANUAL_REVISIONS:
+                    return "extended with manual revisions";
+                case UNINITIALIZED:
+                default:
+                    return "uninitialized";
+            }
+        }
+    };
+
+    private Approach approach=Approach.UNINITIALIZED;
+
 
 
     /** The number of unique gene symbols representing the genes in {@link #geneList} (note that {@link #geneList} has
@@ -90,6 +111,26 @@ public class Model implements Serializable {
     }
 
     public Genome getGenome() { return this.genome; }
+    /** TODO extend to the manual revisions. */
+    public void setApproach (String s) {
+        if (s.equalsIgnoreCase("simple")) this.approach = Approach.SIMPLE;
+        else if (s.equalsIgnoreCase("extended")) this.approach = Approach.EXTENDED;
+        else {
+            logger.error(String.format("Malformed approach string %s",s));
+        }
+    }
+
+    public boolean useSimpleApproach() {
+        return approach==Approach.SIMPLE || approach==Approach.SIMPLE_WITH_MANUAL_REVISIONS;
+    }
+
+    public boolean useExtendedApproach() {
+        return approach==Approach.EXTENDED || approach==Approach.EXTENDED_WITH_MANUAL_REVISIONS;
+    }
+
+    public Approach getApproach() {
+        return approach;
+    }
 
     /** This integer property is declared transient because properties cannot be serialized. We keep it in synch with
      * a corresponding normal integer variable that can be

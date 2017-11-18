@@ -1,6 +1,8 @@
 package vpvgui.model;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,10 +17,10 @@ import java.util.Properties;
  * The purpose of this class is to provide the user with a summary that can be downloaded or copied and that will contain
  * a summary of all of the analysis parameters and results.
  * @author Peter Robinson
- * @version 0.0.1 (2017-11-14)
+ * @version 0.1.1 (2017-11-17)
  */
 public class VPVReport {
-
+    private static final Logger logger = Logger.getLogger(VPVReport.class.getName());
     private Model model=null;
 
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
@@ -58,6 +60,12 @@ public class VPVReport {
         sb.append(String.format("Number of unique fragments: %d\n",total_active_frags));
         sb.append(String.format("Average viewpoint size: %.1f nucleotides\n",avg_size));
         sb.append(String.format("Total effective size: %s kb\n", dformater.format(totalEffectiveNucleotides/100)));
+        if (model==null) {
+            logger.error("Model is null");
+        } else if (model.getApproach()==null) {
+            logger.error("Approach is null");
+        }
+        sb.append(String.format("Approach: %s",model.getApproach().toString()));
         return sb.toString();
     }
 

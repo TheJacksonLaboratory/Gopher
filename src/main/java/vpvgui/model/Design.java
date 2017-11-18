@@ -103,6 +103,9 @@ public class Design {
         Set<String> uniqueGeneSymbols=new HashSet<>();
         avgVPscore=0.0;
         avgVPsize=0.0;
+        // If the user calls this function on a new project before
+        // creating viewpoints, then viewPointList is null, and we should just return.
+        if (viewPointList==null) {return;}
         viewPointList.stream().forEach(vp -> {
             uniqueRestrictionFragments.addAll(vp.getActiveSegments());
             uniqueGeneSymbols.add(vp.getTargetName());

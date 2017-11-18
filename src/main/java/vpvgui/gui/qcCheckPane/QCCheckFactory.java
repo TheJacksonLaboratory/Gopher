@@ -172,6 +172,10 @@ public class QCCheckFactory {
         } else {
             sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContentPercent()));
         }
+        sb.append("</tr>");
+        String approach=model.getApproach().toString();
+        sb.append(String.format("<tr><td>Design approach</td><td>%s</td></tr>",approach));
+
         sb.append("</tbody>\n</table>");
 
         return sb.toString();

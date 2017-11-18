@@ -42,6 +42,7 @@ public class SwitchScreens {
         VPVMainPresenter presenter = (VPVMainPresenter) appView.getPresenter();
         presenter.setPrimaryStageReference(this.primarystage);
         Model model = new Model();
+        model.setApproach("simple");
         model.setProjectName(name);
         model.setXdim(screenWidth);
         model.setYdim(screenHeight);

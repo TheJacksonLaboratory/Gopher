@@ -142,10 +142,10 @@ public class PopupFactory {
         String html = "<h1>Probe length</h1>\n"+
                 "<p>The probes used in capture Hi-C are oligonucleotides (sometimes called baits) " +
                 "that are used to capture sequences of interest, thereby enriching these sequences prior " +
-                "to next generation sequencing. In some technologies, the probes are streptavidin-labeled magnetic \n" +
-                "beads are used to capture target sequences in solution; in other, variable length probes are attached  " +
-                " to an array. The probe length entered here should match the probe length used in the actual capture" +
-                " Hi-C experiment that will be conducted.</p>";
+                "to next generation sequencing. In some technologies, streptavidin-labeled magnetic beads " +
+                "are used to capture target sequences in solution; in others, variable length probes are " +
+                "attached to an array. The probe length entered here should match the probe length used in " +
+                "the actual capture Hi-C experiment that will be conducted.</p>";
 
         return html;
     }

@@ -273,6 +273,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
 
+
     private void setInitializedValuesInGUI() {
         String genomebuild=model.getGenomeBuild();
         if (genomebuild!=null)
@@ -626,28 +627,16 @@ public class VPVMainPresenter implements Initializable {
      */
     public void createViewPoints() {
         logger.trace("Entering createViewPoints");
+        String approach = this.approachChoiceBox.getValue();
+        this.model.setApproach(approach);
         updateModel();
         boolean OK=QCCheckFactory.showQCCheck(model);
         if (! OK ) {
             return;
         }
-
-
-        String approach = this.approachChoiceBox.getValue();
-        boolean doSimple=false;
-        if (approach.equals("Simple")) {
-            doSimple=true;
-        } else if (approach.equals("Extended")) {
-            doSimple=false;
-        } else {
-            logger.error("Could not retrieve approach, I got "+approach);
-            return;
-        }
-
-
         StringProperty sp=new SimpleStringProperty();
         ViewPointCreationTask task =null;
-        if (doSimple) {
+        if (model.useSimpleApproach()) {
             task = new SimpleViewPointCreationTask(model,sp);
         } else {
             task = new ExtendedViewPointCreationTask(model,sp);
