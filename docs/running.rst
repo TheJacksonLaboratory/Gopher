@@ -1,7 +1,7 @@
 Running VSV
 ===============================
 
-Assuming you have built or downloaded the VPViewer.jar file as described in :doc:`installation`, it is simple to start the program. Enter  ::
+Assuming you have built or downloaded the `VPViewer.jar` file as described in :doc:`installation`, it is simple to start the program. Enter  ::
 
   $ java -jar VPViewer.jar
 
