@@ -174,15 +174,51 @@ public class Model implements Serializable {
     /** Total vertical dimension the user's screen. */
     private int ydim;
 
-    public int getUniqueTranscriptionStartPositions() { return uniqueTranscriptionStartPositions; }
+    public int getUniqueTSScount() { return uniqueTSScount; }
 
-    public void setUniqueTranscriptionStartPositions(int n) { this.uniqueTranscriptionStartPositions = n; }
+    public void setUniqueTSScount(int n) { this.uniqueTSScount = n; }
 
     /** Total number of Transcription start sites associated with the genes chosen by the user. Viewpoints will be chosen
      * from these start sites.
+     */
+    private int uniqueTSScount;
+
+    public int getUniqueChosenTSScount() {
+        return uniqueChosenTSScount;
+    }
+
+    public void setUniqueChosenTSScount(int uniqueChosenTSScount) {
+        logger.trace(String.format("Setting chosen TSS count to %d",uniqueChosenTSScount));
+        this.uniqueChosenTSScount = uniqueChosenTSScount;
+    }
+
+    private int uniqueChosenTSScount;
+
+    public int getChosenGeneCount() {
+        return chosenGeneCount;
+    }
+
+    public void setChosenGeneCount(int chosenGeneCount) {
+        logger.trace(String.format("Setting chosen gene count to %d",chosenGeneCount));
+        this.chosenGeneCount = chosenGeneCount;
+    }
+
+    /** Number of genes initialially chosen by user. Can be different from final number of genes if no valid viewpoints
+     * are found for a gene.
 
      */
-    private int uniqueTranscriptionStartPositions;
+    private int chosenGeneCount;
+
+    public int getTotalRefGeneCount() {
+        return totalRefGeneCount;
+    }
+
+    public void setTotalRefGeneCount(int totalRefGeneCount) {
+        this.totalRefGeneCount = totalRefGeneCount;
+    }
+
+    /** Total number of RefGenes in the UCSC file. */
+    private int totalRefGeneCount;
 
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */

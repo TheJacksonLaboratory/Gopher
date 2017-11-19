@@ -7,7 +7,11 @@ import vpvgui.model.Model;
 import java.io.File;
 
 /**
- * Created by peter on 01.07.17.
+ * Coordinate processing of the uploaded genes (target genes) and their comparison with the refGene.txt.gz file. THe main
+ * GUI will call {@link #displayFromFile(Model, File)} if the dialog is opened from an example file from the Help menu
+ * and otherwise will call {@link #display(Model)} to allow the user to choose a file with a FileChooser.
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGeneViewFactory {
 
@@ -32,9 +36,7 @@ public class EntrezGeneViewFactory {
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
-
         });
-
 
         window.setScene(new Scene(view.getView()));
         window.showAndWait();

@@ -34,22 +34,34 @@ import java.util.zip.GZIPInputStream;
  * <p> The class produces a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
  * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
  * included, which is the way the data are shown on the UCSC browser).</p>
- * @author Peter Robinson, Peter Hansen
- * @version 0.2.1 (2017-11-12)
+ * @author Peter Robinson
+ * @author Peter Hansen
+ * @version 0.2.3 (2017-11-19)
  */
 public class RefGeneParser {
-
     static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
-    /** All genes in the refGenefile are converted into VPVGene objects. These will be used to match
-     * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.*/
+    /** All genes in the refGene file are converted into VPVGene objects. These will be used to match
+     * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.
+     * This map should contain all symbols in the refGene file*/
     private Map<String, VPVGene> geneSymbolMap =null;
-    /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen. */
+    /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen.
+     * This map should contain all symbols in the refGene file.
+     *  */
     private Map<String, VPVGene> gene2chromosomePosMap =null;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
-    /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.*/
+    /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.
+     * These are the genes chosen by the user. */
     private Set<String> validGeneSymbols=null;
+
+    private int n_totalGenes;
+    private int n_chosenGenes;
+    private int n_totalTSS;
+    private int n_chosenTSS;
+
+
+
 
     /**
      * @param path Path to the {@code refGene.txt.gz} file.
@@ -60,7 +72,11 @@ public class RefGeneParser {
         parse(path);
     }
 
-    /** Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here. */
+    /** Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here.
+     * A side-effect of the parsing is that we get the total number of genes and transcription
+     * start sites contained in the {@code refGene.txt.gz} file. These counts are stored
+     * in the variables {@link #n_totalTSS} and {@link #n_totalGenes} and can be retrieved
+     * by the functions {@link #getTotalTSScount()} and {@link #getTotalNumberOfRefGenes()}.*/
     private void parse(String path) {
         try {
             InputStream fileStream = new FileInputStream(path);
@@ -69,7 +85,6 @@ public class RefGeneParser {
             BufferedReader br = new BufferedReader(decoder);
             String line;
             while ((line=br.readLine())!=null) {
-                //System.out.println(line);
                 String A[]=line.split("\t");
                 String accession=A[1];
                 String chrom=A[2];
@@ -84,10 +99,9 @@ public class RefGeneParser {
                 } else {
                     gPos = Integer.parseInt(A[5]);
                 }
-                String name2=A[12];
+                String name2=A[12]; // this is the gene symbol
                 //String key = name2.concat(chrom);
                 String key=String.format("%s_%s_%d",name2,chrom,gPos);
-                //System.out.println(accession +"; "+chrom+"; "+strand+"; "+gPos+"; "+name2);
                 System.out.println(key);
                 VPVGene gene=null;
                 if (gene2chromosomePosMap.containsKey(key)) {
@@ -107,12 +121,14 @@ public class RefGeneParser {
                     gene2chromosomePosMap.put(key,gene);
                 }
                 gene.addGenomicPosition(gPos);
+                n_totalTSS++;
             }
             br.close();
         } catch (IOException e) {
             logger.error("Error while attempting to parse the RefGene file from UCSC:"+path);
             logger.error(e,e);
         }
+        n_totalGenes=geneSymbolMap.size();
     }
 
 
@@ -156,6 +172,7 @@ public class RefGeneParser {
                 invalidGeneSymbols.add(sym);
             }
         }
+        logger.trace(String.format("check genes valid size is %d",validGeneSymbols.size()));
     }
 
     /**
@@ -165,26 +182,35 @@ public class RefGeneParser {
      */
     public List<VPVGene> getVPVGeneList() {
         List<VPVGene> genelist=new ArrayList<>();
+        this.n_chosenTSS=0;
         for (VPVGene g: gene2chromosomePosMap.values()) {
-            if (this.validGeneSymbols.contains(g.getGeneSymbol()))
-            genelist.add(g);
+            if (this.validGeneSymbols.contains(g.getGeneSymbol())) {
+                genelist.add(g);
+                this.n_chosenTSS += g.n_viewpointstarts();
+            }
         }
         return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use gene2chromosomePosMap
     }
 
     /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
-    public int n_totalRefGenes() { return this.geneSymbolMap.size(); } // not sure if I should use geneSymbolMap or gene2chromosomePosMap -> use geneSymbolMap
+    public int getTotalNumberOfRefGenes() { return this.n_totalGenes; }
+
+    public int getNumberOfRefGenesChosenByUser() { return this.validGeneSymbols.size(); }
 
     /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
      * number of viewpoints we will design for this gene. Intended for unit testing.
      * @return number of distinct transcription start sites over all VPVGenes.
      */
-    public int n_totalTSSstarts() {
-        int n=0;
-        for (VPVGene vpg : gene2chromosomePosMap.values()) { // must contain all TSS -> use gene2chromosomePosMap
-            n+=vpg.n_viewpointstarts();
-        }
-        return n;
+    public int getTotalTSScount() {
+        return n_totalTSS;
+    }
+
+    /** Calculates the total number of distinct start points (transcript start points), which would correspond to the
+     * number of viewpoints we will design for this gene. Intended for unit testing.
+     * @return number of distinct transcription start sites over all VPVGenes.
+     */
+    public int getCountOfChosenTSS() {
+        return n_chosenTSS;
     }
 
 }

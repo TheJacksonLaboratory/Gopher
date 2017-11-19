@@ -607,7 +607,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * Open a new dialog where the user can paste gene symbols or Entrez Gene IDs.
+     * Open a new dialog where the user can upload gene symbols or Entrez Gene IDs.
      * The effect of the command <pre>EntrezGeneViewFactory.confirmDialog(this.model);</pre>
      * is to pass a list of {@link VPVGene} objects to the {@link Model}.
      * These objects are used with other information in the Model to create {@link vpvgui.model.viewpoint.ViewPoint}
@@ -618,7 +618,9 @@ public class VPVMainPresenter implements Initializable {
      */
     @FXML public void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.getN_validGeneSymbols(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                this.model.getChosenGeneCount(),
+                this.model.getUniqueChosenTSScount()));
         e.consume();
     }
 
@@ -841,7 +843,9 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                this.model.getChosenGeneCount(),
+                this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
         File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
@@ -850,7 +854,9 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                this.model.getChosenGeneCount(),
+                this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
         File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
@@ -859,7 +865,9 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                this.model.getChosenGeneCount(),
+                this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
         File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
@@ -868,7 +876,9 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,file);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",this.model.n_valid_genes(),this.model.n_viewpointStarts()));
+        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                this.model.getChosenGeneCount(),
+                this.model.getUniqueChosenTSScount()));
     }
 
     @FXML public void exportBEDFiles(ActionEvent e) {

@@ -42,44 +42,24 @@ import java.util.function.Consumer;
  * </ol>
  * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link VPVGene} objects to the model.
  * This list should then be used to create {@link vpvgui.model.viewpoint.ViewPoint} objects elsewhere in the code.
- * @author Peter Robinson
- * @version 0.1.2 (2017-11-15)
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGenePresenter implements Initializable {
     static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
     @FXML
-    private Label instructions;
-
-    @FXML
     private WebView wview;
-
-    @FXML
-    private Button uploadGenesButton;
-
-    /** A reference to the Model. We will use it to add genes information to
-     * the model.
-     */
+    /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
-
+    /** This class parses {@link VPVGene} objects from the refGene.txt.gz file. */
     RefGeneParser parser=null;
-
-    /** This will hold the string with the list of genes entered by the user. */
-    private String geneListString=null;
-
-
+    /** reference to the stage of the primary App. */
     private Stage stage = null;
-    //private HashMap<String, Object> result = new HashMap<String, Object>();
-    /** List of the symbols prior to validation, i.e., may contain invalid symbols. */
+    /** List of the uploaded symbols prior to validation, i.e., may contain invalid symbols. */
     private List<String> symbols=null;
-
-
+    /** Signal to close the dialog. */
     private Consumer<Signal> signal;
-    /** The total number of unique transcription start sites associated with the chosen genes. This will be
-     * equal to the number of ViewPoints that VPV attempts to create.
-     */
-    private int uniqueTSSpositions;
-
-
+    /** Flag as to whether the user has validated the uploaded gene symbols. */
     private boolean isvalidated=false;
 
 
@@ -104,9 +84,7 @@ public class EntrezGenePresenter implements Initializable {
 
     public void setModel(Model mod){this.model=mod;}
 
-    /**
-     * Closes the stage of this view
-     */
+    /** Closes the stage of this view. */
     private void closeStage() {
         if(stage!=null) {
             stage.close();
@@ -135,11 +113,16 @@ public class EntrezGenePresenter implements Initializable {
         }
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
         List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
-        uniqueTSSpositions = parser.n_totalTSSstarts();
-        int n_genes=parser.n_totalRefGenes();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
         String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
         this.model.setN_validGeneSymbols(validGeneSymbols.size());
-        this.model.setUniqueTranscriptionStartPositions(uniqueTSSpositions);
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
         setData(html);
         isvalidated=true;
     }
@@ -158,7 +141,7 @@ public class EntrezGenePresenter implements Initializable {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(stage);
         if (file == null) {
-            logger.error("Could not open genes file -TODO throw exception");
+            logger.error("Could not get name of file with gene symbols");
             return;
         } else {
             logger.info("Uploading target genes from "+file.getAbsolutePath());
@@ -168,6 +151,11 @@ public class EntrezGenePresenter implements Initializable {
         e.consume();
     }
 
+    /** This function is responsibble for extracting gene symbols from a file that is uploaded to VPV by the user.
+     * It initializes the List {@link #symbols}, which may contain correct and/or incorrect symbols -- the validity
+     * of the uploaded gene symbols will be checked in the next step.
+     * @param file
+     */
     public void uploadGenesFromFile(File file) {
         this.symbols = new ArrayList<>();
         try {
@@ -251,10 +239,8 @@ public class EntrezGenePresenter implements Initializable {
             return;
         }
         this.model.setVPVGenes(this.parser.getVPVGeneList());
-        logger.debug("Accepting genes and passing VPVGene list to parser. n="+parser.getVPVGeneList().size());
+        this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
         signal.accept(Signal.DONE);
     }
-
-
 
 }

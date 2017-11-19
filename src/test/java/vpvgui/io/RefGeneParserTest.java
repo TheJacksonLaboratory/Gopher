@@ -51,7 +51,7 @@ public class RefGeneParserTest {
     @Test
     public void testTotalNumberOfGenes() {
         int expected=19;
-        Assert.assertEquals(expected,parser.n_totalRefGenes());
+        Assert.assertEquals(expected,parser.getTotalNumberOfRefGenes());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class RefGeneParserTest {
     @Test
     public void testNumberOfStartPoints() {
         int expected=22;
-        Assert.assertEquals(expected,parser.n_totalTSSstarts());
+        Assert.assertEquals(expected,parser.getTotalTSScount());
     }
 
 

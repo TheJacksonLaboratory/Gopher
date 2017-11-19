@@ -217,14 +217,14 @@ public class QCCheckFactory {
         if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
         } else {
-            sb.append(String.format("<td>%d genes</td>",model.getN_validGeneSymbols()));
+            sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Unique TSS</td>");
         if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
             sb.append("<td class=\"red\">TSS list not initialized.</td>");
         } else {
-            sb.append(String.format("<td>%d unique transcription starts</td>",model.getUniqueTranscriptionStartPositions()));
+            sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");
