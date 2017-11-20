@@ -28,5 +28,14 @@ In the extended approach, VPV tries to select multiple restrictions fragments th
 
 Margin size
 ~~~~~~~~~~~
-ToDo... -- write an explanation and show a graphic.
+Traditionally, only two probes (or baits) are placed at the outermost ends of restriction fragments that are ought to be enriched. This is reasonable, if many fragments are targeted, e.g. all fragments that contain TSSs. However, if only the TSS of a few hundred up to thousand genes are targeted, the number of probes is not a limiting factor, and the ends of restriction fragments can be tiled with multiple probes in order to improve the enrichment. The margin size defines the width of the targeted regions at the outermost ends of restriction fragments that are earmarked to be tiled with probes.
 
+ .. figure:: img/improve_fragment_enrichment.png
+   :scale: 70 %
+   :alt: Margin size
+
+
+Tiling Factor
+~~~~~~~~~~~~~
+
+The tiling factor specifies the aimed probe coverage within the margins. For example, if the tiling factor is 2, each position within the margins will be covered by two probes, if possible, i.e. repetitive regions will be left. In VPV this parameter is only used to predict the expected overall number of probes for cost estimate, since VPV only preselects regions for enrichment. The actual probe design for these regions is done by the SureDesign wizard, which has also the parameter tiling factor or density (default 2x).
