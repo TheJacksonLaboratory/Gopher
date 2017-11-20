@@ -83,6 +83,8 @@ public class ViewPoint implements Serializable {
     private int promoterNumber;
     /** Total number of promoters associated with this gene. */
     private int totalPromoters;
+    /** This is a reference to the segment that overlaps the TSS */
+    private Segment centerSegment=null;
 
     public void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -374,6 +376,11 @@ public class ViewPoint implements Serializable {
 
     public String getTargetName() { return this.targetName; }
 
+    public boolean isTSSfragmentChosen() {
+        return this.centerSegment != null && centerSegment.isSelected();
+    }
+
+
     public String toString() {
         return String.format("%s  [%s:%d-%d]",getTargetName(),getReferenceID(),getStartPos(),getEndPos());
     }
@@ -404,15 +411,15 @@ public class ViewPoint implements Serializable {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        Segment centerSegment=null; // the fragment that contains the TSS. Always show it!
+        this.centerSegment=null; // the fragment that contains the TSS. Always show it!
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
 
         for (Segment segment : restrictionSegmentList) {
             if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
-                centerSegment = segment; segment.setOverlapsTSS(true); break;
+                this.centerSegment = segment; segment.setOverlapsTSS(true); break;
             }
         }
-        if (centerSegment==null) {
+        if (this.centerSegment==null) {
             logger.error("center segment NUll for " + getTargetName());
         }
 
@@ -447,8 +454,7 @@ public class ViewPoint implements Serializable {
         setStartPos(start);
         setEndPos(end);
 
-        restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> {
-        });
+//        restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> { });
 
 
         // discard fragments except for the selecxted fragments and their immediate neighbors, i.e.,
@@ -494,17 +500,17 @@ public class ViewPoint implements Serializable {
         boolean resolved = true;
         approach = Approach.SIMPLE;
         // find the fragment that contains genomicPos
-        Segment centerSegment = restrictionSegmentList.stream().
+        this.centerSegment = restrictionSegmentList.stream().
                 filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
                 findFirst().
                 orElse(null);
 
-        if (centerSegment == null) {
+        if (this.centerSegment == null) {
             logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
-            centerSegment.setOverlapsTSS(true);
+            this.centerSegment.setOverlapsTSS(true);
             // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
             double gc = centerSegment.getGCcontent();
             double repeatUp = centerSegment.getRepeatContentMarginUp();

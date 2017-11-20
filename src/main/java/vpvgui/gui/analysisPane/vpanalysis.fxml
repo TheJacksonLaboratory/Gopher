@@ -19,14 +19,15 @@
 
                 <TableView fx:id="viewPointTableView" minHeight="200.0" minWidth="1100.0">
                     <columns>
-                        <TableColumn fx:id="actionTableColumn" editable="false" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" text="Viewpoint" />
+                        <TableColumn fx:id="actionTableColumn" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Viewpoint" />
                         <TableColumn fx:id="deleteTableColumn" maxWidth="80.0" minWidth="80.0" text="Delete" />
                         <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="500.0" minWidth="80.0" prefWidth="100.0" text="Target" />
                         <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="400.0" minWidth="200.0" prefWidth="220.0" text="Genomic location" />
-                        <TableColumn fx:id="nSelectedTableColumn" minWidth="100.0" prefWidth="120.0" text="# Selected" />
-                        <TableColumn fx:id="viewpointScoreColumn" minWidth="100.0" prefWidth="120.0" text="Score" />
+                        <TableColumn fx:id="nSelectedTableColumn" maxWidth="-1.0" minWidth="100.0" prefWidth="100.0" text="# Selected" />
+                        <TableColumn fx:id="viewpointScoreColumn" maxWidth="-1.0" minWidth="100.0" prefWidth="100.0" text="Score" />
                         <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active length" />
                         <TableColumn fx:id="viewpointTotalLength" minWidth="100.0" prefWidth="120.0" text="Total length" />
+                  <TableColumn fx:id="fragmentOverlappingTSSColumn" maxWidth="-1.0" minWidth="140.0" prefWidth="140.0" text="Fragment at TSS" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

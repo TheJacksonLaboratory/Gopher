@@ -38,27 +38,16 @@ public class VPAnalysisPresenter implements Initializable {
 
     private WebEngine contentWebEngine;
 
-    @FXML
-    private TableView<ViewPoint> viewPointTableView;
-    @FXML
-    private TableColumn<ViewPoint, Button> actionTableColumn;
-    @FXML
-    private TableColumn<ViewPoint, Button> deleteTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> targetTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> genomicLocationColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> nSelectedTableColumn;
-
+    @FXML private TableView<ViewPoint> viewPointTableView;
+    @FXML private TableColumn<ViewPoint, Button> actionTableColumn;
+    @FXML private TableColumn<ViewPoint, Button> deleteTableColumn;
+    @FXML private TableColumn<ViewPoint, String> targetTableColumn;
+    @FXML private TableColumn<ViewPoint, String> genomicLocationColumn;
+    @FXML private TableColumn<ViewPoint, String> nSelectedTableColumn;
     @FXML private TableColumn<ViewPoint,String> viewpointScoreColumn;
-
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLengthOfActiveSegments;
-
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLength;
+    @FXML private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
 
 
    // private BooleanProperty editingStarted;
@@ -190,7 +179,7 @@ public class VPAnalysisPresenter implements Initializable {
         actionTableColumn.setSortable(false);
         actionTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
-            Button btn = new Button("Show viewpoint");
+            Button btn = new Button("Show");
             btn.setOnAction(e -> {
                 logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(),vp.getActiveSegments().size()));
@@ -216,7 +205,7 @@ public class VPAnalysisPresenter implements Initializable {
         // the third column
         targetTableColumn.setSortable(true);
         targetTableColumn.setEditable(false);
-
+        // The following shows the gene name with an astrerix if the center segment is selected.
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
 
 
@@ -240,6 +229,9 @@ public class VPAnalysisPresenter implements Initializable {
         // eight column--total length viewpoint
         viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
+
+        // ninth column -- is central fragment with TSS selected?
+        fragmentOverlappingTSSColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().isTSSfragmentChosen()?"yes":"no"));
 
         viewPointTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
