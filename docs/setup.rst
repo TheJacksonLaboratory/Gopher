@@ -28,5 +28,5 @@ In the extended approach, VPV tries to select multiple restrictions fragments th
 
 Margin size
 ~~~~~~~~~~~
-ToDo -- write an explanation and show a graphic.
+ToDo... -- write an explanation and show a graphic.
 
