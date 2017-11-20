@@ -31,6 +31,7 @@ public class BEDFileExporter {
     private String allTracksBEDfile =null;
     private String targetRegionBEDfile =null;
     private String vpvSummaryTSVfile=null;
+    private String vpvSummaryRfile=null;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private String directoryPath=null;
 
@@ -52,6 +53,7 @@ public class BEDFileExporter {
         this.allTracksBEDfile =String.format("%s_allTracks.bed",prefix);
         this.targetRegionBEDfile =String.format("%s_targetRegions.txt",prefix);
         this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",prefix);
+        this.vpvSummaryRfile=String.format("%s_vpvSummary.r",prefix);
     }
 
     private String getFullPath(String fname) {
@@ -82,6 +84,13 @@ public class BEDFileExporter {
             out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen()));
         }
         out_ucscURL.close();
+
+        PrintStream vpvSummaryR = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryRfile)));
+
+        String[] helpSplit=vpvSummaryRfile.split("_vpvSummary.r");
+        String prefix=helpSplit[0];
+        String script=getRscript(prefix);
+        vpvSummaryR.println(script);
 
         // print file for all tracks that can be uploaded to the UCSC genome browser
         // print file for target regions that can be used as input for the SureDesign wizard
@@ -167,6 +176,35 @@ public class BEDFileExporter {
         String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&pix=1800",
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem);
         return url;
+    }
+
+    public String getRscript(String prefix) {
+        String script="TAB <- read.table(\"" + prefix + "_vpvSummary.tsv\", sep = \"\\t\",header=T)\n\n";
+
+        script += "cairo_pdf(\"" + prefix + "_vpvSummary.pdf\", width=7, height=7)\n";
+        script += "par(mfrow=c(2,2))\n\n";
+
+        script += "hist(\n";
+        script += "\tt(TAB[\"SCORE\"]),\n";
+        script += "\tbreaks=seq(0,1,0.05),\n";
+        script += "\tmain=\"Viewpoint scores\",\n";
+        script += "\txlab=\"Score\"\n";
+        script += "\t)\n\n";
+
+        script += "MEAN_SCORE=round(mean(TAB[,\"SCORE\"]),digits=2)\n";
+        script += "legend(\"topleft\", legend=c(paste(\"Avg: \",MEAN_SCORE)),cex=0.8,bty = \"n\")\n\n\n";
+
+
+        script += "X_MIN=min(TAB[\"VP_LENGTH\"])\n";
+        script += "X_MAX=max(TAB[\"VP_LENGTH\"])\n\n";
+
+        script += "hist(\n";
+        script += "t(TAB[\"VP_LENGTH\"]),\n";
+        script += ")\n";
+
+
+        script += "dev.off()\n\n";
+        return script;
     }
 
 }
