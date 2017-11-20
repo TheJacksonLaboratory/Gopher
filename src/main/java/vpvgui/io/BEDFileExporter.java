@@ -73,13 +73,13 @@ public class BEDFileExporter {
         // print tsv file that can be used to share the results of VPV
         // -----------------------------------------------------------
         PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryTSVfile)));
-        out_ucscURL.println("Gene\tGENOMIC_POS\tURL\t#SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH");
+        out_ucscURL.println("Gene\tGENOMIC_POS\tURL\tNO_SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH\tTSS_FRAGMENT_SELECTED");
 
         for (ViewPoint vp : viewpointlist) {
             String url= getDefaultURL(vp,genomeBuild);
             int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
             String SCORE = String.format("%.2f", vp.getScore());
-            out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments()));
+            out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen()));
         }
         out_ucscURL.close();
 
