@@ -137,7 +137,7 @@ public class BEDFileExporter {
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
                     Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
-                    uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_fragment_" + k + "_margin_" + l);
+                    uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
                 }
             }
         }
