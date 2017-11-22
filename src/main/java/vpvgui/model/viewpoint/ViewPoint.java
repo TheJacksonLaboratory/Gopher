@@ -575,13 +575,83 @@ public class ViewPoint implements Serializable {
      * <p>
      * The function iterates over all restriction segments of the viewpoint.
      * For selected segments a <i>position distance score</i> is calculated for each position.
+     * The scores for all positions are summed up and in the end divided by the sum of all
+     * <i>position distance scores</i> for all positions within the interval
+     * [genomicPos - upstreamNucleotideLength; genomicPos + downstreamNucleotideLength ].
+     * <p>
+     * The overall score for the viewpoint is between 0 and 1.
+     *
+     */
+    public void calculateViewpointScore() {
+        Double score = 0.0;
+
+        /* iterate over all selected fragments */
+
+        Integer posCnt = 0;
+        List<Segment> allFrags=restrictionSegmentList;
+        for (Segment currentSegment : allFrags) {
+            double repCont = 0;
+            double positionScoreSumFragment = 0;
+
+            if (currentSegment.isSelected()) {
+
+                repCont=currentSegment.getMeanMarginRepeatContent();
+
+                /* get position distance score for each position of the fragment */
+
+                positionScoreSumFragment = 0;
+                for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
+                    Integer dist = j - genomicPos;
+                    if (dist < 0) {
+                        positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
+                    } else {
+                        positionScoreSumFragment += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
+                    }
+                    posCnt++;
+                }
+            }
+            score += (1 - repCont) * positionScoreSumFragment;
+        }
+
+        /* calculate reference: all position within specified range covered, no repeats */
+
+        double positionScoreSumRef = 0;
+        for(int i = genomicPos-upstreamNucleotideLength; i<genomicPos+downstreamNucleotideLength; i++) {
+
+            Integer dist = i - genomicPos;
+            if (dist < 0) {
+                positionScoreSumRef += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
+            } else {
+                positionScoreSumRef += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
+            }
+        }
+
+        /* set final score */
+
+        //System.out.println( upstreamNucleotideLength+downstreamNucleotideLength + "\t" + score + "\t" + positionScoreSumRef + "\t" + score/positionScoreSumRef);
+        if (posCnt == 0) {
+            this.score = 0.0;
+        } else {
+            this.score = score / positionScoreSumRef;
+        }
+
+    }
+
+    /**
+     * This function calculates the viewpoint score and sets the field 'score' of this class.
+     * The function is also intended to update the score.
+     * <p>
+     * The function iterates over all restriction segments of the viewpoint.
+     * For selected segments a <i>position distance score</i> is calculated for each position.
      * The scores for all positions are summed up and in the end divided by the total number of positions for which
      * <i>position distance scores</i> were calculated.
      * <p>
      * The overall score for the viewpoint is again between 0 and 1.
      *
      */
-    public void calculateViewpointScore() {
+    public void calculateViewpointScore_v1() {
+
+
         Double score = 0.0;
 
         /* iterate over all selected fragments */
@@ -616,8 +686,8 @@ public class ViewPoint implements Serializable {
         } else {
             this.score = score / posCnt;
         }
-    }
 
+    }
     /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
         return getActiveSegments().stream().mapToInt(segment -> segment.getMarginSize()).sum();
