@@ -3,10 +3,8 @@ package vpvgui.gui.analysisPane;
 import org.apache.log4j.Logger;
 import vpvgui.model.Design;
 import vpvgui.model.Model;
-import vpvgui.model.viewpoint.ViewPoint;
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -113,7 +111,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         double avg_n_frag=design.getAvgFragmentsPerVP();
         double avg_size=design.getAvgVPsize();
         double avg_score=design.getAvgVPscore();
-        int n_totalNucleotidesInProbes=design.getN_nucleotides_in_probes();
+        int n_totalNucleotidesInProbes=design.getN_nucleotides_in_unique_fragment_margins();
         int totalEffectiveNucleotides=design.totalEffectiveSize();
 
         sb.append(String.format("<tr><td>Number of genes: %d</td>"+
@@ -121,8 +119,8 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
                 ngenes,avg_n_frag, dformater.format(n_totalNucleotidesInProbes)));
         sb.append(String.format("<tr><td>Number of viewpoints: %d</td><td>Average viewpoint score: %.2f%%</td><td>Tiling factor: %d x</td></tr>",
                 nviewpoints,100*avg_score,tilingFactor));
-        sb.append(String.format("<tr><td>Number of unique fragments: %d</td><td>Average viewpoint size: %.1f nucleotides</td><td>Total effective size: %s kb</td></tr>",
-                total_active_frags, avg_size,  dformater.format(totalEffectiveNucleotides/100)));
+        sb.append(String.format("<tr><td>Number of unique fragments: %d</td><td>Average viewpoint size: %.1f nucleotides</td><td>Estimated number of probes: %d</td></tr>",
+                total_active_frags, avg_size,  design.getEstimatedNumberOfProbes()));
         sb.append("</tbody>\n</table>");
         return sb.toString();
     }

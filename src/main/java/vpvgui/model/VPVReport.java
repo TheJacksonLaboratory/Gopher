@@ -45,7 +45,7 @@ public class VPVReport {
         double avg_n_frag=design.getAvgFragmentsPerVP();
         double avg_size=design.getAvgVPsize();
         double avg_score=design.getAvgVPscore();
-        int n_totalNucleotidesInProbes=design.getN_nucleotides_in_probes();
+        int n_totalNucleotidesInProbes=design.getN_nucleotides_in_unique_fragment_margins();
         int totalEffectiveNucleotides=design.totalEffectiveSize();
         int tilingFactor=model.getTilingFactor();
 

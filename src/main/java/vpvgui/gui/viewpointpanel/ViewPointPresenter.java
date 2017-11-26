@@ -287,6 +287,21 @@ public class ViewPointPresenter implements Initializable {
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
 
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
+        segmentLengthColumn.setCellFactory( column -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    Integer len = Integer.parseInt(item);
+                    if (len < model.getMinFragSize()) {
+                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                    } else {
+                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                    }
+                }
+            }
+        });
         inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
                 .getSegment().getRepeatContentAsPercent())));
         inRepetitiveTableColumn.setComparator(new PercentComparator());
@@ -379,7 +394,7 @@ public class ViewPointPresenter implements Initializable {
                 vp.getAccession(),
                 100*vp.getScore(),
                 vp.getGenomicLocationString(),
-                vp.getActiveLengthInKilobases()));
+                vp.getTotalAndActiveLengthAsString()));
         if (vp.hasNoActiveSegment()) {
             this.vpExplanationProperty.setValue("No selected fragments");
         } else {

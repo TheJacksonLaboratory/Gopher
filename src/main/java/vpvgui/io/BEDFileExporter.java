@@ -76,8 +76,8 @@ public class BEDFileExporter {
         // -----------------------------------------------------------
         PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryTSVfile)));
         out_ucscURL.println("Gene\tGENOMIC_POS\tURL\tNO_SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH\tTSS_FRAGMENT_SELECTED");
-
         for (ViewPoint vp : viewpointlist) {
+            if(vp.getNumOfSelectedFrags()==0) {continue;}
             String url= getDefaultURL(vp,genomeBuild);
             int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
             String SCORE = String.format("%.2f", vp.getScore());
@@ -104,8 +104,8 @@ public class BEDFileExporter {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s",
                     vp.getReferenceID(),
-                    vp.getGenomicPos(),
-                    (vp.getGenomicPos() + 1),
+                    vp.getGenomicPos()-1,
+                    (vp.getGenomicPos()),
                     vp.getTargetName()));
         }
 

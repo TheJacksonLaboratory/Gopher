@@ -39,7 +39,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open ..." />
                               <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" />
                               <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
-                              <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files" />
+                              <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files ..." />
                               <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
                           <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
                         </items>
@@ -83,8 +83,8 @@
                         </Menu>
                         <Menu mnemonicParsing="false" text="Report">
                           <items>
-                            <MenuItem fx:id="displayReport" onAction="#displayReport" mnemonicParsing="false" text="Display report" />
-                              <MenuItem fx:id="exportReport" onAction="#exportReport" mnemonicParsing="false" text="Export report" />
+                            <MenuItem fx:id="displayReport" mnemonicParsing="false" onAction="#displayReport" text="Display report" />
+                              <MenuItem fx:id="exportReport" mnemonicParsing="false" onAction="#exportReport" text="Export report" />
                           </items>
                         </Menu>
                     </menus>

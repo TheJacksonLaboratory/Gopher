@@ -129,13 +129,9 @@ public class ViewPoint implements Serializable {
    }
 
     /** @return a formated String representing the length of the ViewPoint in kb, e.g., 10;203 kb. */
-    public String getActiveLengthInKilobases() {
-       double len = getTotalLengthOfActiveSegments();
-
-        double lenInKb=len/1000; // kilobases
-        return String.format("%s kb (all selected fragments: %s kb)",
-                NumberFormat.getNumberInstance(Locale.US).format(len),
-                NumberFormat.getNumberInstance(Locale.US).format(lenInKb));
+    public String getTotalAndActiveLengthAsString() {
+       double lenInKb=(double)getTotalLengthOfActiveSegments()/1000; // kilobases
+        return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
     /**
