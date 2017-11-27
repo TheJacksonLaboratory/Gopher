@@ -36,7 +36,7 @@ import java.util.zip.GZIPInputStream;
  * included, which is the way the data are shown on the UCSC browser).</p>
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.2.3 (2017-11-19)
+ * @version 0.2.4 (2017-11-26)
  */
 public class RefGeneParser {
     static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
@@ -54,7 +54,7 @@ public class RefGeneParser {
     /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.
      * These are the genes chosen by the user. */
     private Set<String> validGeneSymbols=null;
-
+    /** Total number of genes in the refGene.txt.gz file (number of unique gene symbols). */
     private int n_totalGenes;
     private int n_chosenGenes;
     private int n_totalTSS;
@@ -102,7 +102,6 @@ public class RefGeneParser {
                 String name2=A[12]; // this is the gene symbol
                 //String key = name2.concat(chrom);
                 String key=String.format("%s_%s_%d",name2,chrom,gPos);
-                System.out.println(key);
                 VPVGene gene=null;
                 if (gene2chromosomePosMap.containsKey(key)) {
                     gene = gene2chromosomePosMap.get(key);
@@ -114,14 +113,15 @@ public class RefGeneParser {
                     } else if (strand.equals("-")){
                         gene.setReverseStrand();
                     } else {
-                        System.err.println("[ERROR] did not recognize strand \""+ strand + "\"");
-                        System.exit(1); /* todo throw some exception. */
+                        // this should never happen
+                        logger.error("[ERROR] did not recognize strand \""+ strand + "\"");
+                        continue;
                     }
                     geneSymbolMap.put(name2,gene);
                     gene2chromosomePosMap.put(key,gene);
                 }
                 gene.addGenomicPosition(gPos);
-                n_totalTSS++;
+
             }
             br.close();
         } catch (IOException e) {
@@ -129,6 +129,10 @@ public class RefGeneParser {
             logger.error(e,e);
         }
         n_totalGenes=geneSymbolMap.size();
+        n_totalTSS=0;
+        // Now collect the unique transcription start site positions.
+        gene2chromosomePosMap.values().stream().forEach(vpvGene -> {
+            n_totalTSS += vpvGene.n_viewpointstarts();});
     }
 
 
@@ -172,7 +176,6 @@ public class RefGeneParser {
                 invalidGeneSymbols.add(sym);
             }
         }
-        logger.trace(String.format("check genes valid size is %d",validGeneSymbols.size()));
     }
 
     /**

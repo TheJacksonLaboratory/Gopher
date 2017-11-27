@@ -2,6 +2,7 @@ package vpvgui.model;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class will represent Genes according to the way we are analyzing them in VPV.
@@ -77,11 +78,9 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
         if (this.positions ==null || this.positions.size()==0) {
            // no-op
         } else {
-            for (Integer ii : positions) {
-                sb.append("\n\tTSS pos: " + ii);
-            }
+            String posstring = positions.stream().map(String::valueOf).collect(Collectors.joining(";"));
+            sb.append("-TSS pos: " + posstring);
         }
-        sb.append("\n");
         return sb.toString();
     }
     

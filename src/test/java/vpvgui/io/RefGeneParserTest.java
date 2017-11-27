@@ -47,7 +47,11 @@ public class RefGeneParserTest {
     }
 
 
-
+    /*
+    * Total number of uniq gene symbols
+    * $ zcat refGeneSmall.txt.gz | cut -f 13 | sort | uniq | wc -l
+    *19
+     */
     @Test
     public void testTotalNumberOfGenes() {
         int expected=19;
@@ -104,6 +108,8 @@ public class RefGeneParserTest {
 
     /** There are 25 lines corresponding to 19 genes and 22 distinct transcription start sites
      * in the refGeneSmall.txt.gz file.
+     *  zcat refGeneSmall.txt.gz | cut -f 5 | sort | uniq | wc -l
+     22
      */
     @Test
     public void testNumberOfStartPoints() {
@@ -135,7 +141,6 @@ public class RefGeneParserTest {
         List<Integer> tssList=gene.getTSSlist();
         Assert.assertEquals(1,tssList.size());
         Integer expected=29370;
-        System.err.println(gene.toString());
         Assert.assertEquals(expected,tssList.get(0));
     }
 
