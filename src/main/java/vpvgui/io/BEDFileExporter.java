@@ -32,6 +32,7 @@ public class BEDFileExporter {
     private String targetRegionBEDfile =null;
     private String vpvSummaryTSVfile=null;
     private String vpvSummaryRfile=null;
+    private String vpvUniqueTargetFragmentsFile=null;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private String directoryPath=null;
 
@@ -54,6 +55,7 @@ public class BEDFileExporter {
         this.targetRegionBEDfile =String.format("%s_targetRegions.txt",prefix);
         this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",prefix);
         this.vpvSummaryRfile=String.format("%s_vpvSummary.r",prefix);
+        this.vpvUniqueTargetFragmentsFile=String.format("%s_unique_target_fragments.bed",prefix);
     }
 
     private String getFullPath(String fname) {
@@ -124,6 +126,7 @@ public class BEDFileExporter {
         // print restriction fragments and get unique fragment margins
         out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
         Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragments
+        Set<String> uniqueFragments = new HashSet<String>(); // use a set to get rid of duplicate fragments
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             int k=0; // index of selected fragment
@@ -133,11 +136,12 @@ public class BEDFileExporter {
                 Integer rsEndPos = segment.getEndPos();
                 out_allTracks.println(vp.getReferenceID() + "\t" + (rsStaPos-1) + "\t" + rsEndPos + "\t" + vp.getTargetName());
 
-                // get unique margins of selected fragments
+                // get unique margins of selected fragments and unique fragments
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
                     Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
+                    uniqueFragments.add(vp.getReferenceID() + "\t" + (vp.getStartPos()-1) + "\t" + vp.getEndPos() + "\t" + vp.getTargetName());
                 }
             }
         }
@@ -159,6 +163,13 @@ public class BEDFileExporter {
 
         logger.trace("Done output of BED files. Total Length of Margins: " + totalLengthOfMargins);
 
+        // print out unique set of target fragments to a separate file that can be used as input for diachromatic
+        // ------------------------------------------------------------------------------------------------------
+
+        PrintStream out_uniqueTargetFragments = new PrintStream(new FileOutputStream(getFullPath(vpvUniqueTargetFragmentsFile)));
+        for (String s : uniqueFragmentMargins) {
+            out_uniqueTargetFragments.println(s);
+        }
     }
 
 
