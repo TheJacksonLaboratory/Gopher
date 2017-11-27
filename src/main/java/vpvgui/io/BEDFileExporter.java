@@ -141,7 +141,7 @@ public class BEDFileExporter {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
                     Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
-                    uniqueFragments.add(vp.getReferenceID() + "\t" + (vp.getStartPos()-1) + "\t" + vp.getEndPos() + "\t" + vp.getTargetName());
+                    uniqueFragments.add(vp.getReferenceID() + "\t" + (segment.getStartPos()-1) + "\t" + segment.getEndPos() + "\t" + vp.getTargetName());
                 }
             }
         }
@@ -167,7 +167,7 @@ public class BEDFileExporter {
         // ------------------------------------------------------------------------------------------------------
 
         PrintStream out_uniqueTargetFragments = new PrintStream(new FileOutputStream(getFullPath(vpvUniqueTargetFragmentsFile)));
-        for (String s : uniqueFragmentMargins) {
+        for (String s : uniqueFragments) {
             out_uniqueTargetFragments.println(s);
         }
     }
