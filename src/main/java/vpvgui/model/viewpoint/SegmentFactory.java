@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * In addition to the usual getter and setter function, the class provides a functions that allow to query the <i>HashMap</i>.
  *
  * @author Peter Hansen
- * @version 0.1.1 (2017-11-01)
+ * @version 0.1.2 (2017-11-26)
  */
 public class SegmentFactory implements Serializable {
     private static final Logger logger = Logger.getLogger(SegmentFactory.class.getName());
@@ -81,7 +81,8 @@ public class SegmentFactory implements Serializable {
             int offset = enzyme.getOffset();
             // get sequence around genomic position and convert everything to uppercase
             if (chromosomeLength < genomicPos + maxDistToGenomicPosDown) {
-                logger.warn("maxDistToGenomicPosDown = " + maxDistToGenomicPosDown + " plus genomicPos = " + genomicPos + " greater than than the length of " + referenceSequenceID + " (" + chromosomeLength + ").");
+                logger.warn(String.format("maxDistToGenomicPosDown [%d] + genomicPos [%d] = %d > length of chromosome [%s;%d] -> will adjust",
+                        maxDistToGenomicPosDown,genomicPos,(maxDistToGenomicPosDown+genomicPos), referenceSequenceID , chromosomeLength));
                 maxDistToGenomicPosDown = chromosomeLength - genomicPos;
             }
             // note fastaReader refers to one-based numbering scheme.

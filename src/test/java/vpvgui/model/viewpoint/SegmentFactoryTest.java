@@ -4,8 +4,6 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import vpvgui.model.Design;
-import vpvgui.model.Model;
 import vpvgui.model.RestrictionEnzyme;
 
 import java.io.File;
@@ -39,37 +37,14 @@ import java.util.*;
  */
 public class SegmentFactoryTest {
 
-//    private static Model testModel;
-//    private static Design testDesign;
     private static String testFastaFile = null;
     private static String refSeqID1 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
     private static Integer genomicPos_1 = 125;
-//    private static Integer genomicPos_2 = 150; // position on the next fragment in downstream direction -> overlapping viewpoints
-//    private static String referenceSequenceID_2 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy"; // same sequence, but different name
-//    private static Integer genomicPos_    private static Integer genomicPos_2 = 150; // position on the next fragment in downstream direction -> overlapping viewpoints
-//    private static String referenceSequenceID_2 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments_copy"; // same sequence, but different name
-//    private static Integer genomicPos_3 = 125; // non overlapping viewpoint
     private static Integer maxDistToGenomicPosUp = 115;
     private static Integer maxDistToGenomicPosDown = 115;
-
-//    private static String[] testCuttingPatterns = new String[]{"^GATC", "A^AGCTT"};
-
-
-    // parameters for Lupianez-Funktion
-//    private static Integer fragNumUp = 1;
-//    private static Integer fragNumDown = 2;
-//    private static Integer minSizeUp = 20;
-//    private static Integer minSizeDown = 20;
-//    private static Integer maxSizeUp = 95;
-//    private static Integer maxSizeDown = 150;
-//    private static Integer marginSize = 10;
-//    private static Integer minFragSize = 20;
-//    private static Double minRepFrag = 0.6;
-//    private static String motif = "GATC";
-
     private static IndexedFastaSequenceFile testFastaReader;
     static List<RestrictionEnzyme> chosenEnzymeList;
-    static SegmentFactory cpm=null;
+    static SegmentFactory segmentFactory =null;
 
     private static List<Integer> gatcsites;
 
@@ -89,7 +64,7 @@ public class SegmentFactoryTest {
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
-        cpm = new SegmentFactory(refSeqID1,
+        segmentFactory = new SegmentFactory(refSeqID1,
                 genomicPos_1,
                 testFastaReader,
                 maxDistToGenomicPosUp,
@@ -112,65 +87,29 @@ public class SegmentFactoryTest {
 
     @Test
     public void testCuttingPositionMapConstructor() {
-        Assert.assertNotNull(cpm);
+        Assert.assertNotNull(segmentFactory);
     }
 
     @Test
     public void testGenomicPosition() {
         Integer expected = genomicPos_1;
-        Assert.assertEquals(expected,cpm.getGenomicPos());
+        Assert.assertEquals(expected, segmentFactory.getGenomicPos());
     }
 
     @Test
     public void testMaxDistToGenomicPos() {
         Integer expected = maxDistToGenomicPosUp;
-        Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosUp());
+        Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
         expected = maxDistToGenomicPosDown;
-        Assert.assertEquals(expected,cpm.getMaxDistToGenomicPosDown());
+        Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
     }
 
-
-
-    public SegmentFactory createVeryShortCPM() {
-        RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
-        Map remap = new HashMap<>();
-        remap.put(re.getPlainSite(), re);
-        SegmentFactory.setRestrictionEnzymeMap(remap);
-        chosenEnzymeList = new ArrayList<>();
-        chosenEnzymeList.add(re);
-        ClassLoader classLoader = SegmentFactoryTest.class.getClassLoader();
-        testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
-        final File fasta = new File(testFastaFile);
-        String refID="veryshort";
-        //refID="chr_t4_GATC_short_20bp_and_long_24bp_fragments";
-        Integer genomicPos=42;
-        int maxDistUp=20;
-        int maxDistDown=15;
-        try {
-            testFastaReader = new IndexedFastaSequenceFile(fasta);
-            String seq=testFastaReader.getSequence(refID).getBaseString();
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            System.out.println(seq);
-            System.out.println("length="+seq.length());
-            System.out.println("genomicPos="+genomicPos);
-            System.out.println("maxDistUp="+maxDistUp);
-            System.out.println("maxDistDown="+maxDistDown);
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            cpm = new SegmentFactory(refID,
-                    genomicPos,
-                    testFastaReader,
-                    maxDistUp,
-                    maxDistDown,
-                    chosenEnzymeList);
-            return cpm;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
+    /*
+    * Segment factory where the downstream distance is longer than the extent of the chromosome
+    * Make sure we still get the right DpnII sites.
+     */
     @Test
-    public void testVeryShortCPM (){
+    public void testVeryShortSegmentFactory (){
         List<Integer> adjustedGatcSitesOffsetZero=new ArrayList<>();
         RestrictionEnzyme re = new RestrictionEnzyme("DpnII", "^GATC");
         Map remap = new HashMap<>();
@@ -190,13 +129,6 @@ public class SegmentFactoryTest {
         try {
             testFastaReader = new IndexedFastaSequenceFile(fasta);
             String seq=testFastaReader.getSequence(refID).getBaseString();
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            System.out.println(seq);
-            System.out.println("length="+seq.length());
-            System.out.println("genomicPos="+genomicPos);
-            System.out.println("maxDistUp="+maxDistUp);
-            System.out.println("maxDistDown="+maxDistDown);
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             cpm = new SegmentFactory(refID,
                     genomicPos,
                     testFastaReader,
@@ -217,11 +149,6 @@ public class SegmentFactoryTest {
             if (pos >= genomicPos - maxDistUp) {
                 adjustedGatcSitesOffsetZero.add(pos);
             }
-        }
-
-//        List<Integer> sites = cpm.getAllCuts();
-        for (Integer j:adjustedGatcSitesOffsetZero) {
-            System.out.println("adjusted="+j);
         }
         Assert.assertTrue(adjustedGatcSitesOffsetZero.equals(cpm.getAllCuts()));
     }
