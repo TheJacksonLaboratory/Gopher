@@ -6,6 +6,8 @@ import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.genome.HumanHg38;
+import vpvgui.model.genome.MouseMm9;
+import vpvgui.model.genome.MouseMm10;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
@@ -104,6 +106,10 @@ public class Model implements Serializable {
             this.genome = new HumanHg19();
         } else if (newDatabase.equals("hg38")) {
             this.genome = new HumanHg38();
+        } else if (newDatabase.equals("mm9")) {
+            this.genome = new MouseMm9();
+        } else if (newDatabase.equals("mm10")) {
+            this.genome = new MouseMm10();
         } else {
             PopupFactory.displayError("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
             return;

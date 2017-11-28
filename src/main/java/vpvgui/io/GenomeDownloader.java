@@ -9,6 +9,8 @@ import vpvgui.model.DataSource;
 import vpvgui.model.genome.Genome;
 import vpvgui.model.genome.HumanHg19;
 import vpvgui.model.genome.HumanHg38;
+import vpvgui.model.genome.MouseMm9;
+import vpvgui.model.genome.MouseMm10;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -102,9 +104,9 @@ public class GenomeDownloader {
         } else if (genomebuild.equals("hg38")) {
             return new HumanHg38();
         } else if (genomebuild.equals("mm9")) {
-            throw new DownloadFileNotFoundException(String.format("Not yet implemented: genome for build: %s.", genomebuild));
+            return new MouseMm9();
         } else if (genomebuild.equals("mm10")) {
-            throw new DownloadFileNotFoundException(String.format("Not yet implemented: genome for build: %s.", genomebuild));
+            return new MouseMm10();
         } else {
             throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
         }
