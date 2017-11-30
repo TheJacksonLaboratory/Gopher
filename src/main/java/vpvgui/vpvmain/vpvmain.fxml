@@ -63,6 +63,12 @@
                                 </items>
                               </Menu>
                               <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
+                              <Menu mnemonicParsing="false" text="Set margin strategy">
+                                <items>
+                                    <RadioMenuItem fx:id="singleMarginRadioMenuitem" mnemonicParsing="false" text="allow single margin" />
+                                    <RadioMenuItem fx:id="bothMarginsRadioMenuitem" mnemonicParsing="false" text="require both margins" />
+                                </items>
+                              </Menu>
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Proxy">

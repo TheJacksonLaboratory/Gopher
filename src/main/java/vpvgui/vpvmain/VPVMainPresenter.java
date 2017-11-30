@@ -126,6 +126,8 @@ public class VPVMainPresenter implements Initializable {
     @FXML RadioMenuItem tiling3;
     @FXML RadioMenuItem tiling4;
     @FXML RadioMenuItem tiling5;
+    @FXML RadioMenuItem singleMarginRadioMenuitem;
+    @FXML RadioMenuItem bothMarginsRadioMenuitem;
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
 
@@ -240,6 +242,11 @@ public class VPVMainPresenter implements Initializable {
         tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+
+        ToggleGroup marginToggleGroup = new ToggleGroup();
+        marginToggleGroup.getToggles().addAll(singleMarginRadioMenuitem,bothMarginsRadioMenuitem);
+        singleMarginRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(true); e.consume();});
+        bothMarginsRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(false); e.consume();});
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -643,6 +650,9 @@ public class VPVMainPresenter implements Initializable {
         }
         StringProperty sp=new SimpleStringProperty();
         ViewPointCreationTask task =null;
+
+        // TODO use boolean var allowSingleMargin
+
         if (model.useSimpleApproach()) {
             task = new SimpleViewPointCreationTask(model,sp);
         } else {

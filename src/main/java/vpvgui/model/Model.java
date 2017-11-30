@@ -169,6 +169,12 @@ public class Model implements Serializable {
     public  double getMaxGCcontent() { return maxGCcontent;}
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
+    /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
+    private boolean allowSingleMargin;
+    public boolean getAllowSingleMargin() { return allowSingleMargin; }
+    public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
+
+
     /** Total horizontal dimension  of the user's screen. */
     private int xdim;
     /** Return the current X dimension of the user's screen, but a minimum of 1000 -- this will be the width of the UCSC image shown. */

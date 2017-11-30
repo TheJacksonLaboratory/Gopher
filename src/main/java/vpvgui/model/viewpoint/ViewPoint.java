@@ -398,7 +398,7 @@ public class ViewPoint implements Serializable {
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown) {
+    public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, boolean allowSingleMargin) {
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
             maxSizeUp=maxSizeDown;
@@ -427,10 +427,12 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false);
             } else if (maxSizeDown > genomicPos + segment.getEndPos()) {
                 segment.setSelected(false);
-            } else if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent) {
+            } else if ( allowSingleMargin && segment.getRepeatContentMarginDown() > this.maximumRepeatContent && segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
                 segment.setSelected(false);
-            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+            } else if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent || segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
                 segment.setSelected(false);
+//            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+//                segment.setSelected(false);
             } else if (segment.getGCcontent() > this.maxGcContent || segment.getGCcontent() < this.minGcContent) {
                 segment.setSelected(false);
             } else {
@@ -489,10 +491,10 @@ public class ViewPoint implements Serializable {
 
     /**
      * TODO this function intends to replicate the logic of Justin's simple probe selection approach.
-     * TODO Needs refactoring
+     * TODO Needs CHANGE for allowSingleMargin!!
      *
      */
-    public void generateViewpointSimple() {
+    public void generateViewpointSimple(boolean allowSingleMargin) {
         boolean resolved = true;
         approach = Approach.SIMPLE;
         // find the fragment that contains genomicPos

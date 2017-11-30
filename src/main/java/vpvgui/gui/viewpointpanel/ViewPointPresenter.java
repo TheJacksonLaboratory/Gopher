@@ -488,7 +488,7 @@ public class ViewPointPresenter implements Initializable {
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
             int maxSizeUp = (int) (vp.getUpstreamNucleotideLength() * factor);
             int maxSizeDown = (int) (vp.getDownstreamNucleotideLength() * factor);
-            newVP.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown);
+            newVP.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown,model.getAllowSingleMargin());
             segmentsTableView.getItems().clear();
             this.coloredsegments.clear();
             setViewPoint(newVP);

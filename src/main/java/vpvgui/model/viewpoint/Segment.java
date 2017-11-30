@@ -44,6 +44,13 @@ public class Segment implements Serializable {
     private double repeatContentDown;
     /** Proportion of Gs anc Cs in sequence */
     private double GCcontent;
+
+    private double GCcontentDown;
+
+    private double GCcontentUp;
+
+
+
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
     /** Is this fragment overlapping the TSS, i.e., it is the center fragment? */
@@ -155,6 +162,7 @@ public class Segment implements Serializable {
     /**
      * Calculates the repetitive content on the margins of the segment (if the segment is too small, we take the
      * repeat content of the entire segment to be the margin repeat content).
+     * TODO GC content
      */
     private void calculateRepeatContentMargins(IndexedFastaSequenceFile fastaReader) {
 
