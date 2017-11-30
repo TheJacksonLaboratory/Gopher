@@ -167,7 +167,7 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum repeat content</td>");
-        if (model.getMaxGCcontent()>0.65) {
+        if (model.getMaxRepeatContent()>0.65) {
             sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContentPercent()));
         } else {
             sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContentPercent()));

@@ -180,37 +180,37 @@
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin></ChoiceBox>
-                                    <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0" stylesheets="@vpvmain.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </ChoiceBox>
-                                    <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" prefHeight="30.0" prefWidth="145.0" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" prefHeight="30.0" prefWidth="145.0" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="145.0" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="145.0" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Button>
-                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="145.0" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@vpvmain.css" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
                                        <GridPane.margin>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
@@ -349,7 +349,7 @@
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
                                     </Label>
-                                    <Button fx:id="createCaptureProbesButton" alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                    <Button fx:id="createCaptureProbesButton" alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@vpvmain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                        <GridPane.margin>
                                           <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                        </GridPane.margin>
