@@ -452,7 +452,7 @@ public class ViewPoint implements Serializable {
 //        restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> { });
 
 
-        // discard fragments except for the selecxted fragments and their immediate neighbors, i.e.,
+        // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
         // retain one unselected fragment on each end
         // this will keep the table from having lots of unselected fragments
 
@@ -503,11 +503,6 @@ public class ViewPoint implements Serializable {
         } else {
             this.centerSegment.setOverlapsTSS(true);
             // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
-            double gc = centerSegment.getGCcontent();
-            double repeatUp = centerSegment.getRepeatContentMarginUp();
-            double repeatDown = centerSegment.getRepeatContentMarginDown();
-            double gcUp = centerSegment.getGcContentMarginUp();
-            double gcDown = centerSegment.getGcContentMarginDown();
             int length = centerSegment.length();
             if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
                     &&

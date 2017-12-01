@@ -27,7 +27,7 @@ public class Segment implements Serializable {
     }
 
     /** serialization version ID */
-    static final long serialVersionUID = 2L;
+    static final long serialVersionUID = 3L;
     /** The id of the larger sequence where this Segment is located (usually a chromosome).*/
     private String referenceSequenceID;
     /** The most 5' position of this Segment on the {@link #referenceSequenceID}. */
@@ -172,8 +172,10 @@ public class Segment implements Serializable {
         if (margins.size()==1) { // not enough space to have two margins, because the fragment is too small
             this.repeatContentDown=this.repeatContent; // we therefore just use the overall repeat content for the up/downstream values
             this.repeatContentUp=this.repeatContent;
+            this.GCcontentDown=GCcontent;
+            this.GCcontentUp=GCcontent;
             return;
-        } else if (margins.size()>2 || margins.size()==0) {
+        } else if (margins.size()!=2) {
             PopupFactory.displayError("Error in Segment Class","Number of margin segments was neither 1 nor 2 (report to developers)");
             return;
         }
@@ -240,6 +242,14 @@ public class Segment implements Serializable {
 
     public String getGCcontentAsPercent() {
         return String.format("%.2f%%",100*GCcontent);
+    }
+
+    public String getGCcontentUpAsPercent() {
+        return String.format("%.2f%%",100*GCcontentUp);
+    }
+
+    public String getGCcontentDownAsPercent() {
+        return String.format("%.2f%%",100*GCcontentDown);
     }
 
     public double getGCcontent() {
