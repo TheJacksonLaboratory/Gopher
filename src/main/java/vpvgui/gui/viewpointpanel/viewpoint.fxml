@@ -75,7 +75,8 @@
                         <TableColumn fx:id="inRepetitiveTableColumn" editable="false" minWidth="175.0" prefWidth="175.0" text="Repeat content" />
                         <TableColumn fx:id="repeatContentUpColumn" minWidth="175.0" prefWidth="175.0" text="Repeat content (up)" />
                         <TableColumn fx:id="repeatContentDownColumn" minWidth="200.0" prefWidth="200.0" text="Repeat content (down)" />
-                        <TableColumn fx:id="gcContentTableColumn" minWidth="125.0" prefWidth="125.0" text="GC Content" />
+                        <TableColumn fx:id="gcContentUpColumn" minWidth="175.0" prefWidth="175.0" text="GC content (up)" />
+                        <TableColumn fx:id="gcContentDownColumn" minWidth="200.0" prefWidth="200.0" text="GC content (down)" />
                         <TableColumn fx:id="colorTableColumn" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" text="Column X" />
                     </columns>
                   </TableView>
