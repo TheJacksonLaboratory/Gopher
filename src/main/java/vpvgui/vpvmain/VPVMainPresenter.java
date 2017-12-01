@@ -242,6 +242,7 @@ public class VPVMainPresenter implements Initializable {
         tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
         tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
+        tiling2.setSelected(true);
 
         ToggleGroup marginToggleGroup = new ToggleGroup();
         marginToggleGroup.getToggles().addAll(singleMarginRadioMenuitem,bothMarginsRadioMenuitem);
