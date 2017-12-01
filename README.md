@@ -16,3 +16,9 @@ $ make html
 $ sphinx-autobuild . _build/html
 $ sphinx-build . _build/html
 ```
+On the mac
+```
+$ python3 -m pip install sphinx
+$ python3 -m pip install sphinx_rtd_theme
+$ sphinx-build . _build/html
+```
