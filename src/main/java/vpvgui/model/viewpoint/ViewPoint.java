@@ -430,8 +430,6 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false);
             } else if (!allowSingleMargin && !(isSegmentMarginValid(segment,"Up") && isSegmentMarginValid(segment,"Down"))) {
                 segment.setSelected(false);
-            } else if (segment.getGCcontent() > this.maxGcContent || segment.getGCcontent() < this.minGcContent) {
-                segment.setSelected(false);
             } else {
                 resolved=true; // at least one segment OK, thus ViewPoint is OK
             }
@@ -551,7 +549,7 @@ public class ViewPoint implements Serializable {
 
         }
 
-        return (this.maxGcContent >= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
+        return (this.minGcContent <= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
     }
 
     /**
