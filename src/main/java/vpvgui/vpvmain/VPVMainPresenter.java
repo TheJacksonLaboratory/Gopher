@@ -247,6 +247,7 @@ public class VPVMainPresenter implements Initializable {
         marginToggleGroup.getToggles().addAll(singleMarginRadioMenuitem,bothMarginsRadioMenuitem);
         singleMarginRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(true); e.consume();});
         bothMarginsRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(false); e.consume();});
+        singleMarginRadioMenuitem.setSelected(true);
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
