@@ -12,6 +12,8 @@ Welcome to VPV's documentation!
 	CHC	
 	installation
 	setup
+	parameters
+	designparameters	  
 	running
 	output
 
