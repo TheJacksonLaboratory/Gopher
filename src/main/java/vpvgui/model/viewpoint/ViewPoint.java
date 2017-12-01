@@ -419,7 +419,6 @@ public class ViewPoint implements Serializable {
             logger.error("center segment NUll for " + getTargetName());
         }
 
-
         for (Segment segment:restrictionSegmentList) {
             if (segment.length() < this.minFragSize) {
                 segment.setSelected(false);
@@ -427,17 +426,9 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false);
             } else if (maxSizeDown > genomicPos + segment.getEndPos()) {
                 segment.setSelected(false);
-            } else if ( allowSingleMargin &&
-                    (segment.getRepeatContentMarginDown() > this.maximumRepeatContent ||
-                     segment.getGcContentMarginDown() > this.maxGcContent)
-                    &&
-                    (segment.getRepeatContentMarginUp() > this.maximumRepeatContent ||
-                     segment.getGcContentMarginUp() > this.maxGcContent)
-                    ) {
+            } else if ( allowSingleMargin && !(isSegmentMarginValid(segment,"Up") || isSegmentMarginValid(segment,"Down"))) {
                 segment.setSelected(false);
-            } else if (!allowSingleMargin && (segment.getRepeatContentMarginDown() > this.maximumRepeatContent || segment.getRepeatContentMarginUp() > this.maximumRepeatContent)) {
-                segment.setSelected(false);
-            } else if (!allowSingleMargin && (segment.getGcContentMarginDown() > this.maxGcContent || segment.getGcContentMarginUp() > this.maxGcContent)) {
+            } else if (!allowSingleMargin && !(isSegmentMarginValid(segment,"Up") && isSegmentMarginValid(segment,"Down"))) {
                 segment.setSelected(false);
             } else if (segment.getGCcontent() > this.maxGcContent || segment.getGCcontent() < this.minGcContent) {
                 segment.setSelected(false);
@@ -486,9 +477,6 @@ public class ViewPoint implements Serializable {
             restrictionSegmentList = newlist;
         }
 
-
-
-
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScore();
         setResolved(resolved);
@@ -497,7 +485,6 @@ public class ViewPoint implements Serializable {
 
     /**
      * TODO this function intends to replicate the logic of Justin's simple probe selection approach.
-     * TODO Needs CHANGE for allowSingleMargin!!
      *
      */
     public void generateViewpointSimple(boolean allowSingleMargin) {
@@ -519,13 +506,16 @@ public class ViewPoint implements Serializable {
             double gc = centerSegment.getGCcontent();
             double repeatUp = centerSegment.getRepeatContentMarginUp();
             double repeatDown = centerSegment.getRepeatContentMarginDown();
+            double gcUp = centerSegment.getGcContentMarginUp();
+            double gcDown = centerSegment.getGcContentMarginDown();
             int length = centerSegment.length();
-            if (gc >= this.minGcContent
-                    && gc <= this.maxGcContent
-                    && length >= this.minFragSize
-                    && length <= SIMPLE_APPROACH_MAXSIZE
-                    && repeatUp <= this.maximumRepeatContent
-                    && repeatDown <= this.maximumRepeatContent) {
+            if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
+                    &&
+                    ((!allowSingleMargin && isSegmentMarginValid(centerSegment,"Up") && isSegmentMarginValid(centerSegment,"Down"))
+                    ||
+                    (allowSingleMargin && (isSegmentMarginValid(centerSegment,"Up") || isSegmentMarginValid(centerSegment,"Down")))
+                    )
+                ) {
                 List<Segment> newsegs = new ArrayList<>();
                 centerSegment.setSelected(true);
                 setEndPos(centerSegment.getEndPos());
@@ -549,8 +539,25 @@ public class ViewPoint implements Serializable {
         setResolved(resolved);
     }
 
+    private boolean isSegmentMarginValid(Segment segment, String dir) {
 
+        double repeat=0;
+        double gc=0;
 
+        if(dir.equals("Up")) {
+            repeat = segment.getRepeatContentMarginUp();
+            gc = segment.getGcContentMarginUp();
+        }
+        else if(dir.equals("Down")) {
+            repeat = segment.getRepeatContentMarginDown();
+            gc = segment.getGcContentMarginDown();
+        } else {
+            logger.error(String.format("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'"));
+
+        }
+
+        return (this.maxGcContent >= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
+    }
 
     /**
      * Helper function for the calculation of the viewpoint score.
