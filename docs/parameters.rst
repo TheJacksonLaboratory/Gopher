@@ -1,7 +1,7 @@
 Parameters and Settings for VPV
 ===============================
 
-There are two places for users to specify parameters and settings, the `Design parameters` menu and the main `Setup` tab.
+Parameters that affect the overall size of the viewpoints and the thresholds for GC and repeat content are set in the main `Setup` tab.
 
 
 Choosing parameters
@@ -90,34 +90,3 @@ Fragments must have a certain minimum size to be efficiently enriched in capure 
 have a GC content that lies within a certain range to allow accurate mapping and efficient capture and sequencing. Current design "wizards" will not allow fragments that are outside of this range. VPV will therefore choose only those
 fragments that fulfil these criteria. Users may set these criteria to their maximum values to allow the design wizard to make the final decision on the fragments (then, all fragments within the indicate location will be chosen by VPV).
 
-
-
-Panel design parameters
-~~~~~~~~~~~~~~~~~~~~~~~
-These are settings that determine how the panel design will be performed. Users should understand the requirements of the probe manufacturer and choose settings that match them.
-
-Probe length
-~~~~~~~~~~~~
-The ``Probe length`` should be set according to the length that will be ordered from the manufacturer. A typical value is 120 bp (this is the default in VPV).
-
-
-Tiling factor
-~~~~~~~~~~~~~
-The ``Tiling factor`` refers to the average number of times that a position in the target will covered by a probe. Increasing the tiling factor is expected to increase the overall efficiency of capture for the targeted regions. Bait Tiling creates baits that evenly cover the selected genomic regions, whereby the exact sequences are determined by the probe manufacturer. We advise that it is better to use the highest tiling factor that is possible given the available number of probes.
-
-Margin size
-~~~~~~~~~~~
-The ``Margin size`` refers to the average size of the edge (margin) of the restriction fragments that remain after the fragmentation (sonication) step of the Capture Hi-C protocol. For instance, if a restriction fragment is 1000 bp long directly after restriction enzyme digestion, sonication may further fragment this segment of DNA into two or more smaller fragments, and the fragment that is attached to the biotin marker will be enriched. The baits are therefore typically designed to hybridize to the margins (and not to the center) of the restriction fragments. The margin size parameter should thus be set according to the expected experimental fragmentation size. We have found that 250 bp is a good starting point, and this value is the default in VPV.
-
-
-Margin strategy
-~~~~~~~~~~~~~~~
-Enrichment and sequencing in capture Hi-C experiments effectively is concentrated in the margins of the fragments as defined above. Typcically, fragments whose margins have a too high repeat content or that have a too high or too low GC content are difficult to enrich and sequence and are therefore excluded from probe designs. In many cases, however, one of the two ends of a fragment may satisfy repeat and GC criteria, while the other end does not. VPV allows users to choose whether both ends of a fragment must satisfy these criteria ("require both margins), or whether all fragments are chosen for which at least one of the ends satisfies the critera.
-
-
-
- .. figure:: img/VPVmarginParams.png
-   :scale: 100 %
-   :alt: VPV margin parameters
-
-	 VPV: choose margin strategy.
