@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ public class QCCheckPresenter implements Initializable {
 
     @FXML private Button cancelButon;
     @FXML private Button continueButton;
+    @FXML private Label warning;
 
     private boolean wasCanceled=true;
 
@@ -56,6 +58,11 @@ public class QCCheckPresenter implements Initializable {
 
 
     public boolean wasCanceled() { return  this.wasCanceled;}
+
+    public void setLabel(String text) {
+        warning.setStyle("-fx-text-alignment: right; -fx-font-size: 14pt; -fx-text-fill: red; ");
+        warning.setText(text);
+    }
 
 
 }

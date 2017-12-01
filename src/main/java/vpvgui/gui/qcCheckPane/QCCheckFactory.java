@@ -41,6 +41,10 @@ public class QCCheckFactory {
         String html= getHTML(model);
         presenter.setData(html);
 
+        if (model.getViewPointList().size()>0) {
+            presenter.setLabel("Warning: this step will overwrite current Viewpoints");
+        }
+
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
         return (! presenter.wasCanceled());
