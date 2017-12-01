@@ -427,12 +427,18 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false);
             } else if (maxSizeDown > genomicPos + segment.getEndPos()) {
                 segment.setSelected(false);
-            } else if ( allowSingleMargin && segment.getRepeatContentMarginDown() > this.maximumRepeatContent && segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+            } else if ( allowSingleMargin &&
+                    (segment.getRepeatContentMarginDown() > this.maximumRepeatContent ||
+                     segment.getGcContentMarginDown() > this.maxGcContent)
+                    &&
+                    (segment.getRepeatContentMarginUp() > this.maximumRepeatContent ||
+                     segment.getGcContentMarginUp() > this.maxGcContent)
+                    ) {
                 segment.setSelected(false);
-            } else if (segment.getRepeatContentMarginDown() > this.maximumRepeatContent || segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
+            } else if (!allowSingleMargin && (segment.getRepeatContentMarginDown() > this.maximumRepeatContent || segment.getRepeatContentMarginUp() > this.maximumRepeatContent)) {
                 segment.setSelected(false);
-//            } else if (segment.getRepeatContentMarginUp() > this.maximumRepeatContent) {
-//                segment.setSelected(false);
+            } else if (!allowSingleMargin && (segment.getGcContentMarginDown() > this.maxGcContent || segment.getGcContentMarginUp() > this.maxGcContent)) {
+                segment.setSelected(false);
             } else if (segment.getGCcontent() > this.maxGcContent || segment.getGCcontent() < this.minGcContent) {
                 segment.setSelected(false);
             } else {

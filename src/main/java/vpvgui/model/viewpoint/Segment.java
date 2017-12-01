@@ -65,7 +65,7 @@ public class Segment implements Serializable {
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
         calculateGCandRepeatContent(builder.fastaReader);
-        calculateRepeatContentMargins(builder.fastaReader);
+        calculateRepeatAndGcContentMargins(builder.fastaReader);
     }
 
 
@@ -160,11 +160,10 @@ public class Segment implements Serializable {
     }
 
     /**
-     * Calculates the repetitive content on the margins of the segment (if the segment is too small, we take the
+     * Calculates the repetitive and GC content on the margins of the segment (if the segment is too small, we take the
      * repeat content of the entire segment to be the margin repeat content).
-     * TODO GC content
      */
-    private void calculateRepeatContentMargins(IndexedFastaSequenceFile fastaReader) {
+    private void calculateRepeatAndGcContentMargins(IndexedFastaSequenceFile fastaReader) {
 
         /* generate Segment objects for margins */
 
@@ -181,23 +180,29 @@ public class Segment implements Serializable {
 
         /* If we get here, then we have two IntPair segments, for Up and Downstream */
 
-         for(int i=0;i<margins.size();++i) {
-            IntPair seg =margins.get(i);
-            int start=seg.getStartPos();
-            int end=seg.getEndPos();
+         for(int i=0; i<margins.size(); ++i) {
+            IntPair seg = margins.get(i);
+            int start = seg.getStartPos();
+            int end = seg.getEndPos();
             String s = fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
 
             /* determine repeat content */
             int lowerCase = 0, upperCase = 0;
+            int gc = 0; int at = 0;
             for (int j = 0; j < s.length(); j++) {
                 if (Character.isLowerCase(s.charAt(j))) lowerCase++;
                 if (Character.isUpperCase(s.charAt(j))) upperCase++;
+                if (s.charAt(j)=='A' || s.charAt(j)=='T' || s.charAt(j)=='a' || s.charAt(j)=='t') at++;
+                if (s.charAt(j)=='G' || s.charAt(j)=='C' || s.charAt(j)=='g' || s.charAt(j)=='c') gc++;
             }
             double repcon = ((double) lowerCase / (lowerCase + (double) upperCase));
+            double gccon = ((double) gc / (lowerCase + (double) (at+gc)));
             if (i==0) {
                 this.repeatContentUp = repcon;
+                this.GCcontentUp = gccon;
             } else if (i==1) {
                 this.repeatContentDown = repcon;
+                this.GCcontentDown = gccon;
             }
         }
     }
@@ -221,6 +226,12 @@ public class Segment implements Serializable {
 
     public double getRepeatContentMarginDown() {
         return repeatContentDown;
+    }
+    public double getGcContentMarginDown() {
+        return GCcontentDown;
+    }
+    public double getGcContentMarginUp() {
+        return GCcontentUp;
     }
     /** @return A formatted string, e.g., "7.23%", representing the repeat content of the margin on the down side */
     public String getRepeatContentMarginDownAsPercent() { return String.format("%.2f%%",100*repeatContentDown);}
