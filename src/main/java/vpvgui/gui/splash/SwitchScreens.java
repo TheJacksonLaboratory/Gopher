@@ -19,7 +19,7 @@ import java.io.IOException;
 /** This is a functor class with a callback to switch screens when the user has chosen
  * which viewpoint to work on.
  * @author Peter Robinson
- * @version 0.0.2 (14 September, 2017)
+ * @version 0.1.1 (2 December, 2017)
  */
 public class SwitchScreens {
     private static final Logger logger = Logger.getLogger(SwitchScreens.class.getName());
@@ -82,7 +82,6 @@ public class SwitchScreens {
         model.setYdim(screenHeight);
         presenter.setModelInMainAndInAnalysisPresenter(model);
         logger.trace("Deserialized model "+ model.getProjectName());
-        logger.trace(String.format("That models genome was ",model.getGenome().getGenomeBasename()));
         if (model.viewpointsInitialized()) {
             presenter.refreshViewPoints();
         }
@@ -98,10 +97,6 @@ public class SwitchScreens {
         this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
         this.primarystage.show();
     }
-
-
-
-
 
 
 

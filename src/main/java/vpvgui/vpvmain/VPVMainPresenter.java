@@ -1,6 +1,5 @@
 package vpvgui.vpvmain;
 
-import com.sun.org.apache.bcel.internal.generic.POP;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -318,7 +317,7 @@ public class VPVMainPresenter implements Initializable {
             this.genomeIndexPI.setProgress(0.00);
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
-            this.restrictionEnzymeLabel.setText(model.getRestrictionEnzymeString());
+            this.restrictionEnzymeLabel.setText(model.getFirstRestrictionEnzymeString());
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
@@ -379,7 +378,7 @@ public class VPVMainPresenter implements Initializable {
             this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
-            this.restrictionEnzymeLabel.setText(model.getRestrictionEnzymeString());
+            this.restrictionEnzymeLabel.setText(model.getFirstRestrictionEnzymeString());
         } else {
             this.restrictionEnzymeLabel.setText("not initialized");
         }
@@ -612,7 +611,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
-        this.restrictionEnzymeLabel.setText(this.model.getRestrictionEnzymeString());
+        this.restrictionEnzymeLabel.setText(this.model.getFirstRestrictionEnzymeString());
     }
 
     /**

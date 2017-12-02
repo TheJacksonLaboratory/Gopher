@@ -77,7 +77,7 @@ public class ViewPoint implements Serializable {
     private SegmentFactory segmentFactory;
     /** List of active and inactive restriction {@link vpvgui.model.viewpoint.Segment} objects that are contained within the viewpoint. */
     private List<Segment> restrictionSegmentList;
-    /** List of restriction enzymes chosen by the User. */
+    /** List of restriction enzymes chosen by the User (package scope visibility). */
     static List<RestrictionEnzyme> chosenEnzymes=null;
     /** The "number" of the promoter for the gene in question. */
     private int promoterNumber;
@@ -101,7 +101,10 @@ public class ViewPoint implements Serializable {
 
     public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** A list of restriction enzymes (at least one) as chosen by the user. */
-    public static RestrictionEnzyme getChosenEnzyme(int i) { return chosenEnzymes.get(i);}
+    public static RestrictionEnzyme getChosenEnzyme(int i) {
+        if (chosenEnzymes==null || i-1>chosenEnzymes.size()) return null;
+        else return chosenEnzymes.get(i);
+    }
     /** Overall score of this Viewpoint.*/
     private double score;
     /** Maximim allowable fragment size for simple approach */

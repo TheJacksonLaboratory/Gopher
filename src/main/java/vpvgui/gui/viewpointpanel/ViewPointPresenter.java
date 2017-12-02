@@ -476,8 +476,7 @@ public class ViewPointPresenter implements Initializable {
         String genome = this.model.getGenomeBuild();
         // create url & load content from UCSC
         URLMaker maker = new URLMaker(this.model);
-        String re=this.model.getRestrictionEnzymeString().replaceAll("^","");
-        maker.setEnzyme(re);
+        String re=this.model.getFirstRestrictionEnzymeString().replaceAll("^","");
         String url= maker.getImageURL(vp,getHighlightRegions());
         ucscWebEngine.load(url);
 

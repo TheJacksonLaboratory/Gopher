@@ -3,19 +3,25 @@ package vpvgui.gui.viewpointpanel;
 
 import org.apache.log4j.Logger;
 import vpvgui.model.Model;
+import vpvgui.model.RestrictionEnzyme;
 import vpvgui.model.viewpoint.ViewPoint;
+
+import javax.swing.*;
 
 /**
  * This class makes URLs for displaying the viewpoints.
  * The URLs need to be different for each organism since each organism has a different
  * selection of data.
+ * @author Peter Robinson
+ * @version 0.1.1 (2017-12-01)
  */
 public class URLMaker {
     private static final Logger logger = Logger.getLogger(URLMaker.class.getName());
     private String genomebuild=null;
-      private String restrictionenzyme=null;
     /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
     private int xdim;
+
+    private final String cuttingSite;
 
     /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
     private static final int UCSC_DEFAULT_WIDTH = 1600;
@@ -28,6 +34,7 @@ public class URLMaker {
     public URLMaker(Model model){
         this.genomebuild=model.getGenomeBuild();
         xdim=Math.min(UCSC_DEFAULT_WIDTH,model.getXdim());
+        cuttingSite=model.getFirstRestrictionEnzymeString();
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 
@@ -93,16 +100,10 @@ public class URLMaker {
         String targetItem = vp.getTargetName();
         String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=%d",
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights,xdim);
-        if (restrictionenzyme!=null) {
-            url=String.format("%s&oligoMatch=pack&hgt.oligoMatch=GATC",url,restrictionenzyme);
+        if (cuttingSite!=null && cuttingSite.length()>0) {
+            url=String.format("%s&oligoMatch=pack&hgt.oligoMatch=%s",url,cuttingSite);
         }
         return url;
     }
-
-    public void setEnzyme(String re) {
-        this.restrictionenzyme=re;
-    }
-
-
 
 }

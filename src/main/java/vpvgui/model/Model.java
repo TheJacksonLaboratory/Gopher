@@ -370,17 +370,10 @@ public class Model implements Serializable {
         logger.trace("setViewPoints: viewpointlist with size="+viewpointlist.size());
         this.viewpointList=viewpointlist;
     }
-
-    public String getRestrictionEnzymeString() {
-        if (chosenEnzymelist==null) return "null";
-        StringBuilder sb = new StringBuilder();
-        boolean morethanone=false;
-        for (RestrictionEnzyme re:chosenEnzymelist) {
-            if (morethanone) sb.append("; ");
-            sb.append(re.getName());
-            morethanone=true;
-        }
-        return sb.toString();
+    /** @return the plain cutting site (no caret symbol) of the first enyzme chosen. */
+    public String getFirstRestrictionEnzymeString() {
+        if (chosenEnzymelist==null || chosenEnzymelist.size()<1) return "null";
+       else return chosenEnzymelist.get(0).getPlainSite();
     }
 
     public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
@@ -446,7 +439,7 @@ public class Model implements Serializable {
         properties.setProperty("genome_indexed",indexed);
         String refgenep=model.getRefGenePath()!=null?model.getRefGenePath():"null";
         properties.setProperty("refgene_path",refgenep);
-        properties.setProperty("restriction_enzymes",model.getRestrictionEnzymeString());
+        properties.setProperty("restriction_enzymes",model.getFirstRestrictionEnzymeString());
         String tgpath=model.getTargetGenesPath()!=null?model.getTargetGenesPath():"null";
         properties.setProperty("target_genes_path",tgpath);
         properties.setProperty("min GC content",String.format("%.2f",model.getMinGCcontent()));
