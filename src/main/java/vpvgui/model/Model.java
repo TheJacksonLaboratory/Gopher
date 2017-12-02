@@ -372,8 +372,13 @@ public class Model implements Serializable {
     }
     /** @return the plain cutting site (no caret symbol) of the first enyzme chosen. */
     public String getFirstRestrictionEnzymeString() {
-        if (chosenEnzymelist==null || chosenEnzymelist.size()<1) return "null";
+        if (chosenEnzymelist==null || chosenEnzymelist.size()<1) return "none";
        else return chosenEnzymelist.get(0).getPlainSite();
+    }
+    /** @return all selected enzymes as semicolon-separated string. */
+    public String getAllSelectedEnzymeString() {
+        if (chosenEnzymelist==null || chosenEnzymelist.size()<1) return "none";
+        return chosenEnzymelist.stream().map(re-> re.getPlainSite()).collect(Collectors.joining(";"));
     }
 
     public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {

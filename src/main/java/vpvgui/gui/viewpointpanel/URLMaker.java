@@ -57,6 +57,8 @@ public class URLMaker {
         String url = getDefaultURL(vp,trackType,highlights);
         if (this.genomebuild.equals("hg19")){
             url=String.format("%s&%s",url,getURLFragmentHg19());
+        }  else if (this.genomebuild.equals("hg38")) {
+            url = String.format("%s&%s",url,getURLFragmentHg38());
         }  else if (this.genomebuild.equals("mm9")) {
             url = String.format("%s&%s",url,getURLFragmentMm9());
         }
@@ -65,6 +67,11 @@ public class URLMaker {
     /** These are the things to hide and show to get a nice hg19 image. */
     public String getURLFragmentHg19() {
         return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+    }
+
+    /** These are the things to hide and show to get a nice hg19 image. */
+    public String getURLFragmentHg38() {
+        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     public String getURLFragmentMm9() {

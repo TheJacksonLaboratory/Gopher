@@ -317,7 +317,7 @@ public class VPVMainPresenter implements Initializable {
             this.genomeIndexPI.setProgress(0.00);
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
-            this.restrictionEnzymeLabel.setText(model.getFirstRestrictionEnzymeString());
+            this.restrictionEnzymeLabel.setText(model.getAllSelectedEnzymeString());
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
@@ -378,7 +378,7 @@ public class VPVMainPresenter implements Initializable {
             this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
-            this.restrictionEnzymeLabel.setText(model.getFirstRestrictionEnzymeString());
+            this.restrictionEnzymeLabel.setText(model.getAllSelectedEnzymeString());
         } else {
             this.restrictionEnzymeLabel.setText("not initialized");
         }
@@ -611,7 +611,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         this.model.setChosenRestrictionEnzymes(chosenEnzymes);
-        this.restrictionEnzymeLabel.setText(this.model.getFirstRestrictionEnzymeString());
+        this.restrictionEnzymeLabel.setText(this.model.getAllSelectedEnzymeString());
     }
 
     /**

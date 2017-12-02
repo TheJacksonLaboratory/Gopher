@@ -1,13 +1,11 @@
 package vpvgui.gui.logviewer;
 
 
-import javafx.beans.binding.Bindings;
+
 import javafx.collections.FXCollections;
-import javafx.geometry.Pos;
+
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -22,7 +20,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-
+/**
+ * Class to display a simple log viewer. The log is read from the log4j2 log file and displayed. The lines are colored
+ * according to the level of the log item.
+ */
 public class LogViewerFactory {
     private String logpath=null;
 

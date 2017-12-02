@@ -235,7 +235,7 @@ public class QCCheckFactory {
         if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
             sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
         } else {
-            sb.append(String.format("<td>%s</td>",model.getFirstRestrictionEnzymeString()));
+            sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Transcripts</td>");
