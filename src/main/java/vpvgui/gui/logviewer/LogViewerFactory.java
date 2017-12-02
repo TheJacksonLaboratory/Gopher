@@ -88,13 +88,9 @@ public class LogViewerFactory {
         ToggleButton tail = new ToggleButton("Tail");
         logView.tailProperty().bind(tail.selectedProperty());
 
-        Slider rate = new Slider(0.1, 60, 60);
-        logView.refreshRateProperty().bind(rate.valueProperty());
-        Label rateLabel = new Label();
-        rateLabel.textProperty().bind(Bindings.format("Update: %.2f fps", rate.valueProperty()));
-        rateLabel.setStyle("-fx-font-family: monospace;");
-        VBox rateLayout = new VBox(rate, rateLabel);
-        rateLayout.setAlignment(Pos.CENTER);
+        tail.setOnAction(e-> {if (tail.isSelected()) { tail.setStyle("-fx-background-color: #000000," +
+                "linear-gradient(#7ebcea, #2f4b8f),linear-gradient(#426ab7, #263e75),linear-gradient(#395cab, #223768);\n" +
+                "    -fx-text-fill: white;"); } else {tail.setStyle("");} });
 
         HBox controls = new HBox(
                 10,
