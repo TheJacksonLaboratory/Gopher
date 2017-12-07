@@ -170,7 +170,7 @@ public class Model implements Serializable {
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
-    private boolean allowSingleMargin;
+    private boolean allowSingleMargin=true;
     public boolean getAllowSingleMargin() { return allowSingleMargin; }
     public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
 
