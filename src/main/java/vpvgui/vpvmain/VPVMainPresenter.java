@@ -326,6 +326,13 @@ public class VPVMainPresenter implements Initializable {
         } else {
             this.nValidGenesLabel.setText(null);
         }
+        if (model.getAllowSingleMargin()) {
+            this.bothMarginsRadioMenuitem.setSelected(false);
+            this.singleMarginRadioMenuitem.setSelected(true);
+        } else {
+            this.bothMarginsRadioMenuitem.setSelected(true);
+            this.singleMarginRadioMenuitem.setSelected(false);
+        }
     }
 
     /**
