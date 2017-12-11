@@ -422,13 +422,13 @@ public class ViewPoint implements Serializable {
             logger.error("center segment NUll for " + getTargetName());
         }
 
+        Integer lowerLimit = genomicPos - maxSizeUp;
+        Integer upperLimit = genomicPos + maxSizeDown;
         for (Segment segment:restrictionSegmentList) {
             if (segment.length() < this.minFragSize) {
                 segment.setSelected(false);
-            } else if (maxSizeUp < genomicPos - segment.getStartPos()) {
-                segment.setSelected(false);
-            } else if (maxSizeDown > genomicPos + segment.getEndPos()) {
-                segment.setSelected(false);
+            } else if ( (segment.getStartPos() < lowerLimit && segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos() &&  upperLimit < segment.getEndPos()) ) {
+                    segment.setSelected(false);
             } else if ( allowSingleMargin && !(isSegmentMarginValid(segment,"Up") || isSegmentMarginValid(segment,"Down"))) {
                 segment.setSelected(false);
             } else if (!allowSingleMargin && !(isSegmentMarginValid(segment,"Up") && isSegmentMarginValid(segment,"Down"))) {
