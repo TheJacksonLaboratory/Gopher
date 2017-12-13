@@ -607,11 +607,13 @@ public class ViewPoint implements Serializable {
                 /* get position distance score for each position of the fragment */
 
                 positionScoreSumFragment = 0;
-                for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
+                for (int j = currentSegment.getStartPos(); j <= currentSegment.getEndPos(); j++) {
                     Integer dist = j - genomicPos;
                     if (dist < 0) {
+                        if (dist*-1 > upstreamNucleotideLength) { continue; } // regions outside the specified range are not taken into account
                         positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
                     } else {
+                        if (dist*-1 > downstreamNucleotideLength) { continue; } // regions outside the specified range are not taken into account
                         positionScoreSumFragment += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
                     }
                     posCnt++;
@@ -623,7 +625,7 @@ public class ViewPoint implements Serializable {
         /* calculate reference: all position within specified range covered, no repeats */
 
         double positionScoreSumRef = 0;
-        for(int i = genomicPos-upstreamNucleotideLength; i<genomicPos+downstreamNucleotideLength; i++) {
+        for(int i = genomicPos-upstreamNucleotideLength; i<=genomicPos+downstreamNucleotideLength; i++) {
 
             Integer dist = i - genomicPos;
             if (dist < 0) {
