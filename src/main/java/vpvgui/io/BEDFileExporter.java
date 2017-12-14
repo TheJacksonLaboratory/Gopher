@@ -171,7 +171,7 @@ public class BEDFileExporter {
             Integer len = end - sta;
             totalLengthOfMargins = totalLengthOfMargins + len;
         }
-        //totalLengthOfMargins=0;
+        totalLengthOfMargins=0;
         int target_id = 0;
         for (String key : uniqueFragmentMarginsMap.keySet()) {
             String[] parts = key.split(":");
