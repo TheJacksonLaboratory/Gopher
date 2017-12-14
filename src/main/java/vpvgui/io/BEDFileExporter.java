@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -125,8 +126,10 @@ public class BEDFileExporter {
 
         // print restriction fragments and get unique fragment margins
         out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
-        Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragments
+        Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragment margins
+        HashMap<String,String> uniqueFragmentMarginsMap = new HashMap<String,String>();
         Set<String> uniqueFragments = new HashSet<String>(); // use a set to get rid of duplicate fragments
+
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             int k=0; // index of selected fragment
@@ -140,6 +143,16 @@ public class BEDFileExporter {
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
                     Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
+
+                    String key = vp.getReferenceID() + ":" + (fmStaPos-1) + "-" + fmEndPos; // build key
+                    if (uniqueFragmentMarginsMap.get(key) == null) { // check if region is already in hash
+                        uniqueFragmentMarginsMap.put(key,vp.getTargetName());
+                    } else {
+                        if (!uniqueFragmentMarginsMap.get(key).contains(vp.getTargetName())) { // gene symbol is not in target region name
+                            uniqueFragmentMarginsMap.put(key,uniqueFragmentMarginsMap.get(key) + "," + vp.getTargetName()); // concat old and new value
+                        }
+                    }
+
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
                     uniqueFragments.add(vp.getReferenceID() + "\t" + (segment.getStartPos()-1) + "\t" + segment.getEndPos() + "\t" + vp.getTargetName());
                 }
@@ -150,14 +163,30 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "VPV: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
         Integer totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
-            out_allTracks.println(s);
-            out_targetRegions.println(s);
+            //out_allTracks.println(s);
+            //out_targetRegions.println(s);
             String[] parts = s.split("\t");
             Integer sta = Integer.parseInt(parts[1]);
             Integer end = Integer.parseInt(parts[2]);
             Integer len = end - sta;
             totalLengthOfMargins = totalLengthOfMargins + len;
         }
+        //totalLengthOfMargins=0;
+        int target_id = 0;
+        for (String key : uniqueFragmentMarginsMap.keySet()) {
+            String[] parts = key.split(":");
+            String ref_id = parts[0];
+            String[] parts2 = parts[1].split("-");
+            String sta = parts2[0];
+            String end = parts2[1];
+            out_allTracks.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
+            out_targetRegions.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
+            Integer len = Integer.parseInt(end) - Integer.parseInt(sta);
+            totalLengthOfMargins = totalLengthOfMargins + len;
+            target_id++;
+        }
+
+
         out_allTracks.close();
         out_targetRegions.close();
 
