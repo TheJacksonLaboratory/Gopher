@@ -50,4 +50,7 @@ public class FASTAIndexerTest {
         Assert.assertEquals(expected,faidx.getBytes_per_line());
     }
 
+
+
+
 }
