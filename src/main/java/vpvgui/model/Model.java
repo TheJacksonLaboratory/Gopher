@@ -24,18 +24,18 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 5L;
-    private static final String VERSION="0.3.1";
-    private static final String LAST_CHANGE_DATE="11/11/2017, 20:36 PM";
+    private static final String VERSION="0.3.2";
+    private static final String LAST_CHANGE_DATE="2018-02-15";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
-    private List<RestrictionEnzyme> chosenEnzymelist=null;
+    private List<RestrictionEnzyme> chosenEnzymelist;
     /** List of {@link ViewPoint} objects created from the gene list chosen by the user. */
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<VPVGene> geneList=null;
 
-    public static enum Approach {
+    public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
         public String toString() {
             switch (this) {
@@ -52,7 +52,7 @@ public class Model implements Serializable {
                     return "uninitialized";
             }
         }
-    };
+    }
 
     private Approach approach=Approach.UNINITIALIZED;
 
@@ -117,7 +117,7 @@ public class Model implements Serializable {
     }
 
     public Genome getGenome() { return this.genome; }
-    /** TODO extend to the manual revisions. */
+
     public void setApproach (String s) {
         if (s.equalsIgnoreCase("simple")) this.approach = Approach.SIMPLE;
         else if (s.equalsIgnoreCase("extended")) this.approach = Approach.EXTENDED;
@@ -247,11 +247,15 @@ public class Model implements Serializable {
         this.tilingFactor=tilingFactor;
     }
 
-    public Integer marginSize =Default.MARGIN_SIZE;
+    private Integer marginSize =Default.MARGIN_SIZE;
     public int getMarginSize(){return marginSize;}
     public void setMarginSize(Integer s) {this.marginSize=s; }
 
-    private Map<String, String> indexedFaFiles=null;
+    //private Map<String, String> indexedFaFiles=null;
+    /** Path to the genome fai file, e.g., hg19.fa.fai. */
+    private String indexedGenomeFastaIndexFile=null;
+    public void setIndexedGenomeFastaIndexFile(String path) { indexedGenomeFastaIndexFile=path;}
+    public String getIndexedGenomeFastaIndexFile() { return indexedGenomeFastaIndexFile; }
 
     public List<VPVGene> getVPVGeneList() { return this.geneList; }
 
@@ -291,6 +295,12 @@ public class Model implements Serializable {
     public void setGenomeDirectoryPath(File f) { this.genome.setPathToGenomeDirectory(f.getAbsolutePath());}
     public String getGenomeDirectoryPath() {
         return this.genome.getPathToGenomeDirectory();
+    }
+
+    public String getGenomeFastaFile() {
+        String dir = getGenomeDirectoryPath();
+        String genomeFa =this.genome.getGenomeFastaName();
+        return  dir + File.separator + genomeFa;
     }
 
 
@@ -342,29 +352,6 @@ public class Model implements Serializable {
         return (this.viewpointList!=null && this.viewpointList.size()>0);
     }
 
-
-    public void setIndexedFastaFiles(Map<String, String> indexedFa) {
-        this.indexedFaFiles=indexedFa;
-    }
-
-    public String getIndexFastaFilePath(String contigname) {
-        logger.debug("Will attempt to retrieve indexed Fasta file for contig: \""+contigname+"\"");
-        if (this.indexedFaFiles==null){
-            logger.error("indexFaFiles is NULL");
-            return null;
-        }
-        if (! this.indexedFaFiles.containsKey(contigname)) {
-            logger.error("Coud not find indexed fasta file for contig: "+contigname);
-            logger.error("Size of indexFaFiles: "+indexedFaFiles.size());
-            for (String s:indexedFaFiles.keySet()) {
-                logger.debug("indexedFa files: "+s+">"+indexedFaFiles.get(s));
-            }
-            return null;
-        } else {
-            logger.info("Found indexed fasta file for contig: "+contigname);
-            return this.indexedFaFiles.get(contigname);
-        }
-    }
 
     public void setViewPoints(List<ViewPoint> viewpointlist) {
         logger.trace("setViewPoints: viewpointlist with size="+viewpointlist.size());
@@ -429,10 +416,10 @@ public class Model implements Serializable {
 
     /** Collect all of the important attributes of the {@link Model} object and
      * place them into a Properties object (intended to write or show the settings).
-     * @param model
-     * @return
+     * @param model The model with all of the properties of the analysis
+     * @return Properties of the model (intended for display)
      */
-    public static Properties getProperties(Model model) {
+    private static Properties getProperties(Model model) {
         Properties properties = new Properties();
         properties.setProperty("project_name", model.getProjectName());
         properties.setProperty("genome_build",model.getGenomeBuild());

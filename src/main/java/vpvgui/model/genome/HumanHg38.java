@@ -24,7 +24,8 @@ public class HumanHg38 extends Genome implements Serializable {
         init();
     }
 
-    private void init() {
+    @Override
+    protected void init() {
         Arrays.stream(chromosomes).forEach(s -> {
             valid.add(s);
         });
@@ -34,9 +35,14 @@ public class HumanHg38 extends Genome implements Serializable {
     public String getGenomeBuild() {
         return "hg38";
     }
+    @Override public String getGenomeFastaName(){return "hg38.fa"; }
 
     @Override
-    public String getGenomeBasename(){return genomeBasename;};
+    public String getGenomeBasename(){return genomeBasename;}
     @Override
     public  int getNumberOfCanonicalChromosomes() { return chromosomes.length; }
+
+    @Override  public boolean isCanonicalChromosome(String filename) {
+        return true;
+    }
 }
