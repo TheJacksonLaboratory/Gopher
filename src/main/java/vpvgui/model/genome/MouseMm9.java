@@ -26,7 +26,8 @@ public class MouseMm9 extends Genome implements Serializable {
         init();
     }
 
-    private void init() {
+    @Override
+    protected void init() {
         Arrays.stream(chromosomes).forEach(s -> {
             valid.add(s);
         });
@@ -36,10 +37,13 @@ public class MouseMm9 extends Genome implements Serializable {
     public String getGenomeBuild() {
         return "mm9";
     }
+    @Override public String getGenomeFastaName(){return "mm9.fa"; }
 
     @Override
-    public String getGenomeBasename(){return genomeBasename;};
+    public String getGenomeBasename(){return genomeBasename;}
     @Override
     public  int getNumberOfCanonicalChromosomes() { return chromosomes.length; }
-
+    @Override  public boolean isCanonicalChromosome(String filename) {
+        return true;
+    }
 }

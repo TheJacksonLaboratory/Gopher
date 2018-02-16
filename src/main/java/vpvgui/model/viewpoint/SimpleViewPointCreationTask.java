@@ -15,8 +15,8 @@ import java.util.List;
 
 /**
  * This class coordinates the construction of simple (one probe per viewpoint) ViewPoints,
- * @author Peter Robinson
- * @version 0.0.2
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.2.2 (2018-02-15)
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
@@ -81,9 +81,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * We have placed it in a task because it takes a while.
      *
      * @return
-     * @throws Exception
+     * @throws VPVException if we cannot create the viewpoints
      */
-    protected Void call() throws Exception {
+    protected Void call() throws VPVException {
         if (ViewPoint.chosenEnzymes == null) {
             logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
@@ -92,14 +92,23 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         this.i = 0;
         logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
+
+        String faipath = this.model.getIndexedGenomeFastaIndexFile();
+        String fastapath = this.model.getGenomeFastaFile();
+        if (faipath == null) {
+            logger.error("Could not retrieve faidx file for " + fastapath);
+            throw new VPVException("Could not retrieve faidx file for " + fastapath);
+        }
+        IndexedFastaSequenceFile fastaReader;
+        try {
+            fastaReader =new IndexedFastaSequenceFile(new File(fastapath));
+        } catch (FileNotFoundException fnfe) {
+            throw new VPVException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
+        }
+
+
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
-            String path = this.model.getIndexFastaFilePath(referenceSequenceID);
-            IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-            if (path == null) {
-                logger.error("Could not retrieve faidx file for " + referenceSequenceID);
-                throw new VPVException(String.format("Could not retrieve FASTA index file for ", referenceSequenceID));
-            }
             group.getGenes().parallelStream().forEach(vpvGene -> {
                 calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
             });
@@ -112,11 +121,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
     /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
     private void updateLabelText(StringProperty sb, String msg) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg));
-            }
+        Platform.runLater( () ->{
+            sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg));
         });
     }
 
