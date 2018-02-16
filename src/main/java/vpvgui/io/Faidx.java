@@ -65,7 +65,6 @@ public class Faidx extends Task<Void> {
     protected Void call() throws VPVException {
         String path = genomeDirectoryPath + File.separator + genomeFastaBaseName;
         File fasta = new File(path);
-        double totalprogress=0d;
         int blocks = n_canonical_chromosomes + 1;
         double blocksize = 1D/blocks;
         double currentProgress=0.0D;
@@ -151,7 +150,6 @@ public class Faidx extends Task<Void> {
                 String contigname=rec.getSeqName();
                 int len=rec.seqLength;
                 this.contigLengths.put(contigname,len);
-                logger.trace(String.format("Congs %d",contigLengths.size()));
             }
             wr.close();
             updateProgress(1.0D);

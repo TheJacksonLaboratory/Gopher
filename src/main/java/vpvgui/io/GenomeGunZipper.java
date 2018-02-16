@@ -19,12 +19,11 @@ import java.io.*;
  * un-tarring to work. We then also need to transmit back to the model that the genome download path has been extended
  * by "/chroms".
  * @author Peter Robinson
- * @version 0.2.2 (2017-11-11)
+ * @version 0.2.3 (2018-02-17)
  */
 public class GenomeGunZipper extends Task<Void>  {
     private static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
-    /** Path to the directory where we will download and decompress the genome file. */
-   // private String genomeDirectoryPath=null;
+    /** Model of the current genome, e.g., hg19, with paths and canonical chromosomes etc. */
     private final Genome genome;
     /** This is the basename of the compressed genome file that we download from UCSC. */
     private final String genomeFileNameTarGZ;
@@ -51,19 +50,15 @@ public class GenomeGunZipper extends Task<Void>  {
         this.genomeFileNameTar=this.genomeFileNameTarGZ.replaceAll(".gz","");
     }
 
-    public Genome getGenome() {
-        return genome;
-    }
 
     public String getStatus() { return status; }
 
     /**
-     * We use this method to check if we need to g-unzip the genome files. (We only check for the
-     * presence of chr1.fa--this will break if species without chr1 are analyzed).
-     * @return true if the chromFGa.tar.gz file has been previously extracted
+     * We use this method to check if we need to g-unzip the genome files.
+     * @return true if the hg19.fa file is found (and thus, the chromFa.tar.gx has been previously extracted)
      */
     private boolean alreadyExtracted() {
-        File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + "chr1.fa");
+        File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + genome.getGenomeFastaName());
         return f.exists();
     }
 
@@ -79,6 +74,11 @@ public class GenomeGunZipper extends Task<Void>  {
         String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
         logger.info("About to gunzip "+INPUT_GZIP_FILE);
         boolean needToCreateDirectory=true;
+        double totalprogress=0d;
+        int blocks = genome.getNumberOfCanonicalChromosomes() + 1;
+        double blocksize = 1D/blocks;
+        double currentProgress=0.0D;
+        updateProgress(currentProgress);
         try {
             InputStream in = new FileInputStream(INPUT_GZIP_FILE);
             GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
@@ -89,7 +89,6 @@ public class GenomeGunZipper extends Task<Void>  {
             If we get to 95, we will begin to update by 0.1% until
             we are done.
              */
-            double percentDone=0.01d;
             String dirpath =this.genome.getPathToGenomeDirectory();
             String outputFastaFileName=genome.getGenomeBuild() + ".fa";
             File outfile = new File( dirpath+ File.separator +outputFastaFileName);
@@ -97,6 +96,8 @@ public class GenomeGunZipper extends Task<Void>  {
             BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
 
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
+                currentProgress+=blocksize;
+                updateProgress(currentProgress);
                 // If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway.
                 if (entry.isDirectory()) {
                     continue;
@@ -135,14 +136,7 @@ public class GenomeGunZipper extends Task<Void>  {
                     while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
                         dest.write(data, 0, count);
                     }
-
-
-                    logger.trace("Unzipped "+entry.getName());
-                    if (percentDone<90)
-                        percentDone +=1.0d;
-                    else
-                        percentDone += 0.1d;
-                    updateProgress(percentDone/100);
+                    logger.trace("extracted chromosome:  "+entry.getName());
                 }
             } // end of loop over Tar archive contents
             dest.close();
@@ -153,7 +147,6 @@ public class GenomeGunZipper extends Task<Void>  {
             this.status="extraction could not be completed.";
             throw e;
         }
-
     }
 
 
@@ -161,89 +154,15 @@ public class GenomeGunZipper extends Task<Void>  {
      * It is packaged as a Task to allow concurrency. */
     @Override
     protected Void call() throws IOException {
-        logger.debug("entering extractTarGZ");
-        boolean ok=true;
-        extractCanonicalChromosomes();
+        logger.debug("About to extract canonical chromosome fasta file");
         if (alreadyExtracted()) {
-            logger.debug("Found already extracted files, returning.");
+            logger.debug("Found previously extracted file, returning.");
             updateProgress(100.0);
             this.status="extraction previously completed.";
             OK=true;
-            return null;
-        }
 
-
-
-
-        updateProgress(0.01); /* show progress as 1% to start off with */
-        String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
-        logger.info("About to gunzip "+INPUT_GZIP_FILE);
-        boolean needToCreateDirectory=true;
-        try {
-            InputStream in = new FileInputStream(INPUT_GZIP_FILE);
-            GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
-            TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn);
-            TarArchiveEntry entry;
-            /* For humans, there are 93 files (including all the contigs)
-            For simplicity, we will update the ProgressIndicator by 1% per file. If we get to 95, we will begin to update by 0.1% until
-            we are done.
-             */
-            double percentDone=0.01d;
-            String dirpath =this.genome.getPathToGenomeDirectory();
-            while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-                // If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway.
-                if (entry.isDirectory()) {
-                    continue;
-                } else {
-                    int count;
-                    byte data[] = new byte[BUFFER_SIZE];
-                    // Note that for hg38, the tar archive expands into a subdirectory called chroms.
-                    // If the files begin with "chroms", the direc
-                    String filename=entry.getName();
-                    logger.trace("ungzip'ping "+ filename);
-                    filename=filename.replaceAll("^\\./","");
-                    logger.trace("2 ungzip'ping "+ filename);
-                    if (needToCreateDirectory && filename.startsWith("chroms")) {
-                        // create a chroms directory if needed, otherwise we cannot unpack to it
-                        // this means that the archive wants to unpack to chroms/chr1 etc.
-                        logger.trace(String.format("Creating directory for chroms: %s",filename));
-                        String createDirPath =String.format("%s%schroms",dirpath,File.separator);
-                        File directory = new File(createDirPath);
-                        if (! directory.exists()) {
-                            logger.trace(String.format("Creating directory for chroms: %s",createDirPath));
-                            directory.mkdir();
-                        }
-                        this.genome.setPathToGenomeDirectory(createDirPath);// this extends the genome path.
-                        needToCreateDirectory=false; // only need to do this the first time.
-                    }
-                    // Note that since filename may have the "chroms" subdirectory itself, we do not need to add it here.
-                    File outfile = new File( dirpath+ File.separator +filename);
-                    FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
-                    try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE)) {
-                        while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
-                            dest.write(data, 0, count);
-                        }
-                        dest.close();
-                    }
-                    logger.trace("Unzipped "+entry.getName());
-                    if (percentDone<90)
-                        percentDone +=1.0d;
-                    else
-                        percentDone += 0.1d;
-                    updateProgress(percentDone/100);
-                }
-            }
-            updateProgress(1.0);
-            OK=true;
-            tarIn.close();
-            logger.info("Untar completed successfully for "+INPUT_GZIP_FILE);
-            this.status="chromFa.tar.gz successfully extracted.";
-        } catch (IOException e) {
-            logger.error("Unable to decompress "+INPUT_GZIP_FILE);
-            logger.error(e,e);
-            updateProgress(0.0);
-            this.status="extraction could not be completed.";
-            throw e;
+        } else {
+            extractCanonicalChromosomes();
         }
         return null;
     }
