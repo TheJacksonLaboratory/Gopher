@@ -7,7 +7,6 @@ import vpvgui.model.VPVGene;
 /** This class encapsulates one line in what will become the BED file to order the regulatory exome/gene panel. We
  * model this data with a class so that we can sort the BED file according to chromosomal location after we have
  * extracted all the areas to be enriched.
- * ToDo This class is still a little inelegant with respect to the way it handles chromosomes.
  * @author Peter Robinson
  * @version 0.1.3 (2017-11-14)
  */
@@ -26,7 +25,6 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
         this.fromPos=from;
         this.toPos=to;
         this.elementName=name;
-        //
     }
 
     public RegulatoryBEDFileEntry(RegulatoryElement regelem) {
@@ -37,17 +35,7 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
     }
 
 
-    @Override
-    public boolean equals(Object other){
-        if (other == null) return false;
-        if (other == this) return true;
-        if (!(other instanceof RegulatoryBEDFileEntry))return false;
-        RegulatoryBEDFileEntry oth = (RegulatoryBEDFileEntry)other;
-        return chromosome.equals(oth.chromosome) &&
-                fromPos==oth.fromPos &&
-                toPos==oth.toPos &&
-                elementName.equals(oth.elementName);
-    }
+
 
     public String toString() {
         return String.format("%s\t%d\t%d\t%s", chrom2string(chromosome), fromPos, toPos, elementName);
@@ -75,6 +63,31 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
         }
     }
 
+
+    /** Hash code is based on the end and start positions as well as on the chromosome.
+     * THe element name is not regarded as relevant for equality. */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 17;
+        result = prime * result + chromosome.hashCode();
+        result = prime * result + fromPos;
+        result = prime * result + toPos;
+        result = prime*result + elementName.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof RegulatoryBEDFileEntry))return false;
+        RegulatoryBEDFileEntry oth = (RegulatoryBEDFileEntry)other;
+        return chromosome.equals(oth.chromosome) &&
+                fromPos==oth.fromPos &&
+                toPos==oth.toPos &&
+                elementName.equals(oth.elementName);
+    }
 
     @Override
     public int compareTo(RegulatoryBEDFileEntry other) {

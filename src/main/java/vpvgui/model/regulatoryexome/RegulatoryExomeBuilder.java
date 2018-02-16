@@ -17,7 +17,7 @@ import java.util.zip.GZIPInputStream;
  * a regulatory exome build. We will create probes for all of the exons (including 5' and 3' UTRs) as well
  * as the regulatory elements in Ensembl that are sufficiently close to the transcription start site.
  * @author Peter Robinson
- * @version 0.1.1 (2017-11-11)
+ * @version 0.1.2 (2018-02-15)
  */
 public class RegulatoryExomeBuilder extends Task<Void> {
     static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
@@ -26,7 +26,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** Path to transcript definition file, refGene.txt.gz */
     private String pathToRefGeneFile=null;
 
-    private Model model=null;
+    private Model model;
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
     private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
@@ -51,7 +51,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     }
 
     /** @return map of active viewpoints arranged according to chromosome so that we can quickly find them when we
-     * are screening regulatory elements (which are arranged according to chromosome.
+     * are screening regulatory elements (which are arranged according to chromosome).
      * @param model
      * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
      */

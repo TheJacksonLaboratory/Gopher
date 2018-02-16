@@ -6,14 +6,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import vpvgui.model.Default;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Optional;
 
 public class PopupFactory {
@@ -456,6 +455,50 @@ public class PopupFactory {
         window.showAndWait();
     }
 
+    /**
+     * Show information to user.
+     *
+     * @param text        - message text
+     * @param windowTitle - Title of PopUp window
+     */
+    public static void showInfoMessage(String text, String windowTitle) {
+        Alert al = new Alert(Alert.AlertType.INFORMATION);
+        DialogPane dialogPane = al.getDialogPane();
+        dialogPane.getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+        al.setTitle(windowTitle);
+        al.setHeaderText(null);
+        al.setContentText(text);
+        al.showAndWait();
+    }
+
+
+
+    public static void showException(String windowTitle, String header, Exception exception) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(windowTitle);
+        alert.setHeaderText(header);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        String exceptionText = sw.toString();
+
+        Label label = new Label("The exception stacktrace was:");
+
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(textArea);
+        alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.showAndWait();
+    }
 
 
 }
