@@ -1074,18 +1074,26 @@ public class VPVMainPresenter implements Initializable {
             PopupFactory.displayError("Error","Could not get path to write regulatory exome BED file.");
             return;
         }
+        if (! model.viewpointsInitialized()) {
+            PopupFactory.displayError("Viewpoints not initialized",
+                    "Please initialize viewpoints before exporting regulatory exome");
+            return;
+        }
+
         logger.info("downloadGenome to directory  "+file.getAbsolutePath());
 
 
 
         ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
+
         ProgressIndicator progressIndicator = popup.getProgressIndicator();
         RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
-
+        logger.info("Done with COTR");
         try {
             builder.setOnFailed(e-> {
                 PopupFactory.displayError("Failure to build regulatory exome.",
-                        builder.getException().getMessage());
+                        builder.getStatus());
+                System.err.println(builder.getStatus());
                 popup.close();
             });
             builder.setOnSucceeded(e -> {
