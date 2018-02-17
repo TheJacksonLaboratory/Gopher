@@ -996,7 +996,7 @@ public class VPVMainPresenter implements Initializable {
 
     /** Open a project from a file specified by the user. */
     @FXML
-    public void openProject(ActionEvent e) {
+    public void importProject(ActionEvent e) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open VPV project file");
         File file = chooser.showOpenDialog(null);
@@ -1004,7 +1004,19 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         try {
+            removePreviousValuesFromTextFields();
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
+            if (this.primaryStage!=null)
+                this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",
+                        model.getProjectName()));
+
+        this.vpanalysisview = new VPAnalysisView();
+        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
+        setInitializedValuesInGUI();
+
             setModelInMainAndInAnalysisPresenter(this.model);
             logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
         } catch (IOException ex) {
