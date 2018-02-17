@@ -464,8 +464,13 @@ public class Model implements Serializable {
         }
     }
 
-    /** @return A list of Viewpoints that contain at least one selected fragment. */
+    /**
+     * Note that this function will return an empty list if the viewpoint list is null, which can occur if the
+     * user has not created view points yet. This will be picked up as an error and reported to the user later on.
+     * @return A list of Viewpoints that contain at least one selected fragment.
+     * */
     public List<ViewPoint> getActiveViewPointList() {
+        if (viewpointList==null ) return new ArrayList<>();
        return this.viewpointList.stream().filter(viewPoint -> viewPoint.hasValidProbe()).collect(Collectors.toList());
     }
 
