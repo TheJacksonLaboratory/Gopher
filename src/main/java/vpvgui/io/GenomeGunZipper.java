@@ -59,6 +59,7 @@ public class GenomeGunZipper extends Task<Void>  {
      */
     private boolean alreadyExtracted() {
         File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + genome.getGenomeFastaName());
+        logger.trace("checking for existence of file " + f.getAbsolutePath());
         return f.exists();
     }
 

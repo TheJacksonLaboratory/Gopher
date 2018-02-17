@@ -58,12 +58,27 @@ public class Faidx extends Task<Void> {
 
 
     /**
+     * We use this method to check if we need to g-unzip the genome files.
+     * @return true if the hg19.fa file is found (and thus, the chromFa.tar.gx has been previously extracted)
+     */
+    private boolean alreadyIndexed(String pathToFasta) {
+        String PathToFai=pathToFasta + ".fai";
+        File f = new File(PathToFai);
+        logger.trace("checking for existence of file " + f.getAbsolutePath());
+        return f.exists();
+    }
+
+    /**
      * Create FAI indices for all FASTA files in {@link #genomeDirectoryPath} (only if needed).
      * It is packaged as a Task to allow concurrency
      */
     @Override
     protected Void call() throws VPVException {
         String path = genomeDirectoryPath + File.separator + genomeFastaBaseName;
+        if (alreadyIndexed(path)) {
+            logger.trace("We found index for " + path +" and are skipping the FAI indexing step");
+            return null;
+        }
         File fasta = new File(path);
         int blocks = n_canonical_chromosomes + 1;
         double blocksize = 1D/blocks;
