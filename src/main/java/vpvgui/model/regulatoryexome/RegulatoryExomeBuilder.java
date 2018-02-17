@@ -43,13 +43,15 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private int chosenRegulatoryElements;
     private int totalExons;
     private List<String> status=new ArrayList<>();
+    private final List<RegulationCategory> chosenCategories;
 
-    public RegulatoryExomeBuilder(Model model,ProgressIndicator pi) {
+    public RegulatoryExomeBuilder(Model model, List<RegulationCategory>  chosen, ProgressIndicator pi) {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
         this.regulatoryElementSet=new HashSet<>();
         this.progressInd=pi;
+        chosenCategories=chosen;
         String msg = String.format("We will create regulatory build from %s and %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile);
         logger.trace(msg);
         status.add(msg);
@@ -180,6 +182,9 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             parser.initGzipReader();
             while (parser.hasNext()) {
                 RegulatoryElement elem = parser.next();
+                if (! chosenCategories.contains(elem.getCategory())) {
+                    continue; // only inlcude the chosen regulatory categories
+                }
                 totalRegulatoryElements++;
                 String chrom=elem.getChrom();
                 if (! chrom2vpListMap.containsKey(chrom)) {
@@ -216,28 +221,28 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      * @param pr Current progress.
      */
     private void updateProgress(double pr) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override public void run() {
-                if (progressInd ==null) {
-                    // do nothing
-                    return;
-                }
+        if (progressInd ==null) {
+            return; // do nothing
+        }
+        javafx.application.Platform.runLater(()-> {
                 progressInd.setProgress(pr);
-            }
         });
     }
 
-
+    /** This information will be used in the "report" dialog that gives the User feedbqck about the data and the chosen
+     * viewpoints
+     * @return key-value property pairs with information about the regulatory panel.
+     */
     public Properties getRegulatoryReport() {
         Properties props = new Properties();
         props.setProperty("Regulatory exome downstream distance threshold", String.valueOf(downstreamThreshold));
         props.setProperty("Regulatory exome upstream distance threshold", String.valueOf(upstreamThreshold));
-        props.setProperty("pathToEnsemblRegulatoryBuild",pathToEnsemblRegulatoryBuild);
-        props.setProperty("totalRegulatoryElements", String.valueOf(totalRegulatoryElements));
-        props.setProperty("chosenRegulatoryElements",String.valueOf(chosenRegulatoryElements));
-        props.setProperty("totalExons", String.valueOf(totalExons));
+        props.setProperty("path to Ensembl regulatory build",pathToEnsemblRegulatoryBuild);
+        props.setProperty("total regulatory elements", String.valueOf(totalRegulatoryElements));
+        props.setProperty("chosen regulatory elements",String.valueOf(chosenRegulatoryElements));
+        props.setProperty("total exons", String.valueOf(totalExons));
         int totalUniqueExons = this.regulatoryElementSet.size()-chosenRegulatoryElements;
-        props.setProperty("totalUniqueExons(ToDo check this calculation)", String.valueOf(totalUniqueExons));
+        props.setProperty("total chosen exons ", String.valueOf(totalUniqueExons));
         return props;
     }
 

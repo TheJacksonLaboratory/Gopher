@@ -21,6 +21,7 @@ import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 
+import vpvgui.exception.VPVException;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
@@ -35,6 +36,7 @@ import vpvgui.gui.progresspopup.ProgressPopup;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.qcCheckPane.QCCheckFactory;
+import vpvgui.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.*;
@@ -1078,56 +1080,25 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void buildRegulatoryExome(ActionEvent event) {
         event.consume();
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory to store regulatory exome BED file.");
-        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
-            logger.error("Could not set directory to write regulatory exome BED file.");
-            PopupFactory.displayError("Error","Could not get path to write regulatory exome BED file.");
-            return;
-        }
-        if (! model.viewpointsInitialized()) {
+        if (!model.viewpointsInitialized()) {
             PopupFactory.displayError("Viewpoints not initialized",
                     "Please initialize viewpoints before exporting regulatory exome");
             return;
         }
-
-        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
-
-
-
-        ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
-
-        ProgressIndicator progressIndicator = popup.getProgressIndicator();
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
-        logger.info("Done with COTR");
+        if (! model.regulatoryBuildPathInitialized()) {
+            PopupFactory.displayError("Regulatory build path not initialized",
+                    "Please download the regulatory build file before exporting regulatory exome");
+            return;
+        }
         try {
-            builder.setOnFailed(e-> {
-                PopupFactory.displayError("Failure to build regulatory exome.",
-                        builder.getStatus());
-                System.err.println(builder.getStatus());
-                popup.close();
-            });
-            builder.setOnSucceeded(e -> {
-                try {
-                    logger.trace(String.format("Will output regulatory panel BED file to %s",file.getAbsolutePath()));
-                    builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
-                    Properties regulatoryProperties = builder.getRegulatoryReport();
-                    this.model.setRegulatoryExomeProperties(regulatoryProperties);
-                } catch (IOException ioe) {
-                    PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
-                }
-                popup.close();
-            });
-            try {
-                popup.startProgress(builder);
-
-            } catch (InterruptedException e) {
-                PopupFactory.displayException("Error","Could not download regulatory build", e);
-            }
-
+            final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
+            logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
+            javafx.application.Platform.runLater(() -> {
+                        RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory);
+                    });
+            if (true) return;
         } catch (Exception e) {
-            PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);
+            PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
         }
         logger.trace("buildRegulatoryExome");
     }
