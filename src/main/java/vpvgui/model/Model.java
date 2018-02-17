@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * This class stores all of the data related to the project,including the list of  the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
- * @version 0.2.15 (2017-11-15)
+ * @version 0.2.16 (2018-02-18)
  */
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
@@ -170,7 +170,7 @@ public class Model implements Serializable {
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
-    private boolean allowSingleMargin;
+    private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
     public boolean getAllowSingleMargin() { return allowSingleMargin; }
     public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
 

@@ -33,4 +33,6 @@ public class Default {
 
     public final static String GENOME_BUILD = "hg19";
 
+    public final static Boolean ALLOW_SINGLE_MARGIN=true;
+
 }
