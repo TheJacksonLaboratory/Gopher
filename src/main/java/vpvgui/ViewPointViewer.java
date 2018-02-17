@@ -16,9 +16,11 @@ import vpvgui.gui.splash.SplashView;
 import vpvgui.gui.splash.SwitchScreens;
 import vpvgui.model.Model;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import static vpvgui.io.Platform.getVPVDir;
@@ -46,13 +48,22 @@ public class ViewPointViewer extends Application {
     private Stage primarystage = null;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         updateLog4jConfiguration();
         //logger.info("Starting VPV Gui");
         this.primarystage = primaryStage;
         Image image = new Image(ViewPointViewer.class.getResourceAsStream("/img/vpvicon.png"));
         primaryStage.setTitle("ViewPoint Viewer");
         primaryStage.getIcons().add(image);
+        if (isMacintosh()) {
+            try {
+                URL iconURL = ViewPointViewer.class.getResource("/img/vpvicon.png");
+                java.awt.Image macimage = new ImageIcon(iconURL).getImage();
+                com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
+            } catch (Exception e) {
+                // Not for Windows or Linux. Just skip it!
+            }
+        }
         // get dimensions of users screens to use as Maximum width/height
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         int xdim=(int)primScreenBounds.getWidth();
@@ -64,7 +75,7 @@ public class ViewPointViewer extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         Injector.forgetAll();
     }
 
@@ -112,6 +123,14 @@ public class ViewPointViewer extends Application {
         primarystage.show();
 
         fadeIn.play();
+    }
+
+    /**
+     * @return true if the current platform is a Mac.
+     */
+    private boolean isMacintosh() {
+        String osName = System.getProperty("os.name").toLowerCase();
+        return (osName.contains("mac"));
     }
 
 
