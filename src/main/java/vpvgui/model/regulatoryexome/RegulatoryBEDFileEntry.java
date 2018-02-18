@@ -1,8 +1,7 @@
 package vpvgui.model.regulatoryexome;
 
-import com.sun.org.apache.regexp.internal.RE;
+
 import org.apache.log4j.Logger;
-import vpvgui.model.VPVGene;
 
 /**
  * This class encapsulates one line in what will become the BED file to order the regulatory exome/gene panel. We

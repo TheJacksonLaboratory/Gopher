@@ -12,17 +12,16 @@ VPV needs Java 8 or newer to run. You can determine what version of Java you hav
 
 Using the prebuilt VPV app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Most users should install the prebuilt App called `VPViewer.jar` but it is also possible to build the VPV application from source.
+Most users should install the prebuilt App called `VPViewer.jar` that is available on the Releases section of
+the VPV GitHub repository: https://github.com/TheJacksonLaboratory/VPV/releases/.
+
+
+
+It is also possible to build the VPV application from source.
 On most systems you should be able to start VPV by double clicking on the
 `VPViewer.jar`. Alternatively, you can start `VPViewer.jar` from the shell with the following command. ::
 
   $ java -jar VPViewer.jar
-
-
-The prebuilt VPV file will be available at the VPV GitHUb page following publication.
-
-
-
 
 
 Installing and running the prebuilt ViewPointViewer (VPV) app
