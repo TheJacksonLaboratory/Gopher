@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>vpvgui</groupId>
+    <groupId>jax</groupId>
     <artifactId>vpvgui</artifactId>
-    <version>0.3.2</version>
+    <version>0.3.4</version>
     <packaging>jar</packaging>
 
     <name>vpvgui</name>
@@ -37,13 +37,6 @@
             <version>1.2.17</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.collections/google-collections
-        <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

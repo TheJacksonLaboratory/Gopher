@@ -987,10 +987,6 @@ public class VPVMainPresenter implements Initializable {
         chooser.setTitle("Choose file path to save project file");
         File file = chooser.showSaveDialog(null);
         String path = file.getAbsolutePath();
-        if (path==null) {
-            PopupFactory.displayError("Error","Could not retrieve path to export project file");
-            return;
-        }
         serializeToLocation(path);
         logger.trace(String.format("Serialized file to %s",path));
         e.consume();
@@ -1096,7 +1092,6 @@ public class VPVMainPresenter implements Initializable {
             javafx.application.Platform.runLater(() -> {
                         RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory);
                     });
-            if (true) return;
         } catch (Exception e) {
             PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
         }
