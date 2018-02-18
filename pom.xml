@@ -155,19 +155,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <useUniqueVersions>false</useUniqueVersions>
                             <mainClass>vpvgui.ViewPointViewer</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>create-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <inherited>false</inherited>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

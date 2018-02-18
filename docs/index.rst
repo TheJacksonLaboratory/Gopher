@@ -35,7 +35,9 @@ of genes of interest or of all protein-coding genes.
 Quick start
 ~~~~~~~~~~~
 VPV requires Java 8 or higher to run. The source code of VPV can be downloaded
-from the VPV GitHub repository and the application canbe built using maven (see the GitHub page for instructions). Most users will want to download the pre-built VPV application ??WHERE??.
+from the VPV GitHub repository (https://github.com/TheJacksonLaboratory/VPV/)
+and the application can be built using maven (see the GitHub page for instructions).
+Most users will want to download the pre-built VPV application.
 
 Currently, VPV supports design of probes for human (GRCh37, GRCh38), mouse (mm9, mm10), rat, and fly. The App guides users through the process of downloading genome and transcript data from the UCSC Genome Browser; VPV uses this data to determine the locations of restriction sites and TSS for the chosen genes. Following this, the user can upload a list of gene symbols and choose a restriction enzyme. The App will then generate a list of suggested viewpoints according to a simple or extended approach. The user can visualize the viewpoints and selected restriction fragments within their genomic context directly in the VPV app, and can select or deselect fragments. Finally, the user can export a BED file with the chosen fragments that can be used to design probes (often in conjunction with a Wizard of a manufacturer). Additionally, a file with URLs for the UCSC browser is provided so that the user can inspect the data in the UCSC Genome Browser before proceding with the experiment.
 
