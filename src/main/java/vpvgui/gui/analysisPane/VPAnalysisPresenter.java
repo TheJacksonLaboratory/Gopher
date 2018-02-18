@@ -16,9 +16,7 @@ import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * This is the Tab that shows a table with all of the viewpoints created together with a sumnmary of the overall
@@ -27,7 +25,7 @@ import java.util.ResourceBundle;
  * @version 0.1.2 (2017-11-02).
  */
 public class VPAnalysisPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
+    private static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
     /** This is the message users will see if they open the analysis tab before they have entered the genes
      * and started the analysis of the viewpoints. */
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
@@ -56,6 +54,12 @@ public class VPAnalysisPresenter implements Initializable {
     /** A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
      * UCSC browser.*/
     private TabPane tabpane;
+    /** A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
+     * reference to a Tab that has been opened for it.
+     */
+    private Map<ViewPoint,Tab> openTabs=new HashMap<>();
+
+
 
 
     @Override
@@ -242,6 +246,18 @@ public class VPAnalysisPresenter implements Initializable {
      * @param vp This {@link ViewPoint} object will be opened into a new Tab.
      */
     private void openViewPointInTab(ViewPoint vp) {
+        if (openTabs.containsKey(vp)) {
+            Tab tab = openTabs.get(vp);
+            if (tab==null || tab.isDisabled()) {
+                openTabs.remove(vp);
+            } else {
+                this.tabpane.getTabs().add(tab);
+                this.tabpane.getSelectionModel().select(tab);
+                return;
+            }
+        }
+
+
         final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
         tab.setId(vp.getTargetName());
         tab.setClosable(true);
@@ -262,6 +278,7 @@ public class VPAnalysisPresenter implements Initializable {
 
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
+        openTabs.put(vp,tab);
     }
 
     public void setModel(Model m) { this.model=m; }
@@ -302,9 +319,10 @@ public class VPAnalysisPresenter implements Initializable {
             }
             List<ViewPoint> vpl = this.model.getViewPointList();
             logger.trace("refreshVPTable: got a total of "+vpl.size() + " ViewPoint objects");
-            for (ViewPoint v : vpl) {
-                viewpointlist.add(v);
-            }
+//            for (ViewPoint v : vpl) {
+//                viewpointlist.add(v);
+//            }
+            viewpointlist.addAll(vpl);
             viewPointTableView.getItems().clear(); /* clear previous rows, if any */
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

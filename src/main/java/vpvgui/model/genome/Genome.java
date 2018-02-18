@@ -16,15 +16,17 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-24)
  */
 public abstract class Genome implements Serializable {
-    static Logger logger = Logger.getLogger(Genome.class.getName());
+    private static Logger logger = Logger.getLogger(Genome.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */
-    protected String pathToGenomeDirectory=null;
+    private String pathToGenomeDirectory=null;
     /** Basename of the compressed genome file that we will store to disk */
     protected static final String localFilename = "chromFa.tar.gz";
     /** The valid chromosomes for the current genome build. (will be initialized from the subclasses).*/
     protected  Set<String> valid=null;
+    /** Set of base chromosome file names for canonical chromosomes. For instnace, "chr1.fa", but not "chr1random12432.fa" .*/
+    protected Set<String> chromosomeFileNames;
     /** This is the name of the file we download from UCSC for any of the genomes. */
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     private String genomeBasename = DEFAULT_GENOME_BASENAME;
@@ -33,13 +35,15 @@ public abstract class Genome implements Serializable {
      * the corresponding unpacked chromosome files (note: we require only the canonical files; other files can be deleted
      * by the user without affecting this program.
      */
-    protected boolean downloadComplete=false;
+    private boolean downloadComplete=false;
 
-    protected boolean unpackingComplete=false;
-
-    protected boolean indexingComplete=false;
+    private boolean unpackingComplete=false;
+    /** A flag to indicate that the production of a FAI file for the genome is completed. */
+    private boolean indexingComplete=false;
 
     private String genomeURL = null;
+
+
 
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
@@ -68,8 +72,10 @@ public abstract class Genome implements Serializable {
      * when the genome is downloaded (or a path to a pre-existing file is provided).
      */
     public Genome() {
-        valid=new HashSet<>();
+        init();
     }
+
+    protected abstract void init();
 
     /**
      *
@@ -87,14 +93,10 @@ public abstract class Genome implements Serializable {
     }
 
     public abstract String getGenomeBuild();
+    public abstract String getGenomeFastaName();
     public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
 
-    /** This should be the first function that is called to create and collect the data about the
-     * downloaded genome files.
-     * @param path Path to the directory where the chromFa.tar.gz file will be downloaed.
-     * @return true if the genome file(s) have been completely downloaded.
-     */
     /**
      * @return true if the genome files have been previously downloaded to the indicated path.
      */
@@ -141,7 +143,7 @@ public abstract class Genome implements Serializable {
      * of file.getName(), i.e., the basename of a chromosome file, which is something like {@code chr1.fa}.
      * The function should return true for the canonical chromosomes such as {@code chr1.fa}
      * and should return false for non-canonidal chromosomes such as {@code chr18_gl000207_random.fa}.
-     * @param chromosomeFileBasename
+     * @param chromosomeFileBasename A string such as "chr12"
      * @return true for canonical chromosome files.
      */
     public boolean isCanonical(String chromosomeFileBasename) {
@@ -152,5 +154,7 @@ public abstract class Genome implements Serializable {
     }
 
     public abstract int getNumberOfCanonicalChromosomes();
+
+    public abstract boolean isCanonicalChromosome(String filename);
 
 }

@@ -1,28 +1,31 @@
 .. VPV documentation master file, created by
-   sphinx-quickstart on Sun Sep 24 12:02:05 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+sphinx-quickstart on Sun Sep 24 12:02:05 2017.
+You can adapt this file completely to your liking, but it should at least
+contain the root `toctree` directive.
 
 Welcome to VPV's documentation!
 ===============================
 .. toctree::
-	:maxdepth: 2
-	:caption: Contents:
+   :maxdepth: 2
+   :caption: Contents:
 
-	CHC	
-	installation
-	setup
-	parameters
-	designparameters	  
-	running
-	output
+   CHC
+   installation
+   setup
+   parameters
+   designparameters
+   running
+   output
+   Regulatory Exome <regulatoryexome>
 
 ViewPointViewer (VPV)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 VPV is a Java application designed to help design capture probes
 for capture Hi-C and related protocols. Capture Hi-C (CHC) is based
-on the Hi-C protocol but uses capture baits (similar to whole-exome sequencing) to enrich a set of viewpoints. Commonly, the viewpoints represent proximal promoter regions (surrounding the transcription start site [TSS]) of genes of interest or of all protein-coding genes.
+on the Hi-C protocol but uses capture baits (similar to whole-exome sequencing) to enrich a set of viewpoints.
+Commonly, the viewpoints represent proximal promoter regions (surrounding the transcription start site [TSS])
+of genes of interest or of all protein-coding genes.
 
 - CHC detects interactions between viewpoint regions and distal enhancers (or other genomic regions).
 - CHC has been most commonly performed with the 4-cutter DpnII or with the 6-cutter HindIII.
@@ -30,7 +33,7 @@ on the Hi-C protocol but uses capture baits (similar to whole-exome sequencing) 
 
 
 Quick start
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 VPV requires Java 8 or higher to run. The source code of VPV can be downloaded
 from the VPV GitHub repository and the application canbe built using maven (see the GitHub page for instructions). Most users will want to download the pre-built VPV application ??WHERE??.
 

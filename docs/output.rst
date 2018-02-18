@@ -1,9 +1,8 @@
-VSV Output files
-===============================
+Examining VPV BED files in the UCSC Browser
+===========================================
 
-to do
-
-
+VPV can produce a number of different output files for different analyses. Many users will want the BED file with
+the definitions of target regions that can be used to produce a capture Hi-C probe set.
 
 
 Examing VPV's output in the UCSC Genome Browser

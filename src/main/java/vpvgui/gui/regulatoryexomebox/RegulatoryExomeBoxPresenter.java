@@ -1,0 +1,107 @@
+package vpvgui.gui.regulatoryexomebox;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import org.apache.log4j.Logger;
+import vpvgui.framework.Signal;
+import vpvgui.gui.enzymebox.EnzymeBoxPresenter;
+import vpvgui.model.RestrictionEnzyme;
+import vpvgui.model.regulatoryexome.RegulationCategory;
+import vpvgui.model.regulatoryexome.RegulatoryElement;
+
+import java.net.URL;
+import java.util.*;
+import java.util.function.Consumer;
+
+public class RegulatoryExomeBoxPresenter implements Initializable {
+    static Logger logger = Logger.getLogger(EnzymeBoxPresenter.class.getName());
+    @FXML private Label label;
+    @FXML private VBox regulatoryVBox;
+    @FXML private Button okButton;
+
+    private static List<CheckBox> boxlist;
+    private static int count;
+    private static List<RegulationCategory> chosen = null;
+    private static Map<String,RegulationCategory> categories;
+    private Consumer<vpvgui.framework.Signal> signal;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        this.boxlist = new ArrayList<>();
+        this.categories = new HashMap<>();
+        for (RegulationCategory rc : RegulationCategory.values()) {
+            categories.put(rc.toString(),rc);
+        }
+        this.chosen = new ArrayList<>();
+        Platform.runLater(() -> {
+            initializeCategories();
+            this.okButton.requestFocus();
+        });
+    }
+
+    public void initializeCategories() {
+        for (RegulationCategory rc : categories.values()) {
+            String label = rc.toString();
+            CheckBox cb = new CheckBox(label);
+            cb.setOnAction(e -> handle(rc.toString()));
+            cb.setAllowIndeterminate(false);
+            cb.setSelected(true);
+            chosen.add(rc);
+            cb.setId("checkbx");
+            boxlist.add(cb);
+            this.regulatoryVBox.getChildren().addAll(cb);
+            this.regulatoryVBox.setSpacing(8);
+        }
+    }
+
+
+    public void setSignal(Consumer<Signal> signal) {
+        this.signal = signal;
+    }
+
+
+    public List<RegulationCategory> getChosenCategories() {
+        logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
+        return this.chosen;
+    }
+
+    /**
+     * This gets called every time the use chooses or deselects an enzyme. It resets and fills the
+     * set {@link #chosen}, which can then be retrieved using {@link #getChosenCategories()}.
+     *
+     * @param category
+     */
+    private void handle(String category) {
+        this.chosen = new ArrayList<>();
+        logger.trace(String.format("handle %s",category ));
+        for (CheckBox cb : boxlist) {
+            if (cb.isSelected()) {
+                String name = cb.getText(); /* this is something like "HindIII: A^AGCTT", but we need just "HindIII" */
+                int i = name.indexOf(":");
+                if (i > 0) {
+                    name = name.substring(0, i);
+                }
+                RegulationCategory re = categories.get(name);
+                if (re == null) { /* Should never happen! */
+                    logger.error("We were unable to retrieve the name for enzyme " + name);
+                    return;
+                }
+                chosen.add(re);
+            }
+        }
+        logger.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
+    }
+
+    @FXML
+    public void okButtonClicked(javafx.event.ActionEvent e) {
+        e.consume();
+        signal.accept(Signal.DONE);
+    }
+
+
+}

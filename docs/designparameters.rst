@@ -34,7 +34,14 @@ Margin size
 Margin strategy
 ~~~~~~~~~~~~~~~
 
-For some capture Hi-C design strategies, only two probes (or baits) are placed at the outermost ends of restriction fragments that are ought to be enriched. Enrichment and sequencing in capture Hi-C experiments effectively is concentrated in the margins of the fragments as defined above. Typcically, fragments whose margins have a too high repeat content or that have a too high or too low GC content are difficult to enrich and sequence and are therefore excluded from probe designs. In many cases, however, one of the two ends of a fragment may satisfy repeat and GC criteria, while the other end does not. VPV allows users to choose whether both ends of a fragment must satisfy these criteria ("require both margins), or whether all fragments are chosen for which at least one of the ends satisfies the critera.
+For some capture Hi-C design strategies, only two probes (or baits) are placed at the outermost ends of restriction
+fragments that are ought to be enriched. Enrichment and sequencing in capture Hi-C experiments effectively is concentrated
+in the margins of the fragments as defined above. Typcically, fragments whose margins have a too high repeat content or
+that have a too high or too low GC content are difficult to enrich and sequence and are therefore excluded from probe
+designs. In many cases, however, one of the two ends of a fragment may satisfy repeat and GC criteria, while the other
+end does not. VPV allows users to choose whether both ends of a fragment must satisfy these criteria (``require both margins``),
+or whether all fragments are chosen for which at least one of the ends satisfies the criteria (``allow single margin``).
+The default is ``allow single margin``.
 
 
 

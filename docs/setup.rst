@@ -1,7 +1,7 @@
 VPV: Simple and Extended Approach
 =================================
 
-VSV offers two approaches for choosing viewpoints and probes.
+VPV offers two approaches for choosing viewpoints and probes.
 
 To choose one of the two viewpoint design approaches, select Simple or Extended from the pulldown menu at the top of the setup pane.
 

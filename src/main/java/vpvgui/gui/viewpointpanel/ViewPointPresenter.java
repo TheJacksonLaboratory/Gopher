@@ -80,7 +80,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML private TableColumn<ColoredSegment, String> repeatContentDownColumn;
     @FXML private TableColumn<ColoredSegment, String> gcContentUpColumn;
     @FXML private TableColumn<ColoredSegment, String> gcContentDownColumn;
-    @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
+   // @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
     @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
     @FXML private Button deleteButton;
@@ -112,11 +112,10 @@ public class ViewPointPresenter implements Initializable {
 
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                tab.getTabPane().getTabs().remove(tab);
-            }
+        Platform.runLater(() -> {
+            tab.setDisable(true);
+            this.tab.getTabPane().getTabs().remove(this.tab);
+            this.analysisPresenter.refreshVPTable();
         });
     }
 
@@ -133,6 +132,7 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML private void deleteThisViewPoint(Event e) {
         this.model.deleteViewpoint(this.vp);
+        tab.setDisable(true);
         this.tab.getTabPane().getTabs().remove(this.tab);
         this.analysisPresenter.refreshVPTable();
         e.consume();
@@ -187,8 +187,8 @@ public class ViewPointPresenter implements Initializable {
     class FormattedChromosomeComparator implements Comparator<String> {
         @Override
         public int compare(String s1, String s2) {
-            Integer i1 = null;
-            Integer i2 = null;
+            Integer i1;
+            Integer i2;
             try {
                 int x1 = s1.indexOf(":") + 1;
                 int y1 = s1.indexOf("-");
@@ -272,7 +272,7 @@ public class ViewPointPresenter implements Initializable {
                                     if (item != null && !empty) {
                                         getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
                                     } else {
-                                        getTableRow().setStyle(String.format("-fx-background-color: transparent;"));
+                                        getTableRow().setStyle("-fx-background-color: transparent;");
                                     }
                                 }
                             });
@@ -442,7 +442,7 @@ public class ViewPointPresenter implements Initializable {
             int upstreamSpan=vp.getUpstreamSpan();
             int downstreamSpan=vp.getDownstreamSpan();
             int total = vp.getTotalPromoterCount();
-            String promoterCount="";
+            String promoterCount;
             if (total==1) {
                 promoterCount=String.format("Only promoter of %s gene",vp.getTargetName());
             } else {
@@ -522,7 +522,7 @@ public class ViewPointPresenter implements Initializable {
 
 
     private void zoom(double factor) {
-        String path=this.model.getIndexFastaFilePath(vp.getReferenceID());
+        String path=this.model.getGenomeFastaFile();
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
@@ -566,7 +566,7 @@ public class ViewPointPresenter implements Initializable {
         String genome = this.model.getGenomeBuild();
         String chromosome = this.vp.getReferenceID();
         List<String> colorsegmentlist = coloredsegments.stream().
-                filter(c -> c.isSelected()).
+                filter(ColoredSegment::isSelected).
                 map( c -> String.format("%s.%s%%3A%d-%d%s",
                         genome,
                         chromosome,
@@ -595,7 +595,7 @@ public class ViewPointPresenter implements Initializable {
             this.checkBox = new CheckBox();
         }
 
-        public CheckBox getCheckBox() {
+        CheckBox getCheckBox() {
             return checkBox;
         }
 
@@ -617,7 +617,7 @@ public class ViewPointPresenter implements Initializable {
 
         @Override
         public String toString() {
-            final StringBuffer sb = new StringBuffer("ColoredSegment{");
+            final StringBuilder sb = new StringBuilder("ColoredSegment{");
             sb.append("color='").append(color).append('\'');
             sb.append(", segment=").append(segment);
             sb.append('}');

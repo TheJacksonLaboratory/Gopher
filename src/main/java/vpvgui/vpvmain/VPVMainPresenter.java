@@ -21,6 +21,7 @@ import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.Logger;
 import vpvgui.exception.DownloadFileNotFoundException;
 
+import vpvgui.exception.VPVException;
 import vpvgui.gui.analysisPane.VPAnalysisPresenter;
 import vpvgui.gui.analysisPane.VPAnalysisView;
 import vpvgui.gui.createviewpointpb.CreateViewpointPBPresenter;
@@ -35,6 +36,7 @@ import vpvgui.gui.progresspopup.ProgressPopup;
 import vpvgui.gui.proxy.SetProxyPresenter;
 import vpvgui.gui.proxy.SetProxyView;
 import vpvgui.gui.qcCheckPane.QCCheckFactory;
+import vpvgui.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import vpvgui.gui.settings.SettingsViewFactory;
 import vpvgui.io.*;
 import vpvgui.model.*;
@@ -62,7 +64,7 @@ import java.util.ResourceBundle;
  * @version 0.2.8 (2017-11-12)
  */
 public class VPVMainPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
+    private static Logger logger = Logger.getLogger(VPVMainPresenter.class.getName());
     /** The Model for the entire analysis. */
     private Model model = null;
     /**
@@ -89,7 +91,6 @@ public class VPVMainPresenter implements Initializable {
     @FXML private Label approachLabel;
     /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
-    /** Show progress in downloading the Genome and corresponding transcript definition file.  */
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
     @FXML private Button downloadTranscriptsButton;
     @FXML private ProgressIndicator genomeDownloadPI;
@@ -142,35 +143,35 @@ public class VPVMainPresenter implements Initializable {
     private Stage primaryStage=null;
 
     transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
-    public final int getSizeUp() { return sizeUp.get();}
-    public final void setSizeUp(int su) { sizeUp.set(su);}
-    public IntegerProperty sizeDownProperty() { return sizeDown; }
+    private int getSizeUp() { return sizeUp.get();}
+    private void setSizeUp(int su) { sizeUp.set(su);}
+    private IntegerProperty sizeDownProperty() { return sizeDown; }
 
     transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
-    public final int getSizeDown() { return sizeDown.get();}
-    public final void setSizeDown(int sd) { sizeUp.set(sd);}
-    public IntegerProperty sizeUpProperty() { return sizeUp; }
+    private int getSizeDown() { return sizeDown.get();}
+    private void setSizeDown(int sd) { sizeUp.set(sd);}
+    private IntegerProperty sizeUpProperty() { return sizeUp; }
 
     transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
-    public int getMinFragSize() { return minFragSize.get(); }
-    public void setMinFragSize(int i) { this.minFragSize.set(i);}
-    public IntegerProperty minFragSizeProperty() { return minFragSize; }
+    private int getMinFragSize() { return minFragSize.get(); }
+    private void setMinFragSize(int i) { this.minFragSize.set(i);}
+    private IntegerProperty minFragSizeProperty() { return minFragSize; }
 
     transient private DoubleProperty maxRepeatContent = new SimpleDoubleProperty();
-    public final double getMaxRepeatContent() {return maxRepeatContent.get();}
-    public final void setMaxRepeatContent(double r) { this.maxRepeatContent.set(r);}
-    public DoubleProperty maxRepeatContentProperty() { return maxRepeatContent;  }
+    private double getMaxRepeatContent() {return maxRepeatContent.get();}
+    private void setMaxRepeatContent(double r) { this.maxRepeatContent.set(r);}
+    private DoubleProperty maxRepeatContentProperty() { return maxRepeatContent;  }
 
     transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
-    public final double getMinGCcontent() { return minGCcontent.get();}
-    public final void setMinGCcontent(double mgc) { minGCcontent.set(mgc);}
-    public DoubleProperty minGCcontentProperty() { return minGCcontent; }
+    private double getMinGCcontent() { return minGCcontent.get();}
+    private void setMinGCcontent(double mgc) { minGCcontent.set(mgc);}
+    private DoubleProperty minGCcontentProperty() { return minGCcontent; }
 
     transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
-    public final double getMaxGCcontent() { return maxGCcontent.get();}
+    private double getMaxGCcontent() { return maxGCcontent.get();}
     /** Note we expect the user to enter a percentage, and we convert it here to proportion. */
-    public final void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
-    public DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
+    private void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
+    private DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
     @FXML
     void exitButtonClicked(ActionEvent e) {
@@ -181,7 +182,7 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /** Serialize the project data to the default location. */
-    public boolean serialize() {
+    private boolean serialize() {
         String projectname=this.model.getProjectName();
         if (projectname==null) {
             PopupFactory.displayError("Error","Could not get viewpoint name (should never happen). Will save with default");
@@ -193,7 +194,7 @@ public class VPVMainPresenter implements Initializable {
 
     /** Serialialize the project file to the location given as path.
      * @param path absolute path to which the serilaized file should be saved.
-     * @return
+     * @return true iff serialization is successful
      */
     private boolean serializeToLocation(String path) {
         if (path==null) {
@@ -492,7 +493,7 @@ public class VPVMainPresenter implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for " + build + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath()=="") {
+        if (file==null || file.getAbsolutePath().equals("")) {
             logger.error("Could not set genome download path from Directory Chooser");
             PopupFactory.displayError("Error","Could not get path to download genome.");
             return;
@@ -518,7 +519,7 @@ public class VPVMainPresenter implements Initializable {
         RefGeneDownloader rgd = new RefGeneDownloader(genomeBuild);
         String transcriptName = rgd.getTranscriptName();
         String basename=rgd.getBaseName();
-        String url=null;
+        String url;
         try {
             url = rgd.getURL();
         } catch (DownloadFileNotFoundException dfne) {
@@ -581,24 +582,27 @@ public class VPVMainPresenter implements Initializable {
         th.start();
     }
 
-    /** Create fai (fasta index files)
+    /** Create genome fai (fasta index file)
      * @param e Event triggered by index genome command.
      * */
     @FXML public void indexGenome(ActionEvent e) {
         e.consume();
         logger.trace("Indexing genome files...");
-        FASTAIndexManager manager = new FASTAIndexManager(this.model,this.genomeIndexPI);
+        Faidx manager = new Faidx(this.model,this.genomeIndexPI);
         manager.setOnSucceeded(event ->{
-
-            indexGenomeLabel.setText("FASTA files successfully indexed.");
-            logger.debug("Number of FASTA files retrieved> "+manager.getIndexedFastaFiles().size());
-            model.setIndexedFastaFiles(manager.getIndexedFastaFiles());
-            model.setGenomeIndexed();
-            model.setContigLengths(manager.getContigLengths());
+            int n_chroms = manager.getContigLengths().size();
+            String message = String.format("%d chromosomes in %s successfully indexed.",
+                    n_chroms,
+                    model.getGenome().getGenomeFastaName());
+            indexGenomeLabel.setText(message);
+            logger.debug(message);
+            model.setIndexedGenomeFastaIndexFile(manager.getGenomeFastaIndexPath());
+           model.setGenomeIndexed();
+           model.setContigLengths(manager.getContigLengths());
         } );
         manager.setOnFailed(event-> {
             indexGenomeLabel.setText("FASTA indexing failed");
-            PopupFactory.displayError("Failure to extract FASTA files.",
+            PopupFactory.displayError("Failure to index Genome FASTA file.",
                     manager.getException().getMessage());
         });
         Thread th = new Thread(manager);
@@ -657,7 +661,7 @@ public class VPVMainPresenter implements Initializable {
             return;
         }
         StringProperty sp=new SimpleStringProperty();
-        ViewPointCreationTask task =null;
+        ViewPointCreationTask task;
 
         // TODO use boolean var allowSingleMargin
 
@@ -671,9 +675,8 @@ public class VPVMainPresenter implements Initializable {
         CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
         pbpresent.initBindings(task,sp);
 
-        Stage window;
+        Stage window = new Stage();
         String windowTitle = "Viewpoint creation";
-        window = new Stage();
         window.setOnCloseRequest( event -> {
             window.close();
         } );
@@ -695,7 +698,7 @@ public class VPVMainPresenter implements Initializable {
             this.vpanalysispresenter.setModel(this.model);
             this.vpanalysispresenter.showVPTable();
             selectionModel.select(this.analysistab);
-            logger.trace("Finished factory.createViewPoints()");
+            logger.trace("Finished createViewPoints()");
             pbpresent.closeWindow();
         });
         task.setOnFailed(eh -> {
@@ -779,9 +782,8 @@ public class VPVMainPresenter implements Initializable {
 
     /**
      * Content of {@link Model} is written to platform-dependent default location.
-     *  @throws IOException caused by an error in serialization
      */
-    @FXML private void saveProject(ActionEvent e) throws IOException {
+    @FXML private void saveProject(ActionEvent e) {
        // Model.writeSettingsToFile(this.model);
         boolean result=serialize();
         if (result) { /* if it didnt work, the serialize method will show an error dialog. */
@@ -794,9 +796,9 @@ public class VPVMainPresenter implements Initializable {
     }
 
     /**
-     * @throws IOException caused by an error in serialization
+     * Save all of the data about the current analysis (project) to a serialized file.
      */
-    @FXML private void saveProjectAndClose() throws IOException {
+    @FXML private void saveProjectAndClose() {
         serialize();
         javafx.application.Platform.exit();
     }
@@ -856,7 +858,7 @@ public class VPVMainPresenter implements Initializable {
 
     @FXML public void openGeneWindowWithExampleHumanGenes() {
         File file = new File(getClass().getClassLoader().getResource("humangenesymbols.txt").getFile());
-        if (file==null) {
+        if (! file.exists()) {
             PopupFactory.displayError("Could not open example human gene list","Please report to developers");
             return;
         }
@@ -867,7 +869,7 @@ public class VPVMainPresenter implements Initializable {
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
         File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
-        if (file==null) {
+        if (! file.exists()) {
             PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
             return;
         }
@@ -878,7 +880,7 @@ public class VPVMainPresenter implements Initializable {
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
         File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
-        if (file==null) {
+        if (! file.exists()) {
             PopupFactory.displayError("Could not open example mouse gene list","Please report to developers");
             return;
         }
@@ -889,7 +891,7 @@ public class VPVMainPresenter implements Initializable {
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
         File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
-        if (file==null) {
+        if (! file.exists()) {
             PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
             return;
         }
@@ -908,7 +910,7 @@ public class VPVMainPresenter implements Initializable {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for exporting BED files.");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath()=="") {
+        if (file==null || file.getAbsolutePath().equals("")) {
             PopupFactory.displayError("Error","Could not get path to export BED files.");
             return;
         }
@@ -985,10 +987,6 @@ public class VPVMainPresenter implements Initializable {
         chooser.setTitle("Choose file path to save project file");
         File file = chooser.showSaveDialog(null);
         String path = file.getAbsolutePath();
-        if (path==null) {
-            PopupFactory.displayError("Error","Could not retrieve path to export project file");
-            return;
-        }
         serializeToLocation(path);
         logger.trace(String.format("Serialized file to %s",path));
         e.consume();
@@ -996,15 +994,27 @@ public class VPVMainPresenter implements Initializable {
 
     /** Open a project from a file specified by the user. */
     @FXML
-    public void openProject(ActionEvent e) {
+    public void importProject(ActionEvent e) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open VPV project file");
         File file = chooser.showOpenDialog(null);
-        if (file==null) { /** Null pointer returned if user clicks on cancel. In this case, just do nothing. */
+        if (file==null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;
         }
         try {
+            removePreviousValuesFromTextFields();
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
+            if (this.primaryStage!=null)
+                this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",
+                        model.getProjectName()));
+
+        this.vpanalysisview = new VPAnalysisView();
+        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
+        setInitializedValuesInGUI();
+
             setModelInMainAndInAnalysisPresenter(this.model);
             logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
         } catch (IOException ex) {
@@ -1020,11 +1030,11 @@ public class VPVMainPresenter implements Initializable {
         String genomeBuild=genomeChoiceBox.getValue();
         RegulatoryBuildDownloader regbuildDownloader = new RegulatoryBuildDownloader(genomeBuild);
         String basename=regbuildDownloader.getBaseName();
-        String url=null;
+        String url;
         try {
             url = regbuildDownloader.getURL();
         } catch (DownloadFileNotFoundException dfne) {
-            PopupFactory.displayError(String.format("Cannot generate Regulatory Exome for genome",genomeBuild),dfne.getMessage());
+            PopupFactory.displayError(String.format("Cannot generate Regulatory Exome for genome: %s",genomeBuild),dfne.getMessage());
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
@@ -1066,48 +1076,24 @@ public class VPVMainPresenter implements Initializable {
     @FXML
     public void buildRegulatoryExome(ActionEvent event) {
         event.consume();
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory to store regulatory exome BED file.");
-        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath()=="") {
-            logger.error("Could not set directory to write regulatory exome BED file.");
-            PopupFactory.displayError("Error","Could not get path to write regulatory exome BED file.");
+        if (!model.viewpointsInitialized()) {
+            PopupFactory.displayError("Viewpoints not initialized",
+                    "Please initialize viewpoints before exporting regulatory exome");
             return;
         }
-        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
-
-
-
-        ProgressPopup popup = new ProgressPopup("Exporting BED file...","Calculating and exporting regulatory gene panel BED file");
-        ProgressIndicator progressIndicator = popup.getProgressIndicator();
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model,progressIndicator);
-
+        if (! model.regulatoryBuildPathInitialized()) {
+            PopupFactory.displayError("Regulatory build path not initialized",
+                    "Please download the regulatory build file before exporting regulatory exome");
+            return;
+        }
         try {
-            builder.setOnFailed(e-> {
-                PopupFactory.displayError("Failure to build regulatory exome.",
-                        builder.getException().getMessage());
-                popup.close();
-            });
-            builder.setOnSucceeded(e -> {
-                try {
-                    logger.trace(String.format("Will output regulatory panel BED file to %s",file.getAbsolutePath()));
-                    builder.outputRegulatoryExomeBedFile(file.getAbsolutePath());
-                    Properties regulatoryProperties = builder.getRegulatoryReport();
-                    this.model.setRegulatoryExomeProperties(regulatoryProperties);
-                } catch (IOException ioe) {
-                    PopupFactory.displayException("Error","Could not write regulatory exome panel to file",ioe);
-                }
-                popup.close();
-            });
-            try {
-                popup.startProgress(builder);
-
-            } catch (InterruptedException e) {
-                PopupFactory.displayException("Error","Could not download regulatory build", e);
-            }
-
+            final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
+            logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
+            javafx.application.Platform.runLater(() -> {
+                        RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory);
+                    });
         } catch (Exception e) {
-            PopupFactory.displayException("Error","Could not create regulatory exome panel data",e);
+            PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
         }
         logger.trace("buildRegulatoryExome");
     }

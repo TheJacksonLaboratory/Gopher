@@ -76,6 +76,14 @@ of a repeat content of 73.75%. None of the reject fragments would be expected to
 	 VPV viewpoint for promoter 5 of the ZBTB16 gene.
 
 
+Zooming in and out
+~~~~~~~~~~~~~~~~~~
+It is possible to zoom in or out, which wiull expand or contract the region of the genome that is shown. Zooming
+can affect the number of fragments chosen --zooming out will cause any new fragments in the new win dow that
+satisty the filter criteria to be chosen. On the other hand, zooming in will cause fragments that are no longer visible to be
+deselected.
+
+
 Export BED file
 ~~~~~~~~~~~~~~~
 

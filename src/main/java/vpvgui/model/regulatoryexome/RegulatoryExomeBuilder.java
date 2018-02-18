@@ -4,12 +4,14 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 import vpvgui.exception.VPVException;
+import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -17,42 +19,46 @@ import java.util.zip.GZIPInputStream;
  * a regulatory exome build. We will create probes for all of the exons (including 5' and 3' UTRs) as well
  * as the regulatory elements in Ensembl that are sufficiently close to the transcription start site.
  * @author Peter Robinson
- * @version 0.1.1 (2017-11-11)
+ * @version 0.1.3 (2018-02-16)
  */
 public class RegulatoryExomeBuilder extends Task<Void> {
-    static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
+    private static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
     /** Path to regulatory build file, e.g., homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz */
-    private String pathToEnsemblRegulatoryBuild=null;
+    private final String pathToEnsemblRegulatoryBuild;
     /** Path to transcript definition file, refGene.txt.gz */
-    private String pathToRefGeneFile=null;
+    private final String pathToRefGeneFile;
 
-    private Model model=null;
+    private Model model;
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
-    private Set<RegulatoryBEDFileEntry> regulatoryElementSet=null;
+    private Set<RegulatoryBEDFileEntry> regulatoryElementSet;
     /** Maximum distance 3' (downstream) to TSS (genomicPos) to be included as a regulatory element.*/
     private int downstreamThreshold =10_000;
     /** Maximum distance 5' (upstream) to TSS (genomicPos) to be included as a regulatory element.*/
     private int upstreamThreshold=50_000;
     /** Reference to the progress indicator that will be shown while we are creating the elements and the BED file. */
-    ProgressIndicator progressInd =null;
+    private final ProgressIndicator progressInd;
 
     private int totalRegulatoryElements;
     private int chosenRegulatoryElements;
     private int totalExons;
+    private List<String> status=new ArrayList<>();
+    private final List<RegulationCategory> chosenCategories;
 
-    public RegulatoryExomeBuilder(Model model,ProgressIndicator pi) {
+    public RegulatoryExomeBuilder(Model model, List<RegulationCategory>  chosen, ProgressIndicator pi) {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
         this.regulatoryElementSet=new HashSet<>();
         this.progressInd=pi;
-        logger.trace(String.format("We will create regulatory build from %s and %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile));
+        chosenCategories=chosen;
+        String msg = String.format("We will create regulatory build from %s and %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile);
+        logger.trace(msg);
+        status.add(msg);
     }
 
-    /** @return map of active viewpoints arranged according to chromosome so that we can quickly find them when we
-     * are screening regulatory elements (which are arranged according to chromosome.
-     * @param model
+    /**
+     * @param model reference to the {@link Model} object
      * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
      */
     private Map<String,List<ViewPoint>> getChrom2PosListMap(Model model) {
@@ -60,10 +66,10 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
         Map<String,List<ViewPoint>> chrom2posListMap=new HashMap<>();
-        activeVP.stream().forEach(viewPoint -> {
+        activeVP.forEach(viewPoint -> {
             String chrom=viewPoint.getReferenceID();
             chrom=chrom.replaceAll("chr",""); // remove the chr from chr1 etc.
-            List<ViewPoint> vplist=null;
+            List<ViewPoint> vplist;
             if (chrom2posListMap.containsKey(chrom)) {
                 vplist=chrom2posListMap.get(chrom);
             } else {
@@ -75,14 +81,31 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         return chrom2posListMap;
     }
 
+
+    private void checkOverlap(List<RegulatoryBEDFileEntry> elementlist) {
+        RegulatoryBEDFileEntry currententry=null;
+        logger.info("Checking overlap of entries for regulatory exome");
+        for (RegulatoryBEDFileEntry entry : elementlist) {
+            if (entry.overlaps(currententry)) {
+                logger.info(entry.toString() + " overlaps " + currententry.toString());
+            }
+            currententry=entry;
+        }
+        logger.info("Done overlap check");
+    }
+
+
+
+
+
     public void outputRegulatoryExomeBedFile(String directoryPath) throws IOException {
         String name = this.model.getProjectName();
         String fullpath = String.format("%s%s%s-regulatoryExomePanel.bed", directoryPath, File.separator, name);
+        status.add("Exporting to " + fullpath);
         // sort the elements
-        List<RegulatoryBEDFileEntry> lst = new ArrayList<>();
-        lst.addAll(regulatoryElementSet);
+        List<RegulatoryBEDFileEntry> lst = new ArrayList<>(regulatoryElementSet);
         Collections.sort(lst);
-
+        checkOverlap(lst);
         logger.trace(String.format("We will export reg build to %s",fullpath ));
         BufferedWriter writer = new BufferedWriter(new FileWriter(fullpath));
         for (RegulatoryBEDFileEntry rentry : lst) {
@@ -94,15 +117,15 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /**
      * Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here.
      */
-    private void collectExonsFromTargetGenes() throws Exception {
+    private void collectExonsFromTargetGenes() throws VPVException,IOException {
         Map<String, ViewPoint> vpmap = new HashMap<>();
-        updateProgress(0.50);
+        updateProgress(0.05);
         int j=0;
-        int totalgenes=vpmap.size();
         for (ViewPoint vp : this.model.getActiveViewPointList()) {
             vpmap.put(vp.getAccession(), vp);
         }
-
+        int totalgenes=vpmap.size();
+        status.add(String.format("%d genes for regulatory exome",totalgenes));
 
         InputStream fileStream = new FileInputStream(this.pathToRefGeneFile);
         InputStream gzipStream = new GZIPInputStream(fileStream);
@@ -122,7 +145,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             if (chrom.contains("random")) {
                 continue;
             } /* do not take gene models on random contigs. */
-            String strand = A[3];
+            //String strand = A[3];
             String[] beginnings = A[9].split(",");
             String[] endings = A[10].split(","); // exon begins and ends.
             String name2=A[12];
@@ -139,21 +162,28 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
                 this.regulatoryElementSet.add(regentry);
             }
-            updateProgress((0.5 + (double)++j/(double)totalgenes));
-
+            updateProgress((0.5D + ++j/(double)totalgenes));
         }
         br.close();
 
     }
 
 
-
+    public String getStatus() {
+        return status.stream().collect(Collectors.joining("\n"));
+    }
 
 
     /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
-    protected Void call() {
+    protected Void call() throws VPVException {
         Map<String,List<ViewPoint>> chrom2vpListMap=getChrom2PosListMap(model);
+        if (chrom2vpListMap.size()==0) {
+                PopupFactory.displayError("No Viewpoints chosen",
+                        "Create view points before exporting regulatory bed file");
+
+            return null;
+        }
         int n_genesTimesTen=model.getVPVGeneList().size()*10;
         int j=0;
         //read in the regulatory build and save the intervals that are in the right place.
@@ -164,6 +194,9 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             parser.initGzipReader();
             while (parser.hasNext()) {
                 RegulatoryElement elem = parser.next();
+                if (! chosenCategories.contains(elem.getCategory())) {
+                    continue; // only inlcude the chosen regulatory categories
+                }
                 totalRegulatoryElements++;
                 String chrom=elem.getChrom();
                 if (! chrom2vpListMap.containsKey(chrom)) {
@@ -184,10 +217,12 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             }
             parser.close();
             collectExonsFromTargetGenes();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            String msg = String.format("Could not input regulatory elements: %s",e.getMessage());
+            status.add(msg);
+            throw new VPVException(msg);
         }
-        logger.trace(String.format("We got %d regulatory elemenets",regulatoryElementSet.size()));
+        logger.trace(String.format("We got %d regulatory elements",regulatoryElementSet.size()));
         return null;
     }
 
@@ -197,28 +232,28 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      * @param pr Current progress.
      */
     private void updateProgress(double pr) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override public void run() {
-                if (progressInd ==null) {
-                    // do nothing
-                    return;
-                }
+        if (progressInd ==null) {
+            return; // do nothing
+        }
+        javafx.application.Platform.runLater(()-> {
                 progressInd.setProgress(pr);
-            }
         });
     }
 
-
+    /** This information will be used in the "report" dialog that gives the User feedbqck about the data and the chosen
+     * viewpoints
+     * @return key-value property pairs with information about the regulatory panel.
+     */
     public Properties getRegulatoryReport() {
         Properties props = new Properties();
         props.setProperty("Regulatory exome downstream distance threshold", String.valueOf(downstreamThreshold));
         props.setProperty("Regulatory exome upstream distance threshold", String.valueOf(upstreamThreshold));
-        props.setProperty("pathToEnsemblRegulatoryBuild",pathToEnsemblRegulatoryBuild);
-        props.setProperty("totalRegulatoryElements", String.valueOf(totalRegulatoryElements));
-        props.setProperty("chosenRegulatoryElements",String.valueOf(chosenRegulatoryElements));
-        props.setProperty("totalExons", String.valueOf(totalExons));
+        props.setProperty("path to Ensembl regulatory build",pathToEnsemblRegulatoryBuild);
+        props.setProperty("total regulatory elements", String.valueOf(totalRegulatoryElements));
+        props.setProperty("chosen regulatory elements",String.valueOf(chosenRegulatoryElements));
+        props.setProperty("total exons", String.valueOf(totalExons));
         int totalUniqueExons = this.regulatoryElementSet.size()-chosenRegulatoryElements;
-        props.setProperty("totalUniqueExons(ToDo check this calculation)", String.valueOf(totalUniqueExons));
+        props.setProperty("total chosen exons ", String.valueOf(totalUniqueExons));
         return props;
     }
 
