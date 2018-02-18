@@ -109,8 +109,6 @@ public class GenomeGunZipper extends Task<Void>  {
                     // If the files begin with "chroms", the direc
                     String filename=entry.getName();
                     filename=filename.replaceAll("^\\./","");
-                    logger.trace("Extracting tar archive element: "+ filename);
-                    logger.trace("Genome = "+ genome.toString());
                     if (genome.isCanonicalChromosome(filename)) {
                         logger.trace("Including chromosome "+ filename + " in output file");
                     } else {

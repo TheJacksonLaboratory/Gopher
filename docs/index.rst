@@ -1,17 +1,22 @@
+.. VPV documentation master file, created by
+sphinx-quickstart on Sun Sep 24 12:02:05 2017.
+You can adapt this file completely to your liking, but it should at least
+contain the root `toctree` directive.
+
 Welcome to VPV's documentation!
 ===============================
 .. toctree::
-	:maxdepth: 2
-	:caption: Contents:
+   :maxdepth: 2
+   :caption: Contents:
 
-	CHC	
-	installation
-	setup
-	parameters
-	designparameters	  
-	running
-	output
- Regulatory Exome <regulatoryexome>
+   CHC
+   installation
+   setup
+   parameters
+   designparameters
+   running
+   output
+   Regulatory Exome <regulatoryexome>
 
 ViewPointViewer (VPV)
 ~~~~~~~~~~~~~~~~~~~~~
