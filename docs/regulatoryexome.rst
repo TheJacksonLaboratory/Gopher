@@ -2,7 +2,13 @@ Regulatory Exome
 ================
 VPV can  generate a
 BED file with target definitions designed to generate a gene-panel with exons and regulatory features that can
-be used in conjunction with the capture Hi-C probe set. After creating a capture Hi-C panel (set of viewpoints),
+be used in conjunction with the capture Hi-C probe set. The regulatory regions are derived from the
+Ensembl regulatory build: https://useast.ensembl.org/info/genome/funcgen/regulatory_build.html.
+
+
+
+
+After creating a capture Hi-C panel (set of viewpoints),
 users can export a BED file with definitions for a matching "regulatory exome" using the ``Exome`` menu.
 
  .. figure:: img/VPVexomeMenu.png

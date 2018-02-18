@@ -80,7 +80,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML private TableColumn<ColoredSegment, String> repeatContentDownColumn;
     @FXML private TableColumn<ColoredSegment, String> gcContentUpColumn;
     @FXML private TableColumn<ColoredSegment, String> gcContentDownColumn;
-    @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
+   // @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
     @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
     @FXML private Button deleteButton;
@@ -113,7 +113,9 @@ public class ViewPointPresenter implements Initializable {
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
         Platform.runLater(() -> {
-            tab.getTabPane().getTabs().remove(tab);
+            tab.setDisable(true);
+            this.tab.getTabPane().getTabs().remove(this.tab);
+            this.analysisPresenter.refreshVPTable();
         });
     }
 
@@ -130,6 +132,7 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML private void deleteThisViewPoint(Event e) {
         this.model.deleteViewpoint(this.vp);
+        tab.setDisable(true);
         this.tab.getTabPane().getTabs().remove(this.tab);
         this.analysisPresenter.refreshVPTable();
         e.consume();
@@ -563,7 +566,7 @@ public class ViewPointPresenter implements Initializable {
         String genome = this.model.getGenomeBuild();
         String chromosome = this.vp.getReferenceID();
         List<String> colorsegmentlist = coloredsegments.stream().
-                filter(c -> c.isSelected()).
+                filter(ColoredSegment::isSelected).
                 map( c -> String.format("%s.%s%%3A%d-%d%s",
                         genome,
                         chromosome,
@@ -592,7 +595,7 @@ public class ViewPointPresenter implements Initializable {
             this.checkBox = new CheckBox();
         }
 
-        public CheckBox getCheckBox() {
+        CheckBox getCheckBox() {
             return checkBox;
         }
 
