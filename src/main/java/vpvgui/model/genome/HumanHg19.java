@@ -28,8 +28,6 @@ public class HumanHg19 extends Genome implements Serializable {
     }
     @Override
     protected void init() {
-        chromosomeFileNames=new HashSet<>();
-        valid=new HashSet<>();
         Arrays.stream(chromosomes).forEach(s -> {
             valid.add(s);
             chromosomeFileNames.add(String.format("%s.fa",s));
