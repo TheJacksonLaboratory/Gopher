@@ -88,7 +88,7 @@ This dialog allows users to choose the genes whose promoter regions will be enri
 
 VPV will search for fragments for each transcription start site (TSS) of the indicated genes. VPV will search for fragments located within (Upstream size) base pairs 5' ot the TSS and
 (Downstream size) base pairs 3' of the fragment (5' and 3' are understood with respect to the orientation of transcription of the gene). Fragments are allowed to overlap the upstream downstream boundaries.
-Depending on which restriction enzyme is used the upstream and downstream size have to be set appropriately. The default values -5000 and +1500 are suitable for DpnII, but for enzyme that produce longer fragments such as HindIII larger values should be selected.
+Depending on which restriction enzyme is used the upstream and downstream size have to be set appropriately. The default values -5000 and +1500 are suitable for DpnII, but for enzymes that produce longer fragments such as HindIII larger values should be selected.
 Fragments must have a certain minimum size to be efficiently enriched in capure Hi-C. 120 nucleotides is a good default value for current capture technologies. Additionally, fragments must not exceed a certain repeat content and must
 have a GC content that lies within a certain range to allow accurate mapping and efficient capture and sequencing. Current design "wizards" will not allow fragments that are outside of this range. VPV will therefore choose only those
 fragments that fulfil these criteria. Users may set these criteria to their maximum values to allow the design wizard to make the final decision on the fragments (then, all fragments within the indicate location will be chosen by VPV).
