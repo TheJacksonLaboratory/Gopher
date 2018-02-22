@@ -65,7 +65,7 @@ This dialog allows users to choose the genes whose promoter regions will be enri
 
 * Other parameters
 
-  There are six parameters that can be adjusted. XX
+  There are six parameters that can be adjusted.
 
 
 +-----------------------+--------------------------------------------------------------------------------+
