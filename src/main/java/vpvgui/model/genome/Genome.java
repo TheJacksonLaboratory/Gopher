@@ -18,13 +18,13 @@ import java.util.Set;
 public abstract class Genome implements Serializable {
     private static Logger logger = Logger.getLogger(Genome.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 2L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */
     private String pathToGenomeDirectory=null;
     /** Basename of the compressed genome file that we will store to disk */
     protected static final String localFilename = "chromFa.tar.gz";
     /** The valid chromosomes for the current genome build. (will be initialized from the subclasses).*/
-    protected  Set<String> valid=null;
+    protected Set<String> valid=null;
     /** Set of base chromosome file names for canonical chromosomes. For instnace, "chr1.fa", but not "chr1random12432.fa" .*/
     protected Set<String> chromosomeFileNames;
     /** This is the name of the file we download from UCSC for any of the genomes. */
@@ -72,6 +72,8 @@ public abstract class Genome implements Serializable {
      * when the genome is downloaded (or a path to a pre-existing file is provided).
      */
     public Genome() {
+        chromosomeFileNames=new HashSet<>();
+        valid=new HashSet<>();
         init();
     }
 
@@ -88,7 +90,6 @@ public abstract class Genome implements Serializable {
     /** @return true if the chromFar.tar.gz file is found in the indicated directory. */
     protected boolean gZippedGenomeFileDownloaded() {
         File f = new File(this.pathToGenomeDirectory + File.separator + getGenomeBasename());
-        logger.trace(String.format("Checking existing of file %s",f.getAbsolutePath()));
         return (f.exists() && !f.isDirectory());
     }
 
@@ -98,26 +99,11 @@ public abstract class Genome implements Serializable {
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
 
     /**
-     * @return true if the genome files have been previously downloaded to the indicated path.
+     * @return true if the genome file has been previously downloaded to the indicated path.
      */
     public boolean checkDownloadComplete(String path) {
         this.pathToGenomeDirectory = path;
-        if (gZippedGenomeFileDownloaded()) {
-            return true; // i.e., we found the chromFa.tar.gz file
-        }
-        logger.trace("Did not find chromFa.tar.gz. Will check for individual unpacked files.");
-        // Now look for the unpacked files (the user may have deleted chromFa.tar.gz)
-        return alreadyExtracted();
-    }
-
-    /**
-     * We use this method to check if we need to g-unzip the genome files. (We only check for the
-     * presence of chr1.fa--this will break if species without chr1 are analyzed).
-     * @return true if the chromFGa.tar.gz file has been previously extracted
-     */
-    private  boolean alreadyExtracted(String path) {
-        File f = new File(path + File.separator + "chr1.fa");
-        return f.exists();
+        return gZippedGenomeFileDownloaded();
     }
 
     /**
@@ -155,6 +141,13 @@ public abstract class Genome implements Serializable {
 
     public abstract int getNumberOfCanonicalChromosomes();
 
-    public abstract boolean isCanonicalChromosome(String filename);
+    public boolean isCanonicalChromosome(String filename) {
+        int i = filename.lastIndexOf("/");
+        if (i>0 && filename.length()>i) { filename = filename.substring(i+1); }
+        if (filename.startsWith("chroms/")) {
+            filename=filename.substring(7);
+        }
+        return chromosomeFileNames.contains(filename);
+    }
 
 }

@@ -12,8 +12,8 @@ import javax.swing.*;
  * This class makes URLs for displaying the viewpoints.
  * The URLs need to be different for each organism since each organism has a different
  * selection of data.
- * @author Peter Robinson
- * @version 0.1.1 (2017-12-01)
+ * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
+ * @version 0.1.2 (2018-02-19)
  */
 public class URLMaker {
     private static final Logger logger = Logger.getLogger(URLMaker.class.getName());
@@ -52,7 +52,6 @@ public class URLMaker {
             url = String.format("%s&%s",url,getURLFragmentMm10());
         }
         return url;
-
     }
 
 
@@ -65,41 +64,33 @@ public class URLMaker {
             url = String.format("%s&%s",url,getURLFragmentHg38());
         }  else if (this.genomebuild.equals("mm9")) {
             url = String.format("%s&%s",url,getURLFragmentMm9());
+        } else if (this.genomebuild.equals("mm10")) {
+            url=String.format("%s&%s",url,getURLFragmentMm10());
         }
+        logger.trace(String.format("URL for UCSC %s", url));
         return url;
     }
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg19() {
-        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+        return "gc5Base=full&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
     }
 
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg38() {
-        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
+        return "gc5Base=full&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm9() {
-        return "knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEST=hide&snp128=hide&oreganno=full";
+        return "gc5Base=full&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full";
     }
 
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm10() {
-        return "knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEST=hide&snp128=hide&oreganno=full";
+        return "gc5Base=full&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
     }
 
 
     /**
-     * OLD KIND OF URL
-     * {@code http://genome.ucsc.edu/cgi-bin/hgRenderTracks?db=hg19&position=chr3%3A189344251-189352061&hgFind.matches=TP63&highlight=hg19.chr3%3A189344451-189345117%23F08080%7Chg19.chr3%3A189346090-189346609%23ABEBC6%7Chg19.chr3%3A189347116-189348942%23FFA07A%7Chg19.chr3%3A189348942-189349556%23C39BD3%7Chg19.chr3%3A189349556-189350268%23F7DC6F%7Chg19.chr3%3A189350268-189350584%23F08080%7Chg19.chr3%3A189350584-189350934%23ABEBC6%7Chg19.chr3%3A189351345-189351861%23FFA07A&pix=1400}
-     * We want to add the tracks for
-     * <ol>
-     *     <li>H3K27ac</li>
-     *     <li>DnaIHypersensitivity</li>
-     *     <li>TranscriptionFactorCHipseq</li>
-     *     <li>100 vertebrate conservatoin</li>
-     *     <li>multiZ alignments</li>
-     *     <li>repeats</li>
-     * </ol>
      * This is how: {@code hideTracks=1&<trackName>=full|dense|pack|hide}
      * @param vp The {@link ViewPoint} object to be displayed on the UCSC browser
      * @param trackType either "hgTracks" (interactive browser) or "hgRenderTracks" (static image)
