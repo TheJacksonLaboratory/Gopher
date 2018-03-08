@@ -98,9 +98,9 @@ public class SegmentFactoryTest {
 
     @Test
     public void testMaxDistToGenomicPos() {
-        Integer expected = maxDistToGenomicPosUp;
+        Integer expected = maxDistToGenomicPosUp*3;
         Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
-        expected = maxDistToGenomicPosDown;
+        expected = maxDistToGenomicPosDown*3;
         Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
     }
 
