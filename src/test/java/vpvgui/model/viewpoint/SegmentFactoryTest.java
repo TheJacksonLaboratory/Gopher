@@ -98,9 +98,9 @@ public class SegmentFactoryTest {
 
     @Test
     public void testMaxDistToGenomicPos() {
-        Integer expected = maxDistToGenomicPosUp;
+        Integer expected = maxDistToGenomicPosUp*3;
         Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
-        expected = maxDistToGenomicPosDown;
+        expected = maxDistToGenomicPosDown*3;
         Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
     }
 
@@ -145,8 +145,8 @@ public class SegmentFactoryTest {
 
         int offset=0; // for ^GATC
         for (Integer pos:gatcsites) {
-           // System.out.println("^GATC sites: " +pos);
-            if (pos >= genomicPos - maxDistUp) {
+            //System.out.println("^GATC sites: " + pos);
+            if (pos >= genomicPos - maxDistUp*3) {
                 adjustedGatcSitesOffsetZero.add(pos);
             }
         }

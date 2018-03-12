@@ -16,10 +16,10 @@ public class MouseMm9 extends Genome implements Serializable {
             "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chrX", "chrY"};
 
 
-    public MouseMm9(String directoryPath) {
-        super(directoryPath);
-        init();
-    }
+//    public MouseMm9(String directoryPath) {
+//        super(directoryPath);
+//        init();
+//    }
 
     public MouseMm9() {
         super();
@@ -30,6 +30,7 @@ public class MouseMm9 extends Genome implements Serializable {
     protected void init() {
         Arrays.stream(chromosomes).forEach(s -> {
             valid.add(s);
+            chromosomeFileNames.add(String.format("%s.fa",s));
         });
     }
 
@@ -43,7 +44,4 @@ public class MouseMm9 extends Genome implements Serializable {
     public String getGenomeBasename(){return genomeBasename;}
     @Override
     public  int getNumberOfCanonicalChromosomes() { return chromosomes.length; }
-    @Override  public boolean isCanonicalChromosome(String filename) {
-        return true;
-    }
 }
