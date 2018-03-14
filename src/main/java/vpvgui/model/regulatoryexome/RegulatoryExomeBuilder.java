@@ -7,6 +7,7 @@ import vpvgui.exception.VPVException;
 import vpvgui.gui.popupdialog.PopupFactory;
 import vpvgui.io.GeneRegGTFParser;
 import vpvgui.model.Model;
+import vpvgui.model.viewpoint.Segment;
 import vpvgui.model.viewpoint.ViewPoint;
 
 import java.io.*;
@@ -165,8 +166,27 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             updateProgress((0.5D + ++j/(double)totalgenes));
         }
         br.close();
-
     }
+
+    /** Add all fragments from all view points to our regulatory panel. The intention of this is that we would like to
+     * enrich the DNA of all segments we are investigating in the capture HiC, in addition to the elements from the
+     * Ensembl regulatory build. This will allow us to sequence things like variants in promotoers and UTRs.
+     */
+    private void collectViewPointsFromHiCPanel() {
+        for (ViewPoint vp : this.model.getViewPointList()) {
+            String vpRefId=vp.getReferenceID();
+            for (Segment seg : vp.getAllSegments()) {
+                int b = seg.getStartPos();
+                int e = seg.getEndPos();
+                String chrom = seg.getReferenceSequenceID();
+                String name=String.format("viewpoint%s_%s:%d-%d",vpRefId,chrom,b,e);
+                RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
+                this.regulatoryElementSet.add(regentry);
+            }
+        }
+    }
+
+
 
 
     public String getStatus() {
@@ -216,7 +236,12 @@ public class RegulatoryExomeBuilder extends Task<Void> {
                 }
             }
             parser.close();
-            collectExonsFromTargetGenes();
+            if (chosenCategories.contains(RegulationCategory.EXON)) {
+                collectExonsFromTargetGenes();
+            }
+            if (chosenCategories.contains(RegulationCategory.VIEWPOINT)) {
+                collectViewPointsFromHiCPanel();
+            }
         } catch (IOException e) {
             String msg = String.format("Could not input regulatory elements: %s",e.getMessage());
             status.add(msg);

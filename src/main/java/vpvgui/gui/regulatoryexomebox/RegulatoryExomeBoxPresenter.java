@@ -19,21 +19,21 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class RegulatoryExomeBoxPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(EnzymeBoxPresenter.class.getName());
+    private static Logger logger = Logger.getLogger(EnzymeBoxPresenter.class.getName());
     @FXML private Label label;
     @FXML private VBox regulatoryVBox;
     @FXML private Button okButton;
 
-    private static List<CheckBox> boxlist;
-    private static int count;
-    private static List<RegulationCategory> chosen = null;
-    private static Map<String,RegulationCategory> categories;
+    private List<CheckBox> boxlist;
+    private int count;
+    private List<RegulationCategory> chosen = null;
+    private Map<String,RegulationCategory> categories;
     private Consumer<vpvgui.framework.Signal> signal;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.boxlist = new ArrayList<>();
-        this.categories = new HashMap<>();
+        this.categories = new LinkedHashMap<>();
         for (RegulationCategory rc : RegulationCategory.values()) {
             categories.put(rc.toString(),rc);
         }
@@ -44,7 +44,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
         });
     }
 
-    public void initializeCategories() {
+    private void initializeCategories() {
         for (RegulationCategory rc : categories.values()) {
             String label = rc.toString();
             CheckBox cb = new CheckBox(label);
@@ -65,7 +65,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
     }
 
 
-    public List<RegulationCategory> getChosenCategories() {
+    List<RegulationCategory> getChosenCategories() {
         logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
         return this.chosen;
     }
@@ -74,7 +74,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
      * This gets called every time the use chooses or deselects an enzyme. It resets and fills the
      * set {@link #chosen}, which can then be retrieved using {@link #getChosenCategories()}.
      *
-     * @param category
+     * @param category One of the enumeration constants in {@link RegulationCategory}.
      */
     private void handle(String category) {
         this.chosen = new ArrayList<>();
