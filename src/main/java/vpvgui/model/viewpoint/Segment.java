@@ -209,7 +209,7 @@ public class Segment implements Serializable {
         }
     }
 
-
+    public String getReferenceSequenceID() { return referenceSequenceID; }
     /**
      * This function returns the repeat content calculated by the function {@link #calculateGCandRepeatContent}.
      * @return repeat content of this segment.
