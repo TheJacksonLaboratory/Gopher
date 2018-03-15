@@ -16,13 +16,13 @@ package vpvgui.model.regulatoryexome;
  */
 public enum RegulationCategory {
     PROMOTER("Promoters"),
-    PROMOTER_FLANKING_REGION("Promoter-flanking regions"),
+    PROMOTER_FLANKING_REGION("Promoter-flanking-regions"),
     ENHANCER("Enhancers"),
-    OPEN_CHROMATIN("Open chromatins"),
-    CTCF_BINDING_SITE("CTCF binding sites"),
-    TF_BINDING_SITE("Transcription factor binding sites"),
-    EXON("Exons of target genes"),
-    VIEWPOINT("Viewpoints of target genes");
+    OPEN_CHROMATIN("Open-chromatins"),
+    CTCF_BINDING_SITE("CTCF-binding-sites"),
+    TF_BINDING_SITE("Transcription-factor-binding-sites"),
+    EXON("Exons-of-target-genes"),
+    VIEWPOINT("Viewpoints-of-target-genes");
 
     private final String name;
 
