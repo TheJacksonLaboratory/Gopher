@@ -168,21 +168,15 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         br.close();
     }
 
-    /** Add all fragments from all view points to our regulatory panel. The intention of this is that we would like to
+    /** Add all viewpoints to our regulatory panel. The intention of this is that we would like to
      * enrich the DNA of all segments we are investigating in the capture HiC, in addition to the elements from the
      * Ensembl regulatory build. This will allow us to sequence things like variants in promotoers and UTRs.
      */
     private void collectViewPointsFromHiCPanel() {
         for (ViewPoint vp : this.model.getViewPointList()) {
-            String vpRefId=vp.getReferenceID();
-            for (Segment seg : vp.getAllSegments()) {
-                int b = seg.getStartPos();
-                int e = seg.getEndPos();
-                String chrom = seg.getReferenceSequenceID();
-                String name=String.format("viewpoint%s_%s:%d-%d",vpRefId,chrom,b,e);
-                RegulatoryBEDFileEntry regentry = new RegulatoryBEDFileEntry(chrom,b,e,name);
-                this.regulatoryElementSet.add(regentry);
-            }
+            String name=String.format("viewpoint%s_%s:%d-%d",vp.getReferenceID(),vp.getReferenceID(),vp.getStartPos(),vp.getEndPos());
+            RegulatoryBEDFileEntry VPentry = new RegulatoryBEDFileEntry(vp.getReferenceID(),vp.getStartPos(),vp.getEndPos(),name);
+            this.regulatoryElementSet.add(VPentry);
         }
     }
 
