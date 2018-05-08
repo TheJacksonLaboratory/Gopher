@@ -25,358 +25,404 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
-   <content>
-      <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0" minWidth="830.0" stylesheets="@gophermain.css">
-         <top>
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
+    <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0"
+                minWidth="830.0" stylesheets="@gophermain.css">
+        <top>
             <HBox maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-               <children>
-                  <MenuBar HBox.hgrow="NEVER">
-                    <menus>
-                      <Menu mnemonicParsing="false" text="File">
-                        <items>
-                              <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New" />
-                              <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" />
-                              <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..." />
-                              <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
-                              <MenuItem fx:id="exportBEDFilesMenuItem" mnemonicParsing="false" onAction="#exportBEDFiles" text="Export BED files ..." />
-                              <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
-                          <MenuItem fx:id="close" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
-                        </items>
-                      </Menu>
-                      <Menu mnemonicParsing="false" text="Edit">
-                        <items>
-                              <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
-                              <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
-                        </items>
-                      </Menu>
-                        <Menu mnemonicParsing="false" text="Design parameters">
-                          <items>
-                            <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length" />
-                              <Menu mnemonicParsing="false" text="Set Tiling Factor">
-                                <items>
-                                    <RadioMenuItem fx:id="tiling1" mnemonicParsing="false" text="1" />
-                                    <RadioMenuItem fx:id="tiling2" mnemonicParsing="false" text="2" />
-                                    <RadioMenuItem fx:id="tiling3" mnemonicParsing="false" text="3" />
-                                    <RadioMenuItem fx:id="tiling4" mnemonicParsing="false" text="4" />
-                                    <RadioMenuItem fx:id="tiling5" mnemonicParsing="false" text="5" />
-                                </items>
-                              </Menu>
-                              <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
-                              <Menu mnemonicParsing="false" text="Set margin strategy">
-                                <items>
-                                    <RadioMenuItem fx:id="singleMarginRadioMenuitem" mnemonicParsing="false" text="allow single margin" />
-                                    <RadioMenuItem fx:id="bothMarginsRadioMenuitem" mnemonicParsing="false" text="require both margins" />
-                                </items>
-                              </Menu>
-                          </items>
+                <MenuBar HBox.hgrow="NEVER">
+                    <Menu mnemonicParsing="false" text="File">
+                        <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New"/>
+                        <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project"/>
+                        <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..."/>
+                        <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..."/>
+                        <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files As ..."/>
+                        <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs"
+                                  text="Save digest file As ..."/>
+                        <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose"
+                                  text="Save project and close"/>
+                        <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Close"/>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Edit">
+                        <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject"
+                                  text="Show settings of current project"/>
+                        <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles"
+                                  text="Delete project files ..."/>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Design parameters">
+                        <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length"/>
+                        <Menu mnemonicParsing="false" text="Set Tiling Factor">
+                            <RadioMenuItem fx:id="tiling1" mnemonicParsing="false" text="1"/>
+                            <RadioMenuItem fx:id="tiling2" mnemonicParsing="false" text="2"/>
+                            <RadioMenuItem fx:id="tiling3" mnemonicParsing="false" text="3"/>
+                            <RadioMenuItem fx:id="tiling4" mnemonicParsing="false" text="4"/>
+                            <RadioMenuItem fx:id="tiling5" mnemonicParsing="false" text="5"/>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Proxy">
-                          <items>
-                              <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
-                          </items>
+                        <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size"/>
+                        <Menu mnemonicParsing="false" text="Set margin strategy">
+                            <RadioMenuItem fx:id="singleMarginRadioMenuitem" mnemonicParsing="false"
+                                           text="allow single margin"/>
+                            <RadioMenuItem fx:id="bothMarginsRadioMenuitem" mnemonicParsing="false"
+                                           text="require both margins"/>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Log">
-                          <items>
-                            <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
-                          </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Proxy">
+                        <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy"/>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Log">
+                        <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log"/>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Exome">
+                        <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData"
+                                  text="Download Regulation Data"/>
+                        <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome"
+                                  text="Build regulatory exome"/>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Report">
+                        <MenuItem mnemonicParsing="false" onAction="#displayReport"
+                                  text="Display report"/>
+                        <MenuItem mnemonicParsing="false" onAction="#exportReport"
+                                  text="Export report"/>
+                    </Menu>
+                </MenuBar>
+                <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar"
+                        HBox.hgrow="ALWAYS"/>
+                <MenuBar nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
+                    <Menu mnemonicParsing="false" text="Help">
+                        <MenuItem mnemonicParsing="false" onAction="#showHelpWindow"
+                                  text="Help"/>
+                        <Menu mnemonicParsing="false" text="Example gene sets">
+                            <MenuItem mnemonicParsing="false"
+                                      onAction="#openGeneWindowWithExampleHumanGenes" text="human"/>
+                            <MenuItem mnemonicParsing="false"
+                                      onAction="#openGeneWindowWithExampleMouseGenes" text="mouse"/>
+                            <MenuItem mnemonicParsing="false"
+                                      onAction="#openGeneWindowWithExampleRatGenes" text="rat"/>
+                            <MenuItem mnemonicParsing="false"
+                                      onAction="#openGeneWindowWithExampleFlyGenes" text="fly"/>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Exome">
-                          <items>
-                              <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData" text="Download Regulation Data" />
-                            <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
-                          </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Report">
-                          <items>
-                            <MenuItem fx:id="displayReport" mnemonicParsing="false" onAction="#displayReport" text="Display report" />
-                              <MenuItem fx:id="exportReport" mnemonicParsing="false" onAction="#exportReport" text="Export report" />
-                          </items>
-                        </Menu>
-                    </menus>
-                  </MenuBar>
-                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />
-                  <MenuBar nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
-                    <menus>
-                      <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
-                        <items>
-                              <MenuItem fx:id="helpMenuItem" mnemonicParsing="false" onAction="#showHelpWindow" text="Help" />
-                              <Menu mnemonicParsing="false" text="Example gene sets">
-                                <items>
-                                    <MenuItem fx:id="openHumanGeneWindow" mnemonicParsing="false" onAction="#openGeneWindowWithExampleHumanGenes" text="human" />
-                                  <MenuItem fx:id="openMouseGeneWindow" mnemonicParsing="false" onAction="#openGeneWindowWithExampleMouseGenes" text="mouse" />
-                                    <MenuItem fx:id="openRatGeneWindow" mnemonicParsing="false" onAction="#openGeneWindowWithExampleRatGenes" text="rat" />
-                                    <MenuItem fx:id="openFlyGeneWindow" mnemonicParsing="false" onAction="#openGeneWindowWithExampleFlyGenes" text="fly" />
-                                </items>
-                              </Menu>
-                          <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
-                        </items>
-                      </Menu>
-                    </menus>
-                  </MenuBar>
-               </children>
+                        <MenuItem mnemonicParsing="false" onAction="#about" text="About"/>
+                    </Menu>
+                </MenuBar>
             </HBox>
-         </top>
-         <center>
+        </top>
+        <center>
             <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0" BorderPane.alignment="CENTER">
-              <tabs>
                 <Tab id="setuptab" fx:id="setuptab" closable="false" text="Set up">
-                  <content>
-                        <VBox alignment="TOP_CENTER" fillWidth="false">
-                           <children>
-                              <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
-                                <columnConstraints>
-                                  <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
-                                    <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="160.0" prefWidth="160.0" />
-                                    <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
-                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="420.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                    <RowConstraints minHeight="50.0" />
-                                    <RowConstraints minHeight="50.0" />
-                                    <RowConstraints minHeight="50.0" />
-                                  <RowConstraints minHeight="50.0" />
-                                  <RowConstraints minHeight="50.0" />
-                                    <RowConstraints minHeight="50.0" />
-                                    <RowConstraints minHeight="50.0" />
-                                    <RowConstraints minHeight="50.0" />
-                                </rowConstraints>
-                                 <children>
-                                    <Label text="Approach">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Genome build" GridPane.rowIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Genome" GridPane.rowIndex="2">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Decompress genome" GridPane.rowIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Index Genome FASTA" GridPane.rowIndex="4">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Restriction enzyme(s)" GridPane.rowIndex="6">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Target genes" GridPane.rowIndex="7">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></ChoiceBox>
-                                    <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0" stylesheets="@gophermain.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </ChoiceBox>
-                                    <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <Button fx:id="decompressGenomeButton" mnemonicParsing="false" onAction="#decompressGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                    <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                    <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                    <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                    <Label fx:id="approachLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="downloadedGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="decompressGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                    <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="7">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></Label>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                              </GridPane>
-                              <Separator minHeight="50.0" minWidth="830.0" styleClass="grid" />
-                              <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
-                                <columnConstraints>
-                                    <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
-                                  <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0" />
-                                  <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0" />
-                                    <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="40.0" />
-                                    <RowConstraints minHeight="40.0" />
-                                    <RowConstraints minHeight="40.0" />
-                                    <RowConstraints minHeight="45.0" />
-                                </rowConstraints>
-                                 <children>
-                                    <Label fx:id="sizeUpLabel" text="Upstream size">
-                                       <tooltip>
-                                          <Tooltip text="Number of nucleotides 5' of the target start position in which fragments will be sought" wrapText="true" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Minimum fragment size" GridPane.rowIndex="1">
-                                       <tooltip>
-                                          <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Minimum GC content (%)" GridPane.rowIndex="2">
-                                       <tooltip>
-                                          <Tooltip text="Minimum percent GC content for a fragment to be selected" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500" GridPane.columnIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                       <tooltip>
-                                          <Tooltip text="Range (5')  to search for fragments (only used in extended approach)" />
-                                       </tooltip></TextField>
-                                    <TextField fx:id="sizeDownTextField" minHeight="30.0" promptText="5000" GridPane.columnIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                       <tooltip>
-                                          <Tooltip text="Range (3') to search for fragments (only used in extended approach)" />
-                                       </tooltip></TextField>
-                                    <TextField fx:id="minFragSizeTextField" minHeight="30.0" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
-                                    <TextField fx:id="maxRepContentTextField" minHeight="30.0" promptText="0.6" GridPane.columnIndex="3" GridPane.rowIndex="1">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
-                                    <TextField fx:id="minGCContentTextField" minHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
-                                    <TextField fx:id="maxGCContentTextField" minHeight="30.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin></TextField>
-                                    <Label fx:id="sizeDownLabel" text="Downstream size" GridPane.columnIndex="2">
-                                       <tooltip>
-                                          <Tooltip text="Number of nucleotides 3' of the target start position in which fragments will be sought" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Maximum repeat content (%)" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                       <tooltip>
-                                          <Tooltip text="Maximum repeat content for a fragment to be selected" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Label text="Maximum GC content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                                       <tooltip>
-                                          <Tooltip text="Maximum percent GC content for a fragment to be selected" />
-                                       </tooltip>
-                                       <GridPane.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Label>
-                                    <Button fx:id="createCaptureProbesButton" alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@gophermain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="3">
-                                       <GridPane.margin>
-                                          <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
-                                       </GridPane.margin>
-                                    </Button>
-                                 </children>
-                              </GridPane>
-                           </children>
-                           <effect>
-                              <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0" />
-                           </effect>
-                        </VBox>
-                  </content>
+                    <VBox alignment="TOP_CENTER" fillWidth="false">
+                        <effect>
+                            <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0"/>
+                        </effect>
+                        <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0"
+                                                   prefWidth="200.0"/>
+                                <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="160.0"
+                                                   prefWidth="160.0"/>
+                                <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0"
+                                                   prefWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="420.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                                <RowConstraints minHeight="50.0"/>
+                            </rowConstraints>
+                            <VBox.margin>
+                                <Insets/>
+                            </VBox.margin>
+                            <Label text="Approach">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Genome build" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Genome" GridPane.rowIndex="2">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Decompress genome" GridPane.rowIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Index Genome FASTA" GridPane.rowIndex="4">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="6">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Target genes" GridPane.rowIndex="7">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0"
+                                       GridPane.columnIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </ChoiceBox>
+                            <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0"
+                                       stylesheets="@gophermain.css" GridPane.columnIndex="1"
+                                       GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </ChoiceBox>
+                            <Button fx:id="downloadGenomeButton" mnemonicParsing="false"
+                                    onAction="#downloadGenome" prefHeight="30.0" prefWidth="145.0"
+                                    styleClass="Button" stylesheets="@gophermain.css" text="Download"
+                                    GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <Button fx:id="decompressGenomeButton" mnemonicParsing="false"
+                                    onAction="#decompressGenome" prefHeight="30.0" prefWidth="145.0"
+                                    styleClass="Button" stylesheets="@gophermain.css" text="Start"
+                                    GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome"
+                                    prefHeight="30.0" prefWidth="145.0" styleClass="Button"
+                                    stylesheets="@gophermain.css" text="Start" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="4">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false"
+                                    onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0"
+                                    styleClass="Button" stylesheets="@gophermain.css" text="Download"
+                                    GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes"
+                                    prefHeight="30.0" prefWidth="145.0" styleClass="Button"
+                                    stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="6">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList"
+                                    prefHeight="30.0" prefWidth="145.0" styleClass="Button"
+                                    stylesheets="@gophermain.css" text="Enter gene list" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="7">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                            <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2"
+                                               GridPane.rowIndex="2"/>
+                            <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2"
+                                               GridPane.rowIndex="3"/>
+                            <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2"
+                                               GridPane.rowIndex="4"/>
+                            <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0"
+                                               GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+                            <Label fx:id="approachLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="downloadedGenomeLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="decompressGenomeLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="4">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="5">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="6">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..."
+                                   GridPane.columnIndex="3" GridPane.rowIndex="7">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                        </GridPane>
+                        <Separator minHeight="50.0" minWidth="830.0" styleClass="grid"/>
+                        <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0"
+                                                   prefWidth="200.0"/>
+                                <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0"/>
+                                <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0"/>
+                                <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="40.0"/>
+                                <RowConstraints minHeight="40.0"/>
+                                <RowConstraints minHeight="40.0"/>
+                                <RowConstraints minHeight="45.0"/>
+                            </rowConstraints>
+                            <Label fx:id="sizeUpLabel" text="Upstream size">
+                                <tooltip>
+                                    <Tooltip
+                                            text="Number of nucleotides 5' of the target start position in which fragments will be sought"
+                                            wrapText="true"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Minimum fragment size" GridPane.rowIndex="1">
+                                <tooltip>
+                                    <Tooltip text="Minimum size in nucleotides for a fragment to be selected"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Minimum GC content (%)" GridPane.rowIndex="2">
+                                <tooltip>
+                                    <Tooltip text="Minimum percent GC content for a fragment to be selected"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500"
+                                       GridPane.columnIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                                <tooltip>
+                                    <Tooltip
+                                            text="Range (5')  to search for fragments (only used in extended approach)"/>
+                                </tooltip>
+                            </TextField>
+                            <TextField fx:id="sizeDownTextField" minHeight="30.0" promptText="5000"
+                                       GridPane.columnIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                                <tooltip>
+                                    <Tooltip
+                                            text="Range (3') to search for fragments (only used in extended approach)"/>
+                                </tooltip>
+                            </TextField>
+                            <TextField fx:id="minFragSizeTextField" minHeight="30.0" promptText="130"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </TextField>
+                            <TextField fx:id="maxRepContentTextField" minHeight="30.0" promptText="0.6"
+                                       GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </TextField>
+                            <TextField fx:id="minGCContentTextField" minHeight="30.0" GridPane.columnIndex="1"
+                                       GridPane.rowIndex="2">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </TextField>
+                            <TextField fx:id="maxGCContentTextField" minHeight="30.0" GridPane.columnIndex="3"
+                                       GridPane.rowIndex="2">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </TextField>
+                            <Label fx:id="sizeDownLabel" text="Downstream size" GridPane.columnIndex="2">
+                                <tooltip>
+                                    <Tooltip
+                                            text="Number of nucleotides 3' of the target start position in which fragments will be sought"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Maximum repeat content (%)" GridPane.columnIndex="2"
+                                   GridPane.rowIndex="1">
+                                <tooltip>
+                                    <Tooltip text="Maximum repeat content for a fragment to be selected"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Maximum GC content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                <tooltip>
+                                    <Tooltip text="Maximum percent GC content for a fragment to be selected"/>
+                                </tooltip>
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Button fx:id="createCaptureProbesButton" alignment="CENTER" defaultButton="true"
+                                    minHeight="30.0" minWidth="145.0" mnemonicParsing="false"
+                                    onAction="#createViewPoints" styleClass="Button"
+                                    stylesheets="@gophermain.css" text="Create Viewpoints!"
+                                    GridPane.columnSpan="2147483647" GridPane.halignment="CENTER"
+                                    GridPane.rowIndex="3">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
+                        </GridPane>
+                    </VBox>
                 </Tab>
                 <Tab id="analysistab" fx:id="analysistab" closable="false" text="Analysis">
-                  <content>
-                        <StackPane fx:id="analysisPane" />
-                  </content>
+                    <StackPane fx:id="analysisPane"/>
                 </Tab>
-              </tabs>
             </TabPane>
-         </center>
-      </BorderPane>
-   </content>
+        </center>
+    </BorderPane>
 </ScrollPane>

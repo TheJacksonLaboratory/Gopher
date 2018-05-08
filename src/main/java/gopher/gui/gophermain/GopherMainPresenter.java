@@ -814,6 +814,11 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
+
+    @FXML private void saveDigestFileAs(ActionEvent e) {
+        e.consume();
+    }
+
     /**
      * @param e event triggered by set proxy command.
      */
@@ -1091,7 +1096,7 @@ public class GopherMainPresenter implements Initializable {
         try {
             final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
             logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
-            javafx.application.Platform.runLater(() -> {
+            javafx.application.Platform.runLater(() ->  {
                         RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory);
                     });
         } catch (Exception e) {

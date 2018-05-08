@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# VPV documentation build configuration file, created by
+# GOPHER documentation build configuration file, created by
 # sphinx-quickstart on Sun Sep 24 12:02:05 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -141,7 +141,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'VPV.tex', u'VPV Documentation',
+    (master_doc, 'GOPHER.tex', u'GOPHER Documentation',
      u'Peter Hansen, Peter Robinson', 'manual'),
 ]
 
@@ -151,7 +151,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'vpv', u'VPV Documentation',
+    (master_doc, 'GOPHER', u'GOPHER Documentation',
      [author], 1)
 ]
 
@@ -162,8 +162,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'VPV', u'VPV Documentation',
-     author, 'VPV', 'One line description of project.',
+    (master_doc, 'GOPHER', u'GOPHER Documentation',
+     author, 'GOPHER', 'One line description of project.',
      'Miscellaneous'),
 ]
 

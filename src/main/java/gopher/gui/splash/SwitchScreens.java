@@ -25,7 +25,7 @@ import java.io.IOException;
 public class SwitchScreens {
     private static final Logger logger = Logger.getLogger(SwitchScreens.class.getName());
     /** A reference to the primary stage of the application. */
-    private Stage primarystage = null;
+    private Stage primarystage;
     /** The width of the current screen, which is calculated in {@link gopher.gui.viewpointpanel.ViewPointView}. 800 is a default value,
      * but the variable will always be set to the current value of the user's screen.*/
     private int screenWidth=800;
@@ -38,7 +38,7 @@ public class SwitchScreens {
         this.primarystage= stage;
     }
 
-    public void createNewProject(String name){
+    void createNewProject(String name){
         GopherMainView appView = new GopherMainView();
         GopherMainPresenter presenter = (GopherMainPresenter) appView.getPresenter();
         presenter.setPrimaryStageReference(this.primarystage);
@@ -53,12 +53,12 @@ public class SwitchScreens {
 
     }
 
-    public void openExistingModel(String name) {
+    void openExistingModel(String name) {
         GopherMainView appView = new GopherMainView();
         GopherMainPresenter presenter = (GopherMainPresenter) appView.getPresenter();
         presenter.setPrimaryStageReference(this.primarystage);
         String filepath = Platform.getAbsoluteProjectPath(name);
-        Model model=null;
+        Model model;
         try {
             model = SerializationManager.deserializeModel(filepath);
         } catch (IOException e) {
