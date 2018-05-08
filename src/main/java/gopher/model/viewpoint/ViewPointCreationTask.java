@@ -27,19 +27,19 @@ public abstract class ViewPointCreationTask extends Task<Void> {
 
     private int n_total_promoters;
     /** Referece to the model with all project data. */
-    protected Model model = null;
+    protected Model model;
     /** This is used to show the name of the current Gene on the viewpoint creation dialog. */
-    protected StringProperty currentVP = null;
+    StringProperty currentVP = null;
 
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
      */
-    protected List<ViewPoint> viewpointlist = null;
+    List<ViewPoint> viewpointlist;
 
     protected abstract Void call() throws Exception;
 
 
-    protected ViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+    ViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         this.model = model;
         this.viewpointlist = new ArrayList<>();
         assignVPVGenesToChromosomes(model.getVPVGeneList());
@@ -62,18 +62,18 @@ public abstract class ViewPointCreationTask extends Task<Void> {
 
 
     /**
-     * Here, we assign the {@link VPVGene} obejcts to the corresponding chromosomes. This allows us to
+     * Here, we assign the {@link VPVGene} objects to the corresponding chromosomes. This allows us to
      * create a FastReader only once for each chromosome (and thereby be much more efficient than going through
      * the  {@link VPVGene} obejcts in no particular order).
      * @param vgenes
      */
-    protected void assignVPVGenesToChromosomes(List<VPVGene> vgenes) {
+    private void assignVPVGenesToChromosomes(List<VPVGene> vgenes) {
         this.chromosomes = new HashMap<>();
         n_totalGenes =0;
         this.n_total_promoters=0;
         for (VPVGene g : vgenes) {
             String referenceseq = g.getContigID();
-            ChromosomeGroup group = null;
+            ChromosomeGroup group;
             if (chromosomes.containsKey(referenceseq)) {
                 group = chromosomes.get(referenceseq);
             } else {
@@ -92,9 +92,9 @@ public abstract class ViewPointCreationTask extends Task<Void> {
      * we are creating viewpoints)
      * @return total number of {@link VPVGene} objects.
      */
-    protected int getTotalGeneCount() {
+    int getTotalGeneCount() {
         return n_totalGenes;
     }
 
-    protected int getTotalPromoterCount() {return n_total_promoters; }
+    int getTotalPromoterCount() {return n_total_promoters; }
 }

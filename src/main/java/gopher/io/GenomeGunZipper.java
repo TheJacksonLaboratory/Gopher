@@ -27,8 +27,6 @@ public class GenomeGunZipper extends Task<Void>  {
     private final Genome genome;
     /** This is the basename of the compressed genome file that we download from UCSC. */
     private final String genomeFileNameTarGZ;
-    /** This is the basename of the decompressed but still tar'd genome file that we download from UCSC. */
-    //private final String genomeFileNameTar;
     /** Size of buffer for reading the g-zip'd files.*/
     private static final int BUFFER_SIZE=1024;
     /** Indicator of progress of unzipping the genome tar.gz file. */
@@ -106,24 +104,12 @@ public class GenomeGunZipper extends Task<Void>  {
                     // If the files begin with "chroms", the direc
                     String filename=entry.getName();
                     filename=filename.replaceAll("^\\./","");
-                    if (genome.isCanonicalChromosome(filename)) {
-                        logger.trace("Including chromosome "+ filename + " in output file");
-                    } else {
-                        logger.trace("Omitting non-canonical chromosome " +filename + " from output fasta file");
-                        continue;
-                    }
-//                    if (needToCreateDirectory && filename.startsWith("chroms")) {
-//                        // create a chroms directory if needed, otherwise we cannot unpack to it
-//                        // this means that the archive wants to unpack to chroms/chr1 etc.
-//                        logger.trace(String.format("Creating directory for chroms: %s",filename));
-//                        String createDirPath =String.format("%s%schroms",dirpath,File.separator);
-//                        File directory = new File(createDirPath);
-//                        if (! directory.exists()) {
-//                            logger.trace(String.format("Creating directory for chroms: %s",createDirPath));
-//                            directory.mkdir();
-//                        }
-//                        this.genome.setPathToGenomeDirectory(createDirPath);// this extends the genome path.
-//                        needToCreateDirectory=false; // only need to do this the first time.
+                   // commenting the following out will include non-canonical chromosomes.
+//                    if (genome.isCanonicalChromosome(filename)) {
+//                        logger.trace("Including chromosome "+ filename + " in output file");
+//                    } else {
+//                        logger.trace("Omitting non-canonical chromosome " +filename + " from output fasta file");
+//                        continue;
 //                    }
                     if (filename.equals(genome.getGenomeBasename())) {
                         continue;
