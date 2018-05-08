@@ -34,7 +34,7 @@ public class BEDFileExporter {
     private String vpvSummaryRfile=null;
     private String vpvUniqueTargetFragmentsFile=null;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
-    private String directoryPath=null;
+    private String directoryPath;
 
     /**
      *
@@ -65,8 +65,8 @@ public class BEDFileExporter {
     /**
      * This function is responsible for outputting data in the form of BED files and also a TSV file with URLs and some
      * other data on each viewpoint. Users can viewthe chosen fragments by uploading them to the UCSCbrowser.
-     * @param viewpointlist
-     * @param genomeBuild
+     * @param viewpointlist List of the viewpoints we will output to BED file
+     * @param genomeBuild build of genome we used to generate the viewpoints
      * @throws FileNotFoundException
      */
     public void printRestFragsToBed(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
@@ -123,15 +123,15 @@ public class BEDFileExporter {
                     (int) Math.round(vp.getScore()*1000)));
         }
 
-        // print restriction fragments and get unique fragment margins
+        // print restriction fragments and get unique digest margins
         out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
-        Set<String> uniqueFragmentMargins = new HashSet<String>(); // use a set to get rid of duplicate fragment margins
-        HashMap<String,String> uniqueFragmentMarginsMap = new HashMap<String,String>();
-        Set<String> uniqueFragments = new HashSet<String>(); // use a set to get rid of duplicate fragments
+        Set<String> uniqueFragmentMargins = new HashSet<>(); // use a set to get rid of duplicate digest margins
+        HashMap<String,String> uniqueFragmentMarginsMap = new HashMap<>();
+        Set<String> uniqueFragments = new HashSet<>(); // use a set to get rid of duplicate fragments
 
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
-            int k=0; // index of selected fragment
+            int k=0; // index of selected digest
             for (Segment segment : vp.getActiveSegments()) {
                 k++;
                 Integer rsStaPos = segment.getStartPos();
@@ -212,9 +212,8 @@ public class BEDFileExporter {
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */
         String targetItem = vp.getTargetName();
         String trackType="hgTracks";
-        String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&pix=1800",
+        return String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&pix=1800",
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem);
-        return url;
     }
 
     public String getRscript(String prefix) {

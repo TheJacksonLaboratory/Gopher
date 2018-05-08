@@ -62,7 +62,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
      */
     private Map<String,List<ViewPoint>> getChrom2PosListMap(Model model) {
-        // get all of the viewpoints with at least one selected fragment.
+        // get all of the viewpoints with at least one selected digest.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
         Map<String,List<ViewPoint>> chrom2posListMap=new HashMap<>();

@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 public class VPVReport {
     private static final Logger logger = Logger.getLogger(VPVReport.class.getName());
-    private Model model=null;
+    private Model model;
 
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
 
@@ -74,8 +74,7 @@ public class VPVReport {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         StringBuilder sb = new StringBuilder("Viewpoint Viewer: Panel generation report\n");
-        sb.append(dateFormat.format(date) + "\n");
-
+        sb.append(dateFormat.format(date)).append("\n");
         sb.append(String.format("genome_build: %s\n", model.getGenomeBuild()));
         sb.append(String.format("path_to_downloaded_genome_directory: %s\n",model.getGenomeDirectoryPath()));
         sb.append(String.format("genome_unpacked: %s\n",model.isGenomeUnpacked()));
@@ -84,7 +83,7 @@ public class VPVReport {
         sb.append(String.format("target_genes_path: %s\n",model.getTargetGenesPath()));
         sb.append(String.format("upstream size: %d\n",model.getSizeUp()));
         sb.append(String.format("downstream size: %d\n",model.getSizeDown()));
-        sb.append(String.format("minimum fragment size: %d\n",model.getMinFragSize()));
+        sb.append(String.format("minimum digest size: %d\n",model.getMinFragSize()));
         sb.append(String.format("maximum repeat content: %s%%\n",model.getMaxRepeatContentPercent()));
         sb.append(String.format("maximum GC content: %s%%\n",model.getMaxGCContentPercent()));
         sb.append(String.format("minimum GC content: %s%%\n",model.getMinGCContentPercent()));

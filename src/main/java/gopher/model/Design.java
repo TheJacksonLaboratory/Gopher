@@ -19,7 +19,7 @@ public class Design {
     static Logger logger = Logger.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
-    /** total length in nt of all unique fragment margins  */
+    /** total length in nt of all unique digest margins  */
     private int n_nucleotides_in_unique_fragment_margins;
 
     private int n_genes;
@@ -32,7 +32,7 @@ public class Design {
 
     private double avgVPsize;
     /**
-     * Number of successful (resolved) viewpoints, defined as having at least one active fragment.
+     * Number of successful (resolved) viewpoints, defined as having at least one active digest.
      */
     private int n_resolvedViewpoints;
     /**
@@ -42,7 +42,7 @@ public class Design {
 
     private int n_estimatedProbeCount;
 
-    private Model model = null;
+    private Model model;
 
     public int getN_unique_fragments() {
         return n_unique_fragments;
@@ -102,12 +102,12 @@ public class Design {
         int tilingFactor = model.getTilingFactor();
         double RC=0d;
         int N=0;
-        Set<String> uniqueFragmentMargins = new HashSet<String>();
+        Set<String> uniqueFragmentMargins = new HashSet<>();
         for (ViewPoint vp : model.getViewPointList()) {
             if (vp.getNumOfSelectedFrags() == 0) {
                 continue;
             }
-            int k = 0; // index of selected fragment
+            int k = 0; // index of selected digest
             for (Segment segment : vp.getActiveSegments()) {
                 k++;
 //                Integer rsStaPos = segment.getStartPos();

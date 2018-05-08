@@ -55,6 +55,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.6-jre</version>
+        </dependency>
+
         <!-- The following is for the Max eawt code:
          com.apple.eawt.Application.getApplication().setDockIconImage(macimage); -->
         <dependency>

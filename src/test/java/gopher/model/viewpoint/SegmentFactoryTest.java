@@ -19,15 +19,15 @@ import java.util.*;
  * the offset refers to the location of the cut offset for patterns such as ^GATC or GA^TC
  * int pos = matcher.start() - maxDistToGenomicPosUp + cuttingPositionMapOffsets.get(cutpat) - 1;
  * Note that maxDistToGenomicPositition up is defined as the distance from the center point of the
- * fragment (genomicPos). The subsequence is extracted as
+ * digest (genomicPos). The subsequence is extracted as
  * <pre>genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown</pre>
  * Note that these are all one-based inclusive numbers. So if maxDistToGenomicPosUp and
- * maxDistToGenomicPosDown are both equal to 1, then the resulting fragment is 3 nucleotides long.
+ * maxDistToGenomicPosDown are both equal to 1, then the resulting digest is 3 nucleotides long.
  * Thus, we would get zero for a restriction site that begins exactly at genomicPos, negative numbers for
  * sites that begin 5' to genomicPos, and positive numbers for sites that begin 3' to genomicPos.
  * The offset will indicate where in the cutting site the restriction enzyme actually cuts.
  * ^GATC would have an offset of zero, G^ATC would have an offset of one, etc.
- * MaxDistToGenomicPosUp is the number of bases 3' to genomic pos that our fragment goes.
+ * MaxDistToGenomicPosUp is the number of bases 3' to genomic pos that our digest goes.
  * Here is the sequence
  * <pre>
  * >chr_t4_GATC_veryshort

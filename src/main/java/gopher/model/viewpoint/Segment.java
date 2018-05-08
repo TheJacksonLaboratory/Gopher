@@ -10,7 +10,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
- * This class represents a restriction fragment that is a member of a viewpoint.
+ * This class represents a restriction digest that is a member of a viewpoint.
  * Note that {@link #startPos} and {@link #endPos} use one-based inclusive numbering.
  * @author Peter Hansen
  * @version 0.3.5 (2017-09-19)
@@ -53,7 +53,7 @@ public class Segment implements Serializable {
 
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
-    /** Is this fragment overlapping the TSS, i.e., it is the center fragment? */
+    /** Is this digest overlapping the TSS, i.e., it is the center digest? */
     private boolean overlapsTSS=false;
     /** Used to return {@link #startPos} and {@link #endPos} in String format. */
     private static DecimalFormat formatter = new DecimalFormat("#,###");
@@ -169,7 +169,7 @@ public class Segment implements Serializable {
 
         ArrayList<IntPair> margins = getSegmentMargins();
 
-        if (margins.size()==1) { // not enough space to have two margins, because the fragment is too small
+        if (margins.size()==1) { // not enough space to have two margins, because the digest is too small
             this.repeatContentDown=this.repeatContent; // we therefore just use the overall repeat content for the up/downstream values
             this.repeatContentUp=this.repeatContent;
             this.GCcontentDown=GCcontent;

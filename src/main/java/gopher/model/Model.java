@@ -149,22 +149,22 @@ public class Model implements Serializable {
     public final int getSizeDown() { return sizeDown;}
     public final void setSizeDown(int sd) { sizeDown=sd;}
 
-    /** Minimum allowable size of a restriction fragment within a ViewPoint chosen for capture Hi C enrichment. */
+    /** Minimum allowable size of a restriction digest within a ViewPoint chosen for capture Hi C enrichment. */
     private int minFragSize;
     public int getMinFragSize() { return minFragSize; }
     public void setMinFragSize(int i) { this.minFragSize=i;}
 
-    /** Maximum allowable repeat content in the margin of a selected fragment. */
+    /** Maximum allowable repeat content in the margin of a selected digest. */
     private double maxRepeatContent;
     public  double getMaxRepeatContent() {return maxRepeatContent;}
     public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
     public double getMaxRepeatContentPercent(){return 100*maxRepeatContent; }
-    /** Minimum allowable GC content in a selected fragment. */
+    /** Minimum allowable GC content in a selected digest. */
     private double minGCcontent;
     public  double getMinGCcontent() { return minGCcontent;}
     public  void setMinGCcontent(double mgc) { minGCcontent=mgc;}
     public double getMinGCContentPercent() { return 100*minGCcontent; }
-    /** Maximum allowable GC content in a selected fragment. */
+    /** Maximum allowable GC content in a selected digest. */
     private double maxGCcontent;
     public  double getMaxGCcontent() { return maxGCcontent;}
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
@@ -235,7 +235,7 @@ public class Model implements Serializable {
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
-    /** The length of a probe that will be used to enrich a restriction fragment within a viewpoint. */
+    /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
@@ -467,7 +467,7 @@ public class Model implements Serializable {
     /**
      * Note that this function will return an empty list if the viewpoint list is null, which can occur if the
      * user has not created view points yet. This will be picked up as an error and reported to the user later on.
-     * @return A list of Viewpoints that contain at least one selected fragment.
+     * @return A list of Viewpoints that contain at least one selected digest.
      * */
     public List<ViewPoint> getActiveViewPointList() {
         if (viewpointList==null ) return new ArrayList<>();

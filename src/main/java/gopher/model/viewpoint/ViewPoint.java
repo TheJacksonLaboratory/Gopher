@@ -30,25 +30,25 @@ import java.util.stream.IntStream;
  *
  * @author Peter N Robinson
  * @author Peter Hansen
- * @version 0.2.2 (2017-11-12)
+ * @version 0.2.3 (2018-05-11)
  */
 public class ViewPoint implements Serializable {
     private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 4L;
     /** The possible approaches used to generate this Viewpoint. */
-    public static enum Approach {SIMPLE, EXTENDED};
+    public enum Approach {SIMPLE, EXTENDED}
     /* The approach used to generate this viewpoint */
     private Approach approach;
-    /** Size of the "borders" at the edges of a fragment that are especially important because we sequence there. */
+    /** Size of the "borders" at the edges of a digest that are especially important because we sequence there. */
     private int marginSize;
-    /** Maximum allowable repeat content for a fragment to be included. A fragment will be deselected
+    /** Maximum allowable repeat content for a digest to be included. A digest will be deselected
      * if one of the margins has a higher repeat content.*/
     private double maximumRepeatContent;
     /** "Home" of the viewpoint, usually a chromosome */
     private String chromosomeID;
     /** Accession number of this gene, e.g., NM_0001234 .*/
-    private String accession=null;
+    private String accession;
     /** Name of the target of the viewpoint (often a gene).*/
     private String targetName;
     /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
@@ -62,7 +62,7 @@ public class ViewPoint implements Serializable {
     private int startPos;
     /** end position of the viewpoint */
     private int endPos;
-    /** Minimum allowable size of a restriction fragment-this will usually be determined by the size of the probes
+    /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
     private int minFragSize;
     /** Maximum allowable GC content */
@@ -107,7 +107,7 @@ public class ViewPoint implements Serializable {
     }
     /** Overall score of this Viewpoint.*/
     private double score;
-    /** Maximim allowable fragment size for simple approach */
+    /** Maximim allowable digest size for simple approach */
     private static final int SIMPLE_APPROACH_MAXSIZE=20_000;
 
     public String getAccession() {
@@ -120,10 +120,10 @@ public class ViewPoint implements Serializable {
     public List<Segment> getActiveSegments() {
         if (restrictionSegmentList==null) {
             logger.error(String.format("Error-- null list of restriction segments for %s",getTargetName()));
-            return new ArrayList<Segment>();/* return empty list.*/
+            return new ArrayList<>();/* return empty list.*/
         }
         //return a List of all selected segments
-        return this.restrictionSegmentList.stream().filter(s -> s.isSelected()).collect(Collectors.toList());
+        return this.restrictionSegmentList.stream().filter(Segment::isSelected).collect(Collectors.toList());
     }
 
     /** @return List of all segments (selected or not). */
@@ -195,7 +195,6 @@ public class ViewPoint implements Serializable {
     }
 
     /**
-     * TODO We need to know what strand in order to calculate start/end pos!!!!!!
      * @param fastaReader
      */
     private void init(IndexedFastaSequenceFile fastaReader) {
@@ -222,16 +221,16 @@ public class ViewPoint implements Serializable {
      */
     public static class Builder {
         //  parameters required in the constructor
-        private String chromosomeID =null;
+        private String chromosomeID;
         private String accessionNr=null;
         private int genomicPos;
         // other params
         private IndexedFastaSequenceFile fastaReader;
         private String targetName="";
         // Optional parameters - initialized to default values
-        /* upstream nucleotide length for fragment generation (upstream of genomic pos).*/
+        /* upstream nucleotide length for digest generation (upstream of genomic pos).*/
         private Integer upstreamNtLength = Default.SIZE_UPSTREAM;
-        /* downstream nucleotide length for fragment generation (downstream of genomic pos).*/
+        /* downstream nucleotide length for digest generation (downstream of genomic pos).*/
         private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM;
         /** Need to choose a default strand, but this will always be overwritten. */
         private boolean isPositiveStrand =true;
@@ -321,7 +320,7 @@ public class ViewPoint implements Serializable {
     public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
 
-    private final void setStartPos(Integer startPos) {
+    private void setStartPos(Integer startPos) {
         this.startPos = startPos;
     }
 
@@ -368,7 +367,7 @@ public class ViewPoint implements Serializable {
     }
     /** @return Number of Segments in this ViewPoint that are active (selected). */
     public final int getNumOfSelectedFrags() {
-        return (int) this.restrictionSegmentList.stream().filter(s -> s.isSelected()).count();
+        return (int) this.restrictionSegmentList.stream().filter(Segment::isSelected).count();
     }
 
     public void setTargetName(String name) { this.targetName=name;}
@@ -410,7 +409,7 @@ public class ViewPoint implements Serializable {
 
         boolean resolved = true;
         approach=Approach.EXTENDED;
-        this.centerSegment=null; // the fragment that contains the TSS. Always show it!
+        this.centerSegment=null; // the digest that contains the TSS. Always show it!
         restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
 
         for (Segment segment : restrictionSegmentList) {
@@ -438,7 +437,7 @@ public class ViewPoint implements Serializable {
             }
         }
 
-        // set start position of the viewpoint to start position of the most upstream SELECTED fragment
+        // set start position of the viewpoint to start position of the most upstream SELECTED digest
         int start=Integer.MAX_VALUE;
         int end=Integer.MIN_VALUE;
 
@@ -454,7 +453,7 @@ public class ViewPoint implements Serializable {
 
 
         // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
-        // retain one unselected fragment on each end
+        // retain one unselected digest on each end
         // this will keep the table from having lots of unselected fragments
 
         int LEN = restrictionSegmentList.size();
@@ -491,19 +490,19 @@ public class ViewPoint implements Serializable {
     public void generateViewpointSimple(boolean allowSingleMargin) {
         boolean resolved = true;
         approach = Approach.SIMPLE;
-        // find the fragment that contains genomicPos
+        // find the digest that contains genomicPos
         this.centerSegment = restrictionSegmentList.stream().
                 filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
                 findFirst().
                 orElse(null);
 
         if (this.centerSegment == null) {
-            logger.error(String.format("%s At least one fragment must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
+            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
             this.centerSegment.setOverlapsTSS(true);
-            // originating from the centralized fragment containing 'genomicPos' (included) openExistingProject fragment-wise in UPSTREAM direction
+            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction
             int length = centerSegment.length();
             if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
                     &&
@@ -516,7 +515,7 @@ public class ViewPoint implements Serializable {
                 centerSegment.setSelected(true);
                 setEndPos(centerSegment.getEndPos());
                 setStartPos(centerSegment.getStartPos());
-                // Add the selected fragment and the two neighboring fragments (which are deselected)
+                // Add the selected digest and the two neighboring fragments (which are deselected)
                 int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
                 if (genomicPosFragIdx > 0) {
                     newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
@@ -604,7 +603,7 @@ public class ViewPoint implements Serializable {
 
                 repCont=currentSegment.getMeanMarginRepeatContent();
 
-                /* get position distance score for each position of the fragment */
+                /* get position distance score for each position of the digest */
 
                 positionScoreSumFragment = 0;
                 for (int j = currentSegment.getStartPos(); j <= currentSegment.getEndPos(); j++) {
@@ -675,7 +674,7 @@ public class ViewPoint implements Serializable {
 
                 repCont=currentSegment.getMeanMarginRepeatContent();
 
-                /* get position distance score for each position of the fragment */
+                /* get position distance score for each position of the digest */
 
                 positionScoreSumFragment = 0;
                 for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
@@ -729,12 +728,12 @@ public class ViewPoint implements Serializable {
     }
 
     /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-     * in the case where a selected fragment overlaps that boundary, the start pos of that fragment.
+     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
      * @return leftmost confirmDialog position
      */
     public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
     /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-     * in the case where a selected fragment overlaps that boundary, the end pos of that fragment.
+     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
      * @return rightmost confirmDialog position
      */
     public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }

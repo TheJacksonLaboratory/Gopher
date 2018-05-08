@@ -507,10 +507,10 @@ public class ViewPointPresenter implements Initializable {
 
 
     /**
-     * This function returns a rotating list of colors for the fragment highlights designed to be displayed on the
+     * This function returns a rotating list of colors for the digest highlights designed to be displayed on the
      * UCSC browser. If a segment is not selected, it returns "" (an emtpy string), which basically causes the corresponding
      * segment to show as not color-highlighted in the UCSC image or in the table.
-     * @return a rotating list of colors for the fragment highlights.
+     * @return a rotating list of colors for the digest highlights.
      */
     private String getNextColor(boolean isSelected) {
         String color = colors[this.coloridx];

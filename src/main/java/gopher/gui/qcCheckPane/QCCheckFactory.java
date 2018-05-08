@@ -77,10 +77,10 @@ public class QCCheckFactory {
         sb.append("<p class=\"ex\">Upstream and Downstream are the lengths with respect to the transcript start sites that will be included in" +
                 " the search for viewpoints and fragments. All fragments that are located within or overlap with these positions will be included" +
                 " in the probe design created by VPVGui if they fulfil the remaining criteria listed below.<p>");
-        sb.append("<p class=\"ex\">The minimum probe size refers to the size of the restriction fragment. Any candidate fragment smaller than this " +
+        sb.append("<p class=\"ex\">The minimum probe size refers to the size of the restriction digest. Any candidate digest smaller than this " +
                 "size is rejected because it is unlikely to enrich well in the capture Hi-C procedure and may be difficult to map.</p>");
         sb.append("<p class=\"ex\">The minimum and maximum GC content parameters determine the minimum and maximum allowed content of G and C bases" +
-                " for a fragment. Values above and below these criteria are difficult to enrich and sequence and are therefore rejected from the" +
+                " for a digest. Values above and below these criteria are difficult to enrich and sequence and are therefore rejected from the" +
                 " probe design.</p>");
         sb.append("<p class=\"ex\">The maximum repeat content parameter uses the determination of repeat sequences of the UCSC Genome Browser " +
                 "(which in turn is based on repeatmasker). Fragments with a higher repeat content than this value are reject because they" +
@@ -149,7 +149,7 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getSizeDown()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Minimum fragment size</td>");
+        sb.append("<tr><td>Minimum digest size</td>");
         if (model.getMinFragSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
         } else {

@@ -16,7 +16,7 @@ import java.util.Locale;
  */
 public class ViewPointAnalysisSummaryHTMLGenerator {
     private static final Logger logger = Logger.getLogger(ViewPointAnalysisSummaryHTMLGenerator.class.getName());
-    private Model model=null;
+    private Model model;
 
 
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Panel design</h1>";
@@ -31,7 +31,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
     /**
      * @return a block of CSS code intended for the blue-beige Table of data on the design.
      */
-    public static String getCSSblock() {
+    private static String getCSSblock() {
         return "<style>\n" +
                 "h1 {\n" +
                 "\tfont-size: 16x;\n" +
@@ -78,7 +78,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
 
 
-    public String getHTML() {
+    String getHTML() {
         logger.trace(String.format("Getting HTML ViewPoint summary code for model=%s",this.model.getProjectName()));
         if (model==null){
             logger.error("model was null");
@@ -94,7 +94,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
     /**
      * @param design The parameters used to generate probes (see {@link Design}).
-     * @param tilingFactor coverage factor (how many probes per fragment position).
+     * @param tilingFactor coverage factor (how many probes per digest position).
      * @return HTML string to be displayed on the analysis panel.
      */
     private static String getHTMLTable(Design design,int tilingFactor) {
@@ -136,7 +136,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
                 "and will not be represented in the final set of probes for the capture Hi-C panel design. " +
                 "Users can manually choose fragments in the panels for individual viewpoints. " +
                 "Additionally, users can deselect fragments or delete viewpoints as desired.</p>");
-        sb.append(String.format("<ul><li>Number of valid viewpoints (with at least one fragment): %d of %d</li>" ,resolvedVP,design.getN_viewpoints()) );
+        sb.append(String.format("<ul><li>Number of valid viewpoints (with at least one digest): %d of %d</li>" ,resolvedVP,design.getN_viewpoints()) );
         sb.append(String.format("<li>Number of genes with at least one valid viewpoint: %d of %d</li></ul>" ,resolvedGenes,design.getN_genes() ) );
         return sb.toString();
 

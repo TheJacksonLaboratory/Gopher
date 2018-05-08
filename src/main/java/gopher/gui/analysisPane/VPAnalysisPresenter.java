@@ -234,7 +234,7 @@ public class VPAnalysisPresenter implements Initializable {
         viewpointTotalLength.setCellValueFactory(cdf-> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
 
-        // ninth column -- is central fragment with TSS selected?
+        // ninth column -- is central digest with TSS selected?
         fragmentOverlappingTSSColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().isTSSfragmentChosen()?"yes":"no"));
 
         viewPointTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

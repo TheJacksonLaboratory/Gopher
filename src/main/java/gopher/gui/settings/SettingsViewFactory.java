@@ -42,7 +42,7 @@ public class SettingsViewFactory {
     }
 
     /**
-     * @param properties
+     * @param properties Various items from the settings.
      * @return String containing HTML to confirmDialog in WebView pane
      */
     private static String getHTML(Properties properties) {
@@ -62,7 +62,7 @@ public class SettingsViewFactory {
         String[] numericPropNames = new String[] {
                 "# Fragments upstream", "# Fragments downstream", "Minimum size upstream",
                 "Maximum size upstream", "Minimum size downstream", "Maximum size downstream",
-                "Minimum fragment size", "Maximum repeat content"
+                "Minimum digest size", "Maximum repeat content"
         };
         StringBuilder sb = new StringBuilder();
         sb.append("<html><body><h3>");
