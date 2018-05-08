@@ -8,7 +8,7 @@
     <version>0.3.6</version>
     <packaging>jar</packaging>
 
-    <name>vpvgui</name>
+    <name>gopher</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -154,7 +154,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>vpvgui.ViewPointViewer</mainClass>
+                            <mainClass>gopher.Gopher</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>

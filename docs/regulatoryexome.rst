@@ -1,6 +1,6 @@
 Regulatory Exome
 ================
-VPV can  generate a
+GOPHER can  generate a
 BED file with target definitions designed to generate a gene-panel with exons and regulatory features that can
 be used in conjunction with the capture Hi-C probe set. The regulatory regions are derived from the
 Ensembl regulatory build: https://useast.ensembl.org/info/genome/funcgen/regulatory_build.html.
@@ -13,28 +13,28 @@ users can export a BED file with definitions for a matching "regulatory exome" u
 
  .. figure:: img/VPVexomeMenu.png
     :scale: 50 %
-    :alt: VPV exome menu
+    :alt: exome menu
 
 
 
 The regulatory exome feature is currently implemented for hg19 and hg38. First, download the regulatory build file. Following
-this, choose a location for VPV to export the regulatory exome BED file. After you do this, a window will appear
+this, choose a location for GOPHER to export the regulatory exome BED file. After you do this, a window will appear
 that allows you to choose the categories of regulatory element you would like to include.
 
 
 
  .. figure:: img/VPVexomeCategories.png
     :scale: 75 %
-    :alt: VPV exome menu
+    :alt: exome menu
 
-By default, all categories are included. When you click OK, VPV will determine the locations for the regulatory exome
+By default, all categories are included. When you click OK, GOPHER will determine the locations for the regulatory exome
 and export the BED file.
 
 
 
 Overlapping target regions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-VPV's regulatory exome export function identifies the coding exons and regulatory regions for all target transcripts.
+GOPHER's regulatory exome export function identifies the coding exons and regulatory regions for all target transcripts.
 It identifies exact duplicates (e.g., the same exon occuring in multiple transcripts) and removes them automatically
 so that just one copy of each duplicated sequence is present in the output file. In some cases, overlapping
 segments may be present in the output however. For instance, the following two segments overlap. ::

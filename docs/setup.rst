@@ -1,14 +1,14 @@
-VPV: Simple and Extended Approach
-=================================
+GOPHER: Simple and Extended Approach
+====================================
 
-VPV offers two approaches for choosing viewpoints and probes.
+GOPHER offers two approaches for choosing viewpoints and probes.
 
 To choose one of the two viewpoint design approaches, select Simple or Extended from the pulldown menu at the top of the setup pane.
 
 
 Simple
-~~~~~~~~~~~~~~~~~~~~~~~~~
-In the simple approach, VPV tries to select the fragment that
+~~~~~~
+In the simple approach, GOPHER tries to select the fragment that
 overlaps the transcriptional start site (TSS) and additionally
 satisfies the following requirements.
 
@@ -26,8 +26,9 @@ If the restriction fragment that overlaps the TSS does not satisfy all of these 
 
 
 Extended
-~~~~~~~~~~~~~~~~~~~~~~~~~
-In the extended approach, VPV tries to select multiple restrictions fragments that surround the TSS of a candidate transcript in order to provide a high-resolution view of contacts the the promoter associated with the TSS. VPV will choose every fragment within the boundaries defined by Upstream size and Downstream size in the setup tab. For instance, if upstream size is set to 5000 and downstream size is set to 2000, then VPV will select all restriction fragments that are at least partially located within the 5000 nucleotides 5' (upstream) of the TSS and within 2000 nucleotides 3' (downstream) of the TSS. Note that if a fragment overlaps the upstream or downstream limit by at least one nucleotide it will be chosen if the criteria are fulfiled. The criteria for GC and repeat content are identical to those of the simple approach.
+~~~~~~~~
+In the extended approach, GOPHER tries to select multiple restrictions fragments that surround the TSS of a candidate transcript in order to provide a high-resolution view of contacts the the promoter associated with the TSS.
+GOPHER will choose every fragment within the boundaries defined by Upstream size and Downstream size in the setup tab. For instance, if upstream size is set to 5000 and downstream size is set to 2000, then GOPHER will select all restriction fragments that are at least partially located within the 5000 nucleotides 5' (upstream) of the TSS and within 2000 nucleotides 3' (downstream) of the TSS. Note that if a fragment overlaps the upstream or downstream limit by at least one nucleotide it will be chosen if the criteria are fulfiled. The criteria for GC and repeat content are identical to those of the simple approach.
 
  .. figure:: img/extended_approach.png
    :scale: 70 %

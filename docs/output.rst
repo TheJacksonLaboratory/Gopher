@@ -1,13 +1,13 @@
-Examining VPV BED files in the UCSC Browser
-===========================================
+Examining GOPHER BED files in the UCSC Browser
+==============================================
 
 VPV can produce a number of different output files for different analyses. Many users will want the BED file with
 the definitions of target regions that can be used to produce a capture Hi-C probe set.
 
 
-Examing VPV's output in the UCSC Genome Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-VPV outputs a series of BED files. Here are the first three lines of a typical file::
+Examing GOPHER's output in the UCSC Genome Browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GOPHER outputs a series of BED files. Here are the first three lines of a typical file::
 
 	chr11	3814753	3815000	NUP98
 	chr11	113929420	113929670	ZBTB16
