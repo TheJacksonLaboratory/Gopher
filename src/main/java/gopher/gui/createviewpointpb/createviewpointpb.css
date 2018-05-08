@@ -1,0 +1,23 @@
+.hbox {
+    -fx-background-color: #2f4f4f;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+    -fx-border-color: #2e8b57;
+    -fx-border-width: 2px;
+}
+
+.hbox2 {
+    -fx-background-color: #8fbc8f;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+     -fx-border-color: #2e8b57;
+     -fx-border-width: 2px;
+}
+
+.fancytext {
+    -fx-font: 20px Tahoma;
+    -fx-text-fill: white;
+    -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, aqua 0%, red 50%);
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+}

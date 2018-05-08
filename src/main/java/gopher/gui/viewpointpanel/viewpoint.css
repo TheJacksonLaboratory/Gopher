@@ -1,0 +1,9 @@
+.mylabel
+{
+  -fx-border-color: red;
+   -fx-text-fill: blue;
+   -fx-font-weight: bold;
+   -fx-font-size: 14;
+}
+
+

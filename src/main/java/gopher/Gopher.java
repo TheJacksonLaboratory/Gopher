@@ -1,4 +1,4 @@
-package vpvgui;
+package gopher;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -10,11 +10,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
-import vpvgui.framework.Injector;
-import vpvgui.gui.splash.SplashPresenter;
-import vpvgui.gui.splash.SplashView;
-import vpvgui.gui.splash.SwitchScreens;
-import vpvgui.model.Model;
+import gopher.framework.Injector;
+import gopher.gui.splash.SplashPresenter;
+import gopher.gui.splash.SplashView;
+import gopher.gui.splash.SwitchScreens;
+import gopher.model.Model;
 
 import javax.swing.*;
 import java.io.File;
@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import static vpvgui.io.Platform.getVPVDir;
+import static gopher.io.Platform.getGopherDir;
 
 
 /**
@@ -34,9 +34,9 @@ import static vpvgui.io.Platform.getVPVDir;
  * @author Hannah Blau
  * @version 0.3.1 (2017-11-12)
  */
-public class ViewPointViewer extends Application {
+public class Gopher extends Application {
 
-    //static Logger logger = Logger.getLogger(ViewPointViewer.class.getName());
+    //static Logger logger = Logger.getLogger(Gopher.class.getName());
     /**
      * A reference to the Model; we will write the current settings to file in
      * the {@link #stop} method by means of a method in the Model class.
@@ -52,12 +52,12 @@ public class ViewPointViewer extends Application {
         updateLog4jConfiguration();
         //logger.info("Starting VPV Gui");
         this.primarystage = primaryStage;
-        Image image = new Image(ViewPointViewer.class.getResourceAsStream("/img/vpvicon.png"));
-        primaryStage.setTitle("ViewPoint Viewer");
+        Image image = new Image(Gopher.class.getResourceAsStream("/img/vpvicon.png"));
+        primaryStage.setTitle("GOPHER");
         primaryStage.getIcons().add(image);
         if (isMacintosh()) {
             try {
-                URL iconURL = ViewPointViewer.class.getResource("/img/vpvicon.png");
+                URL iconURL = Gopher.class.getResource("/img/vpvicon.png");
                 java.awt.Image macimage = new ImageIcon(iconURL).getImage();
                 com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
             } catch (Exception e) {
@@ -84,14 +84,14 @@ public class ViewPointViewer extends Application {
     }
 
     /**
-     * This sets the location of the log4j log file to the user's .vpvgui directory.
+     * This sets the location of the log4j log file to the user's .gopher directory.
      */
     private void updateLog4jConfiguration() {
-        File dir = getVPVDir();
-        String logpath = (new File(dir + File.separator + "vpvgui.log")).getAbsolutePath();
+        File dir = getGopherDir();
+        String logpath = (new File(dir + File.separator + "gopher.log")).getAbsolutePath();
         Properties props = new Properties();
         try {
-            InputStream configStream = ViewPointViewer.class.getResourceAsStream("/log4j.properties");
+            InputStream configStream = Gopher.class.getResourceAsStream("/log4j.properties");
             props.load(configStream);
             configStream.close();
         } catch (IOException e) {
