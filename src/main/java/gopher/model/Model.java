@@ -91,7 +91,6 @@ public class Model implements Serializable {
 
     public String getRegulatoryBuildPath() { return regulatoryBuildPath; }
     public void setRegulatoryBuildPath(String regulatoryBuildPath) {
-        logger.trace("Setting reg build path in model to " + regulatoryBuildPath);
         this.regulatoryBuildPath = regulatoryBuildPath;
     }
     public boolean regulatoryBuildPathInitialized(){ return regulatoryBuildPath!=null;}
@@ -114,7 +113,6 @@ public class Model implements Serializable {
             this.genome = new MouseMm10();
         } else {
             PopupFactory.displayError("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
-            return;
         }
     }
 
@@ -367,7 +365,7 @@ public class Model implements Serializable {
     /** @return all selected enzymes as semicolon-separated string. */
     public String getAllSelectedEnzymeString() {
         if (chosenEnzymelist==null || chosenEnzymelist.size()<1) return "none";
-        return chosenEnzymelist.stream().map(re-> re.getPlainSite()).collect(Collectors.joining(";"));
+        return chosenEnzymelist.stream().map(RestrictionEnzyme::getPlainSite).collect(Collectors.joining(";"));
     }
 
     public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
@@ -473,7 +471,7 @@ public class Model implements Serializable {
      * */
     public List<ViewPoint> getActiveViewPointList() {
         if (viewpointList==null ) return new ArrayList<>();
-       return this.viewpointList.stream().filter(viewPoint -> viewPoint.hasValidProbe()).collect(Collectors.toList());
+       return this.viewpointList.stream().filter(ViewPoint::hasValidProbe).collect(Collectors.toList());
     }
 
 }

@@ -50,7 +50,7 @@ public class QCCheckFactory {
         return (! presenter.wasCanceled());
     }
 
-    public static String getHTML(Model model) {
+    private static String getHTML(Model model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
         String designQC=validateDesignParams(model);
@@ -186,7 +186,12 @@ public class QCCheckFactory {
     }
 
 
-
+    /**
+     * Perform a Q/C check of the data that we are using to create the Viewpoints, mainly whether the data is
+     * complete.
+     * @param model Model of the probe design
+     * @return HTML string with summary of Q/C
+     */
     private static String validateData(Model model) {
         StringBuilder sb = new StringBuilder();
         sb.append("<h3>Data section</h3>");
@@ -208,7 +213,7 @@ public class QCCheckFactory {
         if (model.isGenomeUnpacked() && model.isGenomeIndexed()) {
             sb.append("<td>Genome correctly extracted and indexed.</td>");
         } else {
-            String msg="";
+            String msg;
             if (model.isGenomeUnpacked()) {
                 msg="Genome was not correctly indexed";
             } else {
@@ -261,7 +266,7 @@ public class QCCheckFactory {
     /**
      * @return a block of CSS code intended for the blue-beige Table of data on the design.
      */
-    public static String getCSSblock() {
+    private static String getCSSblock() {
         return "<style>\n" +
                 "h1 {\n" +
                 "\tfont-size: 16;\n" +

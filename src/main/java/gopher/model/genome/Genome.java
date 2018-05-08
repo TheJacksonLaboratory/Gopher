@@ -55,11 +55,11 @@ public abstract class Genome implements Serializable {
     }
 
     public boolean isUnpackingComplete() {
-        return pathToGenomeDirectory!= null && unpackingComplete;
+        return unpackingComplete;
     }
 
     public boolean isIndexingComplete() {
-        return pathToGenomeDirectory!= null && indexingComplete;
+        return indexingComplete;
     }
 
     public String getGenomeURL() { return this.genomeURL;}
@@ -88,7 +88,7 @@ public abstract class Genome implements Serializable {
     }
 
     /** @return true if the chromFar.tar.gz file is found in the indicated directory. */
-    protected boolean gZippedGenomeFileDownloaded() {
+    private boolean gZippedGenomeFileDownloaded() {
         File f = new File(this.pathToGenomeDirectory + File.separator + getGenomeBasename());
         return (f.exists() && !f.isDirectory());
     }

@@ -388,7 +388,9 @@ public class GopherMainPresenter implements Initializable {
             this.restrictionEnzymeLabel.setText("not initialized");
         }
         if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid target genes",model.getVPVGeneList().size() ));
+            this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+                    this.model.getChosenGeneCount(),
+                    this.model.getUniqueChosenTSScount()));
         } else {
             this.nValidGenesLabel.setText("not initialized");
         }
@@ -567,8 +569,11 @@ public class GopherMainPresenter implements Initializable {
                 this.genomeDecompressPI);
         genomeGunZipper.setOnSucceeded( event -> {
             decompressGenomeLabel.setText(genomeGunZipper.getStatus());
-            if (genomeGunZipper.OK())
+            if (genomeGunZipper.OK()) {
                 model.setGenomeUnpacked();
+            } else {
+                PopupFactory.displayError("Error","Error from Genome g-unzipper");
+            }
         });
         genomeGunZipper.setOnFailed(eventh -> {
             decompressGenomeLabel.setText("Decompression failed");
