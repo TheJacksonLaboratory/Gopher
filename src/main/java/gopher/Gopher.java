@@ -43,7 +43,7 @@ public class Gopher extends Application {
      */
     private Model model;
 
-    public static final String APPLICATION_ICON = "img/vpvicon.png";
+    public static final String APPLICATION_ICON = "img/gophericon.png";
 
     private Stage primarystage = null;
 
@@ -52,12 +52,12 @@ public class Gopher extends Application {
         updateLog4jConfiguration();
         //logger.info("Starting VPV Gui");
         this.primarystage = primaryStage;
-        Image image = new Image(Gopher.class.getResourceAsStream("/img/vpvicon.png"));
+        Image image = new Image(Gopher.class.getResourceAsStream("/img/gophericon.png"));
         primaryStage.setTitle("GOPHER");
         primaryStage.getIcons().add(image);
         if (isMacintosh()) {
             try {
-                URL iconURL = Gopher.class.getResource("/img/vpvicon.png");
+                URL iconURL = Gopher.class.getResource("/img/gophericon.png");
                 java.awt.Image macimage = new ImageIcon(iconURL).getImage();
                 com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
             } catch (Exception e) {
@@ -112,7 +112,7 @@ public class Gopher extends Application {
         SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
         splashpresenter.setSwitchScreen(switchscreen);
         Scene scene = new Scene(splashview.getView());
-        this.primarystage.setTitle("ViewPoint Viewer");
+        this.primarystage.setTitle("Gopher");
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);

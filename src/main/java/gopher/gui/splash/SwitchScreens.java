@@ -95,7 +95,7 @@ public class SwitchScreens {
         Scene scene = new Scene(appView.getView());
         this.primarystage.setScene(scene);
         this.primarystage.centerOnScreen();
-        this.primarystage.setTitle(String.format("Viewpoint Viewer: %s",name));
+        this.primarystage.setTitle(String.format("Gopher: %s",name));
         this.primarystage.show();
     }
 
