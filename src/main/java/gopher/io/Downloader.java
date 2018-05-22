@@ -3,7 +3,7 @@ package gopher.io;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,7 +82,7 @@ public class Downloader extends Task<Void> {
      * message and does nothing.
      */
     @Override
-    protected Void call() throws VPVException {
+    protected Void call() throws GopherException {
         logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
         InputStream reader;
         FileOutputStream writer;
@@ -117,13 +117,13 @@ public class Downloader extends Task<Void> {
             writer.close();
         } catch (MalformedURLException e) {
             updateProgress(0.00);
-            throw new VPVException(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
+            throw new GopherException(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
         } catch (IOException e) {
             updateProgress(0.00);
-            throw new VPVException(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));
+            throw new GopherException(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));
         } catch (Exception e){
             updateProgress(0.00);
-            throw new VPVException(e.getMessage());
+            throw new GopherException(e.getMessage());
         }
         updateProgress(1.000); /* show 100% completion */
         return null;

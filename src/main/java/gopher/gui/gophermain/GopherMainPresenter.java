@@ -630,7 +630,7 @@ public class GopherMainPresenter implements Initializable {
     /**
      * Open a new dialog where the user can upload gene symbols or Entrez Gene IDs.
      * The effect of the command <pre>EntrezGeneViewFactory.confirmDialog(this.model);</pre>
-     * is to pass a list of {@link VPVGene} objects to the {@link Model}.
+     * is to pass a list of {@link GopherGene} objects to the {@link Model}.
      * These objects are used with other information in the Model to create {@link gopher.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
@@ -648,8 +648,8 @@ public class GopherMainPresenter implements Initializable {
 
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
-     * these will have been entered as {@link VPVGene} objects into the {@link Model}
-     * object. This function will use the {@link VPVGene} obejcts and other information
+     * these will have been entered as {@link GopherGene} objects into the {@link Model}
+     * object. This function will use the {@link GopherGene} obejcts and other information
      * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */

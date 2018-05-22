@@ -2,7 +2,7 @@ package gopher.model.digest;
 
 
 import com.google.common.collect.ImmutableList;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
@@ -49,7 +49,8 @@ import java.util.regex.Pattern;
  */
 public class FragmentFactory {
     private static final Logger logger = LogManager.getLogger(FragmentFactory.class.getName());
-    private List<RestrictionEnzyme> restrictionEnzymeList;
+    /** List of restriction enzyme objects representing the enzymes that were used in the capture Hi-C experiment. */
+    private final List<RestrictionEnzyme> restrictionEnzymeList;
     /** key: index of enzyme; value: name of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #enzyme2number}).*/
     private Map<Integer,RestrictionEnzyme> number2enzyme;
     /** key: name of enzyme; value: index of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #number2enzyme}).*/
@@ -74,14 +75,11 @@ public class FragmentFactory {
      * @param outfile name of output file
      * @param msize margin size (which is used to calculate GC and repeat content)
      */
-    public FragmentFactory(String genomeFastaFile, String outfile, int msize) {
+    public FragmentFactory(String genomeFastaFile, String outfile, int msize, List<RestrictionEnzyme> relist) {
         this.genomeFastaFilePath=genomeFastaFile;
         outfilename=outfile;
-        logger.trace(String.format("FragmentFactory directory=%s",genomeFastaFile));
-        //genomeFilePaths = new ArrayList<>();
-        // Note restriction enzyme file is in src/main/resources
-        //TODO IMPLEMENT THE FOLLOWING OR GET IT FROM SOMEWHERE
-        //restrictionEnzymeList=RestrictionEnzyme.parseRestrictionEnzymes();
+        logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",genomeFastaFile));
+        restrictionEnzymeList=relist;
         marginSize=msize;
     }
 
@@ -90,17 +88,22 @@ public class FragmentFactory {
         return genomeFastaFilePath;
     }
 
-    public void digestGenome(List<String> enzymes) throws VPVException {
 
-        number2enzyme =new HashMap<>();
-        enzyme2number=new HashMap<>();
+    /**
+     *
+     * @param enzymes A list of strings representing the enzymes.
+     * @throws GopherException If an invalid String is passed that does not match  of the allowed enzymes
+     */
+    public void digestGenome(List<String> enzymes) throws GopherException {
+        this.number2enzyme =new HashMap<>();
+        this.enzyme2number=new HashMap<>();
         int n=0;
         for (String enzym : enzymes) {
             RestrictionEnzyme re = restrictionEnzymeList.stream().
                     filter( x ->  enzym.equalsIgnoreCase(x.getName()) ).
                     findFirst().orElse(null);
             if (re==null) {
-                throw new VPVException(String.format("Did not recognize restriction enzyme \"%s\"",enzym));
+                throw new GopherException(String.format("Did not recognize restriction enzyme \"%s\"",enzym));
             } else {
                 n++;
                 number2enzyme.put(n,re);
@@ -116,7 +119,7 @@ public class FragmentFactory {
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new VPVException(String.format("Could not digest chromosomes: %s", e.toString()));
+            throw new GopherException(String.format("Could not digest chromosomes: %s", e.toString()));
         }
 
     }
@@ -159,7 +162,7 @@ public class FragmentFactory {
         try {
              fastaReader = new IndexedFastaSequenceFile(new File(chromosomeFilePath));
         } catch (Exception e) {
-            throw  new VPVException(String.format("Could not find FAI file for %s [%s]",chromosomeFilePath,e.toString()));
+            throw  new GopherException(String.format("Could not find FAI file for %s [%s]",chromosomeFilePath,e.toString()));
         }
 
         ReferenceSequence refseq;

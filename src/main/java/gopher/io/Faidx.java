@@ -4,7 +4,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 import gopher.exception.UnindexableFastaFileException;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.model.Model;
 
 
@@ -73,7 +73,7 @@ public class Faidx extends Task<Void> {
      * It is packaged as a Task to allow concurrency
      */
     @Override
-    protected Void call() throws VPVException {
+    protected Void call() throws GopherException {
         String path = genomeDirectoryPath + File.separator + genomeFastaBaseName;
         if (alreadyIndexed(path)) {
             logger.trace("We found index for " + path +" and are skipping the FAI indexing step");
@@ -169,7 +169,7 @@ public class Faidx extends Task<Void> {
             wr.close();
             updateProgress(1.0D);
         } catch (IOException ioe) {
-            throw new VPVException(ioe.getMessage());
+            throw new GopherException(ioe.getMessage());
         }
 
         return null;

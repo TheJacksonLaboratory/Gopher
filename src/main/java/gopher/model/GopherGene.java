@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @author Peter Robinson
  * @version 0.1.3 (2017-10-02)
  */
-public class VPVGene implements Comparable<VPVGene>, Serializable {
+public class GopherGene implements Comparable<GopherGene>, Serializable {
     /** serialization version ID */
     static final long serialVersionUID = 2L;
     /** An NCBI RefSeq id such as NM_001353311. */
@@ -33,7 +33,7 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
      * @param geneid The RefSeq id (e.g., NM_12345)
      * @param symbol The official gene symbol
      */
-    public VPVGene(String geneid, String symbol) {
+    public GopherGene(String geneid, String symbol) {
         this.refSeqID =geneid;
         this.geneSymbol=symbol;
         this.positions =new TreeSet<>();
@@ -50,11 +50,11 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
 
     public String getGeneSymbol() { return this.geneSymbol;}
     public String getRefSeqID() { return this.refSeqID;}
-    /** Set this VPVGene to be on the forward strand */
+    /** Set this GopherGene to be on the forward strand */
     public  void setForwardStrand() {
         this.forward=true;
     }
-    /** Set this VPVGene to be on the reverse strand */
+    /** Set this GopherGene to be on the reverse strand */
     public void setReverseStrand() {
         this.forward=false;
     }
@@ -67,7 +67,7 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
         this.positions.add(pos);
     }
 
-    /** Dumps the information about the VPVGene and its viewpoints for debugging. */
+    /** Dumps the information about the GopherGene and its viewpoints for debugging. */
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         String strand="-";
@@ -98,7 +98,7 @@ public class VPVGene implements Comparable<VPVGene>, Serializable {
     }
 
     @Override
-    public int compareTo(VPVGene other) {
+    public int compareTo(GopherGene other) {
         return other.positions.first() - this.positions.first();
     }
 }

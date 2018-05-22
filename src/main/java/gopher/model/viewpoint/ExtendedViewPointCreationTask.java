@@ -1,12 +1,12 @@
 package gopher.model.viewpoint;
 
+import gopher.model.GopherGene;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.model.Model;
-import gopher.model.VPVGene;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,7 +41,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         super(model, currentVPproperty);
     }
 
-    private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         List<Integer> gPosList = vpvgene.getTSSlist();
         if (! vpvgene.isForward()) {
@@ -81,10 +81,10 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * @return
      * @throws Exception
      */
-    protected Void call() throws VPVException {
+    protected Void call() throws GopherException {
         if (ViewPoint.chosenEnzymes == null) {
             logger.error("Attempt to start ViewPoint creation with chosenEnzymes=null");
-            throw new VPVException("Attempt to start ViewPoint creation thread with null chosenEnzymes");
+            throw new GopherException("Attempt to start ViewPoint creation thread with null chosenEnzymes");
         }
         this.total = getTotalGeneCount();
         this.i = 0;
@@ -92,13 +92,13 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         String fastapath = this.model.getGenomeFastaFile();
         if (faipath == null) {
             logger.error("Could not retrieve faidx file for " + fastapath);
-            throw new VPVException("Could not retrieve faidx file for " + fastapath);
+            throw new GopherException("Could not retrieve faidx file for " + fastapath);
         }
         IndexedFastaSequenceFile fastaReader;
         try {
             fastaReader =new IndexedFastaSequenceFile(new File(fastapath));
         } catch (FileNotFoundException fnfe) {
-            throw new VPVException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
+            throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
 
         for (ChromosomeGroup group : chromosomes.values()) {

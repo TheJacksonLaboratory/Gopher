@@ -17,7 +17,7 @@ public class VPVGeneTest {
 
     @Test
     public void testVPVGeneCTOR() {
-        VPVGene gene = new VPVGene(geneid,symbol);
+        GopherGene gene = new GopherGene(geneid,symbol);
         Assert.assertEquals(symbol,gene.getGeneSymbol());
         Assert.assertEquals(geneid,gene.getRefSeqID());
     }

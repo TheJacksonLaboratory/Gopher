@@ -1,9 +1,9 @@
 package gopher.io;
 
 
+import gopher.model.GopherGene;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
-import gopher.model.VPVGene;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +31,7 @@ import java.util.zip.GZIPInputStream;
  * </ol>
  * <p>Note that we skip all gene models located on random chromosomes because we do not want to create probes for
  * random chromosome contigs at this time.</p>
- * <p> The class produces a list of {@link VPVGene} objects that represent the genes found in the UCSC files.
+ * <p> The class produces a list of {@link GopherGene} objects that represent the genes found in the UCSC files.
  * These objects convert the coordinate system in the UCSC datbase file (which is 0-start, half-open) to one-based fully closed (both endpoints
  * included, which is the way the data are shown on the UCSC browser).</p>
  * @author Peter Robinson
@@ -40,14 +40,14 @@ import java.util.zip.GZIPInputStream;
  */
 public class RefGeneParser {
     static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
-    /** All genes in the refGene file are converted into VPVGene objects. These will be used to match
-     * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link VPVGene}.
+    /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
+     * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
-    private Map<String, VPVGene> geneSymbolMap =null;
+    private Map<String, GopherGene> geneSymbolMap =null;
     /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen.
      * This map should contain all symbols in the refGene file.
      *  */
-    private Map<String, VPVGene> gene2chromosomePosMap =null;
+    private Map<String, GopherGene> gene2chromosomePosMap =null;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
@@ -102,11 +102,11 @@ public class RefGeneParser {
                 String name2=A[12]; // this is the gene symbol
                 //String key = name2.concat(chrom);
                 String key=String.format("%s_%s_%d",name2,chrom,gPos);
-                VPVGene gene=null;
+                GopherGene gene=null;
                 if (gene2chromosomePosMap.containsKey(key)) {
                     gene = gene2chromosomePosMap.get(key);
                 } else {
-                    gene = new VPVGene(accession, name2);
+                    gene = new GopherGene(accession, name2);
                     gene.setChromosome(chrom);
                     if (strand.equals("+")){
                         gene.setForwardStrand();
@@ -157,7 +157,7 @@ public class RefGeneParser {
     /** The user uploads a list of gene symbols. This function checks this list against the gene symbols that
      * are contained in the corresponding {@code refGene.txt.gz} file. Each uploaded symbol that is found in the
      * {@code refGene.txt.gz}  file is placed in {@link #geneSymbolMap} as the key,
-     * and the corresponding {@link VPVGene} object is placed in the Set {@link #validGeneSymbols},
+     * and the corresponding {@link GopherGene} object is placed in the Set {@link #validGeneSymbols},
      * and all uploaded gene symbols that are not found there are placed in the Set {@link #invalidGeneSymbols}.
      * @param genelst List of gene symbols uploaded by the user.
      */
@@ -179,14 +179,14 @@ public class RefGeneParser {
     }
 
     /**
-     * Iterate through all {@link VPVGene} objects and return a list of only those {@link VPVGene}s that
+     * Iterate through all {@link GopherGene} objects and return a list of only those {@link GopherGene}s that
      * represent valid gene symbols uploaded by the user
      * @return List of VPVGenes representing valid uploaded gene symbols.
      */
-    public List<VPVGene> getVPVGeneList() {
-        List<VPVGene> genelist=new ArrayList<>();
+    public List<GopherGene> getVPVGeneList() {
+        List<GopherGene> genelist=new ArrayList<>();
         this.n_chosenTSS=0;
-        for (VPVGene g: gene2chromosomePosMap.values()) {
+        for (GopherGene g: gene2chromosomePosMap.values()) {
             if (this.validGeneSymbols.contains(g.getGeneSymbol())) {
                 genelist.add(g);
                 this.n_chosenTSS += g.n_viewpointstarts();
@@ -195,7 +195,7 @@ public class RefGeneParser {
         return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use gene2chromosomePosMap
     }
 
-    /** @return the total number of {@link VPVGene} objects created from parsing the {@code refGene.txt.gz} file. */
+    /** @return the total number of {@link GopherGene} objects created from parsing the {@code refGene.txt.gz} file. */
     public int getTotalNumberOfRefGenes() { return this.n_totalGenes; }
 
     public int getNumberOfRefGenesChosenByUser() { return this.validGeneSymbols.size(); }

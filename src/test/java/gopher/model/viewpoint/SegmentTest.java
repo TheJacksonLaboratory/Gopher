@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import gopher.io.RestrictionEnzymeParser;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -7,6 +8,7 @@ import org.junit.Test;
 import gopher.model.Default;
 
 import java.io.File;
+import java.net.URL;
 
 import static org.junit.Assert.*;
 
@@ -26,9 +28,13 @@ public class SegmentTest {
     public static void setup() throws Exception {
         //String testFastaFile="src/test/resources/testgenome/test_genome.fa";
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
+
         String testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         File fasta = new File(testFastaFile);
         FastaReader = new IndexedFastaSequenceFile(fasta);
+
+
+
 
         segmentA=buildSegmentA(FastaReader);
         segmentB = buildSegmentB(FastaReader);

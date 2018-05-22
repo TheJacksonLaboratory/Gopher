@@ -3,7 +3,7 @@ package gopher.model.regulatoryexome;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.GeneRegGTFParser;
 import gopher.model.Model;
@@ -117,7 +117,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /**
      * Parse the {@code refGene.txt.gz} file. Note that we parse zero-based numbers here.
      */
-    private void collectExonsFromTargetGenes() throws VPVException,IOException {
+    private void collectExonsFromTargetGenes() throws GopherException,IOException {
         Map<String, ViewPoint> vpmap = new HashMap<>();
         updateProgress(0.05);
         int j=0;
@@ -150,7 +150,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             String[] endings = A[10].split(","); // exon begins and ends.
             String name2=A[12];
             if (beginnings.length != endings.length) { // should never happen!
-                throw new VPVException(String.format("Malformed line for gene %s (%s): number of exon starts/ends should be equal, but we found %d/%d",
+                throw new GopherException(String.format("Malformed line for gene %s (%s): number of exon starts/ends should be equal, but we found %d/%d",
                         name2,accession,beginnings.length,endings.length));
             }
             for (int i=0;i<beginnings.length;++i) {
@@ -189,7 +189,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
     /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
-    protected Void call() throws VPVException {
+    protected Void call() throws GopherException {
         Map<String,List<ViewPoint>> chrom2vpListMap=getChrom2PosListMap(model);
         if (chrom2vpListMap.size()==0) {
                 PopupFactory.displayError("No Viewpoints chosen",
@@ -238,7 +238,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         } catch (IOException e) {
             String msg = String.format("Could not input regulatory elements: %s",e.getMessage());
             status.add(msg);
-            throw new VPVException(msg);
+            throw new GopherException(msg);
         }
         logger.trace(String.format("We got %d regulatory elements",regulatoryElementSet.size()));
         return null;

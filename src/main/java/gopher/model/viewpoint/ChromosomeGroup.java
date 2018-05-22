@@ -1,15 +1,15 @@
 package gopher.model.viewpoint;
 
 
+import gopher.model.GopherGene;
 import org.apache.log4j.Logger;
-import gopher.model.VPVGene;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * This class is designed to group the {@link gopher.model.VPVGene} objects according to
+ * This class is designed to group the {@link GopherGene} objects according to
  * chromosome so that we can open a FastaReader object only once for each chromosome. We
  * will order the VPVGenes according to chromosome and then sort them according to location
  * on the chromosome.
@@ -20,16 +20,16 @@ public class ChromosomeGroup {
     private static final Logger logger = Logger.getLogger(ChromosomeGroup.class.getName());
     private String referenceSequenceID=null;
 
-    private List<VPVGene> genes=null;
+    private List<GopherGene> genes=null;
 
     public ChromosomeGroup(String ref) {
         this.referenceSequenceID=ref;
         genes=new ArrayList<>();
     }
 
-    public void addVPVGene(VPVGene g) { genes.add(g);}
+    public void addVPVGene(GopherGene g) { genes.add(g);}
 
-    public List<VPVGene> getGenes() {
+    public List<GopherGene> getGenes() {
         Collections.sort(genes);
         return genes;
     }

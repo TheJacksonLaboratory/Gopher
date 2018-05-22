@@ -2,6 +2,7 @@ package gopher.gui.entrezgenetable;
 
 
 
+import gopher.model.GopherGene;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,8 +15,6 @@ import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RefGeneParser;
 import gopher.model.Model;
-import gopher.model.VPVGene;
-
 
 
 import java.io.BufferedReader;
@@ -32,13 +31,13 @@ import java.util.function.Consumer;
  *     <li>Upload causes {@link #uploadGenes(ActionEvent)} to be run, which fills the set {@link #symbols}.
  *     This set can contain valid and invalid symbols</li>
  *     <li>Validate causes {@link #validateGeneSymbols(ActionEvent)} to be run, which causes the
- *     {@link RefGeneParser} object to store {@link VPVGene} objects for each gene/distinct TSS in the RefGene.txt.gz file.
+ *     {@link RefGeneParser} object to store {@link GopherGene} objects for each gene/distinct TSS in the RefGene.txt.gz file.
  *     only one transcriptmodel is stored per distinct transcription start site. The function also displays lists of valid and invalid
  *     gene symbols in the dialog</li>
- *     <li>Accept causes {@link #acceptGenes()} to be run, which creates a list of {@link VPVGene} objects - one for
+ *     <li>Accept causes {@link #acceptGenes()} to be run, which creates a list of {@link GopherGene} objects - one for
  *     each valid symbol -- and passes this to the {@link Model}. It also causes the dialog to close</li>
  * </ol>
- * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link VPVGene} objects to the model.
+ * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link GopherGene} objects to the model.
  * This list should then be used to create {@link gopher.model.viewpoint.ViewPoint} objects elsewhere in the code.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
@@ -49,7 +48,7 @@ public class EntrezGenePresenter implements Initializable {
     private WebView wview;
     /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
-    /** This class parses {@link VPVGene} objects from the refGene.txt.gz file. */
+    /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
     RefGeneParser parser=null;
     /** reference to the stage of the primary App. */
     private Stage stage = null;
@@ -226,7 +225,7 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
-    /** This function closes the dialog for entering genes, and passes the VPVGene list to the model. */
+    /** This function closes the dialog for entering genes, and passes the GopherGene list to the model. */
     @FXML public void acceptGenes() {
         if (!isvalidated) {
             PopupFactory.displayError("Error","Please validate genes for accepting them!");
