@@ -20,7 +20,7 @@ public class EntrezGeneViewFactory {
         Stage window;
         String windowTitle = "Enter Gene List";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         EntrezGeneView view = new EntrezGeneView();
@@ -47,7 +47,7 @@ public class EntrezGeneViewFactory {
         Stage window;
         String windowTitle = "Enter Gene List";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         EntrezGeneView view = new EntrezGeneView();
@@ -84,7 +84,7 @@ public class EntrezGeneViewFactory {
         sb.append("</p>");
         sb.append("<p>");
         sb.append("Finally, click on <b><TT>Accept</TT></b> to import the corresponding genes and transcripts into. ");
-        sb.append("the ViewPoint Viewer app.");
+        sb.append("the GOPHER app.");
         sb.append("</p>");
         sb.append("</body></html>");
         return sb.toString();

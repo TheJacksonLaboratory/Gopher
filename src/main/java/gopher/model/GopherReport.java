@@ -17,15 +17,15 @@ import java.util.Properties;
  * The purpose of this class is to provide the user with a summary that can be downloaded or copied and that will contain
  * a summary of all of the analysis parameters and results.
  * @author Peter Robinson
- * @version 0.1.1 (2017-11-17)
+ * @version 0.1.2 (2018-06-07)
  */
-public class VPVReport {
-    private static final Logger logger = Logger.getLogger(VPVReport.class.getName());
-    private Model model;
+public class GopherReport {
+    private static final Logger logger = Logger.getLogger(GopherReport.class.getName());
+    private final Model model;
 
-    private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
+    private static final NumberFormat dformater= NumberFormat.getInstance(Locale.US);
 
-    public VPVReport(Model model) {
+    public GopherReport(Model model) {
         this.model=model;
     }
 
@@ -73,7 +73,7 @@ public class VPVReport {
     private String getSettingsReport() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
-        StringBuilder sb = new StringBuilder("Viewpoint Viewer: Panel generation report\n");
+        StringBuilder sb = new StringBuilder("GOPHER: Panel generation report\n");
         sb.append(dateFormat.format(date)).append("\n");
         sb.append(String.format("genome_build: %s\n", model.getGenomeBuild()));
         sb.append(String.format("path_to_downloaded_genome_directory: %s\n",model.getGenomeDirectoryPath()));

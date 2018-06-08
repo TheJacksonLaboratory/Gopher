@@ -30,11 +30,10 @@ public class PopupFactory {
 
 
 
-    private boolean showDialogToGetIntegerFromUser(String title, String html, String labeltext, int previousValue, int defaultValue){
+    private boolean showDialogToGetIntegerFromUser(String windowTitle, String html, String labeltext, int previousValue, int defaultValue){
         Stage window;
-        String windowTitle = title;
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         PopupView view = new PopupView();
@@ -76,11 +75,10 @@ public class PopupFactory {
     }
 
 
-    private boolean showDialogToGetStringFromUser(String title, String html, String labeltext, String previousValue, String defaultValue){
+    private boolean showDialogToGetStringFromUser(String windowTitle, String html, String labeltext, String previousValue, String defaultValue){
         Stage window;
-        String windowTitle = title;
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         PopupView view = new PopupView();
@@ -124,7 +122,7 @@ public class PopupFactory {
 
 
     private static String getMarginSizeHTML() {
-        String html = "<h1>Margin Size</h1>\n"+
+        return "<h1>Margin Size</h1>\n"+
                 "<p>" +
                 "The margin size defines the width of the regions at the margins of restriction fragments " +
                 "that are exported as target regions in the end. " +
@@ -132,46 +130,38 @@ public class PopupFactory {
                 "</p>" +
                 "For the simple approach the margin size should equal the probe length." +
                 "</p>";
-
-        return html;
     }
 
 
     private static String getProbeLengthHTML() {
-        String html = "<h1>Probe length</h1>\n"+
+        return  "<h1>Probe length</h1>\n"+
                 "<p>The probes used in capture Hi-C are oligonucleotides (sometimes called baits) " +
                 "that are used to capture sequences of interest, thereby enriching these sequences prior " +
                 "to next generation sequencing. In some technologies, streptavidin-labeled magnetic beads " +
                 "are used to capture target sequences in solution; in others, variable length probes are " +
                 "attached to an array. The probe length entered here should match the probe length used in " +
                 "the actual capture Hi-C experiment that will be conducted.</p>";
-
-        return html;
     }
 
     private static String getProjectNameHTML() {
-        String html = "<h1>VPV Projects</h1>\n"+
+        return  "<h1>VPV Projects</h1>\n"+
                 "<p>Enter a name for a new VPV project. Names should start with letters, numbers, or an underscore." +
                 " By default, VPV stores the projects in a hidden .gopher directory in the user's home directory." +
                 " Projects can also be exported to other locations on the file system using the File|Export... menu item." +
                 " Projects can be imported with Project|Import.</p>";
-
-        return html;
     }
 
     public Integer setProbeLength(int previousValue) {
         String title="Enter Probe Length";
         String labelText="Enter probe length:";
         String html=getProbeLengthHTML();
-        boolean OK=false;
         if (previousValue>0) {
             html=html +  "<p>The previously entered value is shown.</p>";
             html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
         } else {
             html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
         }
-        OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.PROBE_LENGTH);
-
+        boolean OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.PROBE_LENGTH);
         if (OK) {
             return integerValue;
         } else {
@@ -185,14 +175,13 @@ public class PopupFactory {
         String title="Enter Margin Size";
         String labelText="Enter margin size (bp):";
         String html=getMarginSizeHTML();
-        boolean OK=false;
         if (previousValue>0) {
             html=html +  "<p>The previously entered value is shown.</p>";
             html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
         } else {
             html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
         }
-        OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.MARGIN_SIZE);
+        boolean OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.MARGIN_SIZE);
 
         if (OK) {
             return integerValue;
@@ -208,10 +197,7 @@ public class PopupFactory {
         String labelText="Enter project name:";
         String defaultProjectName="new project";
         String html=getProjectNameHTML();
-        boolean OK=false;
-
-        OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
-
+        boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
         if (OK) {
             return stringValue;
         } else {
@@ -262,11 +248,7 @@ public class PopupFactory {
         );
 
         Button button = new Button("OK");
-
-        button.setOnAction(e -> {
-            window.close();
-        });
-
+        button.setOnAction(e -> window.close());
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10, 50, 50, 50));
@@ -300,10 +282,7 @@ public class PopupFactory {
         );
 
         Button button = new Button("OK");
-
-        button.setOnAction(e -> {
-            window.close();
-        });
+        button.setOnAction(e -> window.close() );
 
 
         VBox layout = new VBox(10);
@@ -351,7 +330,7 @@ public class PopupFactory {
 
     public static void showAbout(String versionString, String dateString) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("ViewPoint Viewer");
+        alert.setTitle("GOPHER");
         alert.setHeaderText(null);
         alert.setContentText(String.format("Version %s\nLast changed: %s",versionString,dateString ));
 
@@ -398,7 +377,7 @@ public class PopupFactory {
     /**
      * @return a block of CSS code intended for the blue-beige Table of data on the design.
      */
-    public static String getCSSblock() {
+    private static String getCSSblock() {
         return "<style>\n" +
                 "h1 {\n" +
                 "\tfont-size: 16;\n" +
@@ -431,7 +410,7 @@ public class PopupFactory {
         Stage window;
         String windowTitle = "VPV Report";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         PopupView view = new PopupView();
