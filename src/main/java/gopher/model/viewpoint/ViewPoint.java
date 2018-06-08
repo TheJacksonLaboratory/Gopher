@@ -86,7 +86,14 @@ public class ViewPoint implements Serializable {
     /** This is a reference to the segment that overlaps the TSS */
     private Segment centerSegment=null;
 
-    public void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
+    /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
+     * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
+     */
+    private boolean manuallyRevised=false;
+    /** @return true iff the user has revised of modified this viewpoint in any way. */
+    public boolean wasManuallyRevised() {  return manuallyRevised;  }
+
+    void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
     public int getPromoterNumber(){return promoterNumber;}
     public int getTotalPromoterCount(){return totalPromoters;}
@@ -99,7 +106,7 @@ public class ViewPoint implements Serializable {
         return upstreamNucleotideLength;
     }
 
-    public static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
+    static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
     /** A list of restriction enzymes (at least one) as chosen by the user. */
     public static RestrictionEnzyme getChosenEnzyme(int i) {
         if (chosenEnzymes==null || i-1>chosenEnzymes.size()) return null;
@@ -195,7 +202,7 @@ public class ViewPoint implements Serializable {
     }
 
     /**
-     * @param fastaReader
+     * @param fastaReader file pointer to an index FASTA
      */
     private void init(IndexedFastaSequenceFile fastaReader) {
         this.restrictionSegmentList=new ArrayList<>();
@@ -208,83 +215,6 @@ public class ViewPoint implements Serializable {
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
         initRestrictionFragments(fastaReader);
-    }
-
-    /**
-     * A Builder class. To create a {@link ViewPoint} object, use code such as
-     * <pre>
-     *  refID="chr15";
-     *  int gpos=48937985;
-     *  ViewPoint vp = new ViewPoint.Builder(refID,gpos).targetName("FBN1").upstreamNtLength(1500).build();
-     * </pre>
-     * and add Builders for each parameter with a non-default value.
-     */
-    public static class Builder {
-        //  parameters required in the constructor
-        private String chromosomeID;
-        private String accessionNr=null;
-        private int genomicPos;
-        // other params
-        private IndexedFastaSequenceFile fastaReader;
-        private String targetName="";
-        // Optional parameters - initialized to default values
-        /* upstream nucleotide length for digest generation (upstream of genomic pos).*/
-        private Integer upstreamNtLength = Default.SIZE_UPSTREAM;
-        /* downstream nucleotide length for digest generation (downstream of genomic pos).*/
-        private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM;
-        /** Need to choose a default strand, but this will always be overwritten. */
-        private boolean isPositiveStrand =true;
-        private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
-        private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
-        private double maxGcContent=Default.MAX_GC_CONTENT;
-        private double minGcContent=Default.MIN_GC_CONTENT;
-        private int marginSize=Default.MARGIN_SIZE;
-
-        /**
-         *
-         * @param refID reference sequence ID (eg, chr5)
-         * @param pos central position of the viewpoint on the reference sequence
-         */
-        public Builder(String refID, int pos) {
-            this.chromosomeID = refID;
-            this.genomicPos    = pos;
-        }
-        public Builder targetName(String val)
-        { targetName = val;  return this; }
-        public Builder fastaReader(IndexedFastaSequenceFile val) {
-            this.fastaReader=val; return this;
-        }
-        public Builder maximumGcContent(double maxGC) {
-            maxGcContent=maxGC; return this;
-        }
-        public Builder isForwardStrand(boolean strand) {
-           this.isPositiveStrand = strand;
-            return this;
-        }
-        public Builder minimumGcContent(double minGC) {
-            this.minGcContent=minGC; return this;
-        }
-        public Builder accessionNr(String acc) {
-            this.accessionNr=acc;return this;
-        }
-        public Builder downstreamLength(int val) {
-            this.downstreamNtLength=val; return this;
-        }
-        public Builder upstreamLength(int val) {
-            this.upstreamNtLength=val; return this;
-        }
-        public Builder minimumFragmentSize(int val) {
-            this.minFragSize=val; return this;
-        }
-        public Builder maximumRepeatContent(double val) {
-            this.maximumRepeatContent=val; return this;
-        }
-        public Builder marginSize(int val) {
-            this.marginSize=val; return this;
-        }
-        public ViewPoint build() {
-            return new ViewPoint(this);
-        }
     }
 
 
@@ -341,7 +271,7 @@ public class ViewPoint implements Serializable {
 
 
 
-    public final void setEndPos(Integer endPos) {
+    private void setEndPos(Integer endPos) {
         this.endPos = endPos;
     }
 
@@ -349,7 +279,7 @@ public class ViewPoint implements Serializable {
         return approach.toString();
     }
 
-    public final void setDerivationApproach(Approach derivationApproach) {
+    private void setDerivationApproach(Approach derivationApproach) {
         this.approach = derivationApproach;
     }
 
@@ -362,7 +292,7 @@ public class ViewPoint implements Serializable {
         return getNumOfSelectedFrags()>0 && resolved;
     }
 
-    public final void setResolved(boolean resolved) {
+    private void setResolved(boolean resolved) {
         this.resolved = resolved;
     }
     /** @return Number of Segments in this ViewPoint that are active (selected). */
@@ -410,7 +340,7 @@ public class ViewPoint implements Serializable {
         boolean resolved = true;
         approach=Approach.EXTENDED;
         this.centerSegment=null; // the digest that contains the TSS. Always show it!
-        restrictionSegmentList.stream().forEach(segment -> segment.setSelected(true));
+        restrictionSegmentList.forEach(segment -> segment.setSelected(true));
 
         for (Segment segment : restrictionSegmentList) {
             if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
@@ -473,8 +403,7 @@ public class ViewPoint implements Serializable {
         } else {
             int i = Math.max(0, firstSelectedIndex - 1);
             int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
-            List<Segment> newlist = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
-            restrictionSegmentList = newlist;
+            restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
         }
 
         setDerivationApproach(Approach.EXTENDED);
@@ -547,7 +476,7 @@ public class ViewPoint implements Serializable {
             repeat = segment.getRepeatContentMarginDown();
             gc = segment.getGcContentMarginDown();
         } else {
-            logger.error(String.format("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'"));
+            logger.error("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'");
 
         }
 
@@ -566,12 +495,11 @@ public class ViewPoint implements Serializable {
      * @param maxDistToGenomicPos is used to init the normal distribution used to model the distance score.
      * @return position distance score between 0 and 1 (see maunscript).
      */
-    public double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
+    private double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
         double sd = maxDistToGenomicPos/6; // the factor 1/6 was chosen by eye
         double mean = -3*sd; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
         NormalDistribution nD = new NormalDistribution(mean,sd);
-        double score = nD.cumulativeProbability(-dist);
-        return score;
+        return nD.cumulativeProbability(-dist);
     }
 
 
@@ -698,12 +626,12 @@ public class ViewPoint implements Serializable {
     }
     /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
-        return getActiveSegments().stream().mapToInt(segment -> segment.getMarginSize()).sum();
+        return getActiveSegments().stream().mapToInt(Segment::getMarginSize).sum();
     }
 
     /** @return the total length of all active segments of this ViewPoint. */
     public Integer getTotalLengthOfActiveSegments() {
-        return getActiveSegments().stream().mapToInt(segment -> segment.length()).sum();
+        return getActiveSegments().stream().mapToInt(Segment::length).sum();
     }
 
     /**
@@ -713,8 +641,8 @@ public class ViewPoint implements Serializable {
      * deafult upstream position if no segment was selected.
      * @return the 5' position that we want to confirmDialog.
      */
-    public int getMinimumSelectedPosition() {
-        return getActiveSegments().stream().mapToInt(s -> s.getStartPos()).min().orElse(this.genomicPos-upstreamNucleotideLength);
+    private int getMinimumSelectedPosition() {
+        return getActiveSegments().stream().mapToInt(Segment::getStartPos).min().orElse(this.genomicPos-upstreamNucleotideLength);
     }
     /**
      * This function is intended to help confirmDialog the right
@@ -723,8 +651,8 @@ public class ViewPoint implements Serializable {
      * deafult downstream position if no segment was selected.
      * @return the 5' position that we want to confirmDialog.
      */
-    public int getMaximumSelectedPosition() {
-        return getActiveSegments().stream().mapToInt(s -> s.getEndPos()).max().orElse(this.genomicPos+downstreamNucleotideLength);
+    private int getMaximumSelectedPosition() {
+        return getActiveSegments().stream().mapToInt(Segment::getEndPos).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
     /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
@@ -762,7 +690,7 @@ public class ViewPoint implements Serializable {
     /**
      * If no segments are active/selected, then return zero. Otherwise return the length between the 5' end of the
      * first selected segment and the 3' end of the last selected segment.
-     * @return
+     * @return length between the 5' nt of first selected segment and 3' nt of the last selected segment.
      */
     public Integer getTotalLengthOfViewpoint() {
         if (getActiveSegments().size()==0) return 0;
@@ -787,6 +715,85 @@ public class ViewPoint implements Serializable {
 
     public boolean hasNoActiveSegment() {
         return this.getActiveSegments().size()==0;
+    }
+    /** This function is called if the user has worked on this viewpoint at all. */
+    public void setManuallyRevised() {  this.manuallyRevised = true;  }
+
+    /**
+     * A Builder class. To create a {@link ViewPoint} object, use code such as
+     * <pre>
+     *  refID="chr15";
+     *  int gpos=48937985;
+     *  ViewPoint vp = new ViewPoint.Builder(refID,gpos).targetName("FBN1").upstreamNtLength(1500).build();
+     * </pre>
+     * and add Builders for each parameter with a non-default value.
+     */
+    public static class Builder {
+        //  parameters required in the constructor
+        private String chromosomeID;
+        private String accessionNr=null;
+        private int genomicPos;
+        // other params
+        private IndexedFastaSequenceFile fastaReader;
+        private String targetName="";
+        // Optional parameters - initialized to default values
+        /* upstream nucleotide length for digest generation (upstream of genomic pos).*/
+        private Integer upstreamNtLength = Default.SIZE_UPSTREAM;
+        /* downstream nucleotide length for digest generation (downstream of genomic pos).*/
+        private Integer downstreamNtLength = Default.SIZE_DOWNSTREAM;
+        /** Need to choose a default strand, but this will always be overwritten. */
+        private boolean isPositiveStrand =true;
+        private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
+        private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
+        private double maxGcContent=Default.MAX_GC_CONTENT;
+        private double minGcContent=Default.MIN_GC_CONTENT;
+        private int marginSize=Default.MARGIN_SIZE;
+
+        /**
+         *
+         * @param refID reference sequence ID (eg, chr5)
+         * @param pos central position of the viewpoint on the reference sequence
+         */
+        Builder(String refID, int pos) {
+            this.chromosomeID = refID;
+            this.genomicPos    = pos;
+        }
+        Builder targetName(String val)
+        { targetName = val;  return this; }
+        Builder fastaReader(IndexedFastaSequenceFile val) {
+            this.fastaReader=val; return this;
+        }
+        Builder maximumGcContent(double maxGC) {
+            maxGcContent=maxGC; return this;
+        }
+        Builder isForwardStrand(boolean strand) {
+            this.isPositiveStrand = strand;
+            return this;
+        }
+        Builder minimumGcContent(double minGC) {
+            this.minGcContent=minGC; return this;
+        }
+        Builder accessionNr(String acc) {
+            this.accessionNr=acc;return this;
+        }
+        Builder downstreamLength(int val) {
+            this.downstreamNtLength=val; return this;
+        }
+        Builder upstreamLength(int val) {
+            this.upstreamNtLength=val; return this;
+        }
+        Builder minimumFragmentSize(int val) {
+            this.minFragSize=val; return this;
+        }
+        Builder maximumRepeatContent(double val) {
+            this.maximumRepeatContent=val; return this;
+        }
+        Builder marginSize(int val) {
+            this.marginSize=val; return this;
+        }
+        public ViewPoint build() {
+            return new ViewPoint(this);
+        }
     }
 
 

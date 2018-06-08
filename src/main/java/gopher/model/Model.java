@@ -1,6 +1,7 @@
 package gopher.model;
 
 
+import gopher.io.RestrictionEnzymeParser;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.genome.Genome;
@@ -11,6 +12,7 @@ import gopher.model.genome.MouseMm10;
 import gopher.model.viewpoint.ViewPoint;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,7 @@ public class Model implements Serializable {
     /** List of {@link ViewPoint} objects created from the gene list chosen by the user. */
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
-    private List<VPVGene> geneList=null;
+    private List<GopherGene> geneList=null;
 
     public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
@@ -257,7 +259,7 @@ public class Model implements Serializable {
     public void setIndexedGenomeFastaIndexFile(String path) { indexedGenomeFastaIndexFile=path;}
     public String getIndexedGenomeFastaIndexFile() { return indexedGenomeFastaIndexFile; }
 
-    public List<VPVGene> getVPVGeneList() { return this.geneList; }
+    public List<GopherGene> getVPVGeneList() { return this.geneList; }
 
     public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
     public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
@@ -311,24 +313,12 @@ public class Model implements Serializable {
      * then a list of restriction enzymes structured as name\tsite
      */
     private void initializeEnzymesFromFile() {
-        enzymelist = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/enzymelist.tab")));
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("#"))
-                    continue; /* skip header*/
-                String a[] = line.split("\\s+");
-                RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
-                enzymelist.add(re);
-            }
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        URL location =  this.getClass().getResource("/enzymelist.tab");
+        RestrictionEnzymeParser parser = new RestrictionEnzymeParser(location.getPath());
+        this.enzymelist = parser.getEnzymes();
     }
 
-    public void setVPVGenes(List<VPVGene> vpvgenelist) {
+    public void setVPVGenes(List<GopherGene> vpvgenelist) {
         this.geneList = vpvgenelist;
     }
 
@@ -338,7 +328,7 @@ public class Model implements Serializable {
             return;
         }
         System.err.println("VPV Genes in Model:");
-        for (VPVGene vg : geneList) {
+        for (GopherGene vg : geneList) {
             System.err.println(vg);
         }
     }
@@ -347,7 +337,7 @@ public class Model implements Serializable {
         return this.viewpointList;
     }
 
-    /** @return true if we have at least one VPVGene (which contain ViewPoints). */
+    /** @return true if we have at least one GopherGene (which contain ViewPoints). */
     public boolean viewpointsInitialized() {
         return (this.viewpointList!=null && this.viewpointList.size()>0);
     }
@@ -392,7 +382,7 @@ public class Model implements Serializable {
     public int n_viewpointStarts() {
         if (this.geneList==null) return 0;
         int n=0;
-        for (VPVGene g:geneList) {
+        for (GopherGene g:geneList) {
             n+=g.n_viewpointstarts();
         }
         return n;

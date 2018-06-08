@@ -28,13 +28,13 @@ import java.util.Set;
 public class BEDFileExporter {
 
     private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
-    private String allTracksBEDfile =null;
-    private String targetRegionBEDfile =null;
-    private String vpvSummaryTSVfile=null;
-    private String vpvSummaryRfile=null;
-    private String vpvUniqueTargetFragmentsFile=null;
+    private final String allTracksBEDfile;
+    private final String targetRegionBEDfile;
+    private final String vpvSummaryTSVfile;
+    private final String vpvSummaryRfile;
+    private final String vpvUniqueTargetFragmentsFile;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
-    private String directoryPath;
+    private final String directoryPath;
 
     /**
      *
@@ -42,7 +42,12 @@ public class BEDFileExporter {
      * @param outPrefix The prefix (name) of the files.
      */
     public BEDFileExporter(String dirpath, String outPrefix){
-        initFileNames(outPrefix);
+        // initialize the file  names
+        this.allTracksBEDfile =String.format("%s_allTracks.bed",outPrefix);
+        this.targetRegionBEDfile =String.format("%s_targetRegions.txt",outPrefix);
+        this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",outPrefix);
+        this.vpvSummaryRfile=String.format("%s_vpvSummary.r",outPrefix);
+        this.vpvUniqueTargetFragmentsFile=String.format("%s_unique_target_fragments.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
             dirpath=dirpath.substring(0,dirpath.length()-1);
@@ -50,13 +55,7 @@ public class BEDFileExporter {
         this.directoryPath=dirpath;
     }
 
-    private void initFileNames(String prefix) {
-        this.allTracksBEDfile =String.format("%s_allTracks.bed",prefix);
-        this.targetRegionBEDfile =String.format("%s_targetRegions.txt",prefix);
-        this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",prefix);
-        this.vpvSummaryRfile=String.format("%s_vpvSummary.r",prefix);
-        this.vpvUniqueTargetFragmentsFile=String.format("%s_unique_target_fragments.bed",prefix);
-    }
+
 
     private String getFullPath(String fname) {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
@@ -202,7 +201,7 @@ public class BEDFileExporter {
 
 
     /** @return A UCSC URL representing the target region of interest. */
-    public String getDefaultURL(ViewPoint vp, String genomebuild) {
+    private String getDefaultURL(ViewPoint vp, String genomebuild) {
         int posFrom, posTo;
          int offset = 500;
         posFrom = vp.getStartPos() - offset;
@@ -216,7 +215,7 @@ public class BEDFileExporter {
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem);
     }
 
-    public String getRscript(String prefix) {
+    private String getRscript(String prefix) {
         String script="TAB <- read.table(\"" + prefix + "_vpvSummary.tsv\", sep = \"\\t\",header=T)\n\n";
 
         script += "cairo_pdf(\"" + prefix + "_vpvSummary.pdf\", width=7, height=7)\n";

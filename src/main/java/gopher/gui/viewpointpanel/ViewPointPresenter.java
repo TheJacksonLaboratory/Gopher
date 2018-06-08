@@ -43,7 +43,7 @@ public class ViewPointPresenter implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ViewPointPresenter.class.getName());
 
-    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p><i>Connecting to UCSC " +
+    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
 
@@ -98,10 +98,8 @@ public class ViewPointPresenter implements Initializable {
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
     private VPAnalysisPresenter analysisPresenter=null;
 
-    /**
-     * Instance of {@link ViewPoint} presented by this presenter.
-     */
-    private ViewPoint vp;
+    /** Instance of {@link ViewPoint} presented by this presenter. */
+    private ViewPoint viewpoint;
 
     private int coloridx = 0;
     /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
@@ -124,14 +122,14 @@ public class ViewPointPresenter implements Initializable {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getURL(vp,getHighlightRegions());
+        String url= urlmaker.getURL(viewpoint,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
         e.consume();
     }
 
     @FXML private void deleteThisViewPoint(Event e) {
-        this.model.deleteViewpoint(this.vp);
+        this.model.deleteViewpoint(this.viewpoint);
         tab.setDisable(true);
         this.tab.getTabPane().getTabs().remove(this.tab);
         this.analysisPresenter.refreshVPTable();
@@ -140,7 +138,7 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getImageURL(vp,getHighlightRegions());
+        String url= urlmaker.getImageURL(viewpoint,getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
         this.ucscWebEngine = ucscContentWebView.getEngine();
@@ -253,6 +251,8 @@ public class ViewPointPresenter implements Initializable {
 
         colorTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getColor()));
         isSelectedTableColumn.setCellValueFactory(cdf -> {
+            // if we get here, the user has selected or deselected the checkbox
+            this.viewpoint.setManuallyRevised();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly
@@ -399,26 +399,6 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-        /*
-        gcContentTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getGCcontentAsPercent())));
-        gcContentTableColumn.setComparator(new PercentComparator());
-        gcContentTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
-            // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null && !empty) { // here, item is String like '40.00%'
-                    setText(item);
-                    double gc = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (gc < model.getMinGCcontent() || gc > model.getMaxGCcontent()) { // GC content is like 0.25
-                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-                    } else {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-                    }
-                }
-            }
-        });*/
         vpScoreProperty=new SimpleStringProperty();
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
@@ -429,29 +409,29 @@ public class ViewPointPresenter implements Initializable {
     }
 
     private void updateScore() {
-        this.vp.calculateViewpointScore();
+        this.viewpoint.calculateViewpointScore();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
-                vp.getTargetName(),
-                vp.getAccession(),
-                100*vp.getScore(),
-                vp.getGenomicLocationString(),
-                vp.getTotalAndActiveLengthAsString()));
-        if (vp.hasNoActiveSegment()) {
+                viewpoint.getTargetName(),
+                viewpoint.getAccession(),
+                100* viewpoint.getScore(),
+                viewpoint.getGenomicLocationString(),
+                viewpoint.getTotalAndActiveLengthAsString()));
+        if (viewpoint.hasNoActiveSegment()) {
             this.vpExplanationProperty.setValue("No selected fragments");
         } else {
-            int upstreamSpan=vp.getUpstreamSpan();
-            int downstreamSpan=vp.getDownstreamSpan();
-            int total = vp.getTotalPromoterCount();
+            int upstreamSpan= viewpoint.getUpstreamSpan();
+            int downstreamSpan= viewpoint.getDownstreamSpan();
+            int total = viewpoint.getTotalPromoterCount();
             String promoterCount;
             if (total==1) {
-                promoterCount=String.format("Only promoter of %s gene",vp.getTargetName());
+                promoterCount=String.format("Only promoter of %s gene", viewpoint.getTargetName());
             } else {
                  promoterCount = String.format("Promoter %d of %d of %s gene",
-                        vp.getPromoterNumber(),
-                        total, vp.getTargetName());
+                        viewpoint.getPromoterNumber(),
+                        total, viewpoint.getTargetName());
             }
             this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s (%s)",
-                    upstreamSpan,downstreamSpan,promoterCount,vp.getStrandAsString()));
+                    upstreamSpan,downstreamSpan,promoterCount, viewpoint.getStrandAsString()));
         }
     }
 
@@ -465,21 +445,16 @@ public class ViewPointPresenter implements Initializable {
      * @param vp {@link ViewPoint} which will be presented.
      */
     public void setViewPoint(ViewPoint vp) {
-        this.vp = vp;
+        this.viewpoint = vp;
         updateScore();
         this.coloredsegments = vp.getAllSegments().stream()
-                .map(s -> new ColoredSegment(s, getNextColor(s.isSelected())))
+                .map(s -> new ColoredSegment(s, getNextColor()))
                 .collect(Collectors.toList());
         segmentsTableView.getItems().addAll(coloredsegments);
-
-        // prepare url parts
-        String genome = this.model.getGenomeBuild();
         // create url & load content from UCSC
         URLMaker maker = new URLMaker(this.model);
-        String re=this.model.getFirstRestrictionEnzymeString();
         String url= maker.getImageURL(vp,getHighlightRegions());
         ucscWebEngine.load(url);
-
     }
 
     public void setTab(Tab tab) {
@@ -512,7 +487,7 @@ public class ViewPointPresenter implements Initializable {
      * segment to show as not color-highlighted in the UCSC image or in the table.
      * @return a rotating list of colors for the digest highlights.
      */
-    private String getNextColor(boolean isSelected) {
+    private String getNextColor() {
         String color = colors[this.coloridx];
         this.coloridx = (this.coloridx + 1) % (colors.length);
         return String.format("%%23%s", color);
@@ -523,11 +498,12 @@ public class ViewPointPresenter implements Initializable {
 
     private void zoom(double factor) {
         String path=this.model.getGenomeFastaFile();
+        this.viewpoint.setManuallyRevised();
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-            ViewPoint newVP = new ViewPoint(this.vp,factor,fastaReader);
-            int maxSizeUp = (int) (vp.getUpstreamNucleotideLength() * factor);
-            int maxSizeDown = (int) (vp.getDownstreamNucleotideLength() * factor);
+            ViewPoint newVP = new ViewPoint(this.viewpoint,factor,fastaReader);
+            int maxSizeUp = (int) (viewpoint.getUpstreamNucleotideLength() * factor);
+            int maxSizeDown = (int) (viewpoint.getDownstreamNucleotideLength() * factor);
             newVP.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown,model.getAllowSingleMargin());
             segmentsTableView.getItems().clear();
             this.coloredsegments.clear();
@@ -535,7 +511,7 @@ public class ViewPointPresenter implements Initializable {
             refreshUCSCButtonAction();
             updateScore();
         } catch (FileNotFoundException e) {
-            logger.error("Could not zoom for "+vp.getTargetName());
+            logger.error("Could not zoom for "+ viewpoint.getTargetName());
             logger.error(e,e);
         }
     }
@@ -564,7 +540,7 @@ public class ViewPointPresenter implements Initializable {
      * . */
     private String getHighlightRegions() {
         String genome = this.model.getGenomeBuild();
-        String chromosome = this.vp.getReferenceID();
+        String chromosome = this.viewpoint.getReferenceID();
         List<String> colorsegmentlist = coloredsegments.stream().
                 filter(ColoredSegment::isSelected).
                 map( c -> String.format("%s.%s%%3A%d-%d%s",
@@ -599,7 +575,7 @@ public class ViewPointPresenter implements Initializable {
             return checkBox;
         }
 
-        public String getColor() {
+        String getColor() {
             if (this.segment.isSelected())
                 return color;
             else
@@ -607,21 +583,21 @@ public class ViewPointPresenter implements Initializable {
 
         }
 
-        public Segment getSegment() {
+        Segment getSegment() {
             return segment;
         }
 
-        public boolean isSelected() {
+        boolean isSelected() {
             return segment.isSelected();
         }
 
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder("ColoredSegment{");
-            sb.append("color='").append(color).append('\'');
-            sb.append(", segment=").append(segment);
-            sb.append('}');
-            return sb.toString();
+            return "ColoredSegment{color='" +
+                    color +
+                    "', segment=" +
+                    segment +
+                    "}";
         }
     }
 

@@ -6,7 +6,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
@@ -88,12 +88,12 @@ public class RegulatoryExomeBoxFactory {
 
 
 
-    public static File getDirectoryForExport(Node rootNode) throws VPVException {
+    public static File getDirectoryForExport(Node rootNode) throws GopherException {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory to store regulatory exome BED file.");
         File file = dirChooser.showDialog(rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
-            throw new VPVException("Could not set directory to write regulatory exome BED file.");
+            throw new GopherException("Could not set directory to write regulatory exome BED file.");
         }
         return file;
     }

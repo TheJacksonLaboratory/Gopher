@@ -1,10 +1,10 @@
 package gopher.io;
 
 
+import gopher.model.GopherGene;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import gopher.model.VPVGene;
 
 
 import java.util.Arrays;
@@ -86,9 +86,9 @@ public class RefGeneParserTest {
         int expected=1;
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<VPVGene> vpvgenes=parser.getVPVGeneList();
-        VPVGene gene=null;
-        for (VPVGene g:vpvgenes) {
+        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        GopherGene gene=null;
+        for (GopherGene g:vpvgenes) {
             if (g.getGeneSymbol().equals("FAM216B")){
                 gene=g; break;
             }
@@ -128,9 +128,9 @@ public class RefGeneParserTest {
     public void testGenomicPosNegStrandExample() {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<VPVGene> vpvgenes=parser.getVPVGeneList();
-        VPVGene gene=null;
-        for (VPVGene g:vpvgenes) {
+        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        GopherGene gene=null;
+        for (GopherGene g:vpvgenes) {
             if (g.getGeneSymbol().equals("WASH7P")){
                 gene=g; break;
             }
@@ -155,9 +155,9 @@ public class RefGeneParserTest {
     public void testGenomicPosPlusStrandExample() {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<VPVGene> vpvgenes=parser.getVPVGeneList();
-        VPVGene gene=null;
-        for (VPVGene g:vpvgenes) {
+        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        GopherGene gene=null;
+        for (GopherGene g:vpvgenes) {
             if (g.getGeneSymbol().equals("LINC01010")){
                 gene=g; break;
             }

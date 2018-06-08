@@ -1,12 +1,12 @@
 package gopher.model.viewpoint;
 
+import gopher.model.GopherGene;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.model.Model;
-import gopher.model.VPVGene;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +40,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
-    private void calculateViewPoints(VPVGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
 
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
@@ -81,9 +81,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * We have placed it in a task because it takes a while.
      *
      * @return
-     * @throws VPVException if we cannot create the viewpoints
+     * @throws GopherException if we cannot create the viewpoints
      */
-    protected Void call() throws VPVException {
+    protected Void call() throws GopherException {
         if (ViewPoint.chosenEnzymes == null) {
             logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
@@ -97,13 +97,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         String fastapath = this.model.getGenomeFastaFile();
         if (faipath == null) {
             logger.error("Could not retrieve faidx file for " + fastapath);
-            throw new VPVException("Could not retrieve faidx file for " + fastapath);
+            throw new GopherException("Could not retrieve faidx file for " + fastapath);
         }
         IndexedFastaSequenceFile fastaReader;
         try {
             fastaReader =new IndexedFastaSequenceFile(new File(fastapath));
         } catch (FileNotFoundException fnfe) {
-            throw new VPVException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
+            throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
 
 

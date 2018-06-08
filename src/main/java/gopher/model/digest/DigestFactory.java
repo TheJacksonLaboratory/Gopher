@@ -2,7 +2,7 @@ package gopher.model.digest;
 
 
 import com.google.common.collect.ImmutableList;
-import gopher.exception.VPVException;
+import gopher.exception.GopherException;
 import gopher.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
@@ -14,26 +14,35 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * Class to perform in silico digestion of genome FASTA files. Note that this class borrows some ideas from VPV
- * but the fragments that we create are slightly different compared to VPV because more information is required
- * in the output file.
- * <p>We will additionally add information that will be of use for performing Poisson normalization. To do
- * so, we need to calculate local genomic features:
- * <ul>
- *     <li>GC content. This will be calculated as the GC content at the margin that was used for enrichment
- *     (250bp by default in VPC)</li>
- *     <li>Repeat content. Note that I will include this instead of mappability, I think it is more relevant given the much longer read lengths we have today</li>
- *     <li>Size of the digest</li>
- *     <li>Note that for the final regression, we can consider adding data from the actual ordered probes.</li>
- * </ul></p>
- *This means we will use the following format
+ * Class to perform in silico digestion of genome FASTA files. This class produces an export file that
+ * can be used by downstream analysis programs.
+ * <p>The format of the output program is as follows:</p>
+ * <ol>
+ *     <li>Chromosome</li>
+ *     <li>Fragment_Start_Position  (one-based, inclusive)</li>
+ *     <li>Fragment_End_Position  (one-based, inclusive)</li>
+ *     <li>Fragment_Number (can be used to search for adjacent fragments)</li>
+ *     <li>5'_Restriction_Site</li>
+ *     <li>3'_Restriction_Site</li>
+ *     <li>Length</li>
+ *     <li>GC content of 5' margin</li>
+ *     <li>GC content of 3' margin</li>
+ *     <li>Repeat content of 5' margin</li>
+ *     <li>Repeat content of 3' margin</li>
+ *     <li>Active/inactive flag</li>
+ *     <li>Number of probes (upstream;downstream)</li>
+ * </ol>
+
+ *This means we will use the following format TODO update
  * <pre>
  * Genome:testgenome       Restriction_Enzyme1:BgIII [A^GATCT]     Restriction_Enzyme2:None        Hicup digester version 0.5.10
  * Chromosome      Fragment_Start_Position Fragment_End_Position   Fragment_Number RE1_Fragment_Number     5'_Restriction_Site     3'_Restriction_Site
@@ -45,11 +54,13 @@ import java.util.regex.Pattern;
  * </pre>
  *
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
- * @version 0.0.3
+ * @author <a href="mailto:peter.hansen@charite.de">Peter Hansen</a>
+ * @version 0.1.2
  */
-public class FragmentFactory {
-    private static final Logger logger = LogManager.getLogger(FragmentFactory.class.getName());
-    private List<RestrictionEnzyme> restrictionEnzymeList;
+public class DigestFactory {
+    private static final Logger logger = LogManager.getLogger(DigestFactory.class.getName());
+    /** List of restriction enzyme objects representing the enzymes that were used in the capture Hi-C experiment. */
+    private final List<RestrictionEnzyme> restrictionEnzymeList;
     /** key: index of enzyme; value: name of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #enzyme2number}).*/
     private Map<Integer,RestrictionEnzyme> number2enzyme;
     /** key: name of enzyme; value: index of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #number2enzyme}).*/
@@ -62,11 +73,25 @@ public class FragmentFactory {
     private final int marginSize;
     /** Name of output file. */
     private final String outfilename;
-
-
+    /** Fields of the header of the output file. */
+    private final String[] headerFields = {
+            "Chromosome",
+            "Fragment_Start_Position",
+            "Fragment_End_Position",
+            "Fragment_Number",
+            "5'_Restriction_Site",
+            "3'_Restriction_Site",
+            "Length",
+            "5'_GC_Content",
+            "3'_GC_Content",
+            "5'_Repeat_Content",
+            "3'_Repeat_Content",
+            "Selected",
+            "5'_Probes",
+            "3'_Probes"
+    };
     /** Header of the output file. */
-    private static final String HEADER="Chromosome\tFragment_Start_Position\t" +
-            "Fragment_End_Position\tFragment_Number\t5'_Restriction_Site\t3'_Restriction_Site";
+    private final String HEADER= Arrays.stream(headerFields).collect(Collectors.joining("\t"));
 
     /**
      *
@@ -74,14 +99,11 @@ public class FragmentFactory {
      * @param outfile name of output file
      * @param msize margin size (which is used to calculate GC and repeat content)
      */
-    public FragmentFactory(String genomeFastaFile, String outfile, int msize) {
+    public DigestFactory(String genomeFastaFile, String outfile, int msize, List<RestrictionEnzyme> relist) {
         this.genomeFastaFilePath=genomeFastaFile;
         outfilename=outfile;
-        logger.trace(String.format("FragmentFactory directory=%s",genomeFastaFile));
-        //genomeFilePaths = new ArrayList<>();
-        // Note restriction enzyme file is in src/main/resources
-        //TODO IMPLEMENT THE FOLLOWING OR GET IT FROM SOMEWHERE
-        //restrictionEnzymeList=RestrictionEnzyme.parseRestrictionEnzymes();
+        logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",genomeFastaFile));
+        restrictionEnzymeList=relist;
         marginSize=msize;
     }
 
@@ -90,17 +112,22 @@ public class FragmentFactory {
         return genomeFastaFilePath;
     }
 
-    public void digestGenome(List<String> enzymes) throws VPVException {
 
-        number2enzyme =new HashMap<>();
-        enzyme2number=new HashMap<>();
+    /**
+     *
+     * @param enzymes A list of strings representing the enzymes.
+     * @throws GopherException If an invalid String is passed that does not match  of the allowed enzymes
+     */
+    public void digestGenome(List<String> enzymes) throws GopherException {
+        this.number2enzyme =new HashMap<>();
+        this.enzyme2number=new HashMap<>();
         int n=0;
         for (String enzym : enzymes) {
             RestrictionEnzyme re = restrictionEnzymeList.stream().
                     filter( x ->  enzym.equalsIgnoreCase(x.getName()) ).
                     findFirst().orElse(null);
             if (re==null) {
-                throw new VPVException(String.format("Did not recognize restriction enzyme \"%s\"",enzym));
+                throw new GopherException(String.format("Did not recognize restriction enzyme \"%s\"",enzym));
             } else {
                 n++;
                 number2enzyme.put(n,re);
@@ -116,50 +143,23 @@ public class FragmentFactory {
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new VPVException(String.format("Could not digest chromosomes: %s", e.toString()));
+            throw new GopherException(String.format("Could not digest chromosomes: %s", e.toString()));
         }
 
     }
 
 
 
-    /** This function will identify FASTA files in the directory #genomeDirectoryPath by looking for all files
-     * with the suffix {@code .fa}. It will add the absolute path of each file on the local file system to the
-     * list genomeFilePaths
-     */
-//    private void identifyFASTAfiles() throws DiachromaticException {
-//        File genomeDir = new File(this.genomeDirectoryPath);
-//        if (!genomeDir.exists()) {
-//            throw new DiachromaticException(String.format("Could not find directory \"%s\" with genome FASTA files", this.genomeDirectoryPath));
-//        }
-//        if (!genomeDir.isDirectory()) {
-//            throw new DiachromaticException(String.format("%s must be a directory with genome FASTA files", this.genomeDirectoryPath));
-//        }
-//        for (final File fileEntry : genomeDir.listFiles()) {
-//            if (fileEntry.isDirectory()) {
-//                continue;
-//            } else if (!fileEntry.getPath().endsWith(".fa")) {
-//                continue;
-//            } else {
-//                this.genomeFilePaths.add(fileEntry.getAbsolutePath());
-//            }
-//        }
-//    }
-
-//
-//    int getGenomeFileCount() {
-//        return genomeFilePaths.size();
-//    }
 
     private int counter=1;
-
+    /** This will cut all of the chromosomes in the multi-FASTA chromosome file. */
     private void cutChromosomes(String chromosomeFilePath, BufferedWriter out) throws Exception {
         logger.trace(String.format("cutting chromosomes %s",chromosomeFilePath ));
         IndexedFastaSequenceFile fastaReader;
         try {
              fastaReader = new IndexedFastaSequenceFile(new File(chromosomeFilePath));
         } catch (Exception e) {
-            throw  new VPVException(String.format("Could not find FAI file for %s [%s]",chromosomeFilePath,e.toString()));
+            throw  new GopherException(String.format("Could not find FAI file for %s [%s]",chromosomeFilePath,e.toString()));
         }
 
         ReferenceSequence refseq;

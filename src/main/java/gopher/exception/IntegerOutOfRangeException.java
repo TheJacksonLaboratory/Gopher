@@ -3,7 +3,7 @@ package gopher.exception;
 /**
  * Created by phansen on 6/20/17.
  */
-public class IntegerOutOfRangeException extends VPVException {
+public class IntegerOutOfRangeException extends GopherException {
 
     public IntegerOutOfRangeException() {}
 

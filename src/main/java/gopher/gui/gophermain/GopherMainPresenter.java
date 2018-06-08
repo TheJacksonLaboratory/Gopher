@@ -61,7 +61,7 @@ import java.util.ResourceBundle;
  * @version 0.2.8 (2017-11-12)
  */
 public class GopherMainPresenter implements Initializable {
-    private static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
+    private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
     /** The Model for the entire analysis. */
     private Model model = null;
     /**
@@ -71,9 +71,9 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML private Node rootNode;
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML private ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
+    @FXML private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
     /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML private ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
+    @FXML private final ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
     @FXML private ChoiceBox<String> genomeChoiceBox;
     @FXML private ChoiceBox<String> approachChoiceBox;
     /** Clicking this button downloads the genome build and unpacks it.*/
@@ -214,16 +214,13 @@ public class GopherMainPresenter implements Initializable {
         logger.trace("initialize() called");
         genomeChoiceBox.setItems(genomeTranscriptomeList);
         genomeChoiceBox.getSelectionModel().selectFirst();
-        genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            setGenomeBuild(newValue);
-        });
+        genomeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> setGenomeBuild(newValue) );
         // The following will initialize the GUI to the simple approach
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
         setGUItoSimple();
-        approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            this.approachLabel.setText(newValue);
-        });
+        approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) ->
+            this.approachLabel.setText(newValue) );
         this.approachLabel.setText(approachChoiceBox.getValue());
 
         initializePromptTextsToDefaultValues();
@@ -340,7 +337,7 @@ public class GopherMainPresenter implements Initializable {
      * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
      * @param mod A {@link Model} object.
      */
-    public void setModel(Model mod) {
+    private void setModel(Model mod) {
         this.model=mod;
         logger.trace(String.format("Setting model to %s",mod.getProjectName()));
         setInitializedValuesInGUI();
@@ -630,7 +627,7 @@ public class GopherMainPresenter implements Initializable {
     /**
      * Open a new dialog where the user can upload gene symbols or Entrez Gene IDs.
      * The effect of the command <pre>EntrezGeneViewFactory.confirmDialog(this.model);</pre>
-     * is to pass a list of {@link VPVGene} objects to the {@link Model}.
+     * is to pass a list of {@link GopherGene} objects to the {@link Model}.
      * These objects are used with other information in the Model to create {@link gopher.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
@@ -648,8 +645,8 @@ public class GopherMainPresenter implements Initializable {
 
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
-     * these will have been entered as {@link VPVGene} objects into the {@link Model}
-     * object. This function will use the {@link VPVGene} obejcts and other information
+     * these will have been entered as {@link GopherGene} objects into the {@link Model}
+     * object. This function will use the {@link GopherGene} obejcts and other information
      * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
@@ -679,9 +676,7 @@ public class GopherMainPresenter implements Initializable {
 
         Stage window = new Stage();
         String windowTitle = "Viewpoint creation";
-        window.setOnCloseRequest( event -> {
-            window.close();
-        } );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
         pbpresent.setSignal(signal -> {
             switch (signal) {
@@ -766,7 +761,7 @@ public class GopherMainPresenter implements Initializable {
         this.model=new Model();
         this.model.setProjectName(projectname);
         if (this.primaryStage!=null)
-            this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",projectname));
+            this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setModel(this.model);
@@ -826,7 +821,7 @@ public class GopherMainPresenter implements Initializable {
         Stage window;
         String windowTitle = "Proxy Settings";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         SetProxyView view = new SetProxyView();
@@ -1012,7 +1007,7 @@ public class GopherMainPresenter implements Initializable {
             removePreviousValuesFromTextFields();
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
             if (this.primaryStage!=null)
-                this.primaryStage.setTitle(String.format("Viewpoint Viewer: %s",
+                this.primaryStage.setTitle(String.format("GOPHER: %s",
                         model.getProjectName()));
 
         this.vpanalysisview = new VPAnalysisView();
@@ -1069,9 +1064,7 @@ public class GopherMainPresenter implements Initializable {
 
             popup.close();
         });
-        downloadTask.setOnFailed(e -> {
-            logger.error("Download of regulatory build failed");
-        });
+        downloadTask.setOnFailed(e -> logger.error("Download of regulatory build failed") );
         try {
             popup.startProgress(downloadTask);
         } catch (InterruptedException e) {
@@ -1096,9 +1089,8 @@ public class GopherMainPresenter implements Initializable {
         try {
             final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
             logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
-            javafx.application.Platform.runLater(() ->  {
-                        RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory);
-                    });
+            javafx.application.Platform.runLater(() ->
+                        RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory));
         } catch (Exception e) {
             PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
         }
@@ -1110,13 +1102,13 @@ public class GopherMainPresenter implements Initializable {
     }
 
     @FXML public void displayReport(ActionEvent e) {
-        VPVReport report = new VPVReport(this.model);
+        GopherReport report = new GopherReport(this.model);
         PopupFactory.showSummaryDialog(report.getReport());
         e.consume();
     }
 
     @FXML public void exportReport(ActionEvent e) {
-        VPVReport report = new VPVReport(this.model);
+        GopherReport report = new GopherReport(this.model);
         String filename =String.format("%s-report.txt",model.getProjectName());
         FileChooser chooser = new FileChooser();
         chooser.setInitialFileName(filename);
