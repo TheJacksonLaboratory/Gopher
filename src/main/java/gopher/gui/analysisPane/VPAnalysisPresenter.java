@@ -25,10 +25,10 @@ import java.util.*;
  * @version 0.1.3 (2018-06-07).
  */
 public class VPAnalysisPresenter implements Initializable {
-    private static Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
+    private static final Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
     /** This is the message users will see if they open the analysis tab before they have entered the genes
      * and started the analysis of the viewpoints. */
-    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>View Point Viewer</h3><p>Please set up and " +
+    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p>Please set up and " +
             "initialize analysis using the Set Up Tab.</p></body></html>";
 
     @FXML
@@ -57,7 +57,7 @@ public class VPAnalysisPresenter implements Initializable {
     /** A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
      * reference to a Tab that has been opened for it.
      */
-    private Map<ViewPoint,Tab> openTabs=new HashMap<>();
+    private final Map<ViewPoint,Tab> openTabs=new HashMap<>();
 
 
 
