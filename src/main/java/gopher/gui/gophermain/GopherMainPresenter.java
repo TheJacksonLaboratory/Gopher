@@ -1,5 +1,6 @@
 package gopher.gui.gophermain;
 
+import gopher.model.digest.DigestCreationTask;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -23,8 +24,8 @@ import gopher.exception.DownloadFileNotFoundException;
 
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
-import gopher.gui.createviewpointpb.CreateViewpointPBPresenter;
-import gopher.gui.createviewpointpb.CreateViewpointPBView;
+import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
+import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
@@ -643,6 +644,55 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
+    @FXML private void saveDigestFileAs(ActionEvent e) {
+        logger.trace("Saving the digest file");
+        // get path from chooser
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose file path to save digest file");
+        File file = chooser.showSaveDialog(null);
+        if (file==null) {
+            return;
+        }
+        String path = file.getAbsolutePath();
+        StringProperty sp=new SimpleStringProperty();
+        DigestCreationTask task = new DigestCreationTask(path,model,sp);
+
+        TaskProgressBarView pbview = new TaskProgressBarView();
+        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
+        pbpresent.setTitle("Creating Digest file");
+        pbpresent.initBindings(task,sp);
+        Stage window = new Stage();
+        String windowTitle = "Digest file creation";
+        window.setOnCloseRequest( event -> window.close() );
+        window.setTitle(windowTitle);
+        pbpresent.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+
+        task.setOnSucceeded(event -> {
+            logger.trace("Finished creating digest file");
+            pbpresent.closeWindow();
+        });
+        task.setOnFailed(eh -> {
+            Exception exc = (Exception)eh.getSource().getException();
+            PopupFactory.displayException("Error",
+                    "Exception encountered while attempting to create digest file",
+                    exc);
+        });
+        new Thread(task).start();
+        window.setScene(new Scene(pbview.getView()));
+        window.showAndWait();
+        e.consume();
+    }
+
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
      * these will have been entered as {@link GopherGene} objects into the {@link Model}
@@ -651,7 +701,6 @@ public class GopherMainPresenter implements Initializable {
      * {@link VPAnalysisPresenter} Tab.
      */
     public void createViewPoints() {
-        logger.trace("Entering createViewPoints");
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
@@ -670,8 +719,9 @@ public class GopherMainPresenter implements Initializable {
             task = new ExtendedViewPointCreationTask(model,sp);
         }
 
-        CreateViewpointPBView pbview = new CreateViewpointPBView();
-        CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
+        TaskProgressBarView pbview = new TaskProgressBarView();
+        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
+        pbpresent.setTitle("Creating Viewpoints ...4");
         pbpresent.initBindings(task,sp);
 
         Stage window = new Stage();
@@ -809,10 +859,6 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
-
-    @FXML private void saveDigestFileAs(ActionEvent e) {
-        e.consume();
-    }
 
     /**
      * @param e event triggered by set proxy command.

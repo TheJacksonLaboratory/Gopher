@@ -3,12 +3,16 @@ package gopher.model.digest;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.GopherException;
+import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
+import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -60,8 +64,8 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:peter.hansen@charite.de">Peter Hansen</a>
  * @version 0.1.2
  */
-public class DigestFactory {
-    private static final Logger logger = LogManager.getLogger(DigestFactory.class.getName());
+public class DigestCreationTask extends Task<Void> {
+    private static final Logger logger = LogManager.getLogger(DigestCreationTask.class.getName());
     /** List of restriction enzyme objects representing the enzymes that were used in the capture Hi-C experiment. */
     private final List<RestrictionEnzyme> restrictionEnzymeList;
     /** key: index of enzyme; value: name of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #enzyme2number}).*/
@@ -76,6 +80,13 @@ public class DigestFactory {
     private final int marginSize;
     /** Name of output file. */
     private final String outfilename;
+    /** String property that will be displayed on the GUI as the digest is being created. */
+    private StringProperty sproperty;
+    /** Reference to current model. */
+    private final Model model;
+    /**  We will use this to show progress in digest creation. */
+    private int totalDigestCounter=0;
+
     /** Fields of the header of the output file. */
     private final String[] headerFields = {
             "Chromosome",
@@ -104,18 +115,18 @@ public class DigestFactory {
      * Margin size (which is used to calculate GC and fivePrimeRepeatContent content);
      * The list of chosen restriction enzymes;
      * THe list of chosen viewpoints.
-     * @param genomeFastaFile path to the combined FASTA file with all (or all canonical) chromosomes.
      * @param outfile name of output file
      * @param model Reference to the model
      */
-    public DigestFactory(String genomeFastaFile, String outfile, Model model) {
+    public DigestCreationTask(String outfile, Model model, StringProperty sp) {
         int msize = model.getMarginSize();
         this.restrictionEnzymeList = model.getChosenEnzymelist();
-        this.genomeFastaFilePath=genomeFastaFile;
+        this.genomeFastaFilePath=model.getGenomeFastaFile();
         outfilename=outfile;
-        logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",genomeFastaFile));
+        logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",this.genomeFastaFilePath));
         marginSize=msize;
-        extractChosenSegments(model);
+        this.sproperty=sp;
+        this.model=model;
     }
 
 
@@ -132,29 +143,37 @@ public class DigestFactory {
         }
     }
 
+    public Void call() {
+        updateLabelText("Creating binary tree of selected fragments...");
+        extractChosenSegments(model);
 
+        try {
+            digestGenome(sproperty);
+        } catch (GopherException ge) {
+            PopupFactory.displayException("Digest error","Exception encountered while processing digest",ge);
+        }
+        return null;
+    }
 
-    /** @return the path of the multi-chromosome, single FASTA file used to calculate the digest. */
-    String getGenomeFastaFilePath() {
-        return genomeFastaFilePath;
+    /** This updates the message on the GUI on a JavaFX thread to show the user which digests are
+     * being generated. */
+    private void updateLabelText(String msg) {
+        Platform.runLater( () -> sproperty.setValue(msg) );
     }
 
 
     /**
      *
-     * @param enzymes A list of strings representing the enzymes.
-     * @throws GopherException If an invalid String is passed that does not match  of the allowed enzymes
+     * @throws GopherException If an null restriction enzyme is passed that does not match  of the allowed enzymes
      */
-    public void digestGenome(List<String> enzymes) throws GopherException {
+    private void digestGenome(StringProperty sprop) throws GopherException {
         this.number2enzyme =new HashMap<>();
         this.enzyme2number=new HashMap<>();
+        this.sproperty=sprop;
         int n=0;
-        for (String enzym : enzymes) {
-            RestrictionEnzyme re = restrictionEnzymeList.stream().
-                    filter( x ->  enzym.equalsIgnoreCase(x.getName()) ).
-                    findFirst().orElse(null);
+        for (RestrictionEnzyme re  : this.restrictionEnzymeList) {
             if (re==null) {
-                throw new GopherException(String.format("Did not recognize restriction enzyme \"%s\"",enzym));
+                throw new GopherException("Got null restriction enzyme");
             } else {
                 n++;
                 number2enzyme.put(n,re);
@@ -170,7 +189,6 @@ public class DigestFactory {
             e.printStackTrace();
             throw new GopherException(String.format("Could not digest chromosomes: %s", e.toString()));
         }
-
     }
 
 
@@ -180,6 +198,7 @@ public class DigestFactory {
     /** This will cut all of the chromosomes in the multi-FASTA chromosome file. */
     private void cutChromosomes(String chromosomeFilePath, BufferedWriter out) throws Exception {
         logger.trace(String.format("cutting chromosomes %s",chromosomeFilePath ));
+        updateLabelText(String.format("digesting chromosomes %s",chromosomeFilePath ));
         IndexedFastaSequenceFile fastaReader;
         try {
              fastaReader = new IndexedFastaSequenceFile(new File(chromosomeFilePath));
@@ -194,6 +213,7 @@ public class DigestFactory {
             String sequence = fastaReader.getSequence(seqname).getBaseString();
             //ReferenceSequence refseq = fastaReader.nextSequence();
             logger.trace(String.format("Cutting %s (length %d)",seqname,sequence.length() ));
+            updateLabelText(String.format("Digesting %s (length %d)",seqname,sequence.length() ));
             cutOneChromosome(seqname, sequence);
         }
 
@@ -250,8 +270,8 @@ public class DigestFactory {
                     result.getFivePrimeRepeatContent(),
                     result.getThreePrimeRepeatContent(),
                     selected ? "T" : "F",
-                    -1,
-                    -1));
+                    0,
+                    0));
             previousCutEnzyme=number2enzyme.get(f.enzymeNumber).getName();
             previousCutPosition=f.position;
         }
@@ -276,8 +296,8 @@ public class DigestFactory {
                 result.getFivePrimeRepeatContent(),
                 result.getThreePrimeRepeatContent(),
                 "?-selected",
-                -1,
-                -1));
+                0,
+                0));
     }
 
 
