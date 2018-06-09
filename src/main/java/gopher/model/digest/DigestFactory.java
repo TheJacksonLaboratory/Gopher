@@ -3,7 +3,10 @@ package gopher.model.digest;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.GopherException;
+import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
+import gopher.model.viewpoint.Segment;
+import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import org.apache.log4j.LogManager;
@@ -69,7 +72,7 @@ public class DigestFactory {
     private final String genomeFastaFilePath;
     /** File handle for the output of the restriction fragments. */
     private BufferedWriter out = null;
-    /** size of margin of fragments used for calculating GC and repeat content. */
+    /** size of margin of fragments used for calculating GC and fivePrimeRepeatContent content. */
     private final int marginSize;
     /** Name of output file. */
     private final String outfilename;
@@ -92,20 +95,44 @@ public class DigestFactory {
     };
     /** Header of the output file. */
     private final String HEADER= Arrays.stream(headerFields).collect(Collectors.joining("\t"));
+    /** Binary tree of active {@link Segment}.*/
+    private BinaryTree btree;
+
 
     /**
-     *
+     * This constructor extraqcts several items from the Model:
+     * Margin size (which is used to calculate GC and fivePrimeRepeatContent content);
+     * The list of chosen restriction enzymes;
+     * THe list of chosen viewpoints.
      * @param genomeFastaFile path to the combined FASTA file with all (or all canonical) chromosomes.
      * @param outfile name of output file
-     * @param msize margin size (which is used to calculate GC and repeat content)
+     * @param model Reference to the model
      */
-    public DigestFactory(String genomeFastaFile, String outfile, int msize, List<RestrictionEnzyme> relist) {
+    public DigestFactory(String genomeFastaFile, String outfile, Model model) {
+        int msize = model.getMarginSize();
+        this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath=genomeFastaFile;
         outfilename=outfile;
         logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",genomeFastaFile));
-        restrictionEnzymeList=relist;
         marginSize=msize;
+        extractChosenSegments(model);
     }
+
+
+    private void extractChosenSegments(Model model) {
+        btree = new BinaryTree();
+        //A list of Viewpoints that contain at least one selected digest.
+        List<ViewPoint> vplist = model.getActiveViewPointList();
+        for (ViewPoint vp : vplist) {
+            String chrom = vp.getReferenceID();
+            List<Segment> seglist = vp.getActiveSegments();
+            for (Segment seg : seglist) {
+                btree.add(seg);
+            }
+        }
+    }
+
+
 
     /** @return the path of the multi-chromosome, single FASTA file used to calculate the digest. */
     String getGenomeFastaFilePath() {
@@ -137,8 +164,6 @@ public class DigestFactory {
         try {
             out = new BufferedWriter(new FileWriter(outfilename));
             out.write(HEADER + "\n");
-            // TODO IMPLEMENT THIS IN GOPHER
-            //FASTAIndexManager.indexChromosome(this.genomeFastaFilePath);
             cutChromosomes(this.genomeFastaFilePath, out);
             out.close();
         } catch (Exception e) {
@@ -174,8 +199,14 @@ public class DigestFactory {
 
     }
 
-    private void cutOneChromosome(String seqname,String sequence) throws IOException {
-        ImmutableList.Builder<Fragment> builder = new ImmutableList.Builder<>();
+    /**
+     *
+     * @param scaffoldName name of chromosome or alt scaffold
+     * @param sequence DNA sequence of the chromosome
+     * @throws IOException can be thrown by the BufferedWriter.
+     */
+    private void cutOneChromosome(String scaffoldName,String sequence) throws IOException {
+        ImmutableList.Builder<Digest> builder = new ImmutableList.Builder<>();
         for (Map.Entry<RestrictionEnzyme,Integer> ent : enzyme2number.entrySet()) {
             int enzymeNumber = ent.getValue();
             RestrictionEnzyme enzyme = ent.getKey();
@@ -189,33 +220,38 @@ public class DigestFactory {
                 if (counter%1000==0) {
                     System.out.println(String.format("Added %d th digest",counter ));
                 }
-                builder.add(new Fragment(enzymeNumber,pos));
+                builder.add(new Digest(enzymeNumber,pos));
             }
         }
-        ImmutableList<Fragment> fraglist = ImmutableList.sortedCopyOf(builder.build());
+        ImmutableList<Digest> fraglist = ImmutableList.sortedCopyOf(builder.build());
         String previousCutEnzyme="None";
         Integer previousCutPosition=0; // start of chromosome
         //Header
-        //Chromosome      Fragment_Start_Position Fragment_End_Position   Fragment_Number RE1_Fragment_Number     5'_Restriction_Site     3'_Restriction_Site
-        String chromo=seqname;
-        int n=0;
-        for (Fragment f:fraglist) {
+
+         int n=0;
+        for (Digest f:fraglist) {
             int startpos= (previousCutPosition+1);
             int endpos = f.position;
             // Note: to get subsequence, decrement startpos by one to get zero-based numbering
             // leave endpos as is--it is one past the end in zero-based numbering.
             String subsequence=sequence.substring(startpos-1,endpos);
-            Result result = getGcAndRepeat(subsequence);
-            out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\n",
-                    chromo,
+            Result result = getGcAndRepeat(subsequence, this.marginSize);
+            boolean selected = btree.containsNode(scaffoldName,f.position);
+            out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
+                    scaffoldName,
                     startpos,
                     endpos,
                     (++n),
                     previousCutEnzyme,
                     number2enzyme.get(f.enzymeNumber).getName(),
                     result.getLen(),
-                    result.getGc(),
-                    result.getRepeat()));
+                    result.getFivePrimeGcContent(),
+                    result.getThreePrimeGcContent(),
+                    result.getFivePrimeRepeatContent(),
+                    result.getThreePrimeRepeatContent(),
+                    selected ? "T" : "F",
+                    -1,
+                    -1));
             previousCutEnzyme=number2enzyme.get(f.enzymeNumber).getName();
             previousCutPosition=f.position;
         }
@@ -226,52 +262,81 @@ public class DigestFactory {
         // Note: to get subsequence, decrement startpos by one to get zero-based numbering
         // leave endpos as is--it is one past the end in zero-based numbering.
         String subsequence=sequence.substring(startpos-1,endpos);
-        Result result = getGcAndRepeat(subsequence);
-        out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\n",
-                chromo,
+        Result result = getGcAndRepeat(subsequence,marginSize);
+        out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
+                scaffoldName,
                 (previousCutPosition+1),
                 endpos,
                 (++n),
                 previousCutEnzyme,
                 "None",
                 result.getLen(),
-                result.getGc(),
-                result.getRepeat()));
+                result.getFivePrimeGcContent(),
+                result.getThreePrimeGcContent(),
+                result.getFivePrimeRepeatContent(),
+                result.getThreePrimeRepeatContent(),
+                "?-selected",
+                -1,
+                -1));
     }
 
 
-
+    /**
+     * This is a convenience class for calculating and organizing results of G/C and repeat analysis.
+     */
     static class Result {
         private int len;
-        private double gc;
-        private double repeat;
-        Result(int length, int GCcount, int RepeatCount) {
+        /** G?C content in the 5' portion of the fragment (as defined by the margin size). */
+        private double fivePrimeGcContent;
+        /** G/C content in the 3' portion of the fragment (as defined by the margin size). */
+        private double threePrimeGcContent;
+        /** Repeat content in the 5' portion of the fragment (as defined by the margin size). */
+        private double fivePrimeRepeatContent;
+        /** Repeat content in the 3' portion of the fragment (as defined by the margin size). */
+        private double threePrimeRepeatContent;
+
+        private Result(int length, int GCcount5, int GCcount3, int repeatCount5, int repeatCount3) {
             this.len=length;
             if (len==0) { return; }
-            gc=(double)GCcount/len;
-            repeat=(double)RepeatCount/len;
+            fivePrimeGcContent =(double)GCcount5/len;
+            threePrimeGcContent = (double)GCcount5/len;
+            fivePrimeRepeatContent =(double)repeatCount5/len;
+            threePrimeRepeatContent = (double)repeatCount3/len;
         }
 
         int getLen() { return len; }
-        double getGc() { return gc; }
-        double getRepeat() { return repeat; }
+        double getFivePrimeGcContent() { return fivePrimeGcContent; }
+        double getThreePrimeGcContent() { return threePrimeGcContent; }
+        double getFivePrimeRepeatContent() { return fivePrimeRepeatContent; }
+        double getThreePrimeRepeatContent() { return threePrimeRepeatContent; }
     }
 
-    private Result getGcAndRepeat(String subsequence) {
+    private Result getGcAndRepeat(String subsequence, int marginSize) {
         int len=subsequence.length();
-        int gc=0;
-        int repeat=0;
+        int repeat5=0;
+        int repeat3=0;
+        int gc5=0;
+        int gc3=0;
         for (int i=0;i<len;++i) {
             switch (subsequence.charAt(i)) {
                 case 'a' :
-                case 't' : repeat++; break;
+                case 't' :
+                    if (i<marginSize) repeat5++;
+                    if  ((len-marginSize)<=i) repeat3++;
+                    break;
                 case 'c' :
-                case 'g' : repeat++; gc++; break;
+                case 'g' :
+                    if (i<marginSize) repeat5++;
+                    if  ((len-marginSize)<=i) repeat3++;
+                    // don't break because we also need to count G/C here
                 case 'C' :
-                case 'G' : gc++; break;
+                case 'G' :
+                    if (i<marginSize) gc5++;
+                    if  ((len-marginSize)<=i) gc3++;
+                    break;
             }
         }
-        return new Result(len,gc,repeat);
+        return new Result(len,gc5,gc3,repeat5,repeat3);
     }
 
 

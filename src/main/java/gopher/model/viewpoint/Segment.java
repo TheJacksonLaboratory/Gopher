@@ -324,11 +324,34 @@ public class Segment implements Serializable {
         Segment other = (Segment) obj;
         if (!referenceSequenceID.equals(other.referenceSequenceID))
             return false;
-        if (startPos != other.startPos)
+        if (! startPos.equals(other.startPos))
             return false;
-        if (endPos != other.endPos)
-            return false;
-        return true;
+        return endPos.equals(other.endPos);
     }
+
+    /**
+     * this is used for the binary tree.
+     */
+    public boolean preceeds(Segment other) {
+        if (other.getReferenceSequenceID().compareTo(getReferenceSequenceID()) == 0) {
+            // we are on same chromosome -- check the position
+            return getStartPos() < other.getStartPos();
+        } else {
+            // return true iff this chromosome lexigraphicall preceeds the other one
+            return (getReferenceSequenceID().compareTo(other.getReferenceSequenceID()) < 0);
+        }
+    }
+
+
+    public boolean preceeds(String chrom, int pos) {
+        if (getReferenceSequenceID().compareTo(chrom)==0) {
+            // we are on same chromosome -- check the position
+            return getStartPos() < pos;
+        } else {
+            // return true iff this chromosome lexigraphicall preceeds the other one
+            return (getReferenceSequenceID().compareTo(chrom) < 0);
+        }
+    }
+
 
 }
