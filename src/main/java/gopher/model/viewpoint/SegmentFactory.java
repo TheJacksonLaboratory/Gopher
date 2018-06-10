@@ -35,11 +35,11 @@ public class SegmentFactory implements Serializable {
     private Integer maxDistToGenomicPosDown;
     /** Map of the positions where the enzymes cut. Key: a site, such as GATC, value: list of cutting site positions
      * relative to {@link #genomicPos}. */
-    private HashMap<String, ArrayList<Integer>> cuttingPositionMap;
+    private final HashMap<String, ArrayList<Integer>> cuttingPositionMap;
     /** TODO what is key?. Value, the corresponding {@link RestrictionEnzyme} object. */
     static Map<String, RestrictionEnzyme> restrictionEnzymeMap;
 
-    public static void setRestrictionEnzymeMap(Map<String, RestrictionEnzyme> m) {
+    static void setRestrictionEnzymeMap(Map<String, RestrictionEnzyme> m) {
         restrictionEnzymeMap = m;
     }
 
@@ -70,9 +70,8 @@ public class SegmentFactory implements Serializable {
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);
-        cuttingPositionMap = new HashMap<String, ArrayList<Integer>>();
+        cuttingPositionMap = new HashMap<>();
         Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
-        ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>();
 
         int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
 
@@ -99,37 +98,36 @@ public class SegmentFactory implements Serializable {
             }
             cuttingPositionMap.put(enzyme.getPlainSite(), cuttingPositionList); // push array list to map
         }
-
-        cuttingPositionListUnion.addAll(allPositionSet);
+        ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>(allPositionSet);
         Collections.sort(cuttingPositionListUnion);
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
     }
 
 
 
-    public final void setGenomicPos(Integer genomicPos) {
+    private void setGenomicPos(Integer genomicPos) {
         this.genomicPos = genomicPos;
     }
     /** @return the genomic position of the center of the ViewPoint. */
-    public final Integer getGenomicPos() {
+    Integer getGenomicPos() {
         return genomicPos;
     }
 
 
-    public final void setMaxDistToGenomicPosUp(Integer maxDistToGenomicPosUp) {
+    private void setMaxDistToGenomicPosUp(Integer maxDistToGenomicPosUp) {
         this.maxDistToGenomicPosUp = maxDistToGenomicPosUp;
     }
 
-    public final Integer getMaxDistToGenomicPosUp() {
+    final Integer getMaxDistToGenomicPosUp() {
         return maxDistToGenomicPosUp;
     }
 
 
-    public final void setMaxDistToGenomicPosDown(Integer maxDistToGenomicPosDown) {
+    private void setMaxDistToGenomicPosDown(Integer maxDistToGenomicPosDown) {
         this.maxDistToGenomicPosDown = maxDistToGenomicPosDown;
     }
 
-    public final Integer getMaxDistToGenomicPosDown() {
+    final Integer getMaxDistToGenomicPosDown() {
         return maxDistToGenomicPosDown;
     }
 
@@ -139,23 +137,19 @@ public class SegmentFactory implements Serializable {
         return cuttingPositionMap;
     }
 
-    /** @return only the <i>ArrayList</i> of <i>Integers</i> (relative to {@link #genomicPos}) for a given motif. */
-    public final ArrayList<Integer> getAllCutsForGivenMotif(String motif) {
-        return cuttingPositionMap.get(motif);
-    }
     /** @return List of cuttings positions (relative to {@link #genomicPos} for all Restriction enzymes. */
-    public final List<Integer> getAllCuts() {
+    final List<Integer> getAllCuts() {
         return cuttingPositionMap.get("ALL");
     }
 
 
-    public Integer getUpstreamCut(int j) {
+    Integer getUpstreamCut(int j) {
         // replaces return relToAbsPos(getAllCuts().get(j));
         return getAllCuts().get(j);
     }
 
 
-    public Integer getDownstreamCut(int j) {
+    Integer getDownstreamCut(int j) {
         // replaces return relToAbsPos(getAllCuts().get(j+1));
         return getAllCuts().get(j+1);
     }

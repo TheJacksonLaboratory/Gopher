@@ -123,7 +123,7 @@ public class DigestCreationTask extends Task<Void> {
         this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath=model.getGenomeFastaFile();
         outfilename=outfile;
-        logger.trace(String.format("FragmentFactory initialize with FASTA file=%s",this.genomeFastaFilePath));
+        logger.trace(String.format("Digest Factory initialize with FASTA file=%s",this.genomeFastaFilePath));
         marginSize=msize;
         this.sproperty=sp;
         this.model=model;
@@ -146,6 +146,8 @@ public class DigestCreationTask extends Task<Void> {
     public Void call() {
         updateLabelText("Creating binary tree of selected fragments...");
         extractChosenSegments(model);
+        logger.trace(String.format("We got a total of %d chosen segments in the binary tree",
+                this.btree.getN_nodes()));
 
         try {
             digestGenome(sproperty);
@@ -183,7 +185,7 @@ public class DigestCreationTask extends Task<Void> {
         try {
             out = new BufferedWriter(new FileWriter(outfilename));
             out.write(HEADER + "\n");
-            cutChromosomes(this.genomeFastaFilePath, out);
+            cutChromosomes(this.genomeFastaFilePath);
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,9 +198,8 @@ public class DigestCreationTask extends Task<Void> {
 
     private int counter=1;
     /** This will cut all of the chromosomes in the multi-FASTA chromosome file. */
-    private void cutChromosomes(String chromosomeFilePath, BufferedWriter out) throws Exception {
+    private void cutChromosomes(String chromosomeFilePath) throws Exception {
         logger.trace(String.format("cutting chromosomes %s",chromosomeFilePath ));
-        updateLabelText(String.format("digesting chromosomes %s",chromosomeFilePath ));
         IndexedFastaSequenceFile fastaReader;
         try {
              fastaReader = new IndexedFastaSequenceFile(new File(chromosomeFilePath));
@@ -213,7 +214,7 @@ public class DigestCreationTask extends Task<Void> {
             String sequence = fastaReader.getSequence(seqname).getBaseString();
             //ReferenceSequence refseq = fastaReader.nextSequence();
             logger.trace(String.format("Cutting %s (length %d)",seqname,sequence.length() ));
-            updateLabelText(String.format("Digesting %s (length %d)",seqname,sequence.length() ));
+            updateLabelText(String.format("Digesting %s",seqname));
             cutOneChromosome(seqname, sequence);
         }
 
@@ -236,10 +237,12 @@ public class DigestCreationTask extends Task<Void> {
             Matcher matcher = pattern.matcher(sequence);
             /* one-based position of first nucleotide in the entire subsequence returned by fasta reader */
             while (matcher.find()) {
-                int pos = matcher.start() + offset; /* one-based position of first nucleotide after the restriction enzyme cuts */
-                if (counter%1000==0) {
-                    System.out.println(String.format("Added %d th digest",counter ));
-                }
+                /* Note that we are trying to match the 1-based positions in SegmentFactory.
+                In SegmentFactory, we use the HTSJDK IndexedFastaSequenceFile/Reader, which
+                gives back one-based positions. Here, we are using a Java string, and so we
+                need to add the "1" ourselves.
+                 */
+                int pos = matcher.start() + offset + 1; /* one-based position of first nucleotide after the restriction enzyme cuts */
                 builder.add(new Digest(enzymeNumber,pos));
             }
         }
@@ -272,6 +275,10 @@ public class DigestCreationTask extends Task<Void> {
                     selected ? "T" : "F",
                     0,
                     0));
+            if (counter%1000==0) {
+                updateLabelText(String.format("Digesting %s [%d digests so far]",scaffoldName,counter ));
+            }
+            counter++;
             previousCutEnzyme=number2enzyme.get(f.enzymeNumber).getName();
             previousCutPosition=f.position;
         }
@@ -283,6 +290,25 @@ public class DigestCreationTask extends Task<Void> {
         // leave endpos as is--it is one past the end in zero-based numbering.
         String subsequence=sequence.substring(startpos-1,endpos);
         Result result = getGcAndRepeat(subsequence,marginSize);
+        boolean selected = btree.containsNode(scaffoldName,startpos);
+        if (selected) {
+            System.out.println(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
+                    scaffoldName,
+                    (previousCutPosition+1),
+                    endpos,
+                    (++n),
+                    previousCutEnzyme,
+                    "None",
+                    result.getLen(),
+                    result.getFivePrimeGcContent(),
+                    result.getThreePrimeGcContent(),
+                    result.getFivePrimeRepeatContent(),
+                    result.getThreePrimeRepeatContent(),
+                    selected ? "T" : "F",
+                    0,
+                    0));
+            System.out.println("SELECTED: " + scaffoldName + ": "+startpos);
+        }
         out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
                 scaffoldName,
                 (previousCutPosition+1),
@@ -295,7 +321,7 @@ public class DigestCreationTask extends Task<Void> {
                 result.getThreePrimeGcContent(),
                 result.getFivePrimeRepeatContent(),
                 result.getThreePrimeRepeatContent(),
-                "?-selected",
+                selected ? "T" : "F",
                 0,
                 0));
     }
@@ -305,7 +331,7 @@ public class DigestCreationTask extends Task<Void> {
      * This is a convenience class for calculating and organizing results of G/C and repeat analysis.
      */
     static class Result {
-        private int len;
+        private final int len;
         /** G?C content in the 5' portion of the fragment (as defined by the margin size). */
         private double fivePrimeGcContent;
         /** G/C content in the 3' portion of the fragment (as defined by the margin size). */
