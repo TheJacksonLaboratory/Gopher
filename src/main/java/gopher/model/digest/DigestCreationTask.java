@@ -242,7 +242,7 @@ public class DigestCreationTask extends Task<Void> {
                 gives back one-based positions. Here, we are using a Java string, and so we
                 need to add the "1" ourselves.
                  */
-                int pos = matcher.start() + offset + 1; /* one-based position of first nucleotide after the restriction enzyme cuts */
+                int pos = matcher.start() + offset;
                 builder.add(new Digest(enzymeNumber,pos));
             }
         }
