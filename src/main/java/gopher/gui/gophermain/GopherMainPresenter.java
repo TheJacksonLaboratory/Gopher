@@ -97,7 +97,8 @@ public class GopherMainPresenter implements Initializable {
     @FXML private ProgressIndicator genomeIndexPI;
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
-
+    /** Progress indicator for downloading the transcript file */
+    @FXML private ProgressIndicator alignabilityDownloadPI;
     @FXML private Label sizeUpLabel;
     @FXML private Label sizeDownLabel;
     @FXML private TextField sizeUpTextField;
@@ -119,6 +120,9 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label indexGenomeLabel;
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
+    /** Show name of downloaded transcripts file. */
+    @FXML private Label downloadedAlignabilityLabel;
+
     @FXML RadioMenuItem tiling1;
     @FXML RadioMenuItem tiling2;
     @FXML RadioMenuItem tiling3;
@@ -305,6 +309,16 @@ public class GopherMainPresenter implements Initializable {
             this.downloadedTranscriptsLabel.setText("...");
             this.transcriptDownloadPI.setProgress(0.0);
         }
+
+        String alignabilityMapPath=this.model.getAlignabilityMapPath();
+        if (alignabilityMapPath!=null) {
+            this.downloadedAlignabilityLabel.setText(alignabilityMapPath);
+            this.alignabilityDownloadPI.setProgress(1.0);
+        } else {
+            this.downloadedAlignabilityLabel.setText("...");
+            this.alignabilityDownloadPI.setProgress(0.0);
+        }
+
         if (model.isGenomeIndexed()) {
             this.indexGenomeLabel.setText("Genome files successfully indexed");
             this.genomeIndexPI.setProgress(1.00);
@@ -468,6 +482,7 @@ public class GopherMainPresenter implements Initializable {
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
+        this.alignabilityDownloadPI.setProgress(0.0);
         this.genomeDownloadPI.setProgress(0.0);
         this.genomeIndexPI.setProgress(0.0);
         this.genomeDecompressPI.setProgress(0.0);
@@ -549,6 +564,50 @@ public class GopherMainPresenter implements Initializable {
        th.setDaemon(true);
        th.start();
        e.consume();
+    }
+
+    /**
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
+     */
+    @FXML public void downloadAlignabilityMap(ActionEvent e) {
+
+        String genomeBuild=genomeChoiceBox.getValue();
+        AlignabilityDownloader rgd = new AlignabilityDownloader(genomeBuild);
+        String alignabilityName = rgd.getAlignabilityMapName();
+        String basename=rgd.getBaseName();
+        String url;
+        try {
+            url = rgd.getURL();
+        } catch (DownloadFileNotFoundException dfne) {
+            PopupFactory.displayError("Could not identify bigwig file for genome",dfne.getMessage());
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().isEmpty()) {
+            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
+            return;
+        }
+        if (! rgd.needToDownload(file.getAbsolutePath())) {
+            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bigWig file at %s. No need to download",file.getAbsolutePath()));
+            this.alignabilityDownloadPI.setProgress(1.0);
+            this.downloadedAlignabilityLabel.setText(alignabilityName);
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
+            return;
+        }
+
+        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
+        downloadTask.setOnSucceeded( event -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setRefGenePath(abspath);
+            this.downloadedAlignabilityLabel.setText(alignabilityName);
+        });
+        Thread th = new Thread(downloadTask);
+        th.setDaemon(true);
+        th.start();
+        e.consume();
     }
 
 

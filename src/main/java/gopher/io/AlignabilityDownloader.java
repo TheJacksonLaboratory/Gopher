@@ -27,7 +27,7 @@ public class AlignabilityDownloader {
         return url;
     }
 
-    public String getTranscriptName() { return String.format("%s (%s)",getBaseName(),genome); }
+    public String getAlignabilityMapName() { return String.format("%s (%s)",getBaseName(),genome); }
     /** @return "refGene.txt.gz", the basename of all of the downloaded UCSC files. */
     public String getBaseName() { return "wgEncodeCrgMapabilityAlign100mer.bigWig";}
 

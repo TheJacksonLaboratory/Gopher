@@ -227,8 +227,8 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="downloadTranscriptsButton2" mnemonicParsing="false"
-                                    onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0"
+                            <Button fx:id="downloadAlignabilityMapButton" mnemonicParsing="false"
+                                    onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0"
                                     styleClass="Button" stylesheets="@gophermain.css" text="Download"
                                     GridPane.columnIndex="1" GridPane.rowIndex="6">
                                 <GridPane.margin>
