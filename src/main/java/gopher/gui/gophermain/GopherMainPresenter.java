@@ -572,7 +572,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void downloadAlignabilityMap(ActionEvent e) {
 
         String genomeBuild=genomeChoiceBox.getValue();
-        AlignabilityDownloader rgd = new AlignabilityDownloader(genomeBuild);
+        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
         String alignabilityName = rgd.getAlignabilityMapName();
         String basename=rgd.getBaseName();
         String url;
@@ -607,6 +607,7 @@ public class GopherMainPresenter implements Initializable {
         Thread th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();
+
         e.consume();
     }
 

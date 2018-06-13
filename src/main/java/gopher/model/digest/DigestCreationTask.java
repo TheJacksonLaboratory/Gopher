@@ -137,6 +137,9 @@ public class DigestCreationTask extends Task<Void> {
         for (ViewPoint vp : vplist) {
             String chrom = vp.getReferenceID();
             List<Segment> seglist = vp.getActiveSegments();
+            // 125 active digests for human example genes
+            // coordinates of the fragments correspond to coordinates in digest file
+            // segments are one based, digests in file are one based
             for (Segment seg : seglist) {
                 btree.add(seg);
             }
@@ -242,24 +245,25 @@ public class DigestCreationTask extends Task<Void> {
                 gives back one-based positions. Here, we are using a Java string, and so we
                 need to add the "1" ourselves.
                  */
-                int pos = matcher.start() + offset;
+                int pos = matcher.start() + offset + 1;
                 builder.add(new Digest(enzymeNumber,pos));
             }
         }
         ImmutableList<Digest> fraglist = ImmutableList.sortedCopyOf(builder.build());
         String previousCutEnzyme="None";
-        Integer previousCutPosition=0; // start of chromosome
+        Integer previousCutPosition = 1; // start of chromosome
         //Header
 
          int n=0;
         for (Digest f:fraglist) {
-            int startpos= (previousCutPosition+1);
-            int endpos = f.position;
+            int startpos = previousCutPosition;
+            int endpos = f.position - 1; // f.position is the 1-based first coordinate of the next fragment
             // Note: to get subsequence, decrement startpos by one to get zero-based numbering
             // leave endpos as is--it is one past the end in zero-based numbering.
             String subsequence=sequence.substring(startpos-1,endpos);
             Result result = getGcAndRepeat(subsequence, this.marginSize);
-            boolean selected = btree.containsNode(scaffoldName,f.position);
+            boolean selected = btree.containsNode(scaffoldName,f.position);//
+            // must be always false; btree contains one based coordinates; f.position is zero based
             out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
                     scaffoldName,
                     startpos,
@@ -280,7 +284,7 @@ public class DigestCreationTask extends Task<Void> {
             }
             counter++;
             previousCutEnzyme=number2enzyme.get(f.enzymeNumber).getName();
-            previousCutPosition=f.position;
+            previousCutPosition = f.position;
         }
         // output last digest also
         // No cut ("None") at end of chromosome

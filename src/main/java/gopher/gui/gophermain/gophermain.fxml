@@ -172,12 +172,17 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="7">
+                            <Label fx:id="alignabilityLabel2" text="Alignability" GridPane.rowIndex="7">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Target genes" GridPane.rowIndex="8">
+                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="8">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </GridPane.margin>
+                            </Label>
+                            <Label text="Target genes" GridPane.rowIndex="9">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
@@ -235,10 +240,18 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Button>
+                            <Button fx:id="downloadAlignabilityMapButton2" mnemonicParsing="false"
+                                    onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0"
+                                    styleClass="Button" stylesheets="@gophermain.css" text="Download"
+                                    GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                </GridPane.margin>
+                            </Button>
                             <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes"
                                     prefHeight="30.0" prefWidth="145.0" styleClass="Button"
                                     stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1"
-                                    GridPane.rowIndex="7">
+                                    GridPane.rowIndex="8">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
@@ -246,7 +259,7 @@
                             <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList"
                                     prefHeight="30.0" prefWidth="145.0" styleClass="Button"
                                     stylesheets="@gophermain.css" text="Enter gene list" GridPane.columnIndex="1"
-                                    GridPane.rowIndex="8">
+                                    GridPane.rowIndex="9">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>

@@ -4,7 +4,7 @@ import gopher.exception.DownloadFileNotFoundException;
 
 import java.io.File;
 
-public class AlignabilityDownloader {
+public class AlignabilityMapDownloader {
     final private static String hg19="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig";
     final private static String mm9="http://hgdownload.cse.ucsc.edu/goldenPath/mm9/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig";
     /* No mapability maps available for mm10 und hg38  */
@@ -12,7 +12,7 @@ public class AlignabilityDownloader {
     private String genome=null;
 
     /** @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10. */
-    public AlignabilityDownloader(String genome) {
+    public AlignabilityMapDownloader(String genome) {
         this.genome=genome;
     }
     /** @return The UCSC URL from which the transcript file is to be downloaded. */

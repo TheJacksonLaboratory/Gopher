@@ -50,7 +50,7 @@ public class Gopher extends Application {
     @Override
     public void start(Stage primaryStage) {
         updateLog4jConfiguration();
-        //logger.info("Starting VPV Gui");
+        //logger.info("Starting Gopher Gui");
         this.primarystage = primaryStage;
         Image image = new Image(Gopher.class.getResourceAsStream("/img/gophericon.png"));
         primaryStage.setTitle("GOPHER");
