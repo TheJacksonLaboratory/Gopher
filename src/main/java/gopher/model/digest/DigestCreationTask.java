@@ -262,8 +262,8 @@ public class DigestCreationTask extends Task<Void> {
             // leave endpos as is--it is one past the end in zero-based numbering.
             String subsequence=sequence.substring(startpos-1,endpos);
             Result result = getGcAndRepeat(subsequence, this.marginSize);
-            boolean selected = btree.containsNode(scaffoldName,f.position);//
-            // must be always false; btree contains one based coordinates; f.position is zero based
+            boolean selected = btree.containsNode(scaffoldName,startpos);
+
             out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
                     scaffoldName,
                     startpos,

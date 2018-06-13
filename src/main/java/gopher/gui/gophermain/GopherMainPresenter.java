@@ -594,14 +594,14 @@ public class GopherMainPresenter implements Initializable {
             this.alignabilityDownloadPI.setProgress(1.0);
             this.downloadedAlignabilityLabel.setText(alignabilityName);
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setRefGenePath(abspath);
+            this.model.setAlignabilityMapPath(abspath);
             return;
         }
 
         Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
         downloadTask.setOnSucceeded( event -> {
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setRefGenePath(abspath);
+            this.model.setAlignabilityMapPath(abspath);
             this.downloadedAlignabilityLabel.setText(alignabilityName);
         });
         Thread th = new Thread(downloadTask);
