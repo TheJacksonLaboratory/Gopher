@@ -1,4 +1,4 @@
-package gopher.gui.createviewpointpb;
+package gopher.gui.taskprogressbar;
 
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
@@ -16,9 +16,9 @@ import java.util.function.Consumer;
 /**
  * Presenter for the Viewpoint creation progress bar.
  */
-public class CreateViewpointPBPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(CreateViewpointPBPresenter.class.getName());
-
+public class TaskProgressBarPresenter implements Initializable {
+    static Logger logger = Logger.getLogger(TaskProgressBarPresenter.class.getName());
+    @FXML private Label titleLabel;
     @FXML private Label currentVPlabel;
     @FXML private ProgressBar vpProgressBar;
 
@@ -34,6 +34,8 @@ public class CreateViewpointPBPresenter implements Initializable {
         this.vpProgressBar.progressProperty().bind(task.progressProperty());
         currentVPlabel.textProperty().bind(sp);
     }
+
+    public void setTitle(String t) { this.titleLabel.setText(t);}
 
     public void setSignal(Consumer<Signal> signal) {
         this.signal = signal;

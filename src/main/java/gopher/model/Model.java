@@ -237,6 +237,7 @@ public class Model implements Serializable {
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
+    private String alignabilityMapPath=null;
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
@@ -392,6 +393,11 @@ public class Model implements Serializable {
     public void setRefGenePath(String p) { refGenePath=p; }
     public String getRefGenePath() { return this.refGenePath; }
 
+    public void setAlignabilityMapPath(String p) { alignabilityMapPath=p; }
+    public String getAlignabilityMapPath() { return this.alignabilityMapPath; }
+
+
+
     public void setProjectName(String name) { this.projectName=name;}
     public String getProjectName() { return this.projectName; }
 
@@ -463,5 +469,8 @@ public class Model implements Serializable {
         if (viewpointList==null ) return new ArrayList<>();
        return this.viewpointList.stream().filter(ViewPoint::hasValidProbe).collect(Collectors.toList());
     }
+
+
+
 
 }

@@ -1,5 +1,6 @@
 package gopher.gui.gophermain;
 
+import gopher.model.digest.DigestCreationTask;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -23,8 +24,8 @@ import gopher.exception.DownloadFileNotFoundException;
 
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
-import gopher.gui.createviewpointpb.CreateViewpointPBPresenter;
-import gopher.gui.createviewpointpb.CreateViewpointPBView;
+import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
+import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
@@ -96,7 +97,8 @@ public class GopherMainPresenter implements Initializable {
     @FXML private ProgressIndicator genomeIndexPI;
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
-
+    /** Progress indicator for downloading the transcript file */
+    @FXML private ProgressIndicator alignabilityDownloadPI;
     @FXML private Label sizeUpLabel;
     @FXML private Label sizeDownLabel;
     @FXML private TextField sizeUpTextField;
@@ -118,6 +120,9 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label indexGenomeLabel;
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
+    /** Show name of downloaded transcripts file. */
+    @FXML private Label downloadedAlignabilityLabel;
+
     @FXML RadioMenuItem tiling1;
     @FXML RadioMenuItem tiling2;
     @FXML RadioMenuItem tiling3;
@@ -304,6 +309,16 @@ public class GopherMainPresenter implements Initializable {
             this.downloadedTranscriptsLabel.setText("...");
             this.transcriptDownloadPI.setProgress(0.0);
         }
+
+        String alignabilityMapPath=this.model.getAlignabilityMapPath();
+        if (alignabilityMapPath!=null) {
+            this.downloadedAlignabilityLabel.setText(alignabilityMapPath);
+            this.alignabilityDownloadPI.setProgress(1.0);
+        } else {
+            this.downloadedAlignabilityLabel.setText("...");
+            this.alignabilityDownloadPI.setProgress(0.0);
+        }
+
         if (model.isGenomeIndexed()) {
             this.indexGenomeLabel.setText("Genome files successfully indexed");
             this.genomeIndexPI.setProgress(1.00);
@@ -467,6 +482,7 @@ public class GopherMainPresenter implements Initializable {
         this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
+        this.alignabilityDownloadPI.setProgress(0.0);
         this.genomeDownloadPI.setProgress(0.0);
         this.genomeIndexPI.setProgress(0.0);
         this.genomeDecompressPI.setProgress(0.0);
@@ -548,6 +564,51 @@ public class GopherMainPresenter implements Initializable {
        th.setDaemon(true);
        th.start();
        e.consume();
+    }
+
+    /**
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
+     */
+    @FXML public void downloadAlignabilityMap(ActionEvent e) {
+
+        String genomeBuild=genomeChoiceBox.getValue();
+        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
+        String alignabilityName = rgd.getAlignabilityMapName();
+        String basename=rgd.getBaseName();
+        String url;
+        try {
+            url = rgd.getURL();
+        } catch (DownloadFileNotFoundException dfne) {
+            PopupFactory.displayError("Could not identify bigwig file for genome",dfne.getMessage());
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().isEmpty()) {
+            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
+            return;
+        }
+        if (! rgd.needToDownload(file.getAbsolutePath())) {
+            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bigWig file at %s. No need to download",file.getAbsolutePath()));
+            this.alignabilityDownloadPI.setProgress(1.0);
+            this.downloadedAlignabilityLabel.setText(alignabilityName);
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setAlignabilityMapPath(abspath);
+            return;
+        }
+
+        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
+        downloadTask.setOnSucceeded( event -> {
+            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setAlignabilityMapPath(abspath);
+            this.downloadedAlignabilityLabel.setText(alignabilityName);
+        });
+        Thread th = new Thread(downloadTask);
+        th.setDaemon(true);
+        th.start();
+
+        e.consume();
     }
 
 
@@ -643,6 +704,55 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
+    @FXML private void saveDigestFileAs(ActionEvent e) {
+        logger.trace("Saving the digest file");
+        // get path from chooser
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose file path to save digest file");
+        File file = chooser.showSaveDialog(null);
+        if (file==null) {
+            return;
+        }
+        String path = file.getAbsolutePath();
+        StringProperty sp=new SimpleStringProperty();
+        DigestCreationTask task = new DigestCreationTask(path,model,sp);
+
+        TaskProgressBarView pbview = new TaskProgressBarView();
+        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
+        pbpresent.setTitle("Creating Digest file");
+        pbpresent.initBindings(task,sp);
+        Stage window = new Stage();
+        String windowTitle = "Digest file creation";
+        window.setOnCloseRequest( event -> window.close() );
+        window.setTitle(windowTitle);
+        pbpresent.setSignal(signal -> {
+            switch (signal) {
+                case DONE:
+                    window.close();
+                    break;
+                case CANCEL:
+                case FAILED:
+                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+            }
+
+        });
+
+        task.setOnSucceeded(event -> {
+            logger.trace("Finished creating digest file");
+            pbpresent.closeWindow();
+        });
+        task.setOnFailed(eh -> {
+            Exception exc = (Exception)eh.getSource().getException();
+            PopupFactory.displayException("Error",
+                    "Exception encountered while attempting to create digest file",
+                    exc);
+        });
+        new Thread(task).start();
+        window.setScene(new Scene(pbview.getView()));
+        window.showAndWait();
+        e.consume();
+    }
+
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
      * these will have been entered as {@link GopherGene} objects into the {@link Model}
@@ -651,7 +761,6 @@ public class GopherMainPresenter implements Initializable {
      * {@link VPAnalysisPresenter} Tab.
      */
     public void createViewPoints() {
-        logger.trace("Entering createViewPoints");
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
@@ -670,8 +779,9 @@ public class GopherMainPresenter implements Initializable {
             task = new ExtendedViewPointCreationTask(model,sp);
         }
 
-        CreateViewpointPBView pbview = new CreateViewpointPBView();
-        CreateViewpointPBPresenter pbpresent = (CreateViewpointPBPresenter)pbview.getPresenter();
+        TaskProgressBarView pbview = new TaskProgressBarView();
+        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
+        pbpresent.setTitle("Creating Viewpoints ...4");
         pbpresent.initBindings(task,sp);
 
         Stage window = new Stage();
@@ -809,10 +919,6 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
-
-    @FXML private void saveDigestFileAs(ActionEvent e) {
-        e.consume();
-    }
 
     /**
      * @param e event triggered by set proxy command.

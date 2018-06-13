@@ -96,7 +96,7 @@ public class EntrezGenePresenter implements Initializable {
         e.consume();
         String path = this.model.getRefGenePath();
         if (path==null) {
-            logger.error("attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            logger.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
             PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
             return;
         }
