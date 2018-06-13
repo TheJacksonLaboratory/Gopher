@@ -264,8 +264,12 @@ public class Model implements Serializable {
 
     public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
     public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
+
     public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
     public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
+    public void setAlignabilityUnpacked() { this.genome.setAlignabilityUnpacked(true);}
+    public boolean isAlignabilityUnpacked() { return this.genome.isUnpackingAlignabiltyComplete(); }
+
 
     public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
 

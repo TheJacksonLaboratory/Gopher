@@ -41,6 +41,10 @@ public abstract class Genome implements Serializable {
     /** A flag to indicate that the production of a FAI file for the genome is completed. */
     private boolean indexingComplete=false;
 
+    private boolean unpackingAlignabiltyComplete=false;
+
+
+
     private String genomeURL = null;
 
 
@@ -58,9 +62,9 @@ public abstract class Genome implements Serializable {
         return unpackingComplete;
     }
 
-    public boolean isIndexingComplete() {
-        return indexingComplete;
-    }
+    public boolean isIndexingComplete() { return indexingComplete; }
+
+    public boolean isUnpackingAlignabiltyComplete() { return unpackingAlignabiltyComplete; }
 
     public String getGenomeURL() { return this.genomeURL;}
 
@@ -97,6 +101,9 @@ public abstract class Genome implements Serializable {
     public abstract String getGenomeFastaName();
     public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
+    public void setAlignabilityUnpacked(boolean b) { this.unpackingAlignabiltyComplete=b;}
+
+
 
     /**
      * @return true if the genome file has been previously downloaded to the indicated path.

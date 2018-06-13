@@ -97,8 +97,11 @@ public class GopherMainPresenter implements Initializable {
     @FXML private ProgressIndicator genomeIndexPI;
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
-    /** Progress indicator for downloading the transcript file */
+    /** Progress indicator for downloading alignability file */
     @FXML private ProgressIndicator alignabilityDownloadPI;
+    /** Progress indicator for decompressing alignability file */
+    @FXML private ProgressIndicator alignabilityDecompressPI;
+
     @FXML private Label sizeUpLabel;
     @FXML private Label sizeDownLabel;
     @FXML private TextField sizeUpTextField;
@@ -122,6 +125,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label downloadedTranscriptsLabel;
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedAlignabilityLabel;
+    @FXML private Label decompressAlignabilityLabel;
 
     @FXML RadioMenuItem tiling1;
     @FXML RadioMenuItem tiling2;
@@ -295,7 +299,7 @@ public class GopherMainPresenter implements Initializable {
             this.genomeDownloadPI.setProgress(0);
         }
         if (model.isGenomeUnpacked()) {
-            this.decompressGenomeLabel.setText("extraction previously completed");
+            this.decompressGenomeLabel.setText("Extraction previously completed");
             this.genomeDecompressPI.setProgress(1.00);
         } else {
             this.decompressGenomeLabel.setText("...");
@@ -317,6 +321,14 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.downloadedAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
+        }
+        if(model.isAlignabilityUnpacked()) {
+            this.decompressAlignabilityLabel.setText("Extraction previously completed");
+            this.alignabilityDecompressPI.setProgress(1.00);
+        }
+        else {
+            this.decompressAlignabilityLabel.setText("....");
+            this.alignabilityDecompressPI.setProgress(0.0);
         }
 
         if (model.isGenomeIndexed()) {
@@ -483,6 +495,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
         this.alignabilityDownloadPI.setProgress(0.0);
+        this.alignabilityDecompressPI.setProgress(0.0);
         this.genomeDownloadPI.setProgress(0.0);
         this.genomeIndexPI.setProgress(0.0);
         this.genomeDecompressPI.setProgress(0.0);
@@ -618,7 +631,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         if (this.model.getGenome().isIndexingComplete()) {
-            decompressGenomeLabel.setText("chromosome files extracted");
+            decompressGenomeLabel.setText("Chromosome files extracted");
             genomeDecompressPI.setProgress(1.00);
             model.setGenomeUnpacked();
             return;
@@ -666,6 +679,27 @@ public class GopherMainPresenter implements Initializable {
                     manager.getException().getMessage());
         });
         Thread th = new Thread(manager);
+        th.setDaemon(true);
+        th.start();
+    }
+
+    /** G-unzip the downloaded bigWig file for alignability
+     * @param e  Event triggered by decompress alignability command
+     */
+    @FXML public void decompressAlignabilityMap(ActionEvent e) {
+        e.consume();
+        if (this.model.getGenome().isUnpackingAlignabiltyComplete()) {
+            decompressAlignabilityLabel.setText("Alignability map is already extracted");
+            logger.trace("Alignability map already extracted.");
+            alignabilityDecompressPI.setProgress(1.00);
+            model.setAlignabilityUnpacked();
+            return;
+        }
+        AlignabilityMapDecompressor alignabilityMapDecompressor = new AlignabilityMapDecompressor(this.model.getGenome(),
+                this.alignabilityDecompressPI);
+
+
+        Thread th = new Thread(alignabilityMapDecompressor);
         th.setDaemon(true);
         th.start();
     }
