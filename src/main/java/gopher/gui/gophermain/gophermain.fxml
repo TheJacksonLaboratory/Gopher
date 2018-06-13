@@ -242,7 +242,7 @@
                             </Button>
                             <Button fx:id="downloadAlignabilityMapButton2" mnemonicParsing="false"
                                     onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0"
-                                    styleClass="Button" stylesheets="@gophermain.css" text="Download"
+                                    styleClass="Button" stylesheets="@gophermain.css" text="Start"
                                     GridPane.columnIndex="1" GridPane.rowIndex="7">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
