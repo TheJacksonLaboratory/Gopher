@@ -5,9 +5,9 @@ import gopher.exception.DownloadFileNotFoundException;
 import java.io.File;
 
 public class AlignabilityMapDownloader {
-    final private static String hg19="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig";
-    final private static String mm9="http://hgdownload.cse.ucsc.edu/goldenPath/mm9/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig";
-    /* No mapability maps available for mm10 und hg38  */
+    final private static String hg19="https://www.dropbox.com/s/e0um2wfyq1ru80v/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+    final private static String mm9="https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+    /* No mapability maps available for mm10 und hg38  TODO: create using GEM tools */
 
     private String genome=null;
 
@@ -29,21 +29,15 @@ public class AlignabilityMapDownloader {
 
     public String getAlignabilityMapName() { return String.format("%s (%s)",getBaseName(),genome); }
     /** @return "refGene.txt.gz", the basename of all of the downloaded UCSC files. */
-    public String getBaseName() { return "wgEncodeCrgMapabilityAlign100mer.bigWig";}
-
-
-
-    public boolean needToDownload(String localDirectory) {
-        File f = new File(localDirectory + File.separator + "wgEncodeCrgMapabilityAlign100mer.bigWig");
-        if(f.exists() && !f.isDirectory()) {
-            return false;
-        }
-        f = new File(localDirectory + File.separator + "wgEncodeCrgMapabilityAlign100mer.bigWig");
-        if(f.exists() && !f.isDirectory()) {
-            return false;
-        }
-        return true;
+    public String getBaseName() {
+        String basename = genome;
+        basename += ".100mer.alignabilityMap.bedgraph.gz";
+        return basename;
     }
+
+
+
+
 
 
 }

@@ -101,6 +101,8 @@ public abstract class Genome implements Serializable {
     public abstract String getGenomeFastaName();
     public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
+
+
     public void setAlignabilityUnpacked(boolean b) { this.unpackingAlignabiltyComplete=b;}
 
 

@@ -33,8 +33,9 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
     public AlignabilityMapDecompressor(Genome genom, ProgressIndicator pi) {
         this.progress=pi;
         this.genome=genom;
-        //this.alignabilityMapFileNameTarGZ=this.genome.getGenomeBasename();
-        this.alignabilityMapFileNameTarGZ = "wgEncodeCrgMapabilityAlign100mer.bedgraph.gz";
+        String basename = this.genome.getGenomeBuild();
+        basename += ".100mer.alignabilityMap.bedgraph.gz";
+        this.alignabilityMapFileNameTarGZ = basename;
         logger.trace(String.format("alignabilityMapFileNameTarGZ=%s",alignabilityMapFileNameTarGZ));
         //this.genomeFileNameTar=this.alignabilityMapFileNameTarGZ.replaceAll(".gz","");
     }
@@ -65,8 +66,6 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
         logger.info("About to gunzip "+ INPUT_GZIP_FILE +
                 " ([path to genome directory=" + genome.getPathToGenomeDirectory() +
                 " and genome filename=" + alignabilityMapFileNameTarGZ);
-        boolean needToCreateDirectory=true;
-        int blocks = genome.getNumberOfCanonicalChromosomes() + 1;
         double currentProgress=0.0D;
         updateProgress(currentProgress);
         try {
@@ -78,8 +77,6 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
             File outfile = new File( dirpath + File.separator + outputBedGraphFileName);
             FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
             BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
-
-            genome.setAlignabilityUnpacked(true);
 
             int count = 0;
             byte data[] = new byte[BUFFER_SIZE];
@@ -104,7 +101,7 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
      * It is packaged as a Task to allow concurrency. */
     @Override
     protected Void call() throws IOException {
-        logger.debug("About to extract canonical chromosome fasta file");
+        logger.debug("About to extract alignability file");
         if (alreadyExtracted()) {
             logger.debug("Found previously extracted file, returning.");
             updateProgress(100.0);

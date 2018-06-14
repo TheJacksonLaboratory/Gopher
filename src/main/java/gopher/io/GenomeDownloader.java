@@ -36,7 +36,7 @@ public class GenomeDownloader {
         try {
             this.url=getGenomeURL(build);
             this.genome=getGenome(build);
-            logger.debug("Setting url to "+url);
+            logger.debug("Setting url to "+ url);
         } catch (DownloadFileNotFoundException e){
             logger.error(e,e);
         }

@@ -523,7 +523,7 @@ public class GopherMainPresenter implements Initializable {
             PopupFactory.displayError("Error","Could not get path to download genome.");
             return;
         }
-        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
+        logger.info("downloadGenome to directory  "+ file.getAbsolutePath());
         if (this.model.checkDownloadComplete(file.getAbsolutePath())) {
             // we're done!
             this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
@@ -577,51 +577,6 @@ public class GopherMainPresenter implements Initializable {
        th.setDaemon(true);
        th.start();
        e.consume();
-    }
-
-    /**
-     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
-     */
-    @FXML public void downloadAlignabilityMap(ActionEvent e) {
-
-        String genomeBuild=genomeChoiceBox.getValue();
-        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
-        String alignabilityName = rgd.getAlignabilityMapName();
-        String basename=rgd.getBaseName();
-        String url;
-        try {
-            url = rgd.getURL();
-        } catch (DownloadFileNotFoundException dfne) {
-            PopupFactory.displayError("Could not identify bigwig file for genome",dfne.getMessage());
-            return;
-        }
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
-        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().isEmpty()) {
-            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
-            return;
-        }
-        if (! rgd.needToDownload(file.getAbsolutePath())) {
-            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bigWig file at %s. No need to download",file.getAbsolutePath()));
-            this.alignabilityDownloadPI.setProgress(1.0);
-            this.downloadedAlignabilityLabel.setText(alignabilityName);
-            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setAlignabilityMapPath(abspath);
-            return;
-        }
-
-        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
-        downloadTask.setOnSucceeded( event -> {
-            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setAlignabilityMapPath(abspath);
-            this.downloadedAlignabilityLabel.setText(alignabilityName);
-        });
-        Thread th = new Thread(downloadTask);
-        th.setDaemon(true);
-        th.start();
-
-        e.consume();
     }
 
 
@@ -683,14 +638,65 @@ public class GopherMainPresenter implements Initializable {
         th.start();
     }
 
+
+    /**
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
+     */
+    @FXML public void downloadAlignabilityMap(ActionEvent e) {
+
+        String genomeBuild=genomeChoiceBox.getValue();
+        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
+        String alignabilityName = rgd.getAlignabilityMapName();
+        String basename=rgd.getBaseName();
+        String url;
+        try {
+            url = rgd.getURL();
+        } catch (DownloadFileNotFoundException dfne) {
+            PopupFactory.displayError("Could not identify alignabilty file for genome",dfne.getMessage());
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().isEmpty()) {
+            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
+            return;
+        }
+        File f = new File(file.getAbsolutePath() + File.separator + basename);
+        String abspath = f.getAbsolutePath();
+        if (f.exists()) {
+            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bedgraph.gz file at %s. No need to download",file.getAbsolutePath()));
+            this.alignabilityDownloadPI.setProgress(1.0);
+            this.downloadedAlignabilityLabel.setText(abspath);
+            this.model.setAlignabilityMapPath(abspath);
+            logger.trace(abspath);
+            return;
+        }
+
+        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
+        downloadTask.setOnSucceeded( event -> {
+            String abspath2=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
+            this.model.setAlignabilityMapPath(abspath2);
+            this.downloadedAlignabilityLabel.setText(alignabilityName);
+        });
+        Thread th = new Thread(downloadTask);
+        th.setDaemon(true);
+        th.start();
+
+        e.consume();
+    }
+
+
     /** G-unzip the downloaded bigWig file for alignability
      * @param e  Event triggered by decompress alignability command
      */
     @FXML public void decompressAlignabilityMap(ActionEvent e) {
         e.consume();
-        if (this.model.getGenome().isUnpackingAlignabiltyComplete()) {
+        String basename = model.getGenomeBuild();
+        basename += ".100mer.alignabilityMap.bedgraph";
+        File f = new File(this.model.getGenome().getPathToGenomeDirectory() + File.separator + basename);
+        if (f.exists()) {
             decompressAlignabilityLabel.setText("Alignability map is already extracted");
-            logger.trace("Alignability map already extracted.");
             alignabilityDecompressPI.setProgress(1.00);
             model.setAlignabilityUnpacked();
             return;
@@ -702,6 +708,7 @@ public class GopherMainPresenter implements Initializable {
         Thread th = new Thread(alignabilityMapDecompressor);
         th.setDaemon(true);
         th.start();
+        model.getGenome().setAlignabilityUnpacked(true);
     }
 
 
