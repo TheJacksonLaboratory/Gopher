@@ -1,10 +1,9 @@
 package gopher.io;
 
+import gopher.model.Model;
 import gopher.model.genome.Genome;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.log4j.Logger;
 
@@ -22,37 +21,24 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
     /** Indicator of progress of unzipping the genome tar.gz file. */
     private final ProgressIndicator progress;
 
+    private final Model model;
+
     private String status=null;
 
     private boolean OK = false;
     public boolean OK() {return OK;}
 
     /**
-     * @param genom Reference to the model for downloaded/unpacked/index genome data.
+     * @param model Reference to the model for downloaded/unpacked alignability map
      */
-    public AlignabilityMapDecompressor(Genome genom, ProgressIndicator pi) {
+    public AlignabilityMapDecompressor(Model model, ProgressIndicator pi) {
+        this.model = model;
         this.progress=pi;
-        this.genome=genom;
-        String basename = this.genome.getGenomeBuild();
-        basename += ".100mer.alignabilityMap.bedgraph.gz";
-        this.alignabilityMapFileNameTarGZ = basename;
+        this.genome=model.getGenome();
+        this.alignabilityMapFileNameTarGZ = model.getAlignabilityMapPathIncludingFileNameGz();
         logger.trace(String.format("alignabilityMapFileNameTarGZ=%s",alignabilityMapFileNameTarGZ));
-        //this.genomeFileNameTar=this.alignabilityMapFileNameTarGZ.replaceAll(".gz","");
+
     }
-
-
-    public String getStatus() { return status; }
-
-    /**
-     * We use this method to check if we need to g-unzip the genome files.
-     * @return true if the hg19.fa file is found (and thus, the chromFa.tar.gx has been previously extracted)
-     */
-    private boolean alreadyExtracted() {
-        File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + "wgEncodeCrgMapabilityAlign100mer.bedgraph");
-        logger.trace("Checking for existence of file " + f.getAbsolutePath());
-        return f.exists();
-    }
-
 
     /**
      * This function uses the list of canonical chromosomes from the {@link #genome} and writes only
@@ -61,37 +47,43 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
      * @throws IOException if the genome fasta file cannot be g-unzipped
      */
     private void extractAlignabilityMap() throws IOException {
+
         updateProgress(0.01); /* show progress as 1% to start off with */
-        String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + alignabilityMapFileNameTarGZ)).getAbsolutePath();
-        logger.info("About to gunzip "+ INPUT_GZIP_FILE +
-                " ([path to genome directory=" + genome.getPathToGenomeDirectory() +
-                " and genome filename=" + alignabilityMapFileNameTarGZ);
+
+        String inputGzipFileName = this.model.getAlignabilityMapPathIncludingFileNameGz();
+
+        String outputBedGraphFileName = this.model.getAlignabilityMapPathIncludingFileName();
+
+
+
         double currentProgress=0.0D;
+
         updateProgress(currentProgress);
+
         try {
-            InputStream in = new FileInputStream(INPUT_GZIP_FILE);
+
+            InputStream in = new FileInputStream(inputGzipFileName);
             GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
 
-            String dirpath = this.genome.getPathToGenomeDirectory();
-            String outputBedGraphFileName = genome.getGenomeBuild() + ".100mer.alignabilityMap.bedgraph";
-            File outfile = new File( dirpath + File.separator + outputBedGraphFileName);
-            FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
-            BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+            FileOutputStream out = new FileOutputStream(outputBedGraphFileName, false);
+            BufferedOutputStream bedgraphOut = new BufferedOutputStream(out, BUFFER_SIZE);
 
             int count = 0;
             byte data[] = new byte[BUFFER_SIZE];
             while ((count = gzipIn.read(data, 0, BUFFER_SIZE)) != -1) {
-                dest.write(data, 0, count);
+                bedgraphOut.write(data, 0, count);
             }
-            dest.close();
-            logger.trace("Unzipped bedgraph");
+            bedgraphOut.close();
+
+            logger.trace("Decompression complete");
             updateProgress(1.0);
-            this.status = String.format("Extracted alignability map");
+            this.status = String.format("Decompression complete");
+
         } catch (IOException e) {
-            logger.error("Unable to decompress " + INPUT_GZIP_FILE);
+            logger.error("Unable to decompress " + inputGzipFileName);
             logger.error(e,e);
             updateProgress(0.0);
-            this.status="Extraction could not be completed.";
+            this.status="Decompression could not be completed.";
             throw e;
         }
     }
@@ -102,10 +94,10 @@ public class AlignabilityMapDecompressor  extends Task<Void> {
     @Override
     protected Void call() throws IOException {
         logger.debug("About to extract alignability file");
-        if (alreadyExtracted()) {
-            logger.debug("Found previously extracted file, returning.");
+        if (model.alignabilityMapPathIncludingFileNameExists()) {
+            logger.debug("Decompression complete, returning.");
             updateProgress(100.0);
-            this.status="extraction previously completed.";
+            this.status="Decompression complete";
             OK=true;
 
         } else {

@@ -312,7 +312,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="downloadedAlignabilityLabel" styleClass="bluelabel" text="..."
+                            <Label fx:id="downloadAlignabilityLabel" styleClass="bluelabel" text="..."
                                    GridPane.columnIndex="3" GridPane.rowIndex="6">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>

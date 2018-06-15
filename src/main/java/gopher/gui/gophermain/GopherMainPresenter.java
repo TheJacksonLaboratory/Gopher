@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -47,6 +48,8 @@ import gopher.model.viewpoint.ViewPointCreationTask;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -124,7 +127,7 @@ public class GopherMainPresenter implements Initializable {
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
     /** Show name of downloaded transcripts file. */
-    @FXML private Label downloadedAlignabilityLabel;
+    @FXML private Label downloadAlignabilityLabel;
     @FXML private Label decompressAlignabilityLabel;
 
     @FXML RadioMenuItem tiling1;
@@ -314,16 +317,15 @@ public class GopherMainPresenter implements Initializable {
             this.transcriptDownloadPI.setProgress(0.0);
         }
 
-        String alignabilityMapPath=this.model.getAlignabilityMapPath();
-        if (alignabilityMapPath!=null) {
-            this.downloadedAlignabilityLabel.setText(alignabilityMapPath);
+        if (model.alignabilityMapPathIncludingFileNameGzExists()) {
+            this.downloadAlignabilityLabel.setText("Download complete");
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
-            this.downloadedAlignabilityLabel.setText("...");
+            this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
-        if(model.isAlignabilityUnpacked()) {
-            this.decompressAlignabilityLabel.setText("Extraction previously completed");
+        if(model.alignabilityMapPathIncludingFileNameExists()) {
+            this.decompressAlignabilityLabel.setText("Decompression complete");
             this.alignabilityDecompressPI.setProgress(1.00);
         }
         else {
@@ -644,71 +646,85 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML public void downloadAlignabilityMap(ActionEvent e) {
 
-        String genomeBuild=genomeChoiceBox.getValue();
-        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
-        String alignabilityName = rgd.getAlignabilityMapName();
-        String basename=rgd.getBaseName();
-        String url;
-        try {
-            url = rgd.getURL();
-        } catch (DownloadFileNotFoundException dfne) {
-            PopupFactory.displayError("Could not identify alignabilty file for genome",dfne.getMessage());
-            return;
-        }
-        DirectoryChooser dirChooser = new DirectoryChooser();
+        String genomeBuild = genomeChoiceBox.getValue(); // e.g. hg19 or mm9
+
+        DirectoryChooser dirChooser = new DirectoryChooser(); // choose directory to which the map will be downloaded
         dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
             PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
             return;
         }
-        File f = new File(file.getAbsolutePath() + File.separator + basename);
-        String abspath = f.getAbsolutePath();
-        if (f.exists()) {
-            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bedgraph.gz file at %s. No need to download",file.getAbsolutePath()));
+
+        // assemble file paths including file names and save in model
+        String alignabilityMapPathIncludingFileName = file.getAbsolutePath();
+        alignabilityMapPathIncludingFileName += File.separator;
+        alignabilityMapPathIncludingFileName += genomeBuild;
+        alignabilityMapPathIncludingFileName += ".100mer.alignabilityMap.bedgraph";
+        String alignabilityMapPathIncldingFileNameGz = alignabilityMapPathIncludingFileName.concat(".gz");
+        model.setAlignabilityMapPathIncludingFileName(alignabilityMapPathIncludingFileName);
+        model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncldingFileNameGz);
+
+
+        // check if the file that is going to be downloaded already exists
+        if (model.alignabilityMapPathIncludingFileNameGzExists()) {
+            logger.trace(String.format("Found " +  alignabilityMapPathIncldingFileNameGz + ". No need to download"));
             this.alignabilityDownloadPI.setProgress(1.0);
-            this.downloadedAlignabilityLabel.setText(abspath);
-            this.model.setAlignabilityMapPath(abspath);
-            logger.trace(abspath);
+            this.downloadAlignabilityLabel.setText("Download complete");
             return;
         }
 
-        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
+        // prepare download
+        String basenameGz = genomeBuild.concat(".100mer.alignabilityMap.bedgraph.gz");
+        String url = null;
+        if(genomeBuild.equals("hg19")) {
+            url = "https://www.dropbox.com/s/e0um2wfyq1ru80v/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+        } else if (genomeBuild.equals("mm9")) {
+            url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+        } else {
+            this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
+            return;
+        }
+
+        Downloader downloadTask = new Downloader(file, url, basenameGz, alignabilityDownloadPI);
         downloadTask.setOnSucceeded( event -> {
-            String abspath2=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setAlignabilityMapPath(abspath2);
-            this.downloadedAlignabilityLabel.setText(alignabilityName);
+            this.downloadAlignabilityLabel.setText("Download complete");
         });
         Thread th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();
-
         e.consume();
     }
 
 
-    /** G-unzip the downloaded bigWig file for alignability
+    /** G-unzip the downloaded bedGraph file for alignability
      * @param e  Event triggered by decompress alignability command
      */
     @FXML public void decompressAlignabilityMap(ActionEvent e) {
-        e.consume();
-        String basename = model.getGenomeBuild();
-        basename += ".100mer.alignabilityMap.bedgraph";
-        File f = new File(this.model.getGenome().getPathToGenomeDirectory() + File.separator + basename);
-        if (f.exists()) {
-            decompressAlignabilityLabel.setText("Alignability map is already extracted");
+
+        if (model.alignabilityMapPathIncludingFileNameExists()) {
+            decompressAlignabilityLabel.setText("Decompression complete");
             alignabilityDecompressPI.setProgress(1.00);
-            model.setAlignabilityUnpacked();
             return;
         }
-        AlignabilityMapDecompressor alignabilityMapDecompressor = new AlignabilityMapDecompressor(this.model.getGenome(),
+
+        if(model.getAlignabilityMapPathIncludingFileName()==null || !model.alignabilityMapPathIncludingFileNameGzExists()) {
+            this.decompressAlignabilityLabel.setText("File mot found. Please download first.");
+            return;
+        }
+
+        AlignabilityMapDecompressor alignabilityMapDecompressor = new AlignabilityMapDecompressor(this.model,
                 this.alignabilityDecompressPI);
 
+        alignabilityMapDecompressor.setOnSucceeded( event -> {
+            this.decompressAlignabilityLabel.setText("Decompression complete");
+        });
 
         Thread th = new Thread(alignabilityMapDecompressor);
         th.setDaemon(true);
         th.start();
-        model.getGenome().setAlignabilityUnpacked(true);
+        this.decompressAlignabilityLabel.setText("Decompressing...");
+        e.consume();
     }
 
 

@@ -237,7 +237,9 @@ public class Model implements Serializable {
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
-    private String alignabilityMapPath=null;
+    private String alignabilityMapPathIncludingFileNameGz = null;
+    private String alignabilityMapPathIncludingFileName = null;
+
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
@@ -267,9 +269,6 @@ public class Model implements Serializable {
 
     public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
     public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
-    public void setAlignabilityUnpacked() { this.genome.setAlignabilityUnpacked(true);}
-    public boolean isAlignabilityUnpacked() { return this.genome.isUnpackingAlignabiltyComplete(); }
-
 
     public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
 
@@ -397,10 +396,25 @@ public class Model implements Serializable {
     public void setRefGenePath(String p) { refGenePath=p; }
     public String getRefGenePath() { return this.refGenePath; }
 
-    public void setAlignabilityMapPath(String p) { alignabilityMapPath=p; }
-    public String getAlignabilityMapPath() { return this.alignabilityMapPath; }
+    public void setAlignabilityMapPathIncludingFileNameGz(String p) { alignabilityMapPathIncludingFileNameGz = p; }
+    public String getAlignabilityMapPathIncludingFileNameGz() { return this.alignabilityMapPathIncludingFileNameGz; }
+    public boolean alignabilityMapPathIncludingFileNameGzExists() {
+        if(alignabilityMapPathIncludingFileNameGz != null && (new File(alignabilityMapPathIncludingFileNameGz)).exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-
+    public void setAlignabilityMapPathIncludingFileName(String p) { alignabilityMapPathIncludingFileName = p; }
+    public String getAlignabilityMapPathIncludingFileName() { return this.alignabilityMapPathIncludingFileName; }
+    public boolean alignabilityMapPathIncludingFileNameExists() {
+        if(alignabilityMapPathIncludingFileName != null && (new File(alignabilityMapPathIncludingFileName)).exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public void setProjectName(String name) { this.projectName=name;}
     public String getProjectName() { return this.projectName; }

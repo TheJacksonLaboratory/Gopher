@@ -71,21 +71,4 @@ public class DataSource {
         ds.genomeURL=UCSCmm10url;
         return ds;
     }
-
-    public static DataSource createAlignabilityhg19() {
-        DataSource ds = new DataSource();
-        ds.genomeName = "Alignability-hg19";
-        ds.genomeURL = "https://www.dropbox.com/s/e0um2wfyq1ru80v/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
-        return ds;
-    }
-
-    public static DataSource createAlignabilitymm9() {
-        DataSource ds = new DataSource();
-        ds.genomeName = "Alignability-mm9";
-        ds.genomeURL = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
-        return ds;
-    }
-
-
-
 }
