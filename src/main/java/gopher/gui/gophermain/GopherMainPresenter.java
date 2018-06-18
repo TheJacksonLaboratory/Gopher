@@ -677,20 +677,28 @@ public class GopherMainPresenter implements Initializable {
         // prepare download
         String basenameGz = genomeBuild.concat(".100mer.alignabilityMap.bedgraph.gz");
         String url = null;
+        String url2 = null;
         if(genomeBuild.equals("hg19")) {
             url = "https://www.dropbox.com/s/e0um2wfyq1ru80v/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
+
         } else if (genomeBuild.equals("mm9")) {
             url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
         } else {
             this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
             return;
         }
+        // also download chromosme file
+        Downloader downloadTask0 = new Downloader(file, url2, "chromInfo.txt.gz", alignabilityDownloadPI);
+        Thread th = new Thread(downloadTask0);
+        th.start();
 
         Downloader downloadTask = new Downloader(file, url, basenameGz, alignabilityDownloadPI);
         downloadTask.setOnSucceeded( event -> {
             this.downloadAlignabilityLabel.setText("Download complete");
         });
-        Thread th = new Thread(downloadTask);
+        th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();
         e.consume();

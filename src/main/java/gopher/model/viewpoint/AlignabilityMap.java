@@ -3,6 +3,7 @@ package gopher.model.viewpoint;
 import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
@@ -36,7 +37,28 @@ public class AlignabilityMap {
      * @return Score at pos
      */
     public Double getScoreAtPos(String chromosome, Integer pos) {
-        return 1.0;
+
+        Double score = -2.0;
+
+        // get the right array
+        int index = Collections.binarySearch(this.alignabilityMap.get(chromosome).coordArray, pos);
+        if(0 <= index) {
+
+            // pos cooresponds to a position at which the score changes
+            score = this.alignabilityMap.get(chromosome).scoreArray.get(index);
+
+        } else {
+
+            // pos does not correspond to a position at which the score changes (this should happen more often)
+            int preceding_index = (index+2)*(-1);
+            score = this.alignabilityMap.get(chromosome).scoreArray.get(preceding_index);
+        }
+        return score;
+    }
+
+    public Double getScoreFromTo(String chromosome, Integer pos) {
+        Double score = 0.0;
+        return score;
     }
 
     /**
@@ -51,6 +73,15 @@ public class AlignabilityMap {
      */
     private HashMap<String,ArrayPair> alignabilityMap = null;
 
+    /**
+     * The first and last positions of the chromosomes often consists of N's. For regions consisting of N's
+     * there are no alignability scores. The parser for the bedgraph file will fill those gaps with
+     * regions that have a score of -1. For the last positions of a chromosome the size of the chromosome is needed,
+     * which are stored in this map.
+     *
+     */
+    private HashMap<String,Integer> chromSizesMap = null;
+
 
     /**
      * Constructor
@@ -58,8 +89,39 @@ public class AlignabilityMap {
      * @param alignabilityMapPathIncludingFileName Path including file name to gzipped bedGraph file.
      * @throws IOException
      */
-    AlignabilityMap(String alignabilityMapPathIncludingFileName) throws IOException {
+    AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName) throws IOException {
+        this.parseChromInfoFile(chromInfoPathIncludingFileName);
         this.parseBedGraphFile(alignabilityMapPathIncludingFileName);
+    }
+
+    /**
+     * Parses the content of a 'chromInfo.txt.gz' file and stores the chromosome sizes in the hash map 'chromSizesMap'.
+     *
+     * @param chromInfoPathIncludingFileName
+     * @throws IOException
+     */
+    public void parseChromInfoFile(String chromInfoPathIncludingFileName) throws IOException {
+
+        chromSizesMap = new HashMap<String,Integer>();
+
+        InputStream fileStream = new FileInputStream(chromInfoPathIncludingFileName);
+        InputStream gzipStream = new GZIPInputStream(fileStream);
+        Reader decoder = new InputStreamReader(gzipStream);
+        BufferedReader br = new BufferedReader(decoder);
+
+        try {
+            String line;
+            while ((line = br.readLine()) != null) {
+
+                // extract information from line
+                String A[] = line.split("\t");
+                String chromosome = A[0];
+                Integer length = Integer.parseInt(A[1]);
+                chromSizesMap.put(chromosome,length);
+            }
+        } finally {
+            br.close();
+        }
     }
 
 
@@ -74,6 +136,8 @@ public class AlignabilityMap {
         InputStream gzipStream = new GZIPInputStream(fileStream);
         Reader decoder = new InputStreamReader(gzipStream);
         BufferedReader br = new BufferedReader(decoder);
+
+        alignabilityMap = new HashMap<String, ArrayPair>();
 
         try {
             String line;
@@ -92,10 +156,15 @@ public class AlignabilityMap {
                 if(!chromosome.equals(prevChr)) {
 
                     // this is the first line of the file for a new chromosome
-                    alignabilityMap = new HashMap<String, ArrayPair>();     // create new hash map for chromosome
-                    ArrayPair posVal = new ArrayPair();                     // create new pair of arrays
+                    if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
+                        // there were no alignability scores for the last postions of the last chromosome
+                        alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1.0);
+                    }
+
+                    ArrayPair posVal = new ArrayPair();                     // create new pair of arrays for chromosome
                     alignabilityMap.put(chromosome, posVal);                // and put ararray pair to hash map
-                    if (1 != dist) {
+
+                    if (sta != 1) {
                         // there is a gap before the first region of the chromosome
                         alignabilityMap.get(chromosome).addCoordScorePair(1, -1.0);
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
@@ -117,6 +186,13 @@ public class AlignabilityMap {
                 prevChr = chromosome;
                 prevEnd = end;
             } // end while
+
+
+            if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
+                // if the region of the last line of the bedpraph did not reach the end of the chromosome
+                alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1.0);
+            }
+
         } finally {
             br.close();
         }
@@ -142,4 +218,18 @@ public class AlignabilityMap {
             scoreArray.add(score);
         }
     }
+
+
+    /**
+     * Helper function. Prints the content of alignabilityMap to the screen.
+     */
+    public void printAlignabilityMap() {
+        for (String key : alignabilityMap.keySet()) {
+            for (int j = 0; j < alignabilityMap.get(key).coordArray.size(); j++) {
+                logger.trace(key + "\t" + alignabilityMap.get(key).coordArray.get(j) + "\t" + alignabilityMap.get(key).scoreArray.get(j));
+
+            }
+        }
+    }
+
 }
