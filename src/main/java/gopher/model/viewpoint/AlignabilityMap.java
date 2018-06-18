@@ -11,7 +11,8 @@ import java.util.zip.GZIPInputStream;
  *
  * This class reads an array hash of pairs of arrays. The keys are chromosome names. The array pairs are combined
  * in a simple private sub class (ArrayPair) of this class and consists of an Integer and a Double array. The first
- * array has all positions at which the alignability score changes. The second array has the associated scores.
+ * array has all positions at which the alignability score changes in sorted order. The second array has the
+ * associated scores.
  *
  * This data structure can be efficiently queried for alignabilty scores at given positions. The search function
  * performs a binary search on the array for position within the array pair object of the given chromosome. The
