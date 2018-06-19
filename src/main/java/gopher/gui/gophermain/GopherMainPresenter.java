@@ -102,8 +102,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private ProgressIndicator transcriptDownloadPI;
     /** Progress indicator for downloading alignability file */
     @FXML private ProgressIndicator alignabilityDownloadPI;
-    /** Progress indicator for decompressing alignability file */
-    @FXML private ProgressIndicator alignabilityDecompressPI;
 
     @FXML private Label sizeUpLabel;
     @FXML private Label sizeDownLabel;
@@ -324,14 +322,6 @@ public class GopherMainPresenter implements Initializable {
             this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
-        if(model.alignabilityMapPathIncludingFileNameExists()) {
-            this.decompressAlignabilityLabel.setText("Decompression complete");
-            this.alignabilityDecompressPI.setProgress(1.00);
-        }
-        else {
-            this.decompressAlignabilityLabel.setText("....");
-            this.alignabilityDecompressPI.setProgress(0.0);
-        }
 
         if (model.isGenomeIndexed()) {
             this.indexGenomeLabel.setText("Genome files successfully indexed");
@@ -497,7 +487,6 @@ public class GopherMainPresenter implements Initializable {
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
         this.alignabilityDownloadPI.setProgress(0.0);
-        this.alignabilityDecompressPI.setProgress(0.0);
         this.genomeDownloadPI.setProgress(0.0);
         this.genomeIndexPI.setProgress(0.0);
         this.genomeDecompressPI.setProgress(0.0);
@@ -662,7 +651,6 @@ public class GopherMainPresenter implements Initializable {
         alignabilityMapPathIncludingFileName += genomeBuild;
         alignabilityMapPathIncludingFileName += ".100mer.alignabilityMap.bedgraph";
         String alignabilityMapPathIncldingFileNameGz = alignabilityMapPathIncludingFileName.concat(".gz");
-        model.setAlignabilityMapPathIncludingFileName(alignabilityMapPathIncludingFileName);
         model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncldingFileNameGz);
 
 
@@ -703,39 +691,6 @@ public class GopherMainPresenter implements Initializable {
         th.start();
         e.consume();
     }
-
-
-    /** G-unzip the downloaded bedGraph file for alignability
-     * @param e  Event triggered by decompress alignability command
-     */
-    @FXML public void decompressAlignabilityMap(ActionEvent e) {
-
-        if (model.alignabilityMapPathIncludingFileNameExists()) {
-            decompressAlignabilityLabel.setText("Decompression complete");
-            alignabilityDecompressPI.setProgress(1.00);
-            return;
-        }
-
-        if(model.getAlignabilityMapPathIncludingFileName()==null || !model.alignabilityMapPathIncludingFileNameGzExists()) {
-            this.decompressAlignabilityLabel.setText("File mot found. Please download first.");
-            return;
-        }
-
-        AlignabilityMapDecompressor alignabilityMapDecompressor = new AlignabilityMapDecompressor(this.model,
-                this.alignabilityDecompressPI);
-
-        alignabilityMapDecompressor.setOnSucceeded( event -> {
-            this.decompressAlignabilityLabel.setText("Decompression complete");
-        });
-
-        Thread th = new Thread(alignabilityMapDecompressor);
-        th.setDaemon(true);
-        th.start();
-        this.decompressAlignabilityLabel.setText("Decompressing...");
-        e.consume();
-    }
-
-
 
     /** This function is called after the user has chosen restriction enzymes in the
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}

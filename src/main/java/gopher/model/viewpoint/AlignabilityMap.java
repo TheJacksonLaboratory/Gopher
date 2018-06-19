@@ -38,10 +38,11 @@ public class AlignabilityMap {
      */
     public Double getScoreAtPos(String chromosome, Integer pos) {
 
-        Double score = -2.0;
+        Double score;
 
-        // get the right array
+        // get index from binary search
         int index = Collections.binarySearch(this.alignabilityMap.get(chromosome).coordArray, pos);
+
         if(0 <= index) {
 
             // pos cooresponds to a position at which the score changes
@@ -56,9 +57,36 @@ public class AlignabilityMap {
         return score;
     }
 
-    public Double getScoreFromTo(String chromosome, Integer pos) {
-        Double score = 0.0;
-        return score;
+    public ArrayList<Double> getScoreFromTo(String chromosome, Integer fromPos, Integer toPos) {
+
+        ArrayList scoreArrayForRegion = new ArrayList<Double>();
+
+        // get start index from binary search
+        int index = Collections.binarySearch(this.alignabilityMap.get(chromosome).coordArray, fromPos);
+
+
+        if(index < 0) {
+
+            // pos does not correspond to a position at which the score changes (this should happen more often)
+            index = (index+2)*(-1); // take the next previous index
+        }
+        //logger.trace("fromPos: " + fromPos);
+        //logger.trace("start_index: " + index);
+        //logger.trace(this.alignabilityMap.get(chromosome).coordArray);
+        //logger.trace(this.alignabilityMap.get(chromosome).scoreArray);
+
+        for(int pos = fromPos; pos <= toPos; pos++) {
+
+            if( (index < this.alignabilityMap.get(chromosome).coordArray.size()) &&
+                    (pos == this.alignabilityMap.get(chromosome).coordArray.get(index + 1))) {
+                index++;
+            }
+            scoreArrayForRegion.add(this.alignabilityMap.get(chromosome).scoreArray.get(index));
+            //logger.trace("index: " + index + "\t" + "pos: " + pos + "\t" + "score: " + this.alignabilityMap.get(chromosome).scoreArray.get(index));
+        }
+
+
+        return scoreArrayForRegion;
     }
 
     /**
@@ -132,6 +160,8 @@ public class AlignabilityMap {
      */
     public void parseBedGraphFile(String alignabilityMapPathIncludingFileName) throws IOException {
 
+        logger.debug("About to parse bedgraph file " + alignabilityMapPathIncludingFileName + "...");
+
         InputStream fileStream = new FileInputStream(alignabilityMapPathIncludingFileName);
         InputStream gzipStream = new GZIPInputStream(fileStream);
         Reader decoder = new InputStreamReader(gzipStream);
@@ -148,8 +178,8 @@ public class AlignabilityMap {
                 // extract information from line
                 String A[] = line.split("\t");
                 String chromosome = A[0];
-                Integer sta = Integer.parseInt(A[1]) + 1;                   // start coordinates of the bedGraph format are 0-based
-                Integer end = Integer.parseInt(A[2]);                       // end coordinates of the bedGraph format are 1-based
+                Integer sta = Integer.parseInt(A[1]) + 1;             // start coordinates of the bedGraph format are 0-based
+                Integer end = Integer.parseInt(A[2]);                 // end coordinates of the bedGraph format are 1-based
                 Double alignabilityScore= Double.parseDouble(A[3]);
 
                 int dist = sta - prevEnd;
@@ -174,11 +204,11 @@ public class AlignabilityMap {
 
                 } else {
 
-                    // this is NOT the first line of the file for a new chromosome
+                    // this is NOT the first line for a new chromosome
                     if (1 < dist) {
                         // there is a gap before the current region
-                        alignabilityMap.get(chromosome).addCoordScorePair(1, -1.0);
-                        alignabilityMap.get(chromosome).addCoordScorePair(sta-1, alignabilityScore);
+                        alignabilityMap.get(chromosome).addCoordScorePair(prevEnd + 1, -1.0);
+                        alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
                     } else {
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
                     }
@@ -195,6 +225,7 @@ public class AlignabilityMap {
 
         } finally {
             br.close();
+            logger.debug("...done.");
         }
     }
 
@@ -217,6 +248,8 @@ public class AlignabilityMap {
             coordArray.add(sta);
             scoreArray.add(score);
         }
+
+
     }
 
 

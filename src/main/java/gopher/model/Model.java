@@ -238,7 +238,6 @@ public class Model implements Serializable {
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
     private String alignabilityMapPathIncludingFileNameGz = null;
-    private String alignabilityMapPathIncludingFileName = null;
 
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
@@ -400,16 +399,6 @@ public class Model implements Serializable {
     public String getAlignabilityMapPathIncludingFileNameGz() { return this.alignabilityMapPathIncludingFileNameGz; }
     public boolean alignabilityMapPathIncludingFileNameGzExists() {
         if(alignabilityMapPathIncludingFileNameGz != null && (new File(alignabilityMapPathIncludingFileNameGz)).exists()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void setAlignabilityMapPathIncludingFileName(String p) { alignabilityMapPathIncludingFileName = p; }
-    public String getAlignabilityMapPathIncludingFileName() { return this.alignabilityMapPathIncludingFileName; }
-    public boolean alignabilityMapPathIncludingFileNameExists() {
-        if(alignabilityMapPathIncludingFileName != null && (new File(alignabilityMapPathIncludingFileName)).exists()) {
             return true;
         } else {
             return false;
