@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class AlignabilityMapTest {
     private static Logger logger = Logger.getLogger(AlignabilityMap.class.getName());
 
-    private static AlignabilityMap testMap =null;
+    private static AlignabilityMap testMap = null;
 
     @BeforeClass
     public static void setup() throws Exception {

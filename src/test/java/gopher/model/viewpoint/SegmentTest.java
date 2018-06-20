@@ -1,18 +1,25 @@
 package gopher.model.viewpoint;
 
 import gopher.io.RestrictionEnzymeParser;
+import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import gopher.model.Default;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class SegmentTest {
+    private static Logger logger = Logger.getLogger(SegmentTest.class.getName());
 
     private static IndexedFastaSequenceFile FastaReader;
     private static String referenceSequenceID = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
@@ -36,7 +43,7 @@ public class SegmentTest {
 
 
 
-        segmentA=buildSegmentA(FastaReader);
+        segmentA = buildSegmentA(FastaReader);
         segmentB = buildSegmentB(FastaReader);
         segmentC = buildSegmentC(FastaReader);
     }
@@ -332,6 +339,32 @@ public class SegmentTest {
     public void testGetChromosomealPositionAsStringSegmentA() {
         String expected=String.format("%s:%d-%d",referenceSequenceID,21,44);
         Assert.assertEquals(expected,segmentA.getChromosomalPositionString());
+    }
+
+    @Test
+    public void getBaitsForUpstreamMargin() throws IOException {
+
+        // create segment for testing
+        File fasta = new File("src/test/resources/testAlignabilityMap/testPobeFactory.fa");
+        FastaReader = new IndexedFastaSequenceFile(fasta);
+        Segment testSeg = new Segment.Builder("chr1",900,2002).
+                fastaReader(FastaReader).
+                marginSize(250).
+                build();
+        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        Integer upStreamStaPos = ip.get(0).getStartPos();
+        Integer upStreamEndPos = ip.get(0).getEndPos();
+
+        AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz");
+
+
+        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
+        logger.trace(baitList.size());
+        for (Bait bait : baitList) {
+            bait.getAlignabilityScore(testMap);
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+        }
+
     }
 
 

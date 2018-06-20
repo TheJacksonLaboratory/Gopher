@@ -2,6 +2,7 @@ package gopher.model;
 
 
 import gopher.io.RestrictionEnzymeParser;
+import gopher.model.viewpoint.AlignabilityMap;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.genome.Genome;
@@ -17,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class stores all of the data related to the project,including the list of  the viewpoint objects.
+ * This class stores all of the data related to the project,including the list of the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
  * @version 0.2.16 (2018-02-18)
@@ -36,6 +37,8 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<GopherGene> geneList=null;
+
+    private AlignabilityMap alignabilityMap = null;
 
     public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
@@ -238,6 +241,7 @@ public class Model implements Serializable {
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
     private String alignabilityMapPathIncludingFileNameGz = null;
+    private String chromInfoPathIncludingFileNameGz = null;
 
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
@@ -404,6 +408,17 @@ public class Model implements Serializable {
             return false;
         }
     }
+
+    public void setChromInfoPathIncludingFileNameGz(String p) { chromInfoPathIncludingFileNameGz = p; }
+    public String getChromInfoPathIncludingFileNameGz() { return this.chromInfoPathIncludingFileNameGz; }
+    public boolean chromInfoPathIncludingFileNameGzExists() {
+        if(chromInfoPathIncludingFileNameGz != null && (new File(chromInfoPathIncludingFileNameGz)).exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     public void setProjectName(String name) { this.projectName=name;}
     public String getProjectName() { return this.projectName; }

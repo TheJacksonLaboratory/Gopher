@@ -1,6 +1,7 @@
 package gopher.gui.gophermain;
 
 import gopher.model.digest.DigestCreationTask;
+import gopher.model.viewpoint.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -41,10 +42,6 @@ import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.settings.SettingsViewFactory;
 import gopher.io.*;
 import gopher.model.*;
-import gopher.model.viewpoint.SimpleViewPointCreationTask;
-import gopher.model.viewpoint.ViewPoint;
-import gopher.model.viewpoint.ExtendedViewPointCreationTask;
-import gopher.model.viewpoint.ViewPointCreationTask;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 
@@ -646,17 +643,21 @@ public class GopherMainPresenter implements Initializable {
         }
 
         // assemble file paths including file names and save in model
-        String alignabilityMapPathIncludingFileName = file.getAbsolutePath();
-        alignabilityMapPathIncludingFileName += File.separator;
-        alignabilityMapPathIncludingFileName += genomeBuild;
-        alignabilityMapPathIncludingFileName += ".100mer.alignabilityMap.bedgraph";
-        String alignabilityMapPathIncldingFileNameGz = alignabilityMapPathIncludingFileName.concat(".gz");
-        model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncldingFileNameGz);
+        String alignabilityMapPathIncludingFileNameGz = file.getAbsolutePath();
+        alignabilityMapPathIncludingFileNameGz += File.separator;
+        alignabilityMapPathIncludingFileNameGz += genomeBuild;
+        alignabilityMapPathIncludingFileNameGz += ".100mer.alignabilityMap.bedgraph.gz";
+        model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncludingFileNameGz);
+
+        String chromInfoPathIncludingFileNameGz = file.getAbsolutePath();
+        chromInfoPathIncludingFileNameGz += File.separator;
+        chromInfoPathIncludingFileNameGz += "chromInfo.txt.gz";
+        model.setChromInfoPathIncludingFileNameGz(chromInfoPathIncludingFileNameGz);
 
 
         // check if the file that is going to be downloaded already exists
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
-            logger.trace(String.format("Found " +  alignabilityMapPathIncldingFileNameGz + ". No need to download"));
+            logger.trace(String.format("Found " +  alignabilityMapPathIncludingFileNameGz + ". No need to download"));
             this.alignabilityDownloadPI.setProgress(1.0);
             this.downloadAlignabilityLabel.setText("Download complete");
             return;
@@ -1236,6 +1237,40 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void exportReport(ActionEvent e) {
         GopherReport report = new GopherReport(this.model);
         String filename =String.format("%s-report.txt",model.getProjectName());
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialFileName(filename);
+        File file=chooser.showSaveDialog(this.primaryStage);
+        if (file==null) {
+            PopupFactory.displayError("Error","Could not get filename for saving report");
+            return;
+        }
+        report.outputRegulatoryReport(file.getAbsolutePath());
+        e.consume();
+    }
+
+    @FXML public void createProbes(ActionEvent event) {
+        event.consume();
+        if (!model.viewpointsInitialized()) {
+            PopupFactory.displayError("Viewpoints not initialized",
+                    "Please initialize viewpoints before creating probes");
+            return;
+        }
+        try {
+            //ProbeFactory probeFactory = new ProbeFactory(model);
+            /*
+            final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
+            logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
+            javafx.application.Platform.runLater(() ->
+                    RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory));*/
+        } catch (Exception e) {
+            PopupFactory.displayException("Error", "Could not create probes", e);
+        }
+        logger.trace("buildRegulatoryExome");
+    }
+
+    @FXML public void exportProbes(ActionEvent e) {
+        GopherReport report = new GopherReport(this.model);
+        String filename =String.format("%s-probes.txt",model.getProjectName());
         FileChooser chooser = new FileChooser();
         chooser.setInitialFileName(filename);
         File file=chooser.showSaveDialog(this.primaryStage);

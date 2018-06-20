@@ -77,7 +77,7 @@ public class AlignabilityMap {
 
         for(int pos = fromPos; pos <= toPos; pos++) {
 
-            if( (index < this.alignabilityMap.get(chromosome).coordArray.size()) &&
+            if( (index < this.alignabilityMap.get(chromosome).coordArray.size()-1) &&
                     (pos == this.alignabilityMap.get(chromosome).coordArray.get(index + 1))) {
                 index++;
             }

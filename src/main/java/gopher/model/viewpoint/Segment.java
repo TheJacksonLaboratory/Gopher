@@ -8,6 +8,7 @@ import gopher.model.IntPair;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a restriction digest that is a member of a viewpoint.
@@ -351,6 +352,18 @@ public class Segment implements Serializable {
             // return true iff this chromosome lexigraphicall preceeds the other one
             return (getReferenceSequenceID().compareTo(chrom) < 0);
         }
+    }
+
+    public List<Bait> getBaitsForUpstreamMargin(Integer baitSize) {
+        Integer sta = this.getSegmentMargins().get(0).getStartPos();
+        Integer end = this.getSegmentMargins().get(0).getEndPos();
+
+        List<Bait> baitList = new ArrayList<Bait>();
+        for(int i = sta; i <= end - baitSize + 1; i++ ) {
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1 );
+            baitList.add(b);
+        }
+        return baitList;
     }
 
 

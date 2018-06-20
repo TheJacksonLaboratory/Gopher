@@ -1,3 +1,0 @@
-chr1	2300	/gbdb/hg19/hg19.2bit
-chr2	2000	/gbdb/hg19/hg19.2bit
-chr3	3000	/gbdb/hg19/hg19.2bit
