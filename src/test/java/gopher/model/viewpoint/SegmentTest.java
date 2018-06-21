@@ -6,6 +6,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import gopher.model.Default;
 
@@ -345,7 +346,7 @@ public class SegmentTest {
     public void getBaitsForUpstreamMargin() throws IOException {
 
         // create segment for testing
-        File fasta = new File("src/test/resources/testAlignabilityMap/testPobeFactory.fa");
+        File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
         FastaReader = new IndexedFastaSequenceFile(fasta);
         Segment testSeg = new Segment.Builder("chr1",900,2002).
                 fastaReader(FastaReader).
@@ -355,19 +356,42 @@ public class SegmentTest {
         Integer upStreamStaPos = ip.get(0).getStartPos();
         Integer upStreamEndPos = ip.get(0).getEndPos();
 
-        AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz");
+        AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
 
 
         List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            bait.getAlignabilityScore(testMap);
             logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
         }
 
     }
 
+    @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
+    @Test
+    public void getBaitsForUpstreamMarginRealData() throws IOException {
 
+        // create segment for testing
+        File fasta = new File("/Users/hansep/data/hg19/hg19.fa");
+        FastaReader = new IndexedFastaSequenceFile(fasta);
+        Segment testSeg = new Segment.Builder("chr20",50160700,50161090).//up:50158209,50158459;down:
+                fastaReader(FastaReader).
+                marginSize(250).
+                build();
+        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        Integer upStreamStaPos = ip.get(0).getStartPos();
+        Integer upStreamEndPos = ip.get(0).getEndPos();
+
+        AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+
+
+        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
+        logger.trace(baitList.size());
+        for (Bait bait : baitList) {
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+        }
+
+    }
 
 
 

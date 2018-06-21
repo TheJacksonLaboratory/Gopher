@@ -30,15 +30,21 @@ import java.util.zip.GZIPInputStream;
 public class AlignabilityMap {
     private static Logger logger = Logger.getLogger(AlignabilityMap.class.getName());
 
+    private Integer kmerSize = null;
+    public Integer getKmerSize() {
+        return this.kmerSize;
+    }
+
+
     /**
      * Core function of this class.
      *
      * @param pos
      * @return Score at pos
      */
-    public Double getScoreAtPos(String chromosome, Integer pos) {
+    public Integer getScoreAtPos(String chromosome, Integer pos) {
 
-        Double score;
+        Integer score;
 
         // get index from binary search
         int index = Collections.binarySearch(this.alignabilityMap.get(chromosome).coordArray, pos);
@@ -57,7 +63,7 @@ public class AlignabilityMap {
         return score;
     }
 
-    public ArrayList<Double> getScoreFromTo(String chromosome, Integer fromPos, Integer toPos) {
+    public ArrayList<Integer> getScoreFromTo(String chromosome, Integer fromPos, Integer toPos) {
 
         ArrayList scoreArrayForRegion = new ArrayList<Double>();
 
@@ -117,9 +123,10 @@ public class AlignabilityMap {
      * @param alignabilityMapPathIncludingFileName Path including file name to gzipped bedGraph file.
      * @throws IOException
      */
-    AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName) throws IOException {
+    AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName, Integer kmerSize) throws IOException {
         this.parseChromInfoFile(chromInfoPathIncludingFileName);
         this.parseBedGraphFile(alignabilityMapPathIncludingFileName);
+        this.kmerSize = kmerSize;
     }
 
     /**
@@ -173,30 +180,41 @@ public class AlignabilityMap {
             String line;
             String prevChr="chr0";
             Integer prevEnd = 0;
+            String A[];
+            String chromosome;
+            Integer sta;
+            Integer end;
+            Integer alignabilityScore;
             while ((line = br.readLine()) != null) {
 
                 // extract information from line
-                String A[] = line.split("\t");
-                String chromosome = A[0];
-                Integer sta = Integer.parseInt(A[1]) + 1;             // start coordinates of the bedGraph format are 0-based
-                Integer end = Integer.parseInt(A[2]);                 // end coordinates of the bedGraph format are 1-based
-                Double alignabilityScore= Double.parseDouble(A[3]);
+                A = line.split("\t");
+                chromosome = A[0];
+                sta = Integer.parseInt(A[1]) + 1;             // start coordinates of the bedGraph format are 0-based
+                end = Integer.parseInt(A[2]);                 // end coordinates of the bedGraph format are 1-based
+                alignabilityScore = (int) Math.round(1.0/Double.parseDouble(A[3]));
 
                 int dist = sta - prevEnd;
                 if(!chromosome.equals(prevChr)) {
 
+                    if(!prevChr.equals("chr0")) {
+                        logger.trace(alignabilityMap.get(prevChr).coordArray.size());
+                    }
+
+                    logger.trace(chromosome);
+
                     // this is the first line of the file for a new chromosome
                     if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
                         // there were no alignability scores for the last postions of the last chromosome
-                        alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1.0);
+                        alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1);
                     }
 
-                    ArrayPair posVal = new ArrayPair();                     // create new pair of arrays for chromosome
-                    alignabilityMap.put(chromosome, posVal);                // and put ararray pair to hash map
+                    //ArrayPair posVal = new ArrayPair();                     // create new pair of arrays for chromosome
+                    alignabilityMap.put(chromosome, new ArrayPair());         // and put array pair to hash map
 
                     if (sta != 1) {
                         // there is a gap before the first region of the chromosome
-                        alignabilityMap.get(chromosome).addCoordScorePair(1, -1.0);
+                        alignabilityMap.get(chromosome).addCoordScorePair(1, -1);
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
                     } else {
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
@@ -207,7 +225,7 @@ public class AlignabilityMap {
                     // this is NOT the first line for a new chromosome
                     if (1 < dist) {
                         // there is a gap before the current region
-                        alignabilityMap.get(chromosome).addCoordScorePair(prevEnd + 1, -1.0);
+                        alignabilityMap.get(chromosome).addCoordScorePair(prevEnd + 1, -1);
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
                     } else {
                         alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
@@ -215,12 +233,13 @@ public class AlignabilityMap {
                 }
                 prevChr = chromosome;
                 prevEnd = end;
+
             } // end while
 
 
             if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
                 // if the region of the last line of the bedpraph did not reach the end of the chromosome
-                alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1.0);
+                alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1);
             }
 
         } finally {
@@ -237,13 +256,13 @@ public class AlignabilityMap {
     private class ArrayPair {
 
         private ArrayList<Integer> coordArray = null;
-        private ArrayList<Double> scoreArray = null;
+        private ArrayList<Integer> scoreArray = null;
 
-        public void addCoordScorePair(Integer sta, Double score) {
+        public void addCoordScorePair(Integer sta, Integer score) {
             if(coordArray == null) {
                 // these are the first values added to this object
-                coordArray = new ArrayList<Integer>();
-                scoreArray = new ArrayList<Double>();
+                coordArray = new ArrayList<>();
+                scoreArray = new ArrayList<>();
             }
             coordArray.add(sta);
             scoreArray.add(score);

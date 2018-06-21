@@ -360,7 +360,7 @@ public class Segment implements Serializable {
 
         List<Bait> baitList = new ArrayList<Bait>();
         for(int i = sta; i <= end - baitSize + 1; i++ ) {
-            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1 );
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1 ,50);
             baitList.add(b);
         }
         return baitList;

@@ -23,12 +23,12 @@ public class ProbeFactoryTest {
     public static void setup() throws Exception {
 
         // create AlignabilityMap object for testing
-        testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz");
+        testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
 
         // create segments for testing
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
-        //String testFastaFile = classLoader.getResource("src/test/resources/testAlignabilityMap/testPobeFactory.fa").getFile();
-        File fasta = new File("src/test/resources/testAlignabilityMap/testPobeFactory.fa");
+        //String testFastaFile = classLoader.getResource("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa").getFile();
+        File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
         FastaReader = new IndexedFastaSequenceFile(fasta);
 
         testSeg = new Segment.Builder("chr1",900,2002).

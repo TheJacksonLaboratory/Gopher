@@ -646,7 +646,7 @@ public class GopherMainPresenter implements Initializable {
         String alignabilityMapPathIncludingFileNameGz = file.getAbsolutePath();
         alignabilityMapPathIncludingFileNameGz += File.separator;
         alignabilityMapPathIncludingFileNameGz += genomeBuild;
-        alignabilityMapPathIncludingFileNameGz += ".100mer.alignabilityMap.bedgraph.gz";
+        alignabilityMapPathIncludingFileNameGz += ".50mer.alignabilityMap.bedgraph.gz";
         model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncludingFileNameGz);
 
         String chromInfoPathIncludingFileNameGz = file.getAbsolutePath();
@@ -664,15 +664,15 @@ public class GopherMainPresenter implements Initializable {
         }
 
         // prepare download
-        String basenameGz = genomeBuild.concat(".100mer.alignabilityMap.bedgraph.gz");
+        String basenameGz = genomeBuild.concat(".50mer.alignabilityMap.bedgraph.gz");
         String url = null;
         String url2 = null;
         if(genomeBuild.equals("hg19")) {
-            url = "https://www.dropbox.com/s/e0um2wfyq1ru80v/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+            url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
             url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
 
         } else if (genomeBuild.equals("mm9")) {
-            url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1";
+            url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
             url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
         } else {
             this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
