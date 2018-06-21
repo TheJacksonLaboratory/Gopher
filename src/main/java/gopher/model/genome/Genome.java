@@ -43,8 +43,6 @@ public abstract class Genome implements Serializable {
 
     private String genomeURL = null;
 
-
-
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
     }
@@ -58,9 +56,7 @@ public abstract class Genome implements Serializable {
         return unpackingComplete;
     }
 
-    public boolean isIndexingComplete() {
-        return indexingComplete;
-    }
+    public boolean isIndexingComplete() { return indexingComplete; }
 
     public String getGenomeURL() { return this.genomeURL;}
 
@@ -97,6 +93,10 @@ public abstract class Genome implements Serializable {
     public abstract String getGenomeFastaName();
     public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
+
+
+
+
 
     /**
      * @return true if the genome file has been previously downloaded to the indicated path.
