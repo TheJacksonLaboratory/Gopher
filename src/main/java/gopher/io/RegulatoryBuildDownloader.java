@@ -62,10 +62,7 @@ public class RegulatoryBuildDownloader {
     public boolean needToDownload(String localDirectory) {
         String basename=getBaseName();
         File f = new File(localDirectory + File.separator + basename);
-        if(f.exists() && !f.isDirectory()) {
-            return false;
-        }
-        return true;
+        return !f.exists() || f.isDirectory();
     }
 
 }

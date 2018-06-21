@@ -31,7 +31,7 @@ import static gopher.io.Platform.getGopherDir;
 public class SplashPresenter implements Initializable {
     static Logger logger = Logger.getLogger(SplashPresenter.class.getName());
     @FXML
-    private ChoiceBox projectBox;
+    private ChoiceBox<String> projectBox;
     @FXML private Button newProjectButton;
     @FXML private Button openProjectButton;
     @FXML private AnchorPane pane;

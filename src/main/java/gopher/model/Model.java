@@ -67,8 +67,6 @@ public class Model implements Serializable {
      * one entry for each transcription start site and chromosomal location of the target genes entered by the user).
      */
     private int n_validGeneSymbols;
-    /** Key:Name of a chromosome (or in general, of a contig); Value: length in nucleotides */
-    private Map<String,Integer> contigLengths;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
     /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
@@ -272,9 +270,6 @@ public class Model implements Serializable {
 
     public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
     public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
-
-    public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
-
 
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
     public void setTargetGenesPath(String path){this.targetGenesPath=path; }

@@ -358,7 +358,7 @@ public class Segment implements Serializable {
         Integer sta = this.getSegmentMargins().get(0).getStartPos();
         Integer end = this.getSegmentMargins().get(0).getEndPos();
 
-        List<Bait> baitList = new ArrayList<Bait>();
+        List<Bait> baitList = new ArrayList<>();
         for(int i = sta; i <= end - baitSize + 1; i++ ) {
             Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1 ,50);
             baitList.add(b);

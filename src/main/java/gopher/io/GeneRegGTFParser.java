@@ -111,8 +111,7 @@ public class GeneRegGTFParser {
                 feature_type=b.substring(13);
             }
         }
-        RegulatoryElement elem = new RegulatoryElement(chrom,from,to,id,feature_type);
-        return elem;
+        return new RegulatoryElement(chrom,from,to,id,feature_type);
     }
 
 

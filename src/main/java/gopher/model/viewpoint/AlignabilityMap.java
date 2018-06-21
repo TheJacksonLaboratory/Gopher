@@ -137,7 +137,7 @@ public class AlignabilityMap {
      */
     public void parseChromInfoFile(String chromInfoPathIncludingFileName) throws IOException {
 
-        chromSizesMap = new HashMap<String,Integer>();
+        chromSizesMap = new HashMap<>();
 
         InputStream fileStream = new FileInputStream(chromInfoPathIncludingFileName);
         InputStream gzipStream = new GZIPInputStream(fileStream);
@@ -174,7 +174,7 @@ public class AlignabilityMap {
         Reader decoder = new InputStreamReader(gzipStream);
         BufferedReader br = new BufferedReader(decoder);
 
-        alignabilityMap = new HashMap<String, ArrayPair>();
+        alignabilityMap = new HashMap<>();
 
         try {
             String line;
