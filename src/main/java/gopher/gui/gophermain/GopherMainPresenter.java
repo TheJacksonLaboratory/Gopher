@@ -614,7 +614,6 @@ public class GopherMainPresenter implements Initializable {
             logger.debug(message);
             model.setIndexedGenomeFastaIndexFile(manager.getGenomeFastaIndexPath());
            model.setGenomeIndexed();
-           model.setContigLengths(manager.getContigLengths());
         } );
         manager.setOnFailed(event-> {
             indexGenomeLabel.setText("FASTA indexing failed");
