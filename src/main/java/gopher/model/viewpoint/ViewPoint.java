@@ -166,7 +166,7 @@ public class ViewPoint implements Serializable {
         this.accession=vp.accession;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
-        logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+        //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
         init(fastaReader);
     }
 

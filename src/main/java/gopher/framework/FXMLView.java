@@ -223,8 +223,7 @@ public abstract class FXMLView extends StackPane {
         found = getClass().getResource(name);
         if (mandatory && found == null) {
             final String message = "Cannot load file " + name;
-            System.err.println(message);
-            System.err.println("Stopping initialization phase...");
+            System.err.println(message + ". Stopping initialization phase...");
             throw new IllegalStateException(message);
         }
         return name;
@@ -252,9 +251,8 @@ public abstract class FXMLView extends StackPane {
      * @param presenterConsumer listener for the presenter construction
      */
     public void getPresenter(Consumer<Object> presenterConsumer) {
-        this.presenterProperty.addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) -> {
-            presenterConsumer.accept(newValue);
-        });
+        this.presenterProperty.addListener((ObservableValue<? extends Object> o, Object oldValue, Object newValue) ->
+            presenterConsumer.accept(newValue));
     }
 
     /**
