@@ -359,10 +359,10 @@ public class SegmentTest {
         AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
 
 
-        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
+        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap, 120);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.setAlignabilityScore(testMap));
         }
 
     }
@@ -372,23 +372,22 @@ public class SegmentTest {
     public void getBaitsForUpstreamMarginRealData() throws IOException {
 
         // create segment for testing
-        File fasta = new File("/Users/hansep/data/hg19/hg19.fa");
+        File fasta = new File("/home/peter/storage_1/VPV_data/hg19/hg19.fa");
         FastaReader = new IndexedFastaSequenceFile(fasta);
         Segment testSeg = new Segment.Builder("chr20",50160700,50161090).//up:50158209,50158459;down:
                 fastaReader(FastaReader).
                 marginSize(250).
                 build();
         ArrayList<IntPair> ip = testSeg.getSegmentMargins();
-        Integer upStreamStaPos = ip.get(0).getStartPos();
-        Integer upStreamEndPos = ip.get(0).getEndPos();
 
-        AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        //AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
 
 
-        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
+        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap,120);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.setAlignabilityScore(testMap) + "\t" + bait.setGCContent(FastaReader) + "\t" + bait.setRepeatContent(FastaReader));
         }
 
     }
