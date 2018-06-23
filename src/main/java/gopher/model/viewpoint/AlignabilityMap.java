@@ -266,7 +266,7 @@ public class AlignabilityMap {
      * Consists of an Integer array containing to positions at which the alignability score changes in sorted order
      * and a Double array with associtated scores.
      */
-    private class ArrayPair {
+    private static class ArrayPair {
 
         private int size;
 
