@@ -1,9 +1,12 @@
 package gopher.gui.viewpointpanel;
 
 
+import gopher.model.RestrictionEnzyme;
 import org.apache.log4j.Logger;
 import gopher.model.Model;
 import gopher.model.viewpoint.ViewPoint;
+
+import java.util.stream.Collectors;
 
 /**
  * This class makes URLs for displaying the viewpoints.
@@ -12,13 +15,13 @@ import gopher.model.viewpoint.ViewPoint;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.2 (2018-02-19)
  */
-public class URLMaker {
+class URLMaker {
     private static final Logger logger = Logger.getLogger(URLMaker.class.getName());
     private String genomebuild=null;
     /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
     private int xdim;
-
-    private final String cuttingSite;
+    /** A String such as DpnII or DpnII,HindIII that will be used to display all cuttings sites on UCSC. */
+    private final String enzymeString;
 
     /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
     private static final int UCSC_DEFAULT_WIDTH = 1600;
@@ -31,7 +34,7 @@ public class URLMaker {
     URLMaker(Model model){
         this.genomebuild=model.getGenomeBuild();
         xdim=Math.min(UCSC_DEFAULT_WIDTH,model.getXdim());
-        cuttingSite=model.getFirstRestrictionEnzymeString();
+        this.enzymeString = model.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 
@@ -39,14 +42,23 @@ public class URLMaker {
     String getImageURL(ViewPoint vp, String highlight) {
         final String trackType="hgRenderTracks";
         String url = getDefaultURL(vp,trackType,highlight);
-        if (this.genomebuild.equals("hg19")) {
+        switch (genomebuild) {
+            case "hg19":
+
             url = String.format("%s&%s", url, getURLFragmentHg19());
-        } else if (this.genomebuild.equals("hg38")) {
+            break;
+            case "hg38":
                 url = String.format("%s&%s",url,getURLFragmentHg38());
-        } else if (this.genomebuild.equals("mm9")) {
+                break;
+            case "mm9":
             url = String.format("%s&%s",url,getURLFragmentMm9());
-        } else if (this.genomebuild.equals("mm10")) {
+            break;
+        case "mm10":
             url = String.format("%s&%s",url,getURLFragmentMm10());
+            break;
+            default:
+                // should never happen
+                logger.error("Unable to find URL for genome build "+genomebuild);
         }
         return url;
     }
@@ -103,8 +115,8 @@ public class URLMaker {
         String targetItem = vp.getTargetName();
         String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=%d",
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights,xdim);
-        if (cuttingSite!=null && cuttingSite.length()>0) {
-            url=String.format("%s&oligoMatch=pack&hgt.oligoMatch=%s",url,cuttingSite);
+        if (enzymeString!=null && enzymeString.length()>0) {
+            url=String.format("%s&cutters=full&hgt.cutters=%s",url,enzymeString);
         }
         return url;
     }

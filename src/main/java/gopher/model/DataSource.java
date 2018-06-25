@@ -71,6 +71,4 @@ public class DataSource {
         ds.genomeURL=UCSCmm10url;
         return ds;
     }
-
-
 }

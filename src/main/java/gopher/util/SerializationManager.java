@@ -31,8 +31,7 @@ public class SerializationManager {
             logger.error("Deserialized object was NULL");
         }
         ois.close();
-        Model model = (Model) obj;
-        return model;
+        return (Model) obj;
     }
 
 

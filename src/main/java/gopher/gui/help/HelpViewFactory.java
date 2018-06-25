@@ -27,13 +27,12 @@ public class HelpViewFactory {
 
 
     private static String getHTML() {
-        String sb = "<html><body><h3>VPV Help</h3>" +
+        return "<html><body><h3>VPV Help</h3>" +
                 "<p>VPV (<i>GOPHER</i>) is designed to facilitate the design of probes for capture Hi-C and related" +
                 " methods by visualizing the restriction fragments that surround the one or multiple transcription" +
                 "start sites of a gene (a viewpoint) in the context of their genomic position and repeat content.</p>" +
                 "<p>Documentation can be found at the <a href=\"https://readthedocs.org/projects/gopher/\">GOPHER Documentation Website</a>.</p>" +
                 "</body></html>";
-        return sb;
 
     }
 

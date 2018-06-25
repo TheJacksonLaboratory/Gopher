@@ -68,7 +68,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
-            vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model.getAllowSingleMargin());
+            vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model);
             viewpointlist.add(vp);
         }
     }

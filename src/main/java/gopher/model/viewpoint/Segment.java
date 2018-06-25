@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import gopher.exception.GopherException;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
@@ -8,6 +9,7 @@ import gopher.model.IntPair;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a restriction digest that is a member of a viewpoint.
@@ -49,6 +51,10 @@ public class Segment implements Serializable {
 
     private double GCcontentUp;
 
+    private IndexedFastaSequenceFile fastaReader = null;
+
+    private List<Bait> baitListUpStreamMargin = null;
+    private List<Bait> baitListDownStreamMargin = null;
 
 
     /** Size of the margins in up and downstream direction. */
@@ -64,6 +70,7 @@ public class Segment implements Serializable {
         this.endPos=builder.endPos;
         this.marginSize=builder.marginSize;
         this.selected=false; /* default */
+        this.fastaReader = builder.fastaReader;
         calculateGCandRepeatContent(builder.fastaReader);
         calculateRepeatAndGcContentMargins(builder.fastaReader);
     }
@@ -353,5 +360,52 @@ public class Segment implements Serializable {
         }
     }
 
+    // TODO: Hanlde cases for which there is only one margin because the segment is shorter tha 2 times the margin size
+    public List<Bait> setBaitsForUpstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize) {
 
+        Integer sta = this.getSegmentMargins().get(0).getStartPos();
+        Integer end = this.getSegmentMargins().get(0).getEndPos();
+
+        baitListUpStreamMargin = new ArrayList<>();
+        for(int i = sta; i <= end - baitSize + 1; i++ ) {
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1);
+            b.setGCContent(this.fastaReader);
+            b.setRepeatContent(this.fastaReader);
+            b.setAlignabilityScore(alignabilityMap);
+            // filter ?
+            baitListUpStreamMargin.add(b);
+        }
+        return this.baitListUpStreamMargin;
+    }
+    public List<Bait> getBaitsForUpstreamMargin() throws GopherException {
+        if (this.baitListUpStreamMargin != null) {
+            return this.baitListUpStreamMargin;
+        } else {
+            throw new GopherException("Baits for upstream margin not yet initialized!");
+        }
+    }
+
+    public List<Bait> setBaitsForDownstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize) {
+
+        Integer sta = this.getSegmentMargins().get(1).getStartPos();
+        Integer end = this.getSegmentMargins().get(1).getEndPos();
+
+        baitListDownStreamMargin = new ArrayList<>();
+        for(int i = sta; i <= end - baitSize + 1; i++ ) {
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1);
+            b.setGCContent(this.fastaReader);
+            b.setRepeatContent(this.fastaReader);
+            b.setAlignabilityScore(alignabilityMap);
+            // filter?
+            baitListDownStreamMargin.add(b);
+        }
+        return baitListDownStreamMargin;
+    }
+    public List<Bait> getBaitsForDownstreamMargin() throws GopherException {
+        if (this.baitListDownStreamMargin != null) {
+            return this.baitListDownStreamMargin;
+        } else {
+            throw new GopherException("Baits for downstream margin not yet initialized!");
+        }
+    }
 }

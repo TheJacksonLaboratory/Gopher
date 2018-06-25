@@ -15,7 +15,7 @@ public class HumanHg19 extends Genome implements Serializable {
             "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21",
             "chr22", "chrX", "chrY"};
 
-    private static String genomeBasename="chromFa.tar.gz";
+    private static final String genomeBasename="chromFa.tar.gz";
 
     public HumanHg19(String directoryPath) {
         super(directoryPath);

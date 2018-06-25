@@ -50,10 +50,7 @@ public class RefGeneDownloader {
             return false;
         }
         f = new File(localDirectory + File.separator + "refGene.txt");
-        if(f.exists() && !f.isDirectory()) {
-            return false;
-        }
-        return true;
+        return !f.exists() || f.isDirectory();
     }
 
 

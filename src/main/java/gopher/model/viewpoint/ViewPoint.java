@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
@@ -86,6 +87,8 @@ public class ViewPoint implements Serializable {
     /** This is a reference to the segment that overlaps the TSS */
     private Segment centerSegment=null;
 
+    private Model model;
+
     /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
      * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
      */
@@ -166,8 +169,8 @@ public class ViewPoint implements Serializable {
         this.accession=vp.accession;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
-        logger.error(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
-        init(fastaReader);
+        //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+        init(fastaReader, this.model);
     }
 
 
@@ -198,13 +201,14 @@ public class ViewPoint implements Serializable {
         this.marginSize= builder.marginSize;
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
-        init(builder.fastaReader);
+        this.model=builder.model;
+        init(builder.fastaReader,builder.model);
     }
 
     /**
      * @param fastaReader file pointer to an index FASTA
      */
-    private void init(IndexedFastaSequenceFile fastaReader) {
+    private void init(IndexedFastaSequenceFile fastaReader,Model model) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -330,7 +334,8 @@ public class ViewPoint implements Serializable {
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, boolean allowSingleMargin) {
+    public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, Model model ) {
+        boolean allowSingleMargin=model.getAllowSingleMargin();
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
             maxSizeUp=maxSizeDown;
@@ -416,7 +421,8 @@ public class ViewPoint implements Serializable {
      * TODO this function intends to replicate the logic of Justin's simple probe selection approach.
      *
      */
-    public void generateViewpointSimple(boolean allowSingleMargin) {
+    public void generateViewpointSimple(Model model) {
+        boolean allowSingleMargin = model.getAllowSingleMargin();
         boolean resolved = true;
         approach = Approach.SIMPLE;
         // find the digest that contains genomicPos
@@ -748,6 +754,7 @@ public class ViewPoint implements Serializable {
         private double maxGcContent=Default.MAX_GC_CONTENT;
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
+        private Model model;
 
         /**
          *
@@ -791,6 +798,11 @@ public class ViewPoint implements Serializable {
         Builder marginSize(int val) {
             this.marginSize=val; return this;
         }
+        Builder model(Model model) {
+            this.model=model; return this;
+        }
+
+
         public ViewPoint build() {
             return new ViewPoint(this);
         }

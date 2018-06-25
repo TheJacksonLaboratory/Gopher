@@ -77,6 +77,7 @@ public class Faidx extends Task<Void> {
         String path = genomeDirectoryPath + File.separator + genomeFastaBaseName;
         if (alreadyIndexed(path)) {
             logger.trace("We found index for " + path +" and are skipping the FAI indexing step");
+            updateProgress(1.00);
             return null;
         }
         File fasta = new File(path);
@@ -183,9 +184,7 @@ public class Faidx extends Task<Void> {
         if (progress==null) { // can run the class without a PI
             return;
         }
-        javafx.application.Platform.runLater( () -> {
-            progress.setProgress(pr);
-        });
+        javafx.application.Platform.runLater( () -> progress.setProgress(pr) );
     }
 
     public Map<String,Integer> getContigLengths () { return this.contigLengths; }

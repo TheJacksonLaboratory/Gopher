@@ -65,7 +65,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
-            vp.generateViewpointSimple(model.getAllowSingleMargin());
+            vp.generateViewpointSimple(model);
             if (vp.getResolved()) {
                 viewpointlist.add(vp);
                 logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
