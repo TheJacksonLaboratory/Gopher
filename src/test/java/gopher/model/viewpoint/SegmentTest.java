@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import gopher.exception.GopherException;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
@@ -343,7 +344,7 @@ public class SegmentTest {
     }
 
     @Test
-    public void getBaitsForUpstreamMargin() throws IOException {
+    public void getBaitsForUpstreamMargin() throws IOException, GopherException {
 
         // create segment for testing
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
@@ -359,7 +360,7 @@ public class SegmentTest {
         AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
 
 
-        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap, 120);
+        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap, 120,1,3,0.35,0.65,10.00);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
             logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.setAlignabilityScore(testMap));
@@ -369,7 +370,7 @@ public class SegmentTest {
 
     @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
     @Test
-    public void getBaitsForUpstreamMarginRealData() throws IOException {
+    public void getBaitsForUpstreamMarginRealData() throws IOException, GopherException {
 
         // create segment for testing
         File fasta = new File("/home/peter/storage_1/VPV_data/hg19/hg19.fa");
@@ -384,7 +385,7 @@ public class SegmentTest {
         AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
 
 
-        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap,120);
+        List<Bait> baitList = testSeg.setBaitsForUpstreamMargin(testMap, 120,1,3,0.35,0.65,10.00);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
             logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.setAlignabilityScore(testMap) + "\t" + bait.setGCContent(FastaReader) + "\t" + bait.setRepeatContent(FastaReader));

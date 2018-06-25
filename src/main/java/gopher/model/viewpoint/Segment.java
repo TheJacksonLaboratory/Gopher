@@ -189,7 +189,7 @@ public class Segment implements Serializable {
 
         /* If we get here, then we have two IntPair segments, for Up and Downstream */
 
-         for(int i=0; i<margins.size(); ++i) {
+        for(int i=0; i<margins.size(); ++i) {
             IntPair seg = margins.get(i);
             int start = seg.getStartPos();
             int end = seg.getEndPos();
@@ -361,51 +361,69 @@ public class Segment implements Serializable {
     }
 
     // TODO: Hanlde cases for which there is only one margin because the segment is shorter tha 2 times the margin size
-    public List<Bait> setBaitsForUpstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize) {
+    public List<Bait> setBaitsForUpstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize, Integer minProbeNum, Integer maxProbeNum, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getSegmentMargins().get(0).getStartPos();
         Integer end = this.getSegmentMargins().get(0).getEndPos();
 
         baitListUpStreamMargin = new ArrayList<>();
-        for(int i = sta; i <= end - baitSize + 1; i++ ) {
-            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1);
+        for(int i = sta; i <= end - baitSize + 1; i++ ) { // from left to right because this is the upstream margin
+
+            // init bait
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize - 1);
             b.setGCContent(this.fastaReader);
             b.setRepeatContent(this.fastaReader);
             b.setAlignabilityScore(alignabilityMap);
-            // filter ?
-            baitListUpStreamMargin.add(b);
+
+            // check for constraints and add if appropriate
+            if(b.getGCContent() <= maxGCcontent && minGCcontent <= b.getGCContent() && b.getAlignabilityScore() <= maxAlignabilityScore) {
+                baitListUpStreamMargin.add(b);
+            }
+
+            // abort if maxProbeNum is reached
+            if(baitListUpStreamMargin.size()==maxProbeNum) { break; }
         }
         return this.baitListUpStreamMargin;
     }
-    public List<Bait> getBaitsForUpstreamMargin() throws GopherException {
-        if (this.baitListUpStreamMargin != null) {
+    public List<Bait> getBaitsForUpstreamMargin() {
             return this.baitListUpStreamMargin;
-        } else {
-            throw new GopherException("Baits for upstream margin not yet initialized!");
-        }
     }
 
-    public List<Bait> setBaitsForDownstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize) {
+    public List<Bait> setBaitsForDownstreamMargin(AlignabilityMap alignabilityMap, Integer baitSize, Integer minProbeNum, Integer maxProbeNum, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
-        Integer sta = this.getSegmentMargins().get(1).getStartPos();
-        Integer end = this.getSegmentMargins().get(1).getEndPos();
+        if(1<this.getSegmentMargins().size()) {
 
-        baitListDownStreamMargin = new ArrayList<>();
-        for(int i = sta; i <= end - baitSize + 1; i++ ) {
-            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize -1);
-            b.setGCContent(this.fastaReader);
-            b.setRepeatContent(this.fastaReader);
-            b.setAlignabilityScore(alignabilityMap);
-            // filter?
-            baitListDownStreamMargin.add(b);
+
+            Integer sta = this.getSegmentMargins().get(1).getStartPos();
+            Integer end = this.getSegmentMargins().get(1).getEndPos();
+
+            baitListDownStreamMargin = new ArrayList<>();
+            for (int i = end - baitSize + 1; sta < i; i--) { // from right to left because this is the upstream margin
+
+                // init bait
+                Bait b = new Bait(this.referenceSequenceID, i, i + baitSize - 1);
+                b.setGCContent(this.fastaReader);
+                b.setRepeatContent(this.fastaReader);
+                b.setAlignabilityScore(alignabilityMap);
+
+                // check for constraints and add if appropriate
+                if (b.getGCContent() <= maxGCcontent && minGCcontent <= b.getGCContent() && b.getAlignabilityScore() <= maxAlignabilityScore) {
+                    baitListDownStreamMargin.add(b);
+                }
+
+                // abort if maxProbeNum is reached
+                if(baitListDownStreamMargin.size()==maxProbeNum) { break; }
+
+            }
         }
         return baitListDownStreamMargin;
+
     }
-    public List<Bait> getBaitsForDownstreamMargin() throws GopherException {
-        if (this.baitListDownStreamMargin != null) {
+    public List<Bait> getBaitsForDownstreamMargin()  {
             return this.baitListDownStreamMargin;
-        } else {
-            throw new GopherException("Baits for downstream margin not yet initialized!");
-        }
+    }
+
+    public List<Bait> setBaitsForSmallFragmments(AlignabilityMap alignabilityMap, Integer baitSize) {
+        return baitListDownStreamMargin;
     }
 }

@@ -27,18 +27,21 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     /** Current number of created viewpoints (this variable is used for the progress indicator) . */
     private int i;
 
+    private AlignabilityMap alignabilityMap = null;
+
 
     /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
-     *
-     * @param model
+     *  @param model
      * @param currentVPproperty
+     * @param alignabilityMap
      */
-    public ExtendedViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+    public ExtendedViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
         super(model, currentVPproperty);
+        this.alignabilityMap=alignabilityMap;
     }
 
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
@@ -64,6 +67,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     marginSize(model.getMarginSize()).
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
+                    alignabilityMap(this.alignabilityMap).
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */

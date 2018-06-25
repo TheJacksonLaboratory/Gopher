@@ -120,7 +120,7 @@ public class AlignabilityMap {
      * @param alignabilityMapPathIncludingFileName Path including file name to gzipped bedGraph file.
      * @throws IOException
      */
-    AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName, Integer kmerSize) throws IOException {
+    public AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName, Integer kmerSize) throws IOException {
         this.parseChromInfoFile(chromInfoPathIncludingFileName);
         this.parseBedGraphFile(alignabilityMapPathIncludingFileName);
         this.kmerSize = kmerSize;

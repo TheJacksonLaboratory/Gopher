@@ -89,6 +89,8 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
+    private AlignabilityMap alignabilityMap = null;
+
     /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
      * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
      */
@@ -169,7 +171,8 @@ public class ViewPoint implements Serializable {
         this.accession=vp.accession;
         this.isPositiveStrand=vp.isPositiveStrand;
         this.maximumRepeatContent=vp.maximumRepeatContent;
-        //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+         //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+        this.alignabilityMap=vp.alignabilityMap;
         init(fastaReader, this.model);
     }
 
@@ -202,6 +205,7 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
+        this.alignabilityMap=builder.alignabilityMap;
         init(builder.fastaReader,builder.model);
     }
 
@@ -233,6 +237,8 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
+            restFrag.setBaitsForUpstreamMargin(this.alignabilityMap,120,1,10,0.35,0.65,10.0);
+            restFrag.setBaitsForDownstreamMargin(this.alignabilityMap,120,1,10,0.35,0.65,10.0);
             restrictionSegmentList.add(restFrag);
         }
     }
@@ -755,6 +761,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
+        private static AlignabilityMap alignabilityMap;
 
         /**
          *
@@ -801,7 +808,9 @@ public class ViewPoint implements Serializable {
         Builder model(Model model) {
             this.model=model; return this;
         }
-
+        Builder alignabilityMap(AlignabilityMap alignabilityMap) {
+            this.alignabilityMap=alignabilityMap; return this;
+        }
 
         public ViewPoint build() {
             return new ViewPoint(this);

@@ -57,12 +57,8 @@ public class Bait {
         this.averageKmeralignabilty = score/alignabilityScoreList.size();
         return this.averageKmeralignabilty ;
     }
-    public Double getAlignabilityScore() throws GopherException {
-        if(this.averageKmeralignabilty != null) {
+    public Double getAlignabilityScore() {
             return this.averageKmeralignabilty;
-        } else {
-            throw new GopherException("Average kmer alignabilty is not yet calculated!");
-        }
     }
 
 
@@ -87,12 +83,8 @@ public class Bait {
         }
         return this.GCcontent;
     }
-    public Double getGCContent() throws GopherException {
-        if(this.GCcontent != null) {
+    public Double getGCContent()  {
             return this.GCcontent;
-        } else {
-            throw new GopherException("GC content is not yet calculated!");
-        }
     }
 
     public Double setRepeatContent(IndexedFastaSequenceFile fastaReader) {
@@ -111,7 +103,7 @@ public class Bait {
         }
         return this.repeatContent;
     }
-    public Double setRepeatContent() throws GopherException {
+    public Double getRepeatContent() throws GopherException {
         if(this.repeatContent != null) {
             return this.repeatContent;
         } else {

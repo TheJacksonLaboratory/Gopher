@@ -780,7 +780,7 @@ public class GopherMainPresenter implements Initializable {
      * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
-    public void createViewPoints() {
+    public void createViewPoints() throws IOException {
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
@@ -793,10 +793,14 @@ public class GopherMainPresenter implements Initializable {
 
         // TODO use boolean var allowSingleMargin
 
+        logger.trace("Reading alignability map to memory...");
+        AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
+        logger.trace("...done.");
+
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,sp);
+            task = new SimpleViewPointCreationTask(model,sp,alignabilityMap);
         } else {
-            task = new ExtendedViewPointCreationTask(model,sp);
+            task = new ExtendedViewPointCreationTask(model,sp,alignabilityMap);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
