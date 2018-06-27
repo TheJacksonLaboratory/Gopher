@@ -237,8 +237,8 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-            restFrag.setBaitsForUpstreamMargin(this.alignabilityMap,120,1,10,0.35,0.65,10.0);
-            restFrag.setBaitsForDownstreamMargin(this.alignabilityMap,120,1,10,0.35,0.65,10.0);
+
+            //restFrag.setUsableBaits(1, 3, 120, alignabilityMap, 0.35, 0.65, 10.0);
             restrictionSegmentList.add(restFrag);
         }
     }

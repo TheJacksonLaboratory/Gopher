@@ -156,12 +156,12 @@ public class BEDFileExporter {
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
                     uniqueFragments.add(vp.getReferenceID() + "\t" + (segment.getStartPos()-1) + "\t" + segment.getEndPos() + "\t" + vp.getTargetName());
                     for(Bait bait : segment.getBaitsForUpstreamMargin()) {
-                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
+                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tup|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" +  (int) Math.round(1000/bait.getAlignabilityScore()));
                     }
-                    /*
+
                     for(Bait bait : segment.getBaitsForDownstreamMargin()) {
-                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
-                    }*/
+                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tdown|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
+                    }
                 }
             }
         }
