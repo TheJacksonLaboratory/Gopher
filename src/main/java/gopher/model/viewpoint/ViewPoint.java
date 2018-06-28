@@ -756,7 +756,7 @@ public class ViewPoint implements Serializable {
         /** Need to choose a default strand, but this will always be overwritten. */
         private boolean isPositiveStrand =true;
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
-        private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
+        private double maximumRepeatContent=Default.MAXIMUM_KMER_ALIGNABILITY;
         private double maxGcContent=Default.MAX_GC_CONTENT;
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
