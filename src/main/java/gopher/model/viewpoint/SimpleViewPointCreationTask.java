@@ -25,18 +25,21 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     /** Index of current viewpoint */
     private int i;
 
+    private AlignabilityMap alignabilityMap = null;
+
 
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
-     *
-     * @param model
+     *  @param model
      * @param currentVPproperty
-     */
-    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+   * @param alignabilityMap
+   */
+    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
         super(model,currentVPproperty);
+        this.alignabilityMap=alignabilityMap;
     }
 
 
@@ -61,11 +64,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     marginSize(model.getMarginSize()).
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
+                    alignabilityMap(this.alignabilityMap).
                     build();
+
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
-            vp.generateViewpointSimple(model.getAllowSingleMargin());
+            vp.generateViewpointSimple(model);
             if (vp.getResolved()) {
                 viewpointlist.add(vp);
                 logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));

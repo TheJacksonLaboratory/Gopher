@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import gopher.exception.GopherException;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
@@ -343,7 +344,7 @@ public class SegmentTest {
     }
 
     @Test
-    public void getBaitsForUpstreamMargin() throws IOException {
+    public void getBaitsForUpstreamMargin() throws IOException, GopherException {
 
         // create segment for testing
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
@@ -358,42 +359,36 @@ public class SegmentTest {
 
         AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
 
-
-        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
+        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,testMap,0.35,0.65,10.0);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore());
         }
 
     }
 
     @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
     @Test
-    public void getBaitsForUpstreamMarginRealData() throws IOException {
+    public void getBaitsForUpstreamMarginRealData() throws IOException, GopherException {
 
         // create segment for testing
-        File fasta = new File("/Users/hansep/data/hg19/hg19.fa");
+        File fasta = new File("/home/peter/storage_1/VPV_data/hg19/hg19.fa");
         FastaReader = new IndexedFastaSequenceFile(fasta);
         Segment testSeg = new Segment.Builder("chr20",50160700,50161090).//up:50158209,50158459;down:
                 fastaReader(FastaReader).
                 marginSize(250).
                 build();
         ArrayList<IntPair> ip = testSeg.getSegmentMargins();
-        Integer upStreamStaPos = ip.get(0).getStartPos();
-        Integer upStreamEndPos = ip.get(0).getEndPos();
 
-        AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        //AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
 
+        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,testMap,0.35,0.65,10.0);
 
-        List<Bait> baitList = testSeg.getBaitsForUpstreamMargin(120);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore(testMap));
+            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore() + "\t" + bait.getGCContent() + "\t" + bait.getRepeatContent());
         }
 
     }
-
-
-
-
 }
