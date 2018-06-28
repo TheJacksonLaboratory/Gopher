@@ -2,6 +2,7 @@ package gopher.model;
 
 
 import gopher.io.RestrictionEnzymeParser;
+import gopher.model.viewpoint.AlignabilityMap;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.genome.Genome;
@@ -17,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class stores all of the data related to the project,including the list of  the viewpoint objects.
+ * This class stores all of the data related to the project,including the list of the viewpoint objects.
  * @author Peter Robinson
  * @author Hannah Blau
  * @version 0.2.16 (2018-02-18)
@@ -36,6 +37,8 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<GopherGene> geneList=null;
+
+    private AlignabilityMap alignabilityMap = null;
 
     public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
@@ -64,8 +67,6 @@ public class Model implements Serializable {
      * one entry for each transcription start site and chromosomal location of the target genes entered by the user).
      */
     private int n_validGeneSymbols;
-    /** Key:Name of a chromosome (or in general, of a contig); Value: length in nucleotides */
-    private Map<String,Integer> contigLengths;
     /** Proxy (null if not needed/not set) */
     private String httpProxy=null;
     /** Proxy port (null if not set). Note we store this as a String,but it has been validated as an Integer. */
@@ -237,7 +238,9 @@ public class Model implements Serializable {
 
     /** The complete path to the refGene.txt.gz transcript file on the user's computer. */
     private String refGenePath=null;
-    private String alignabilityMapPath=null;
+    private String alignabilityMapPathIncludingFileNameGz = null;
+    private String chromInfoPathIncludingFileNameGz = null;
+
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
@@ -264,11 +267,9 @@ public class Model implements Serializable {
 
     public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
     public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
+
     public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
     public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
-
-    public void setContigLengths(Map<String,Integer> contigLens) { this.contigLengths=contigLens;}
-
 
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
     public void setTargetGenesPath(String path){this.targetGenesPath=path; }
@@ -393,9 +394,25 @@ public class Model implements Serializable {
     public void setRefGenePath(String p) { refGenePath=p; }
     public String getRefGenePath() { return this.refGenePath; }
 
-    public void setAlignabilityMapPath(String p) { alignabilityMapPath=p; }
-    public String getAlignabilityMapPath() { return this.alignabilityMapPath; }
+    public void setAlignabilityMapPathIncludingFileNameGz(String p) { alignabilityMapPathIncludingFileNameGz = p; }
+    public String getAlignabilityMapPathIncludingFileNameGz() { return this.alignabilityMapPathIncludingFileNameGz; }
+    public boolean alignabilityMapPathIncludingFileNameGzExists() {
+        if(alignabilityMapPathIncludingFileNameGz != null && (new File(alignabilityMapPathIncludingFileNameGz)).exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    public void setChromInfoPathIncludingFileNameGz(String p) { chromInfoPathIncludingFileNameGz = p; }
+    public String getChromInfoPathIncludingFileNameGz() { return this.chromInfoPathIncludingFileNameGz; }
+    public boolean chromInfoPathIncludingFileNameGzExists() {
+        if(chromInfoPathIncludingFileNameGz != null && (new File(chromInfoPathIncludingFileNameGz)).exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
     public void setProjectName(String name) { this.projectName=name;}

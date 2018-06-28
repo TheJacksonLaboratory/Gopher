@@ -1,6 +1,7 @@
 package gopher.gui.gophermain;
 
 import gopher.model.digest.DigestCreationTask;
+import gopher.model.viewpoint.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -13,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -40,13 +42,11 @@ import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.settings.SettingsViewFactory;
 import gopher.io.*;
 import gopher.model.*;
-import gopher.model.viewpoint.SimpleViewPointCreationTask;
-import gopher.model.viewpoint.ViewPoint;
-import gopher.model.viewpoint.ExtendedViewPointCreationTask;
-import gopher.model.viewpoint.ViewPointCreationTask;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -97,8 +97,9 @@ public class GopherMainPresenter implements Initializable {
     @FXML private ProgressIndicator genomeIndexPI;
     /** Progress indicator for downloading the transcript file */
     @FXML private ProgressIndicator transcriptDownloadPI;
-    /** Progress indicator for downloading the transcript file */
+    /** Progress indicator for downloading alignability file */
     @FXML private ProgressIndicator alignabilityDownloadPI;
+
     @FXML private Label sizeUpLabel;
     @FXML private Label sizeDownLabel;
     @FXML private TextField sizeUpTextField;
@@ -121,7 +122,8 @@ public class GopherMainPresenter implements Initializable {
     /** Show name of downloaded transcripts file. */
     @FXML private Label downloadedTranscriptsLabel;
     /** Show name of downloaded transcripts file. */
-    @FXML private Label downloadedAlignabilityLabel;
+    @FXML private Label downloadAlignabilityLabel;
+    @FXML private Label decompressAlignabilityLabel;
 
     @FXML RadioMenuItem tiling1;
     @FXML RadioMenuItem tiling2;
@@ -295,7 +297,7 @@ public class GopherMainPresenter implements Initializable {
             this.genomeDownloadPI.setProgress(0);
         }
         if (model.isGenomeUnpacked()) {
-            this.decompressGenomeLabel.setText("extraction previously completed");
+            this.decompressGenomeLabel.setText("Extraction previously completed");
             this.genomeDecompressPI.setProgress(1.00);
         } else {
             this.decompressGenomeLabel.setText("...");
@@ -310,12 +312,11 @@ public class GopherMainPresenter implements Initializable {
             this.transcriptDownloadPI.setProgress(0.0);
         }
 
-        String alignabilityMapPath=this.model.getAlignabilityMapPath();
-        if (alignabilityMapPath!=null) {
-            this.downloadedAlignabilityLabel.setText(alignabilityMapPath);
+        if (model.alignabilityMapPathIncludingFileNameGzExists()) {
+            this.downloadAlignabilityLabel.setText("Download complete");
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
-            this.downloadedAlignabilityLabel.setText("...");
+            this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
 
@@ -510,7 +511,7 @@ public class GopherMainPresenter implements Initializable {
             PopupFactory.displayError("Error","Could not get path to download genome.");
             return;
         }
-        logger.info("downloadGenome to directory  "+file.getAbsolutePath());
+        logger.info("downloadGenome to directory  "+ file.getAbsolutePath());
         if (this.model.checkDownloadComplete(file.getAbsolutePath())) {
             // we're done!
             this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
@@ -566,51 +567,6 @@ public class GopherMainPresenter implements Initializable {
        e.consume();
     }
 
-    /**
-     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
-     */
-    @FXML public void downloadAlignabilityMap(ActionEvent e) {
-
-        String genomeBuild=genomeChoiceBox.getValue();
-        AlignabilityMapDownloader rgd = new AlignabilityMapDownloader(genomeBuild);
-        String alignabilityName = rgd.getAlignabilityMapName();
-        String basename=rgd.getBaseName();
-        String url;
-        try {
-            url = rgd.getURL();
-        } catch (DownloadFileNotFoundException dfne) {
-            PopupFactory.displayError("Could not identify bigwig file for genome",dfne.getMessage());
-            return;
-        }
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
-        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().isEmpty()) {
-            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
-            return;
-        }
-        if (! rgd.needToDownload(file.getAbsolutePath())) {
-            logger.trace(String.format("Found wgEncodeCrgMapabilityAlign100mer.bigWig file at %s. No need to download",file.getAbsolutePath()));
-            this.alignabilityDownloadPI.setProgress(1.0);
-            this.downloadedAlignabilityLabel.setText(alignabilityName);
-            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setAlignabilityMapPath(abspath);
-            return;
-        }
-
-        Downloader downloadTask = new Downloader(file, url, basename, alignabilityDownloadPI);
-        downloadTask.setOnSucceeded( event -> {
-            String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
-            this.model.setAlignabilityMapPath(abspath);
-            this.downloadedAlignabilityLabel.setText(alignabilityName);
-        });
-        Thread th = new Thread(downloadTask);
-        th.setDaemon(true);
-        th.start();
-
-        e.consume();
-    }
-
 
     /** G-unzip and un-tar the downloaded chromFa.tar.gz file.
      * @param e  Event triggered by decompress genome command
@@ -618,7 +574,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         if (this.model.getGenome().isIndexingComplete()) {
-            decompressGenomeLabel.setText("chromosome files extracted");
+            decompressGenomeLabel.setText("Chromosome files extracted");
             genomeDecompressPI.setProgress(1.00);
             model.setGenomeUnpacked();
             return;
@@ -658,7 +614,6 @@ public class GopherMainPresenter implements Initializable {
             logger.debug(message);
             model.setIndexedGenomeFastaIndexFile(manager.getGenomeFastaIndexPath());
            model.setGenomeIndexed();
-           model.setContigLengths(manager.getContigLengths());
         } );
         manager.setOnFailed(event-> {
             indexGenomeLabel.setText("FASTA indexing failed");
@@ -671,6 +626,71 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
+    /**
+     * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
+     */
+    @FXML public void downloadAlignabilityMap(ActionEvent e) {
+
+        String genomeBuild = genomeChoiceBox.getValue(); // e.g. hg19 or mm9
+
+        DirectoryChooser dirChooser = new DirectoryChooser(); // choose directory to which the map will be downloaded
+        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().isEmpty()) {
+            PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
+            return;
+        }
+
+        // assemble file paths including file names and save in model
+        String alignabilityMapPathIncludingFileNameGz = file.getAbsolutePath();
+        alignabilityMapPathIncludingFileNameGz += File.separator;
+        alignabilityMapPathIncludingFileNameGz += genomeBuild;
+        alignabilityMapPathIncludingFileNameGz += ".50mer.alignabilityMap.bedgraph.gz";
+        model.setAlignabilityMapPathIncludingFileNameGz(alignabilityMapPathIncludingFileNameGz);
+
+        String chromInfoPathIncludingFileNameGz = file.getAbsolutePath();
+        chromInfoPathIncludingFileNameGz += File.separator;
+        chromInfoPathIncludingFileNameGz += "chromInfo.txt.gz";
+        model.setChromInfoPathIncludingFileNameGz(chromInfoPathIncludingFileNameGz);
+
+
+        // check if the file that is going to be downloaded already exists
+        if (model.alignabilityMapPathIncludingFileNameGzExists()) {
+            logger.trace(String.format("Found " +  alignabilityMapPathIncludingFileNameGz + ". No need to download"));
+            this.alignabilityDownloadPI.setProgress(1.0);
+            this.downloadAlignabilityLabel.setText("Download complete");
+            return;
+        }
+
+        // prepare download
+        String basenameGz = genomeBuild.concat(".50mer.alignabilityMap.bedgraph.gz");
+        String url = null;
+        String url2 = null;
+        if(genomeBuild.equals("hg19")) {
+            url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
+            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
+
+        } else if (genomeBuild.equals("mm9")) {
+            url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
+            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+        } else {
+            this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
+            return;
+        }
+        // also download chromosme file
+        Downloader downloadTask0 = new Downloader(file, url2, "chromInfo.txt.gz", alignabilityDownloadPI);
+        Thread th = new Thread(downloadTask0);
+        th.start();
+
+        Downloader downloadTask = new Downloader(file, url, basenameGz, alignabilityDownloadPI);
+        downloadTask.setOnSucceeded( event -> {
+            this.downloadAlignabilityLabel.setText("Download complete");
+        });
+        th = new Thread(downloadTask);
+        th.setDaemon(true);
+        th.start();
+        e.consume();
+    }
 
     /** This function is called after the user has chosen restriction enzymes in the
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
@@ -760,7 +780,7 @@ public class GopherMainPresenter implements Initializable {
      * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
-    public void createViewPoints() {
+    public void createViewPoints() throws IOException {
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
@@ -773,10 +793,14 @@ public class GopherMainPresenter implements Initializable {
 
         // TODO use boolean var allowSingleMargin
 
+        logger.trace("Reading alignability map to memory...");
+        AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
+        logger.trace("...done.");
+
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,sp);
+            task = new SimpleViewPointCreationTask(model,sp,alignabilityMap);
         } else {
-            task = new ExtendedViewPointCreationTask(model,sp);
+            task = new ExtendedViewPointCreationTask(model,sp,alignabilityMap);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
@@ -1216,6 +1240,40 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void exportReport(ActionEvent e) {
         GopherReport report = new GopherReport(this.model);
         String filename =String.format("%s-report.txt",model.getProjectName());
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialFileName(filename);
+        File file=chooser.showSaveDialog(this.primaryStage);
+        if (file==null) {
+            PopupFactory.displayError("Error","Could not get filename for saving report");
+            return;
+        }
+        report.outputRegulatoryReport(file.getAbsolutePath());
+        e.consume();
+    }
+
+    @FXML public void createProbes(ActionEvent event) {
+        event.consume();
+        if (!model.viewpointsInitialized()) {
+            PopupFactory.displayError("Viewpoints not initialized",
+                    "Please initialize viewpoints before creating probes");
+            return;
+        }
+        try {
+            //ProbeFactory probeFactory = new ProbeFactory(model);
+            /*
+            final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
+            logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
+            javafx.application.Platform.runLater(() ->
+                    RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory));*/
+        } catch (Exception e) {
+            PopupFactory.displayException("Error", "Could not create probes", e);
+        }
+        logger.trace("buildRegulatoryExome");
+    }
+
+    @FXML public void exportProbes(ActionEvent e) {
+        GopherReport report = new GopherReport(this.model);
+        String filename =String.format("%s-probes.txt",model.getProjectName());
         FileChooser chooser = new FileChooser();
         chooser.setInitialFileName(filename);
         File file=chooser.showSaveDialog(this.primaryStage);

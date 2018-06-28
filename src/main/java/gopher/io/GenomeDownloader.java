@@ -36,7 +36,7 @@ public class GenomeDownloader {
         try {
             this.url=getGenomeURL(build);
             this.genome=getGenome(build);
-            logger.debug("Setting url to "+url);
+            logger.debug("Setting url to "+ url);
         } catch (DownloadFileNotFoundException e){
             logger.error(e,e);
         }
@@ -60,9 +60,7 @@ public class GenomeDownloader {
     public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
         logger.trace(String.format("Starting download of %s to %s",directory,url));
-        downloadTask.setOnSucceeded(e -> {
-            logger.trace("Finished downloading genome file to "+directory);
-        });
+        downloadTask.setOnSucceeded(e -> logger.trace("Finished downloading genome file to "+directory));
         downloadTask.setOnFailed(eh -> {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

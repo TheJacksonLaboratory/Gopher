@@ -1,5 +1,6 @@
 package gopher.io;
 
+import gopher.model.viewpoint.Bait;
 import org.apache.log4j.Logger;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
@@ -88,7 +89,7 @@ public class BEDFileExporter {
 
         PrintStream vpvSummaryR = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryRfile)));
 
-        String[] helpSplit=vpvSummaryRfile.split("_vpvSummary.r");
+        String[] helpSplit=vpvSummaryRfile.split("_gopherSummary.r");
         String prefix=helpSplit[0];
         String script=getRscript(prefix);
         vpvSummaryR.println(script);
@@ -100,7 +101,7 @@ public class BEDFileExporter {
         PrintStream out_allTracks = new PrintStream(new FileOutputStream(getFullPath(allTracksBEDfile)));
 
         // print genomic positions
-        out_allTracks.println("track name='" + "VPV: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
+        out_allTracks.println("track name='" + "Gopher: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s",
@@ -111,7 +112,7 @@ public class BEDFileExporter {
         }
 
         // print viewpoints
-        out_allTracks.println("track name='" + "VPV: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
+        out_allTracks.println("track name='" + "Gopher: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
@@ -123,10 +124,11 @@ public class BEDFileExporter {
         }
 
         // print restriction fragments and get unique digest margins
-        out_allTracks.println("track name='" + "VPV: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
+        out_allTracks.println("track name='" + "Gopher: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
         Set<String> uniqueFragmentMargins = new HashSet<>(); // use a set to get rid of duplicate digest margins
         HashMap<String,String> uniqueFragmentMarginsMap = new HashMap<>();
-        Set<String> uniqueFragments = new HashSet<>(); // use a set to get rid of duplicate fragments
+        Set<String> uniqueFragments = new HashSet<>(); // use a set to get rid of duplicated fragments
+        Set<String> uniqueProbes = new HashSet<>(); // use a set to get rid of duplicated probes
 
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
@@ -153,12 +155,19 @@ public class BEDFileExporter {
 
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
                     uniqueFragments.add(vp.getReferenceID() + "\t" + (segment.getStartPos()-1) + "\t" + segment.getEndPos() + "\t" + vp.getTargetName());
+                    for(Bait bait : segment.getBaitsForUpstreamMargin()) {
+                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tup|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" +  (int) Math.round(1000/bait.getAlignabilityScore()));
+                    }
+
+                    for(Bait bait : segment.getBaitsForDownstreamMargin()) {
+                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tdown|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
+                    }
                 }
             }
         }
 
         // print out unique set of margins as targets for enrichment
-        out_allTracks.println("track name='" + "VPV: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
+        out_allTracks.println("track name='" + "Gopher: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
         Integer totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
             //out_allTracks.println(s);
@@ -182,6 +191,11 @@ public class BEDFileExporter {
             Integer len = Integer.parseInt(end) - Integer.parseInt(sta);
             totalLengthOfMargins = totalLengthOfMargins + len;
             target_id++;
+        }
+
+        out_allTracks.println("track name='" + "Gopher: Probes" + "' description='" + "Probes" + "' color=0,0,0" + "' useScore=1" + " visibility=3");
+        for(String s : uniqueProbes) {
+            out_allTracks.println(s);
         }
 
 

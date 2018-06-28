@@ -31,11 +31,6 @@ public abstract class Genome implements Serializable {
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
     private String genomeBasename = DEFAULT_GENOME_BASENAME;
 
-    /** Does the directory indicated by {@link #pathToGenomeDirectory} contain either the chromFa.tar.gz file or
-     * the corresponding unpacked chromosome files (note: we require only the canonical files; other files can be deleted
-     * by the user without affecting this program.
-     */
-    private boolean downloadComplete=false;
 
     private boolean unpackingComplete=false;
     /** A flag to indicate that the production of a FAI file for the genome is completed. */
@@ -43,24 +38,18 @@ public abstract class Genome implements Serializable {
 
     private String genomeURL = null;
 
-
-
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
     }
     public void setPathToGenomeDirectory(String absolutePath) { this.pathToGenomeDirectory=absolutePath;}
 
-    public boolean isDownloadComplete() {
-        return pathToGenomeDirectory!= null && downloadComplete;
-    }
+
 
     public boolean isUnpackingComplete() {
         return unpackingComplete;
     }
 
-    public boolean isIndexingComplete() {
-        return indexingComplete;
-    }
+    public boolean isIndexingComplete() { return indexingComplete; }
 
     public String getGenomeURL() { return this.genomeURL;}
 
@@ -97,6 +86,10 @@ public abstract class Genome implements Serializable {
     public abstract String getGenomeFastaName();
     public void setGenomeUnpacked(boolean b) { this.unpackingComplete=b;}
     public void setGenomeIndexed(boolean b) { this.indexingComplete=b;}
+
+
+
+
 
     /**
      * @return true if the genome file has been previously downloaded to the indicated path.

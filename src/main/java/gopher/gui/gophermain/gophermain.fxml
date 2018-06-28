@@ -33,16 +33,16 @@
             <HBox maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                 <MenuBar HBox.hgrow="NEVER">
                     <Menu mnemonicParsing="false" text="File">
-                        <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New"/>
-                        <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project"/>
+                        <MenuItem mnemonicParsing="false" onAction="#startNewProject" text="New" accelerator="Shortcut+N"/>
+                        <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Save project" accelerator="Shortcut+S"/>
                         <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..."/>
                         <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..."/>
-                        <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files As ..."/>
+                        <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..."/>
                         <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs"
                                   text="Save digest file As ..."/>
                         <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose"
                                   text="Save project and close"/>
-                        <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Close"/>
+                        <MenuItem mnemonicParsing="false" onAction="#closeWindow" text="Quit" accelerator="Shortcut+Q"/>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Edit">
                         <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject"
@@ -85,13 +85,19 @@
                         <MenuItem mnemonicParsing="false" onAction="#exportReport"
                                   text="Export report"/>
                     </Menu>
+                    <Menu mnemonicParsing="false" text="Probes">
+                        <MenuItem mnemonicParsing="false" onAction="#createProbes"
+                                  text="Create probes"/>
+                        <MenuItem mnemonicParsing="false" onAction="#exportProbes"
+                                  text="Export probes"/>
+                    </Menu>
                 </MenuBar>
                 <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar"
                         HBox.hgrow="ALWAYS"/>
                 <MenuBar nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
                     <Menu mnemonicParsing="false" text="Help">
                         <MenuItem mnemonicParsing="false" onAction="#showHelpWindow"
-                                  text="Help"/>
+                                  text="Help" accelerator="Shortcut+H"/>
                         <Menu mnemonicParsing="false" text="Example gene sets">
                             <MenuItem mnemonicParsing="false"
                                       onAction="#openGeneWindowWithExampleHumanGenes" text="human"/>
@@ -109,7 +115,7 @@
         </top>
         <center>
             <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0" BorderPane.alignment="CENTER">
-                <Tab id="setuptab" fx:id="setuptab" closable="false" text="Set up">
+                <Tab id="setuptab" closable="false" text="Set up">
                     <VBox alignment="TOP_CENTER" fillWidth="false">
                         <effect>
                             <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0"/>
@@ -167,22 +173,17 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="alignabilityLabel" text="Alignability" GridPane.rowIndex="6">
+                            <Label text="Alignability map" GridPane.rowIndex="6">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="alignabilityLabel2" text="Alignability" GridPane.rowIndex="7">
+                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="7">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="8">
-                                <GridPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                                </GridPane.margin>
-                            </Label>
-                            <Label text="Target genes" GridPane.rowIndex="9">
+                            <Label text="Target genes" GridPane.rowIndex="8">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                 </GridPane.margin>
@@ -240,26 +241,18 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="downloadAlignabilityMapButton2" mnemonicParsing="false"
-                                    onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0"
-                                    styleClass="Button" stylesheets="@gophermain.css" text="Download"
-                                    GridPane.columnIndex="1" GridPane.rowIndex="7">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                                </GridPane.margin>
-                            </Button>
                             <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes"
                                     prefHeight="30.0" prefWidth="145.0" styleClass="Button"
                                     stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1"
-                                    GridPane.rowIndex="8">
+                                    GridPane.rowIndex="7">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="enterGeneListButton" mnemonicParsing="false" onAction="#enterGeneList"
+                            <Button mnemonicParsing="false" onAction="#enterGeneList"
                                     prefHeight="30.0" prefWidth="145.0" styleClass="Button"
                                     stylesheets="@gophermain.css" text="Enter gene list" GridPane.columnIndex="1"
-                                    GridPane.rowIndex="9">
+                                    GridPane.rowIndex="8">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
@@ -310,7 +303,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="downloadedAlignabilityLabel" styleClass="bluelabel" text="..."
+                            <Label fx:id="downloadAlignabilityLabel" styleClass="bluelabel" text="..."
                                    GridPane.columnIndex="3" GridPane.rowIndex="6">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -440,7 +433,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                 </GridPane.margin>
                             </Label>
-                            <Button fx:id="createCaptureProbesButton" alignment="CENTER" defaultButton="true"
+                            <Button alignment="CENTER" defaultButton="true"
                                     minHeight="30.0" minWidth="145.0" mnemonicParsing="false"
                                     onAction="#createViewPoints" styleClass="Button"
                                     stylesheets="@gophermain.css" text="Create Viewpoints!"

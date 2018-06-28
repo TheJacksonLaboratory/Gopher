@@ -30,13 +30,13 @@ public class EnzymeBoxPresenter implements Initializable {
     Button okButton;
 
 
-    private static List<CheckBox> boxlist;
+    private List<CheckBox> boxlist;
 
-    private static int count;
+    private int count;
 
-    private static List<RestrictionEnzyme> chosen = null;
+    private List<RestrictionEnzyme> chosen = null;
 
-    private static Map<String, RestrictionEnzyme> enzymemap;
+    private Map<String, RestrictionEnzyme> enzymemap;
 
     private Consumer<gopher.framework.Signal> signal;
 
