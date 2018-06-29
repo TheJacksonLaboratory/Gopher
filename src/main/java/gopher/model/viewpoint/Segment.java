@@ -379,7 +379,7 @@ public class Segment implements Serializable {
         // try to set bmax usable baits independently for up and downstream margin
         this.setUsableBaitsForUpstreamMargin(bmin, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
         this.setUsableBaitsForDownstreamMargin(bmin, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
-        Integer x = this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
+        this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
 
         if (bmin <= this.getBaitNumUp() && bmin <= this.getBaitNumDown()) {
             // both margin have at least bmin non redundant baits -> this segment is targetable
@@ -404,7 +404,7 @@ public class Segment implements Serializable {
 
                 if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
-                    this.unselectable = true;
+                    this.unselectable = false;
                     this.targetable = false;
                     this.rescuable = true;
                     return;
@@ -421,7 +421,7 @@ public class Segment implements Serializable {
                 this.removeRedundantBaits();
                 if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
-                    this.unselectable = true;
+                    this.unselectable = false;
                     this.targetable = false;
                     this.rescuable = true;
                     return;
@@ -433,6 +433,7 @@ public class Segment implements Serializable {
                 }
             }
         }
+
     }
 
 
@@ -441,9 +442,7 @@ public class Segment implements Serializable {
 
     public Integer getBaitNumUp() { return this.baitListUpStreamMargin.size(); }
 
-    public Integer getBaitNumDown() {
-        return this.baitListDownStreamMargin.size();
-    }
+    public Integer getBaitNumDown() {return this.baitListDownStreamMargin.size(); }
 
 
     public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {

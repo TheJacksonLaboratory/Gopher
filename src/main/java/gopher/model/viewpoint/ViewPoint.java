@@ -391,19 +391,18 @@ public class ViewPoint implements Serializable {
             }
 
             // the remaining segments must be targetable; sanity check
-            if(!segment.isTargetable() && segment.isSelected()) {
+            if(!segment.isTargetable() && segment.isSelected() && !model.getAllowSingleMargin()) {
                 logger.debug("Error: This segment should be targetable!");
+            }
+
+            if(segment.isSelected() && segment.isRescuable()) {
+                logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
             }
 
             // if at least one segment is selected, declare viewpoint to be resolved
             if(segment.isSelected()) {
                 this.resolved = true;
             }
-
-            if(segment.isSelected() && (segment.getBaitNumUp() != segment.getBaitNumDown())) {
-                logger.trace("***" + this.getAccession());
-            }
-
         }
 
         /*
