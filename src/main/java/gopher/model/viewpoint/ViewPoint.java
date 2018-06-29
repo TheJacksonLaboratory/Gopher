@@ -237,8 +237,8 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-
-            restFrag.setUsableBaits(4, 5, 120, alignabilityMap, 0.35, 0.65, 10.0);
+            Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
+            restFrag.setUsableBaits(model.getMinBaitCount(),model.getMaxBaitCount(),model.getProbeLength(),alignabilityMap,model.getMinGCcontent(),model.getMaxGCcontent(),maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
@@ -362,8 +362,52 @@ public class ViewPoint implements Serializable {
             logger.error("center segment NUll for " + getTargetName());
         }
 
+        // select segments
         Integer lowerLimit = genomicPos - maxSizeUp;
         Integer upperLimit = genomicPos + maxSizeDown;
+        for (Segment segment:restrictionSegmentList) {
+
+            segment.setSelected(true); // segment selection is done here and nowhere else
+
+            // do not select fragments that are too small
+            if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
+                segment.setSelected(false);
+            }
+
+            // do not select segments that are entirely outside the allowed range
+            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) )
+            {
+                segment.setSelected(false);
+            }
+
+            // do not select segments that have less than 2 times bmin baits
+            if(segment.isUnselectable()) {
+                segment.setSelected(false);
+            }
+
+            // if allow single margin is false, do not select segments that are rescuable
+            if(!model.getAllowSingleMargin() && segment.isRescuable()) {
+                segment.setSelected(false);
+            }
+
+            // the remaining segments must be targetable; sanity check
+            if(!segment.isTargetable() && segment.isSelected()) {
+                logger.debug("Error: This segment should be targetable!");
+            }
+
+            // if at least one segment is selected, declare viewpoint to be resolved
+            if(segment.isSelected()) {
+                this.resolved = true;
+            }
+
+            if(segment.isSelected() && (segment.getBaitNumUp() != segment.getBaitNumDown())) {
+                logger.trace("***" + this.getAccession());
+            }
+
+        }
+
+        /*
+        OLD SELECTION RULES CAN BE REMOVED AS SOON AS WE DECIDE TO SWITCH TO THE NEW ONES
         for (Segment segment:restrictionSegmentList) {
             if (segment.length() < this.minFragSize) {
                 segment.setSelected(false);
@@ -377,6 +421,7 @@ public class ViewPoint implements Serializable {
                 resolved=true; // at least one segment OK, thus ViewPoint is OK
             }
         }
+        */
 
         // set start position of the viewpoint to start position of the most upstream SELECTED digest
         int start=Integer.MAX_VALUE;

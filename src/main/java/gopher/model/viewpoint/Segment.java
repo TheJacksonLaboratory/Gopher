@@ -370,7 +370,6 @@ public class Segment implements Serializable {
 
         if (this.length() < baitSize) {
             // do not place baits in segments shorter than the bait size
-            this.selected = false;
             this.unselectable = true;
             this.targetable = false;
             this.rescuable = false;
@@ -378,13 +377,12 @@ public class Segment implements Serializable {
         }
 
         // try to set bmax usable baits independently for up and downstream margin
-        this.setUsableBaitsForUpstreamMargin(bmax, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
-        this.setUsableBaitsForDownstreamMargin(bmax, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
+        this.setUsableBaitsForUpstreamMargin(bmin, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
+        this.setUsableBaitsForDownstreamMargin(bmin, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
         Integer x = this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
 
         if (bmin <= this.getBaitNumUp() && bmin <= this.getBaitNumDown()) {
             // both margin have at least bmin non redundant baits -> this segment is targetable
-            this.selected = true;
             this.unselectable = false;
             this.targetable = true;
             this.rescuable = false;
@@ -392,51 +390,42 @@ public class Segment implements Serializable {
         } else {
             // try to rescue the segment by allowing unbalanced probes
             if (this.getBaitNumUp() < bmin && this.getBaitNumDown() < bmin) {
-                // both margins have less than bmin baits this segment cannot be rescued
-                this.selected = false;
+                // both margins have less than bmin baits this segment, i.e. bait cannot be rescued
                 this.unselectable = true;
                 this.targetable = false;
                 this.rescuable = false;
                 return;
             }
             if (this.getBaitNumUp() < bmin) {
-                // the upstream margin has less than bmin baits
-                logger.trace("the upstream margin has less than bmin baits");
-                Integer numOfMissingBaits = 2 * bmax - getBaitNumUp(); // determine number of missing baits
+                // the upstream margin has less than bmin baits; try to set missing baits in downstream margin
+                Integer numOfMissingBaits = 2 * bmin - getBaitNumUp(); // determine number of missing baits
                 this.setUsableBaitsForDownstreamMargin(numOfMissingBaits, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore); // try to set this number in downstream margin
                 this.removeRedundantBaits();
 
-                if (this.getBaitNumTotal() >= 2 * bmin) {
+                if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
-                    this.selected = false;
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = true;
-                    logger.trace("getBaitNumUp: " + getBaitNumUp() + "   getBaitNumUp: " + getBaitNumDown());
                     return;
                 } else {
-                    this.selected = false;
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = false;
                     return;
                 }
             } else {
-                // the downstream margin has less than bmin baits
-                logger.trace("the downstream margin has less than bmin baits");
-                Integer numOfMissingBaits = 2 * bmax - getBaitNumDown(); // determine number of missing baits
+                // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
+                Integer numOfMissingBaits = 2 * bmin - getBaitNumDown(); // determine number of missing baits
                 this.setUsableBaitsForUpstreamMargin(numOfMissingBaits, baitSize, alignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore); // try to set this number in upstream margin
                 this.removeRedundantBaits();
-                if (this.getBaitNumTotal() >= 2 * bmin) {
+                if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
-                    this.selected = false;
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = true;
-                    logger.trace("getBaitNumUp: " + getBaitNumUp() + "   getBaitNumUp: " + getBaitNumDown());
                     return;
                 } else {
-                    this.selected = false;
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = false;
@@ -473,7 +462,7 @@ public class Segment implements Serializable {
                 baitListUpStreamMargin.add(b);
             }
 
-            // abort if maxProbeNum is reached
+            // abort if bmax is reached
             if(baitListUpStreamMargin.size()==bmax) { break; }
 
             // abort if end of bait reaches end of segment
@@ -507,7 +496,7 @@ public class Segment implements Serializable {
                     baitListDownStreamMargin.add(b);
                 }
 
-                // abort if maxProbeNum is reached
+                // abort if bmax is reached
                 if(baitListDownStreamMargin.size()==bmax) { break; }
 
                 // abort if end of bait reaches start of segment
@@ -550,4 +539,19 @@ public class Segment implements Serializable {
         this.baitListDownStreamMargin = newBaitListDownStreamMargin;
         return numOfRedundantBaitsRemoved;
     }
+
+    public boolean isTargetable() {
+        return this.targetable;
+    }
+
+    public boolean isRescuable() {
+        return this.rescuable;
+    }
+
+    public boolean isUnselectable() {
+        return this.unselectable;
+    }
+
+
 }
+

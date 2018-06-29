@@ -65,6 +65,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
                     alignabilityMap(this.alignabilityMap).
+                    model(this.model).
                     build();
 
             vp.setPromoterNumber(++n,gPosList.size());
