@@ -45,8 +45,6 @@ import gopher.model.*;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 
-import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -105,9 +103,11 @@ public class GopherMainPresenter implements Initializable {
     @FXML private TextField sizeUpTextField;
     @FXML private TextField sizeDownTextField;
     @FXML private TextField minFragSizeTextField;
-    @FXML private TextField maxRepContentTextField;
+    @FXML private TextField maxKmerAlignabilityTextField;
     @FXML private TextField minGCContentTextField;
     @FXML private TextField maxGCContentTextField;
+    @FXML private TextField minBaitCountTextField;
+    @FXML private TextField maxBaitCountTextField;
 
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
@@ -165,6 +165,21 @@ public class GopherMainPresenter implements Initializable {
     private double getMaxRepeatContent() {return maxRepeatContent.get();}
     private void setMaxRepeatContent(double r) { this.maxRepeatContent.set(r);}
     private DoubleProperty maxRepeatContentProperty() { return maxRepeatContent;  }
+
+    transient private IntegerProperty maxMeanKmerAlignability = new SimpleIntegerProperty();
+    private int getMaxMeanKmerAlignability(){ return maxMeanKmerAlignability.get();}
+    private void setMaxMeanKmerAlignability(int mmka) { this.maxMeanKmerAlignability.set(mmka);}
+    private IntegerProperty maxMeanKmerAlignabilityProperty() { return maxMeanKmerAlignability; }
+
+    transient private IntegerProperty minBaitCount = new SimpleIntegerProperty();
+    private int getMinimumBaitCount(){ return minBaitCount.get();}
+    private void setMinimumBaitCount(int bc) { this.minBaitCount.set(bc);}
+    private IntegerProperty minimumBaitCountProperty() { return minBaitCount; }
+
+    transient private IntegerProperty maxBaitCount = new SimpleIntegerProperty();
+    private int getMaximumBaitCount(){ return maxBaitCount.get();}
+    private void setMaximumBaitCount(int bc) { this.maxBaitCount.set(bc);}
+    private IntegerProperty maximumBaitCountProperty() { return maxBaitCount; }
 
     transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
     private double getMinGCcontent() { return minGCcontent.get();}
@@ -375,15 +390,25 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
         }
+        if (model.getMinBaitCount()>0) {
+            this.minBaitCountTextField.setText(String.valueOf(model.getMinBaitCount()));
+        } else {
+            this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
+        }
+        if (model.getMaxBaitCount()>0) {
+            this.maxBaitCountTextField.setText(String.valueOf(model.getMaxBaitCount()));
+        } else {
+            this.maxBaitCountTextField.setText(String.valueOf(Default.MAX_BAIT_NUMBER));
+        }
         if (model.getMinFragSize()>0) {
             this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
         } else {
             this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         }
-        if (model.getMaxRepeatContent()>0) {
-            this.maxRepContentTextField.setText(String.format("%.1f%%",model.getMaxRepeatContentPercent()));
+        if (model.getMaxMeanKmerAlignability()>0) {
+            this.maxKmerAlignabilityTextField.setText(String.format("%d",model.getMaxMeanKmerAlignability()));
         } else {
-            this.maxRepContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAXIMUM_REPEAT_CONTENT));
+            this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         }
         if (model.getSizeUp()>0) {
             this.sizeUpTextField.setText(String.format("%d",model.getSizeUp()));
@@ -420,9 +445,11 @@ public class GopherMainPresenter implements Initializable {
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
+        this.minBaitCountTextField.setPromptText(String.valueOf(Default.MIN_BAIT_NUMBER));
+        this.maxBaitCountTextField.setPromptText(String.valueOf(Default.MAX_BAIT_NUMBER));
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
-        this.maxRepContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAXIMUM_REPEAT_CONTENT));
+        this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -432,9 +459,11 @@ public class GopherMainPresenter implements Initializable {
         this.sizeUpTextField.setText(null);
         this.sizeDownTextField.setText(null);
         this.minGCContentTextField.setText(null);
+        this.minBaitCountTextField.setText(null);
+        this.maxBaitCountTextField.setText(null);
         this.maxGCContentTextField.setText(null);
         this.minFragSizeTextField.setText(null);
-        this.maxRepContentTextField.setText(null);
+        this.maxKmerAlignabilityTextField.setText(null);
     }
 
     /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
@@ -443,15 +472,19 @@ public class GopherMainPresenter implements Initializable {
         Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
         Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),converter);
         Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
-        Bindings.bindBidirectional(this.maxRepContentTextField.textProperty(),maxRepeatContentProperty(),converter);
+        Bindings.bindBidirectional(this.maxKmerAlignabilityTextField.textProperty(),maxMeanKmerAlignabilityProperty(),converter);
         Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
+        Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
+        Bindings.bindBidirectional(this.maxBaitCountTextField.textProperty(),maximumBaitCountProperty(),converter);
         sizeDownTextField.clear();
         sizeUpTextField.clear();
         minFragSizeTextField.clear();
-        maxRepContentTextField.clear();
+        maxKmerAlignabilityTextField.clear();
         minGCContentTextField.clear();
         maxGCContentTextField.clear();
+        minBaitCountTextField.clear();
+        maxBaitCountTextField.clear();
 
     }
 
@@ -466,11 +499,17 @@ public class GopherMainPresenter implements Initializable {
         this.model.setSizeUp(getSizeUp()>0?getSizeUp():Default.SIZE_UPSTREAM);
         this.model.setMinFragSize(getMinFragSize()>0?getMinFragSize():Default.MINIMUM_FRAGMENT_SIZE);
         double repeatProportion=getMaxRepeatContent()/100;
-        this.model.setMaxRepeatContent(repeatProportion>0?repeatProportion:Default.MAXIMUM_REPEAT_CONTENT);
+        this.model.setMaxRepeatContent(repeatProportion>0?repeatProportion:Default.MAXIMUM_KMER_ALIGNABILITY);
         double minGCproportion = getMinGCcontent()/100;
         this.model.setMinGCcontent(minGCproportion>0?minGCproportion:Default.MIN_GC_CONTENT);
         double maxGCproportion = getMaxGCcontent()/100;
         this.model.setMaxGCcontent(maxGCproportion>0?maxGCproportion:Default.MAX_GC_CONTENT);
+        int kmerAlign = getMaxMeanKmerAlignability()>0?getMaxMeanKmerAlignability() : Default.MAXIMUM_KMER_ALIGNABILITY;
+        this.model.setMaxMeanKmerAlignability(kmerAlign);
+        int minbait = getMinimumBaitCount()>0 ? getMinimumBaitCount() : Default.MIN_BAIT_NUMBER;
+        this.model.setMinBaitCount(minbait);
+        int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
+        this.model.setMaxBaitCount(maxbait);
     }
 
 
@@ -664,8 +703,8 @@ public class GopherMainPresenter implements Initializable {
 
         // prepare download
         String basenameGz = genomeBuild.concat(".50mer.alignabilityMap.bedgraph.gz");
-        String url = null;
-        String url2 = null;
+        String url;
+        String url2;
         if(genomeBuild.equals("hg19")) {
             url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
             url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";

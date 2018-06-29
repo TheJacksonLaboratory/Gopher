@@ -18,7 +18,7 @@ public class Default {
 
 
     /** Minimum allowable GC content (in percent) */
-    public final static double MIN_GC_CONTENT=0.25;
+    public final static double MIN_GC_CONTENT=0.35;
     /** Maximum allowable GC content (in percent) */
     public final static double MAX_GC_CONTENT=0.65;
 
@@ -26,13 +26,15 @@ public class Default {
     public final static int TILING_FACTOR = 1;
 
     public final static int MINIMUM_FRAGMENT_SIZE = 120;
-    /** Maximum allowable repeat content (in percent). */
-    public final static double MAXIMUM_REPEAT_CONTENT = 0.70;
+    /** Maximum allowable mean kmer alignability. */
+    public final static int MAXIMUM_KMER_ALIGNABILITY = 10;
 
     public final static int MARGIN_SIZE = 250;
 
-    public final static String GENOME_BUILD = "hg19";
-
     public final static Boolean ALLOW_SINGLE_MARGIN=true;
+
+    public final static int MIN_BAIT_NUMBER = 1;
+
+    public final static int MAX_BAIT_NUMBER = 3;
 
 }
