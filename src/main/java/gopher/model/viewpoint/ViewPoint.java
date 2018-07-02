@@ -367,7 +367,7 @@ public class ViewPoint implements Serializable {
         Integer upperLimit = genomicPos + maxSizeDown;
         for (Segment segment:restrictionSegmentList) {
 
-            segment.setSelected(true); // segment selection is done here and nowhere else
+            segment.setSelected(true); // initial segment selection is done here and nowhere else
 
             // do not select fragments that are too small
             if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
@@ -399,11 +399,6 @@ public class ViewPoint implements Serializable {
             if(segment.isSelected()) {
                 this.resolved = true;
             }
-
-            if(segment.isSelected() && (segment.getBaitNumUp() != segment.getBaitNumDown())) {
-                logger.trace("***" + this.getAccession());
-            }
-
         }
 
         /*
