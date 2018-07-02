@@ -528,8 +528,58 @@ public class ViewPoint implements Serializable {
         }
     }
 
-
     public void generateViewpointSimple(Model model) {
+
+        boolean allowSingleMargin = model.getAllowSingleMargin();
+        boolean resolved = true;
+        approach = Approach.SIMPLE;
+
+        // find the digest that contains genomicPos
+        this.centerSegment = restrictionSegmentList.stream().
+                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
+                findFirst().
+                orElse(null);
+
+        if (this.centerSegment == null) {
+            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
+            resolved = false;
+            restrictionSegmentList.clear(); /* no fragments */
+        } else {
+            this.centerSegment.setOverlapsTSS(true);
+
+            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
+            int length = centerSegment.length();
+
+            if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isTargetable())
+                   ||
+                    ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isRescuable() && allowSingleMargin)
+
+                    )
+            {
+                List<Segment> newsegs = new ArrayList<>();
+                centerSegment.setSelected(true);
+                setEndPos(centerSegment.getEndPos());
+                setStartPos(centerSegment.getStartPos());
+                // Add the selected digest and the two neighboring fragments (which are deselected)
+                int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
+                if (genomicPosFragIdx > 0) {
+                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
+                }
+                newsegs.add(centerSegment);
+                if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
+                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
+                }
+                restrictionSegmentList.clear();
+                restrictionSegmentList.addAll(newsegs);
+                resolved = true;
+            }
+        }
+        setDerivationApproach(Approach.SIMPLE);
+        calculateViewpointScore();
+        setResolved(resolved);
+    }
+
+    public void generateViewpointSimpleOld(Model model) {
 
         boolean allowSingleMargin = model.getAllowSingleMargin();
         boolean resolved = true;
