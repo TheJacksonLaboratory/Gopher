@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 5L;
-    private static final String VERSION="0.3.2";
-    private static final String LAST_CHANGE_DATE="2018-02-15";
+    static final long serialVersionUID = 6L;
+    private static final String VERSION="0.3.11";
+    private static final String LAST_CHANGE_DATE="2018-06-28";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -158,10 +158,17 @@ public class Model implements Serializable {
     public void setMinFragSize(int i) { this.minFragSize=i;}
 
     /** Maximum allowable repeat content in the margin of a selected digest. */
+    // TODO -- this is being replaced by the alignability score
     private double maxRepeatContent;
     public  double getMaxRepeatContent() {return maxRepeatContent;}
     public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
     public double getMaxRepeatContentPercent(){return 100*maxRepeatContent; }
+
+    /** Maximum allowable mean kmer alignability score of a margin. */
+    private int maxMeanKmerAlignability;
+    public int getMaxMeanKmerAlignability() {return this.maxMeanKmerAlignability;}
+    public void setMaxMeanKmerAlignability(int mmka) { this.maxMeanKmerAlignability=mmka;}
+
     /** Minimum allowable GC content in a selected digest. */
     private double minGCcontent;
     public  double getMinGCcontent() { return minGCcontent;}
@@ -176,6 +183,15 @@ public class Model implements Serializable {
     private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
     public boolean getAllowSingleMargin() { return allowSingleMargin; }
     public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
+    /** Minimum number of baits (probes) per valid margin */
+    private int minBaitCount;
+    public int getMinBaitCount(){return minBaitCount;}
+    public void setMinBaitCount(int bc) { this.minBaitCount=bc;}
+    /** Maximum number of baits (probes) per valid margin */
+    private int maxBaitCount;
+    public int getMaxBaitCount(){return maxBaitCount;}
+    public void setMaxBaitCount(int bc) { this.maxBaitCount=bc;}
+
 
 
     /** Total horizontal dimension  of the user's screen. */

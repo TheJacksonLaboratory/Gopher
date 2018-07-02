@@ -68,6 +68,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
                     alignabilityMap(this.alignabilityMap).
+                    model(this.model).
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
