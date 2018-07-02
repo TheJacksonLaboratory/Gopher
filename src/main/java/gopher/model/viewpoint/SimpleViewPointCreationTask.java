@@ -115,6 +115,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
+            logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
             group.getGenes().parallelStream().forEach(vpvGene -> {
                 calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
             });
