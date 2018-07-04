@@ -193,7 +193,14 @@ public class Model implements Serializable {
     public int getMaxBaitCount(){return maxBaitCount;}
     public void setMaxBaitCount(int bc) { this.maxBaitCount=bc;}
 
-
+    /** Estimated average length of restriction fragments */
+    private Double estAvgRestFragLen = null;
+    public void setEstAvgRestFragLen(Double estAvgRestFragLen) {
+        this.estAvgRestFragLen = estAvgRestFragLen;
+    }
+    public Double getEstAvgRestFragLen() {
+        return this.estAvgRestFragLen;
+    }
 
     /** Total horizontal dimension  of the user's screen. */
     private int xdim;

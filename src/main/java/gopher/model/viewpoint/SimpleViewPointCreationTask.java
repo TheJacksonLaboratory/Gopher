@@ -1,7 +1,9 @@
 package gopher.model.viewpoint;
 
 import gopher.model.GopherGene;
+import gopher.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
@@ -10,7 +12,9 @@ import gopher.model.Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -112,7 +116,49 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
 
-        // calculate avgDigestSize here for
+        // estimate average size of restriction fragments
+        // TODO: Move this code to a function getEstAvgRestFragLen
+        logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
+        // Combine all patterns in one regular expression.
+        String regExCombinedCutPat ="";
+        for(int i=0; i < model.getChosenEnzymelist().size(); i++) {
+            regExCombinedCutPat +=  model.getChosenEnzymelist().get(i).getPlainSite();
+            if(i<model.getChosenEnzymelist().size()-1) {
+                regExCombinedCutPat += "|";
+            }
+        }
+        // count all occurrences of the cutting motifs and divide by sequence length
+        int totalNumOfCuts = 0;
+        long totalLength = 0;
+        ReferenceSequence rf = fastaReader.nextSequence();
+        while(rf != null) {
+            if(rf.getName().contains("_")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosomes
+            if(rf.getName().contains("chrM")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosome M
+
+            logger.trace("Cutting: " + rf.getName());
+            String sequence = fastaReader.getSequence(rf.getName()).getBaseString();
+            logger.trace("\tPattern: " + regExCombinedCutPat);
+            Pattern pattern = Pattern.compile(regExCombinedCutPat,Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(sequence);
+            while (matcher.find()) {
+                totalNumOfCuts++;
+            }
+
+            totalLength = totalLength + sequence.length();
+            logger.trace("\tCurrent number of cuts: " + totalNumOfCuts);
+            logger.trace("\tCurrent length: " + totalLength);
+            logger.trace("\tEstimated average length : " + (1.0*totalLength/totalNumOfCuts));
+            rf = fastaReader.nextSequence();
+        }
+
+        Double estAvgRestFragLen = 1.0*totalLength/totalNumOfCuts;
+        model.setEstAvgRestFragLen(estAvgRestFragLen);
+        logger.trace("Total number of cuts: " + totalNumOfCuts);
+        logger.trace("Total length: " + totalLength);
+        logger.trace("Estimated average length : " + (1.0*totalLength/totalNumOfCuts));
+        logger.trace("Average length: " + estAvgRestFragLen);
+        logger.trace("...done.");
+
 
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */

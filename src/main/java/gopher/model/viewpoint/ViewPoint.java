@@ -513,7 +513,7 @@ public class ViewPoint implements Serializable {
                 restrictionSegmentList.clear();
                 restrictionSegmentList.addAll(newsegs);
                 resolved = true;
-                calculateViewpointScoreSimple(900.0, centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
             }
         }
         setDerivationApproach(Approach.SIMPLE);
