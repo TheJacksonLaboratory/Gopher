@@ -483,14 +483,6 @@ public class ViewPoint implements Serializable {
 
             // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
             int length = centerSegment.length();
-            /* old conditions
-            if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
-                    &&
-                    ((!allowSingleMargin && isSegmentMarginValid(centerSegment,"Up") && isSegmentMarginValid(centerSegment,"Down"))
-                            ||
-                            (allowSingleMargin && (isSegmentMarginValid(centerSegment,"Up") || isSegmentMarginValid(centerSegment,"Down")))
-                    )
-                    )*/
             if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isTargetable())
                    ||
                     ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isRescuable() && allowSingleMargin)
@@ -513,11 +505,41 @@ public class ViewPoint implements Serializable {
                 restrictionSegmentList.clear();
                 restrictionSegmentList.addAll(newsegs);
                 resolved = true;
-                calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                if(score < 0.6) {
+                    // add adjacent segment
+                    if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos()) {
+                        // try to add adjacent segment in upstream direction
+                        if(isSegmentValid(restrictionSegmentList.get(2))) {
+                            restrictionSegmentList.get(2).setSelected(true); // set segment selected
+                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, restrictionSegmentList.get(2).getEndPos()); // recalculate score
+                        }
+                    } else {
+                        // try add adjacent segment in downstream direction
+                        if(isSegmentValid(restrictionSegmentList.get(0))) {
+                            restrictionSegmentList.get(0).setSelected(true); // set segment selected
+                            score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), restrictionSegmentList.get(0).getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                        }
+                    }
+                }
             }
         }
         setDerivationApproach(Approach.SIMPLE);
         setResolved(resolved);
+    }
+
+    private boolean isSegmentValid(Segment seg) {
+
+        if(seg.length() < minFragSize || seg.length()>= SIMPLE_APPROACH_MAXSIZE) {
+            return false;
+        }
+        if(seg.isTargetable()) {
+            return true;
+        }
+        if(model.getAllowSingleMargin() && seg.isRescuable()) {
+            return true;
+        }
+        return(false);
     }
 
 
@@ -632,12 +654,13 @@ public class ViewPoint implements Serializable {
 
     }
 
-    public void calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
+    public Double calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
 
         double mean = 0; // corresponds to TSS position
         double sd = avgRestFragSize/6; // chosen by eye
         NormalDistribution nD = new NormalDistribution(mean,sd);
         this.score = nD.cumulativeProbability(vpEndPos - centerPos) - nD.cumulativeProbability(vpStaPos - centerPos);
+        return score;
     }
 
     /**
