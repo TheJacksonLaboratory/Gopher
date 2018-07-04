@@ -409,7 +409,7 @@ public class ViewPointPresenter implements Initializable {
     }
 
     private void updateScore() {
-        this.viewpoint.calculateViewpointScore();
+        this.viewpoint.calculateViewpointScoreExtended();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),

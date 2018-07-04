@@ -457,76 +457,10 @@ public class ViewPoint implements Serializable {
         }
 
         setDerivationApproach(Approach.EXTENDED);
-        calculateViewpointScore();
+        calculateViewpointScoreExtended();
         setResolved(resolved);
     }
 
-
-    /**
-     * TODO this function intends to replicate the logic of Justin's simple probe selection approach.
-     *
-     */
-    public void generateViewpointSimpleNew(Model model) {
-
-        boolean allowSingleMargin = model.getAllowSingleMargin();
-        boolean resolved = true;
-        approach = Approach.SIMPLE;
-
-        // find the digest that contains genomicPos
-        this.centerSegment = restrictionSegmentList.stream().
-                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
-                findFirst().
-                orElse(null);
-
-        if (this.centerSegment == null) {
-            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
-            resolved = false;
-            restrictionSegmentList.clear(); /* no fragments */
-        } else {
-
-            // check if the TSS fragment can be targeted or rescued
-            this.centerSegment.setOverlapsTSS(true);
-            this.centerSegment.setSelected(true);
-
-            // TSS fragment is too short or too long
-            if(this.centerSegment.length() < model.getMinFragSize() || this.centerSegment.length() <= SIMPLE_APPROACH_MAXSIZE) {
-                this.centerSegment.setSelected(false);
-            }
-
-            // TSS fragment has not enough baits
-            if(this.centerSegment.getBaitNumTotal() < 2*model.getMinBaitCount()) {
-                this.centerSegment.setSelected(false);
-            }
-
-            // TSS has unbalanced baits in the two margins and allow single margin is set to false
-            if(!model.getAllowSingleMargin() && (this.centerSegment.getBaitNumUp() != this.centerSegment.getBaitNumDown())) {
-                this.centerSegment.setSelected(false);
-            }
-
-            if(this.centerSegment.isSelected()) {
-                List<Segment> newsegs = new ArrayList<>();
-                this.setEndPos(centerSegment.getEndPos());
-                this.setStartPos(centerSegment.getStartPos());
-
-                // Add the selected digest and the two neighboring fragments (which are deselected)
-                /*
-                int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
-                if (genomicPosFragIdx > 0) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
-                }
-                newsegs.add(centerSegment);
-                if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
-                }
-                */
-                //restrictionSegmentList.clear();
-                //restrictionSegmentList.addAll(newsegs);
-                //setDerivationApproach(Approach.SIMPLE);
-                //calculateViewpointScore();
-                this.setResolved(resolved);
-            }
-        }
-    }
 
     public void generateViewpointSimple(Model model) {
 
@@ -549,7 +483,14 @@ public class ViewPoint implements Serializable {
 
             // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
             int length = centerSegment.length();
-
+            /* old conditions
+            if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
+                    &&
+                    ((!allowSingleMargin && isSegmentMarginValid(centerSegment,"Up") && isSegmentMarginValid(centerSegment,"Down"))
+                            ||
+                            (allowSingleMargin && (isSegmentMarginValid(centerSegment,"Up") || isSegmentMarginValid(centerSegment,"Down")))
+                    )
+                    )*/
             if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isTargetable())
                    ||
                     ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isRescuable() && allowSingleMargin)
@@ -572,64 +513,14 @@ public class ViewPoint implements Serializable {
                 restrictionSegmentList.clear();
                 restrictionSegmentList.addAll(newsegs);
                 resolved = true;
+                calculateViewpointScoreSimple(900.0, centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
             }
         }
         setDerivationApproach(Approach.SIMPLE);
-        calculateViewpointScore();
         setResolved(resolved);
     }
 
-    public void generateViewpointSimpleOld(Model model) {
 
-        boolean allowSingleMargin = model.getAllowSingleMargin();
-        boolean resolved = true;
-        approach = Approach.SIMPLE;
-
-        // find the digest that contains genomicPos
-        this.centerSegment = restrictionSegmentList.stream().
-                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
-                findFirst().
-                orElse(null);
-
-        if (this.centerSegment == null) {
-            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
-            resolved = false;
-            restrictionSegmentList.clear(); /* no fragments */
-        } else {
-            this.centerSegment.setOverlapsTSS(true);
-
-            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
-            int length = centerSegment.length();
-
-            if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
-                    &&
-                    ((!allowSingleMargin && isSegmentMarginValid(centerSegment,"Up") && isSegmentMarginValid(centerSegment,"Down"))
-                            ||
-                            (allowSingleMargin && (isSegmentMarginValid(centerSegment,"Up") || isSegmentMarginValid(centerSegment,"Down")))
-                    )
-                    ) {
-                List<Segment> newsegs = new ArrayList<>();
-                centerSegment.setSelected(true);
-                setEndPos(centerSegment.getEndPos());
-                setStartPos(centerSegment.getStartPos());
-                // Add the selected digest and the two neighboring fragments (which are deselected)
-                int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
-                if (genomicPosFragIdx > 0) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
-                }
-                newsegs.add(centerSegment);
-                if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
-                }
-                restrictionSegmentList.clear();
-                restrictionSegmentList.addAll(newsegs);
-                resolved = true;
-            }
-        }
-        setDerivationApproach(Approach.SIMPLE);
-        calculateViewpointScore();
-        setResolved(resolved);
-    }
 
     private boolean isSegmentMarginValid(Segment segment, String dir) {
 
@@ -684,7 +575,7 @@ public class ViewPoint implements Serializable {
      * The overall score for the viewpoint is between 0 and 1.
      *
      */
-    public void calculateViewpointScore() {
+    public void calculateViewpointScoreExtended() {
         Double score = 0.0;
 
         /* iterate over all selected fragments */
@@ -739,6 +630,14 @@ public class ViewPoint implements Serializable {
             this.score = score / positionScoreSumRef;
         }
 
+    }
+
+    public void calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
+
+        double mean = 0; // corresponds to TSS position
+        double sd = avgRestFragSize/6; // chosen by eye
+        NormalDistribution nD = new NormalDistribution(mean,sd);
+        this.score = nD.cumulativeProbability(vpEndPos - centerPos) - nD.cumulativeProbability(vpStaPos - centerPos);
     }
 
     /**
@@ -917,7 +816,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private static AlignabilityMap alignabilityMap;
+        private transient static AlignabilityMap alignabilityMap;
 
         /**
          *

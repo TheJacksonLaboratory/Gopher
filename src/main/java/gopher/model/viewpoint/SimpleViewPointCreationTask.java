@@ -112,6 +112,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
 
+        // calculate avgDigestSize here for
 
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
@@ -132,6 +133,4 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg));
         });
     }
-
-
 }
