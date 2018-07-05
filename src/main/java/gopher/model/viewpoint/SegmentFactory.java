@@ -66,7 +66,14 @@ public class SegmentFactory implements Serializable {
                           Integer maxDistToGenomicPosDown,
                           List<RestrictionEnzyme> chosenEnzymeList) {
         maxDistToGenomicPosUp=maxDistToGenomicPosUp*3;
+        if(genomicPos<maxDistToGenomicPosUp) {
+            maxDistToGenomicPosUp=genomicPos;
+        }
         maxDistToGenomicPosDown=maxDistToGenomicPosDown*3;
+        Integer referenceSequenceLen = fastaReader.getSequence(referenceSequenceID).length();
+        if(referenceSequenceLen < genomicPos + maxDistToGenomicPosDown) {
+            maxDistToGenomicPosDown = referenceSequenceLen - genomicPos;
+        }
         setGenomicPos(genomicPos);
         setMaxDistToGenomicPosUp(maxDistToGenomicPosUp);
         setMaxDistToGenomicPosDown(maxDistToGenomicPosDown);

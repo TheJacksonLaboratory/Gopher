@@ -149,6 +149,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             logger.trace("\tCurrent length: " + totalLength);
             logger.trace("\tEstimated average length : " + (1.0*totalLength/totalNumOfCuts));
             rf = fastaReader.nextSequence();
+            if(100000<totalNumOfCuts) {break;}
         }
 
         Double estAvgRestFragLen = 1.0*totalLength/totalNumOfCuts;

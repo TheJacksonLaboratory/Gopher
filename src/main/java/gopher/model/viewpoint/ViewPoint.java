@@ -489,39 +489,51 @@ public class ViewPoint implements Serializable {
 
                     )
             {
-                List<Segment> newsegs = new ArrayList<>();
                 centerSegment.setSelected(true);
-                setEndPos(centerSegment.getEndPos());
-                setStartPos(centerSegment.getStartPos());
-                // Add the selected digest and the two neighboring fragments (which are deselected)
+                this.setStartPos(centerSegment.getStartPos());
+                this.setEndPos(centerSegment.getEndPos());
+
+                // Add the selected digest and the two neighboring segments
+                Segment upstreamSegment = null;
+                Segment downstreamSegment = null;
                 int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
                 if (genomicPosFragIdx > 0) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
+                    upstreamSegment = restrictionSegmentList.get(genomicPosFragIdx - 1);
+                } else {
+                    logger.trace("Warning: There is no segment in upstream direction of the center segment!");
                 }
-                newsegs.add(centerSegment);
                 if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
+                    downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
+
+                } else {
+                    logger.trace("Warning: There is no segment in downstream direction of the center segment!");
                 }
-                restrictionSegmentList.clear();
-                restrictionSegmentList.addAll(newsegs);
                 resolved = true;
                 Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
                 if(score < 0.6) {
                     // add adjacent segment
-                    if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos()) {
-                        // try to add adjacent segment in upstream direction
-                        if(isSegmentValid(restrictionSegmentList.get(2))) {
-                            restrictionSegmentList.get(2).setSelected(true); // set segment selected
-                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, restrictionSegmentList.get(2).getEndPos()); // recalculate score
+                    if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
+                        // try to add adjacent segment in downstream direction
+                        if(isSegmentValid(downstreamSegment)) {
+                            downstreamSegment.setSelected(true);
+                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
+                            this.setStartPos(centerSegment.getStartPos());
+                            this.setEndPos(downstreamSegment.getEndPos());
                         }
-                    } else {
-                        // try add adjacent segment in downstream direction
-                        if(isSegmentValid(restrictionSegmentList.get(0))) {
-                            restrictionSegmentList.get(0).setSelected(true); // set segment selected
-                            score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), restrictionSegmentList.get(0).getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                    } else if (upstreamSegment != null) {
+                        // try add adjacent segment in upstream direction
+                        if(isSegmentValid(upstreamSegment)) {
+                            upstreamSegment.setSelected(true);
+                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                            this.setStartPos(upstreamSegment.getStartPos());
+                            this.setEndPos(centerSegment.getEndPos());
                         }
                     }
                 }
+                restrictionSegmentList.clear();
+                if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
+                if(centerSegment != null) {restrictionSegmentList.add(centerSegment);}
+                if(downstreamSegment != null) {restrictionSegmentList.add(downstreamSegment);}
             }
         }
         setDerivationApproach(Approach.SIMPLE);
