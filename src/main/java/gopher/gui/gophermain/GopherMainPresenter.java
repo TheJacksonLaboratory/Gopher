@@ -812,6 +812,30 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
+    @FXML public void saveProbeFileAs(ActionEvent e) {
+        List<ViewPoint> vplist=this.model.getViewPointList();
+        if (vplist==null || vplist.isEmpty()) {
+            PopupFactory.displayError("Error","Attempt to save probe file failed. Complete generation and analysis of ViewPoints before saving probes!");
+            return;
+        }
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for saving probe file");
+        File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            PopupFactory.displayError("Error","Could not get path to save file.");
+            return;
+        }
+        String prefix=model.getProjectName();
+        ProbeFileExporter exporter = new ProbeFileExporter(file.getAbsolutePath(),prefix);
+        try {
+            exporter.printProbeFileAgilentInFormat(this.model.getViewPointList(),this.model.getGenomeBuild());
+        } catch (Exception exc) {
+            PopupFactory.displayException("Could not save probes.", exc.getMessage(),exc);
+        }
+        e.consume();
+    }
+
+
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
      * these will have been entered as {@link GopherGene} objects into the {@link Model}
@@ -1289,41 +1313,6 @@ public class GopherMainPresenter implements Initializable {
         report.outputRegulatoryReport(file.getAbsolutePath());
         e.consume();
     }
-
-    @FXML public void createProbes(ActionEvent event) {
-        event.consume();
-        if (!model.viewpointsInitialized()) {
-            PopupFactory.displayError("Viewpoints not initialized",
-                    "Please initialize viewpoints before creating probes");
-            return;
-        }
-        try {
-            //ProbeFactory probeFactory = new ProbeFactory(model);
-            /*
-            final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
-            logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
-            javafx.application.Platform.runLater(() ->
-                    RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory));*/
-        } catch (Exception e) {
-            PopupFactory.displayException("Error", "Could not create probes", e);
-        }
-        logger.trace("buildRegulatoryExome");
-    }
-
-    @FXML public void exportProbes(ActionEvent e) {
-        GopherReport report = new GopherReport(this.model);
-        String filename =String.format("%s-probes.txt",model.getProjectName());
-        FileChooser chooser = new FileChooser();
-        chooser.setInitialFileName(filename);
-        File file=chooser.showSaveDialog(this.primaryStage);
-        if (file==null) {
-            PopupFactory.displayError("Error","Could not get filename for saving report");
-            return;
-        }
-        report.outputRegulatoryReport(file.getAbsolutePath());
-        e.consume();
-    }
-
 }
 
 

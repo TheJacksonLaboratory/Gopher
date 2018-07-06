@@ -36,7 +36,8 @@
                         <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..." />
                         <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
                         <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..." />
-                        <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file As ..." />
+                        <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file as ..." />
+                        <MenuItem mnemonicParsing="false" onAction="#saveProbeFileAs" text="Save probe file as ..." />
                         <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
                         <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#closeWindow" text="Quit" />
                     </Menu>
@@ -72,10 +73,6 @@
                     <Menu mnemonicParsing="false" text="Report">
                         <MenuItem mnemonicParsing="false" onAction="#displayReport" text="Display report" />
                         <MenuItem mnemonicParsing="false" onAction="#exportReport" text="Export report" />
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Probes">
-                        <MenuItem mnemonicParsing="false" onAction="#createProbes" text="Create probes" />
-                        <MenuItem mnemonicParsing="false" onAction="#exportProbes" text="Export probes" />
                     </Menu>
                 </MenuBar>
                 <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />
