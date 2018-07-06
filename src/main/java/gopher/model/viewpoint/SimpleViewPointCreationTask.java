@@ -12,6 +12,7 @@ import gopher.model.Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.instrument.Instrumentation;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +56,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
+        Instrumentation inst=null;
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).

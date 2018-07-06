@@ -253,9 +253,10 @@ public class ViewPoint implements Serializable {
     }
     /** @return a string like chr4:29,232,796 */
     public String getGenomicLocationString() { return String.format("%s:%s", chromosomeID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
-    /** @return overall score of this ViewPoint. TODO what about simple?     */
+
+    /** @return overall score of this ViewPoint */
     public final double getScore() {
-        return score;
+        return this.score;
     }
     public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
@@ -534,10 +535,15 @@ public class ViewPoint implements Serializable {
                 if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
                 if(centerSegment != null) {restrictionSegmentList.add(centerSegment);}
                 if(downstreamSegment != null) {restrictionSegmentList.add(downstreamSegment);}
+                upstreamSegment=null;
+                centerSegment=null;
+                downstreamSegment=null;
+                this.alignabilityMap=null;
             }
         }
         setDerivationApproach(Approach.SIMPLE);
         setResolved(resolved);
+
     }
 
     private boolean isSegmentValid(Segment seg) {
