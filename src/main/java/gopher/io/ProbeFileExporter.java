@@ -1,6 +1,5 @@
 package gopher.io;
 
-import gopher.model.viewpoint.AlignabilityMap;
 import gopher.model.viewpoint.Bait;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
@@ -26,6 +25,7 @@ public class ProbeFileExporter {
     private static final Logger logger = Logger.getLogger(gopher.io.BEDFileExporter.class.getName());
 
         private final String ProbeFileAgilentFormat;
+        private final String ProbeFileBedFormat;
         private final String directoryPath; // Path to directory where the BED files will be stored. Has no path is guaranteed to have no trailing slash.
 
     /**
@@ -35,7 +35,8 @@ public class ProbeFileExporter {
      */
     public ProbeFileExporter(String dirpath, String outPrefix){
         // initialize the file names
-        this.ProbeFileAgilentFormat =String.format("%s_agilentProbeFile.bed",outPrefix);
+        this.ProbeFileAgilentFormat = String.format("%s_agilentProbeFile.bed",outPrefix);
+        this.ProbeFileBedFormat = String.format("%s_BedProbeFile.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
             dirpath=dirpath.substring(0,dirpath.length()-1);
@@ -47,12 +48,16 @@ public class ProbeFileExporter {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
     }
 
-    public void printProbeFileAgilentInFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws FileNotFoundException {
+    public void printProbeFileInAgilentFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws FileNotFoundException {
+
+        Integer probe_length = 120;
 
         IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(IndexedFastaSequenceFilePath));
 
-        PrintStream out_probe_file = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
-        out_probe_file.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
+        PrintStream out_probe_file_bed = new PrintStream(new FileOutputStream(getFullPath(ProbeFileBedFormat)));
+
+        PrintStream out_probe_file_agilent = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
+        out_probe_file_agilent.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
 
         // use a hashMap of Integer sets to get rid of duplicated probes
         Set<String> uniqueProbes = new HashSet<>();
@@ -89,12 +94,10 @@ public class ProbeFileExporter {
             }
         }
 
-
-
         List sortedKeyList = new ArrayList(uniqueBaits.keySet());
         Collections.sort(sortedKeyList);
         Date curDate = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("ddmmyy");
+        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
         String dateToStr = format.format(curDate);
         for(Object key : sortedKeyList) {
             String refID = key.toString();
@@ -115,14 +118,12 @@ public class ProbeFileExporter {
                 probeID += "_";
                 probeID += (sortedPositions.get(i)-1);
                 // get sequence
-                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+120-1);
-                out_probe_file.println(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1));
+                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+probe_length-1);
+                out_probe_file_agilent.println(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1));
+                out_probe_file_bed.println(refID + "\t" + (sortedPositions.get(i)-1) + "\t" + (sortedPositions.get(i)+probe_length-2) + "\t" + probeID); // start and end 0-based
             }
         }
-
-        out_probe_file.close();
-
+        out_probe_file_agilent.close();
+        out_probe_file_bed.close();
     }
-
-
 }
