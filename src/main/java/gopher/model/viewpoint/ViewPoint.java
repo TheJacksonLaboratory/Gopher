@@ -2,6 +2,7 @@ package gopher.model.viewpoint;
 
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import javafx.scene.control.CheckBox;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import gopher.model.Default;
@@ -94,9 +95,9 @@ public class ViewPoint implements Serializable {
     /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
      * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
      */
-    private boolean manuallyRevised=false;
+    private CheckBox manuallyRevised = new CheckBox();
     /** @return true iff the user has revised of modified this viewpoint in any way. */
-    public boolean wasManuallyRevised() {  return manuallyRevised;  }
+    public boolean wasManuallyRevised() {  return manuallyRevised.isSelected();  }
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -124,6 +125,14 @@ public class ViewPoint implements Serializable {
 
     public String getAccession() {
         return accession;
+    }
+
+    public CheckBox getManuallyRevised() {
+        return manuallyRevised;
+    }
+
+    public void setManuallyRevised(CheckBox cb) {
+        this.manuallyRevised=cb;
     }
 
     /**
@@ -825,7 +834,7 @@ public class ViewPoint implements Serializable {
         return this.getActiveSegments().size()==0;
     }
     /** This function is called if the user has worked on this viewpoint at all. */
-    public void setManuallyRevised() {  this.manuallyRevised = true;  }
+    public void setManuallyRevised() {  this.manuallyRevised.setSelected(true);  }
 
     /**
      * A Builder class. To create a {@link ViewPoint} object, use code such as
