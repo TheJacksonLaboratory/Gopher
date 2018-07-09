@@ -237,8 +237,8 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-
-            restFrag.setUsableBaits(1, 3, 120, alignabilityMap, 0.35, 0.65, 10.0);
+            Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
+            restFrag.setUsableBaits(model.getMinBaitCount(),model.getMaxBaitCount(),model.getProbeLength(),alignabilityMap,model.getMinGCcontent(),model.getMaxGCcontent(),maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
@@ -253,9 +253,10 @@ public class ViewPoint implements Serializable {
     }
     /** @return a string like chr4:29,232,796 */
     public String getGenomicLocationString() { return String.format("%s:%s", chromosomeID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
-    /** @return overall score of this ViewPoint. TODO what about simple?     */
+
+    /** @return overall score of this ViewPoint */
     public final double getScore() {
-        return score;
+        return this.score;
     }
     public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
@@ -362,8 +363,46 @@ public class ViewPoint implements Serializable {
             logger.error("center segment NUll for " + getTargetName());
         }
 
+        // select segments
         Integer lowerLimit = genomicPos - maxSizeUp;
         Integer upperLimit = genomicPos + maxSizeDown;
+        for (Segment segment:restrictionSegmentList) {
+
+            segment.setSelected(true); // initial segment selection is done here and nowhere else
+
+            // do not select fragments that are too small
+            if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
+                segment.setSelected(false);
+            }
+
+            // do not select segments that are entirely outside the allowed range
+            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) )
+            {
+                segment.setSelected(false);
+            }
+
+            // do not select segments that have less than 2 times bmin baits
+            if(segment.isUnselectable()) {
+                segment.setSelected(false);
+            }
+
+            // if allow single margin is false, do not select segments that are rescuable
+            if(!model.getAllowSingleMargin() && segment.isRescuable()) {
+                segment.setSelected(false);
+            }
+
+            if(segment.isSelected() && segment.isRescuable()) {
+                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
+            }
+
+            // if at least one segment is selected, declare viewpoint to be resolved
+            if(segment.isSelected()) {
+                this.resolved = true;
+            }
+        }
+
+        /*
+        OLD SELECTION RULES CAN BE REMOVED AS SOON AS WE DECIDE TO SWITCH TO THE NEW ONES
         for (Segment segment:restrictionSegmentList) {
             if (segment.length() < this.minFragSize) {
                 segment.setSelected(false);
@@ -377,6 +416,7 @@ public class ViewPoint implements Serializable {
                 resolved=true; // at least one segment OK, thus ViewPoint is OK
             }
         }
+        */
 
         // set start position of the viewpoint to start position of the most upstream SELECTED digest
         int start=Integer.MAX_VALUE;
@@ -418,19 +458,17 @@ public class ViewPoint implements Serializable {
         }
 
         setDerivationApproach(Approach.EXTENDED);
-        calculateViewpointScore();
+        calculateViewpointScoreExtended();
         setResolved(resolved);
     }
 
 
-    /**
-     * TODO this function intends to replicate the logic of Justin's simple probe selection approach.
-     *
-     */
     public void generateViewpointSimple(Model model) {
+
         boolean allowSingleMargin = model.getAllowSingleMargin();
         boolean resolved = true;
         approach = Approach.SIMPLE;
+
         // find the digest that contains genomicPos
         this.centerSegment = restrictionSegmentList.stream().
                 filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
@@ -443,37 +481,86 @@ public class ViewPoint implements Serializable {
             restrictionSegmentList.clear(); /* no fragments */
         } else {
             this.centerSegment.setOverlapsTSS(true);
-            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction
+
+            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
             int length = centerSegment.length();
-            if (length >= this.minFragSize && length <= SIMPLE_APPROACH_MAXSIZE
-                    &&
-                    ((!allowSingleMargin && isSegmentMarginValid(centerSegment,"Up") && isSegmentMarginValid(centerSegment,"Down"))
-                    ||
-                    (allowSingleMargin && (isSegmentMarginValid(centerSegment,"Up") || isSegmentMarginValid(centerSegment,"Down")))
+            if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isTargetable())
+                   ||
+                    ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isRescuable() && allowSingleMargin)
+
                     )
-                ) {
-                List<Segment> newsegs = new ArrayList<>();
+            {
                 centerSegment.setSelected(true);
-                setEndPos(centerSegment.getEndPos());
-                setStartPos(centerSegment.getStartPos());
-                // Add the selected digest and the two neighboring fragments (which are deselected)
+                this.setStartPos(centerSegment.getStartPos());
+                this.setEndPos(centerSegment.getEndPos());
+
+                // Add the selected digest and the two neighboring segments
+                Segment upstreamSegment = null;
+                Segment downstreamSegment = null;
                 int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
                 if (genomicPosFragIdx > 0) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx - 1));
+                    upstreamSegment = restrictionSegmentList.get(genomicPosFragIdx - 1);
+                } else {
+                    logger.trace("Warning: There is no segment in upstream direction of the center segment!");
                 }
-                newsegs.add(centerSegment);
                 if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
-                    newsegs.add(restrictionSegmentList.get(genomicPosFragIdx + 1));
+                    downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
+
+                } else {
+                    logger.trace("Warning: There is no segment in downstream direction of the center segment!");
+                }
+                resolved = true;
+                Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                if(score < 0.6) {
+                    // add adjacent segment
+                    if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
+                        // try to add adjacent segment in downstream direction
+                        if(isSegmentValid(downstreamSegment)) {
+                            downstreamSegment.setSelected(true);
+                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
+                            this.setStartPos(centerSegment.getStartPos());
+                            this.setEndPos(downstreamSegment.getEndPos());
+                        }
+                    } else if (upstreamSegment != null) {
+                        // try add adjacent segment in upstream direction
+                        if(isSegmentValid(upstreamSegment)) {
+                            upstreamSegment.setSelected(true);
+                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                            this.setStartPos(upstreamSegment.getStartPos());
+                            this.setEndPos(centerSegment.getEndPos());
+                        }
+                    }
                 }
                 restrictionSegmentList.clear();
-                restrictionSegmentList.addAll(newsegs);
-                resolved = true;
+                if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
+                if(centerSegment != null) {restrictionSegmentList.add(centerSegment);}
+                if(downstreamSegment != null) {restrictionSegmentList.add(downstreamSegment);}
+                upstreamSegment=null;
+                centerSegment=null;
+                downstreamSegment=null;
+                this.alignabilityMap=null;
             }
         }
         setDerivationApproach(Approach.SIMPLE);
-        calculateViewpointScore();
         setResolved(resolved);
+
     }
+
+    private boolean isSegmentValid(Segment seg) {
+
+        if(seg.length() < minFragSize || seg.length()>= SIMPLE_APPROACH_MAXSIZE) {
+            return false;
+        }
+        if(seg.isTargetable()) {
+            return true;
+        }
+        if(model.getAllowSingleMargin() && seg.isRescuable()) {
+            return true;
+        }
+        return(false);
+    }
+
+
 
     private boolean isSegmentMarginValid(Segment segment, String dir) {
 
@@ -528,7 +615,7 @@ public class ViewPoint implements Serializable {
      * The overall score for the viewpoint is between 0 and 1.
      *
      */
-    public void calculateViewpointScore() {
+    public void calculateViewpointScoreExtended() {
         Double score = 0.0;
 
         /* iterate over all selected fragments */
@@ -583,6 +670,15 @@ public class ViewPoint implements Serializable {
             this.score = score / positionScoreSumRef;
         }
 
+    }
+
+    public Double calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
+
+        double mean = 0; // corresponds to TSS position
+        double sd = avgRestFragSize/6; // chosen by eye
+        NormalDistribution nD = new NormalDistribution(mean,sd);
+        this.score = nD.cumulativeProbability(vpEndPos - centerPos) - nD.cumulativeProbability(vpStaPos - centerPos);
+        return score;
     }
 
     /**
@@ -756,12 +852,12 @@ public class ViewPoint implements Serializable {
         /** Need to choose a default strand, but this will always be overwritten. */
         private boolean isPositiveStrand =true;
         private Integer minFragSize=Default.MINIMUM_FRAGMENT_SIZE;
-        private double maximumRepeatContent=Default.MAXIMUM_REPEAT_CONTENT;
+        private double maximumRepeatContent=Default.MAXIMUM_KMER_ALIGNABILITY;
         private double maxGcContent=Default.MAX_GC_CONTENT;
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private static AlignabilityMap alignabilityMap;
+        private transient static AlignabilityMap alignabilityMap;
 
         /**
          *

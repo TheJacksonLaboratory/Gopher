@@ -81,21 +81,21 @@ class URLMaker {
     }
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg19() {
-        return "gc5Base=full&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full";
+        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&wgEncodeCrgMapabilityAlign50mer=full";
     }
 
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg38() {
-        return "gc5Base=full&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
+        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm9() {
-        return "gc5Base=full&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full";
+        return "gc5Base=dense&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full&wgEncodeCrgMapabilityAlign50mer=full";
     }
 
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm10() {
-        return "gc5Base=full&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
+        return "gc5Base=dense&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
     }
 
 
@@ -116,7 +116,7 @@ class URLMaker {
         String url = String.format("http://genome.ucsc.edu/cgi-bin/%s?db=%s&position=%s%%3A%d-%d&hgFind.matches=%s&%s&pix=%d",
                 trackType, genomebuild, chrom, posFrom, posTo, targetItem, highlights,xdim);
         if (enzymeString!=null && enzymeString.length()>0) {
-            url=String.format("%s&cutters=full&hgt.cutters=%s",url,enzymeString);
+            url=String.format("%s&cutters=dense&hgt.cutters=%s",url,enzymeString);
         }
         return url;
     }
