@@ -828,7 +828,9 @@ public class GopherMainPresenter implements Initializable {
         String prefix=model.getProjectName();
         ProbeFileExporter exporter = new ProbeFileExporter(file.getAbsolutePath(),prefix);
         try {
-            exporter.printProbeFileAgilentInFormat(this.model.getViewPointList(),this.model.getGenomeBuild());
+            logger.trace(model.getGenomeFastaFile());
+            logger.trace(model.getIndexedGenomeFastaIndexFile());
+            exporter.printProbeFileAgilentInFormat(this.model.getViewPointList(),this.model.getGenomeBuild(), model.getGenomeFastaFile());
         } catch (Exception exc) {
             PopupFactory.displayException("Could not save probes.", exc.getMessage(),exc);
         }

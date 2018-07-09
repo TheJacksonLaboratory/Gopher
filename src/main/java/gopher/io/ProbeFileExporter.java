@@ -4,6 +4,8 @@ import gopher.model.viewpoint.AlignabilityMap;
 import gopher.model.viewpoint.Bait;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -45,63 +47,81 @@ public class ProbeFileExporter {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
     }
 
-    public void printProbeFileAgilentInFormat(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
+    public void printProbeFileAgilentInFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws FileNotFoundException {
+
+        IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(IndexedFastaSequenceFilePath));
+
         PrintStream out_probe_file = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
         out_probe_file.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
 
         // use a hashMap of Integer sets to get rid of duplicated probes
-        HashMap<String,Set<Integer>> uniqueProbes = null;
-/*
+        Set<String> uniqueProbes = new HashSet<>();
+        HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<String, ArrayList<Integer>>();
+
         for (ViewPoint vp : viewpointlist) {
             if (vp.getNumOfSelectedFrags() == 0) { continue; }
             for(Segment seg : vp.getActiveSegments()) {
 
-                if(0<seg.getBaitNumTotal()) { continue; }
+                if(0 == seg.getBaitNumTotal()) { continue; }
 
-                for(Bait bait : seg.getBaitsForUpstreamMargin()) {
-                    uniqueProbes.get(bait.getRefId()).add(bait.getStartPos());
+                for(Bait b : seg.getBaitsForUpstreamMargin()) {
+                    String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
+                    uniqueProbes.add(key);
+                    if(!uniqueBaits.containsKey(b.getRefId())) {
+                        ArrayList<Integer> staPosList = new ArrayList<Integer>();
+                        staPosList.add(b.getStartPos());
+                        uniqueBaits.put(b.getRefId(),staPosList);
+                    } else {
+                        uniqueBaits.get(b.getRefId()).add(b.getStartPos());
+                    }
                 }
-                for(Bait bait : seg.getBaitsForDownstreamMargin()) {
-                    uniqueProbes.get(bait.getRefId()).add(bait.getStartPos());
+                for(Bait b : seg.getBaitsForDownstreamMargin()) {
+                    String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
+                    uniqueProbes.add(key);
+                    if(!uniqueBaits.containsKey(b.getRefId())) {
+                        ArrayList<Integer> staPosList = new ArrayList<Integer>();
+                        staPosList.add(b.getStartPos());
+                        uniqueBaits.put(b.getRefId(),staPosList);
+                    } else {
+                        uniqueBaits.get(b.getRefId()).add(b.getStartPos());
+                    }
                 }
             }
         }
 
-        // sort keys of hashMap lexicographically
-        List sortedKeyList = new ArrayList(uniqueProbes.keySet());
+
+
+        List sortedKeyList = new ArrayList(uniqueBaits.keySet());
         Collections.sort(sortedKeyList);
+        Date curDate = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("ddmmyy");
+        String dateToStr = format.format(curDate);
+        for(Object key : sortedKeyList) {
+            String refID = key.toString();
+            // convert ArrayList to set to get rid of duplicated baits
+            Set<Integer> foo = new HashSet<Integer>(uniqueBaits.get(refID));
+            // convert back to ArrayList for sorting
+            ArrayList<Integer> sortedPositions = new ArrayList<Integer>(foo);
 
-        for(int i=0; i<sortedKeyList.size(); i++) {
-            List sortedStartPosList = new ArrayList(uniqueProbes.get(sortedKeyList.get(i)));
-            Collections.sort(sortedKeyList);
-            for(int j=0; j<sortedStartPosList.size(); j++) {
-                logger.trace(sortedKeyList.get(i) + "\t" + sortedStartPosList);
+            Collections.sort(sortedPositions);
+            for(int i = 0; i < sortedPositions.size(); i++) {
+                // build ProbeID
+                String probeID = "probe_";
+                probeID += dateToStr;
+                probeID += "_";
+                probeID += genomeBuild;
+                probeID += "_";
+                probeID += refID;
+                probeID += "_";
+                probeID += (sortedPositions.get(i)-1);
+                // get sequence
+                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+120-1);
+                out_probe_file.println(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1));
             }
-        }
-
-*/
-
-
-
-        for (ViewPoint vp : viewpointlist) {
-            if (vp.getNumOfSelectedFrags() == 0) { continue; }
-            String targetID = vp.getReferenceID();
-            Date curDate = new Date();
-            SimpleDateFormat format = new SimpleDateFormat("ddmmyy");
-            String dateToStr = format.format(curDate);
-            String probeID = "probe_";
-            probeID += dateToStr;
-            probeID += "_";
-            probeID += genomeBuild;
-            probeID += "_";
-            probeID += vp.getReferenceID();
-            probeID += "_";
-            probeID += vp.getStartPos();
-            out_probe_file.println(targetID+ "\t" + probeID);
-
         }
 
         out_probe_file.close();
+
     }
 
 
