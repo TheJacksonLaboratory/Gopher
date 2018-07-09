@@ -12,6 +12,7 @@ import gopher.model.genome.MouseMm9;
 import gopher.model.genome.MouseMm10;
 import gopher.model.viewpoint.ViewPoint;
 
+import java.beans.Transient;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -38,7 +39,7 @@ public class Model implements Serializable {
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<GopherGene> geneList=null;
 
-    private AlignabilityMap alignabilityMap = null;
+    private transient AlignabilityMap alignabilityMap = null;
 
     public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
@@ -192,7 +193,14 @@ public class Model implements Serializable {
     public int getMaxBaitCount(){return maxBaitCount;}
     public void setMaxBaitCount(int bc) { this.maxBaitCount=bc;}
 
-
+    /** Estimated average length of restriction fragments */
+    private Double estAvgRestFragLen = null;
+    public void setEstAvgRestFragLen(Double estAvgRestFragLen) {
+        this.estAvgRestFragLen = estAvgRestFragLen;
+    }
+    public Double getEstAvgRestFragLen() {
+        return this.estAvgRestFragLen;
+    }
 
     /** Total horizontal dimension  of the user's screen. */
     private int xdim;

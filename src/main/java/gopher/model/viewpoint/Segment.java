@@ -551,6 +551,40 @@ public class Segment implements Serializable {
         return this.unselectable;
     }
 
+    public Double getMeanGCcontentOfBaits() {
+        Double meanGCcontentOfBaits = 0.0;
+        for(Bait b : baitListUpStreamMargin) {
+            meanGCcontentOfBaits = meanGCcontentOfBaits + b.getGCContent();
+        }
+        for(Bait b : baitListDownStreamMargin) {
+            meanGCcontentOfBaits = meanGCcontentOfBaits + b.getGCContent();
+        }
+        return meanGCcontentOfBaits/this.getBaitNumTotal();
+    }
+
+    public Double getMeanAlignabilityOfBaits() {
+        Double meanAlignabilityOfBaits = 0.0;
+        for(Bait b : baitListUpStreamMargin) {
+            meanAlignabilityOfBaits = meanAlignabilityOfBaits + b.getAlignabilityScore();
+        }
+        for(Bait b : baitListDownStreamMargin) {
+            meanAlignabilityOfBaits = meanAlignabilityOfBaits + b.getAlignabilityScore();
+        }
+        return meanAlignabilityOfBaits/this.getBaitNumTotal();
+    }
+
+    public Double getMeanRepeatContentOfBaits() {
+        Double meanRepeatContentOfBaits = 0.0;
+        for(Bait b : baitListUpStreamMargin) {
+            meanRepeatContentOfBaits = meanRepeatContentOfBaits + b.getRepeatContent();
+        }
+        for(Bait b : baitListDownStreamMargin) {
+            meanRepeatContentOfBaits = meanRepeatContentOfBaits + b.getRepeatContent();
+        }
+        return meanRepeatContentOfBaits/this.getBaitNumTotal();
+    }
+
+
 
 }
 
