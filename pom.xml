@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>jax</groupId>
-    <artifactId>vpvgui</artifactId>
+    <groupId>gopher</groupId>
+    <artifactId>GopherGui</artifactId>
     <version>0.3.9</version>
     <packaging>jar</packaging>
 
@@ -96,6 +96,7 @@
 
 
     <build>
+        <finalName>GopherGui-${project.version}</finalName>
         <!--  <sourceDirectory>src</sourceDirectory> -->
         <resources>
             <resource>
@@ -138,7 +139,7 @@
                 </includes>
             </resource>
         </resources>
-        <finalName>VpvGui-${project.version}</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
