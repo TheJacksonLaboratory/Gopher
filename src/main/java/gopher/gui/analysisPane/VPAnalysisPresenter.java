@@ -47,7 +47,7 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLengthOfActiveSegments;
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLength;
     @FXML private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
-    @FXML private TableColumn<ViewPoint,CheckBox> manuallyRevisedColumn;
+    @FXML private TableColumn<ViewPoint,String> manuallyRevisedColumn;
 
 
    // private BooleanProperty editingStarted;
@@ -238,7 +238,7 @@ public class VPAnalysisPresenter implements Initializable {
         // ninth column -- is central digest with TSS selected?
         fragmentOverlappingTSSColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().isTSSfragmentChosen()?"yes":"no"));
 
-        manuallyRevisedColumn.setCellValueFactory(new PropertyValueFactory<ViewPoint,CheckBox>("revised"));
+        manuallyRevisedColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getManuallyRevised()));
 
         viewPointTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }

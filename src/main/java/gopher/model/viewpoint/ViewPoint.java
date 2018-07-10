@@ -25,11 +25,6 @@ import java.util.stream.IntStream;
  * This class provides a set of utility functions that can be used for primarily for editing of the coordinates,
  * which can be either set manually or automatically using different (so far two) approaches.
  * The last editing step will be tracked.</p>
- * <p>
- * TODO, implement utility functions calculating characteristics of the viewpoint, such as repetitive or GC content,
- * or the number of restriction enzyme cutting sites.
- * <p>
- *
  * @author Peter N Robinson
  * @author Peter Hansen
  * @version 0.2.3 (2018-05-11)
@@ -91,13 +86,18 @@ public class ViewPoint implements Serializable {
     private Model model;
 
     private AlignabilityMap alignabilityMap = null;
+    /** This is the unicode character for a checkmark. We will use it to show that the user has
+     * checked this viewpoint. */
+    private static final String CHECK_MARK="\u2714";
+    /** We will use the empty string to show that the user has not yet manually revised or saved this viewpoint.*/
+    private static final String EMPTY_STRING="";
 
     /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
      * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
      */
-    private CheckBox manuallyRevised = new CheckBox();
+    private String manuallyRevised=EMPTY_STRING;
     /** @return true iff the user has revised of modified this viewpoint in any way. */
-    public boolean wasManuallyRevised() {  return manuallyRevised.isSelected();  }
+    public boolean wasManuallyRevised() {  return manuallyRevised.equals(CHECK_MARK);  }
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -127,14 +127,12 @@ public class ViewPoint implements Serializable {
         return accession;
     }
 
-    public CheckBox getManuallyRevised() {
+    public String getManuallyRevised() {
         return manuallyRevised;
     }
 
-    public void setManuallyRevised(CheckBox cb) {
-        this.manuallyRevised=cb;
-    }
-
+    /** This function is called if the user has worked on this viewpoint at all. */
+    public void setManuallyRevised() {  this.manuallyRevised=CHECK_MARK;  }
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
      * @return a list of Segments of a viewpoint that are active and will be displayed on the UCSC Browser. */
@@ -563,10 +561,7 @@ public class ViewPoint implements Serializable {
         if(seg.isTargetable()) {
             return true;
         }
-        if(model.getAllowSingleMargin() && seg.isRescuable()) {
-            return true;
-        }
-        return(false);
+        return (model.getAllowSingleMargin() && seg.isRescuable());
     }
 
 
@@ -833,8 +828,7 @@ public class ViewPoint implements Serializable {
     public boolean hasNoActiveSegment() {
         return this.getActiveSegments().size()==0;
     }
-    /** This function is called if the user has worked on this viewpoint at all. */
-    public void setManuallyRevised() {  this.manuallyRevised.setSelected(true);  }
+
 
     /**
      * A Builder class. To create a {@link ViewPoint} object, use code such as

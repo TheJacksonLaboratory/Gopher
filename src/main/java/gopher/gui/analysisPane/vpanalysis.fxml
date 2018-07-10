@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<StackPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.analysisPane.VPAnalysisPresenter">
+<StackPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.analysisPane.VPAnalysisPresenter">
     <SplitPane dividerPositions="0.5" orientation="VERTICAL">
         <VBox alignment="CENTER">
             <WebView fx:id="contentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
@@ -24,11 +24,8 @@
                 <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" minWidth="100.0" prefWidth="120.0" text="Active length" />
                 <TableColumn fx:id="viewpointTotalLength" minWidth="100.0" prefWidth="120.0" text="Total length" />
                 <TableColumn fx:id="fragmentOverlappingTSSColumn" maxWidth="-1.0" minWidth="140.0" prefWidth="140.0" text="Fragment at TSS" />
-            <TableColumn fx:id="manuallyRevisedColumn" prefWidth="75.0" text="Manually revised" />
+            <TableColumn fx:id="manuallyRevisedColumn" maxWidth="-1.0" minWidth="100.0" prefWidth="100.0" text="Manually revised" />
             </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
         </TableView>
     </SplitPane>
 </StackPane>
