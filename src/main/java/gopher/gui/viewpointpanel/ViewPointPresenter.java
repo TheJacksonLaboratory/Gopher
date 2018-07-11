@@ -260,7 +260,8 @@ public class ViewPointPresenter implements Initializable {
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
-                    cdf.getValue().getSegment().setSelected(new_val); // changes the selected value of the Segment
+                    // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
+                    cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     Platform.runLater(new Runnable() {
                         @Override public void run() {
                             updateScore();
@@ -425,7 +426,7 @@ public class ViewPointPresenter implements Initializable {
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
-        setManuallyRevised();
+        //setManuallyRevised();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
@@ -515,6 +516,16 @@ public class ViewPointPresenter implements Initializable {
     private void zoom(double factor) {
         String path=this.model.getGenomeFastaFile();
         this.viewpoint.setManuallyRevised();
+        this.viewpoint.zoom(factor);
+        segmentsTableView.getItems().clear();
+        this.coloredsegments.clear();
+        segmentsTableView.getItems().clear();
+        this.coloredsegments.clear();
+        setViewPoint(this.viewpoint);
+        refreshUCSCButtonAction();
+        updateScore();
+
+        /*
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.viewpoint,factor,fastaReader);
@@ -530,6 +541,7 @@ public class ViewPointPresenter implements Initializable {
             logger.error("Could not zoom for "+ viewpoint.getTargetName());
             logger.error(e,e);
         }
+        */
     }
 
 

@@ -4,6 +4,7 @@ import gopher.exception.GopherException;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -13,13 +14,15 @@ import java.util.ArrayList;
  * There is also a function 'isUsable' that can be used to determine if a bait is usable given thresholds
  * for the individual properties such as GC content.
  */
-public class Bait {
+public class Bait implements Serializable {
     private static Logger logger = Logger.getLogger(Bait.class.getName());
+    /** serialization version ID */
+    static final long serialVersionUID = 1L;
 
     // coordinates of the bait
-    private String refID = null;
-    private Integer startPos = null;
-    private Integer endPos = null;
+    private String refID;
+    private Integer startPos;
+    private Integer endPos;
 
     // average kmer alignabilty of the bait
     private Double averageKmeralignabilty = null;
