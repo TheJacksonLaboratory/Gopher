@@ -1,6 +1,7 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
+import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
@@ -375,8 +376,12 @@ public class Segment implements Serializable {
         }
     }
 
-    public void setUsableBaits(Integer bmin, Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
-
+    public void setUsableBaits(Model model,  AlignabilityMap alignabilityMap,  Double maxAlignabilityScore) {
+        Integer bmin =model.getMinBaitCount();
+        Integer bmax = model.getMaxBaitCount();
+        Integer baitSize = model.getProbeLength();
+        Double minGCcontent = model.getMinGCcontent();
+        Double maxGCcontent = model.getMaxGCcontent();
         if (this.length() < baitSize) {
             // do not place baits in segments shorter than the bait size
             this.unselectable = true;

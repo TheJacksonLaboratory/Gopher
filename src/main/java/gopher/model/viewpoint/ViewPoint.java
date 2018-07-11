@@ -63,11 +63,6 @@ public class ViewPoint implements Serializable {
     private int minimumAllowableStartPosition;
     /** The maximum allowable end position if the user zooms. */
     private int maximumAllowableEndPosition;
-
-
-
-
-
     /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
     private int minFragSize;
@@ -165,32 +160,32 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-    /**
-     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
-     * @param vp An existing ViewPoint that is used as the center point of the zoom
-     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
-     * @param fastaReader The reader used to get new sequences.
-     */
-    @Deprecated
-    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
-        this.chromosomeID =vp.chromosomeID;
-        this.genomicPos=vp.genomicPos;
-        this.targetName=vp.targetName;
-        this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
-        this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
-        setStartPos(genomicPos - upstreamNucleotideLength);
-        setEndPos(genomicPos + downstreamNucleotideLength);
-        this.maxGcContent=vp.maxGcContent;
-        this.minGcContent=vp.minGcContent;
-        this.minFragSize=vp.minFragSize;
-        this.marginSize= vp.marginSize;
-        this.accession=vp.accession;
-        this.isPositiveStrand=vp.isPositiveStrand;
-        this.maximumRepeatContent=vp.maximumRepeatContent;
-         //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
-       // this.alignabilityMap=vp.alignabilityMap;
-        //init(fastaReader, this.model);
-    }
+//    /**
+//     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
+//     * @param vp An existing ViewPoint that is used as the center point of the zoom
+//     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
+//     * @param fastaReader The reader used to get new sequences.
+//     */
+//    @Deprecated
+////    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
+//        this.chromosomeID =vp.chromosomeID;
+//        this.genomicPos=vp.genomicPos;
+//        this.targetName=vp.targetName;
+//        this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
+//        this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
+//        setStartPos(genomicPos - upstreamNucleotideLength);
+//        setEndPos(genomicPos + downstreamNucleotideLength);
+//        this.maxGcContent=vp.maxGcContent;
+//        this.minGcContent=vp.minGcContent;
+//        this.minFragSize=vp.minFragSize;
+//        this.marginSize= vp.marginSize;
+//        this.accession=vp.accession;
+//        this.isPositiveStrand=vp.isPositiveStrand;
+//        this.maximumRepeatContent=vp.maximumRepeatContent;
+//        logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+//       // this.alignabilityMap=vp.alignabilityMap;
+//        //init(fastaReader, this.model);
+//    }
 
     /**
      * This function should only be used for the extended approach. It changes the start and end position
@@ -198,15 +193,17 @@ public class ViewPoint implements Serializable {
      * @param zoomfactor
      */
     public void zoom(double zoomfactor) {
+        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
         this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
         this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
+        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
 
-        upstreamNucleotideLength = upstreamNucleotideLength>minimumAllowableStartPosition ?
-                upstreamNucleotideLength :
-                minimumAllowableStartPosition;
-        downstreamNucleotideLength = downstreamNucleotideLength<maximumAllowableEndPosition ?
-                downstreamNucleotideLength :
-                maximumAllowableEndPosition;
+//        upstreamNucleotideLength = upstreamNucleotideLength>minimumAllowableStartPosition ?
+//                upstreamNucleotideLength :
+//                minimumAllowableStartPosition;
+//        downstreamNucleotideLength = downstreamNucleotideLength<maximumAllowableEndPosition ?
+//                downstreamNucleotideLength :
+//                maximumAllowableEndPosition;
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
         setFragmentsForExtendedApproach(this.startPos,this.endPos,false);
@@ -238,6 +235,7 @@ public class ViewPoint implements Serializable {
         setEndPos(genomicPos + downstreamNucleotideLength);
         setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
         setMaximumAllowableEndPos(genomicPos * SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
+        logger.trace(String.format("CTOR - min allowable start %d max allow end %d",this.minimumAllowableStartPosition, this.maximumAllowableEndPosition ));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -261,6 +259,7 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
+        logger.trace("init; segmentFactory is "+ segmentFactory.toString());
         initRestrictionFragments(fastaReader, alignabilityMap);
     }
 
@@ -276,8 +275,9 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
+            logger.trace("Creating restriction fragment " + restFrag.toString());
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits(model.getMinBaitCount(),model.getMaxBaitCount(),model.getProbeLength(),alignabilityMap,model.getMinGCcontent(),model.getMaxGCcontent(),maxMeanAlignabilityScore);
+            restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
@@ -386,6 +386,10 @@ public class ViewPoint implements Serializable {
      * @param updateOriginallySelected if true,alter the originallySelected field in {@link Segment}
      */
     private void setFragmentsForExtendedApproach(int lowerLimit, int upperLimit, boolean updateOriginallySelected) {
+        logger.trace("Setting fragements for extended approach. Lower limit is " + lowerLimit + " upper limit is " + upperLimit);
+        int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+        logger.trace(String.format("[%s] Before setting, %d of %d segments were selected",getTargetName(),restrictionSegmentList.size(),c ));
+
         for (Segment segment:restrictionSegmentList) {
 
             segment.setSelected(true,updateOriginallySelected); // initial segment selection is done here and nowhere else
@@ -420,6 +424,8 @@ public class ViewPoint implements Serializable {
                 this.resolved = true;
             }
         }
+        c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+        logger.trace(String.format("After setting, %d/%d segments were selected",c , restrictionSegmentList.size()));
     }
 
 
@@ -893,7 +899,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private transient static AlignabilityMap alignabilityMap;
+        private AlignabilityMap alignabilityMap;
 
         /**
          *
@@ -941,7 +947,7 @@ public class ViewPoint implements Serializable {
             this.model=model; return this;
         }
         Builder alignabilityMap(AlignabilityMap alignabilityMap) {
-            alignabilityMap=alignabilityMap; return this;
+            this.alignabilityMap=alignabilityMap; return this;
         }
 
         public ViewPoint build() {

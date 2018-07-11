@@ -464,15 +464,30 @@ public class ViewPointPresenter implements Initializable {
     public void setViewPoint(ViewPoint vp) {
         this.viewpoint = vp;
         updateScore();
-        this.coloredsegments = vp.getAllSegments().stream()
+        showColoredSegmentsInTable();
+        showUcscView();
+    }
+
+
+    private void showColoredSegmentsInTable() {
+        segmentsTableView.getItems().clear();
+        this.coloredsegments = this.viewpoint.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
                 .collect(Collectors.toList());
         segmentsTableView.getItems().addAll(coloredsegments);
-        // create url & load content from UCSC
+    }
+
+    /**
+     * create url & load content from UCSC
+     */
+    private void showUcscView() {
         URLMaker maker = new URLMaker(this.model);
-        String url= maker.getImageURL(vp,getHighlightRegions());
+        String url= maker.getImageURL(this.viewpoint,getHighlightRegions());
         ucscWebEngine.load(url);
     }
+
+
+
 
     public void setTab(Tab tab) {
         this.tab = tab;
@@ -514,16 +529,16 @@ public class ViewPointPresenter implements Initializable {
 
 
     private void zoom(double factor) {
-        String path=this.model.getGenomeFastaFile();
+        //String path=this.model.getGenomeFastaFile();
+        logger.trace(String.format("Zooming with factor %.2f",factor));
         this.viewpoint.setManuallyRevised();
+        logger.trace(String.format("Before zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
-        segmentsTableView.getItems().clear();
-        this.coloredsegments.clear();
-        segmentsTableView.getItems().clear();
-        this.coloredsegments.clear();
-        setViewPoint(this.viewpoint);
-        refreshUCSCButtonAction();
+        logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         updateScore();
+        showColoredSegmentsInTable();
+        refreshUCSCButtonAction();
+
 
         /*
         try {
