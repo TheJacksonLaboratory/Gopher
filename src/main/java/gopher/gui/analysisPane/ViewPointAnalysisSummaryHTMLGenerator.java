@@ -117,10 +117,12 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         sb.append(String.format("<tr><td>Number of genes: %d</td>"+
                 "<td>Average number of active fragments per viewpoint: %.1f</td><td>Total margin size: %s nucleotides</td></tr>",
                 ngenes,avg_n_frag, dformater.format(n_totalNucleotidesInProbes)));
-        sb.append(String.format("<tr><td>Number of viewpoints: %d</td><td>Average viewpoint score: %.2f%%</td><td>Tiling factor: %d x</td></tr>",
-                nviewpoints,100*avg_score,tilingFactor));
-        sb.append(String.format("<tr><td>Number of unique fragments: %d</td><td>Average viewpoint size: %.1f nucleotides</td><td>Estimated number of probes: %d</td></tr>",
-                total_active_frags, avg_size,  design.getEstimatedNumberOfProbes()));
+        sb.append(String.format("<tr><td>Number of viewpoints: %d</td><td>Average viewpoint score: %.2f%%</td><td>unique selected targetable fragments: %d</td></tr>",
+                nviewpoints,100*avg_score,42));
+        sb.append(String.format("<tr><td>Number of unique fragments: %d</td><td>Average viewpoint size: %.1f nucleotides</td><td>unique selected rescued fragments: %d</td></tr>",
+                total_active_frags, avg_size,  42));
+        sb.append(String.format("<tr><td>Number of baits: %d</td><td>bp/viewpoint: %.1f nucleotides</td><td>??: %d</td></tr>",
+                42, 42.0,  42));
         sb.append("</tbody>\n</table>");
         return sb.toString();
     }
