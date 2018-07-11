@@ -408,12 +408,24 @@ public class ViewPointPresenter implements Initializable {
         this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }
 
+    /**
+     * Calling this method sets the "manually revised" flag of the selected ViewPoint to
+     * true and also refreshes the viewpoint table so that a check is shown.
+     */
+    private void setManuallyRevised() {
+        this.viewpoint.setManuallyRevised();
+        Platform.runLater( () -> this.analysisPresenter.refreshVPTable() );
+    }
+
+
+
     private void updateScore() {
         if(this.viewpoint.getDerivationApproach().equals("SIMPLE")) {
             this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
+        setManuallyRevised();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
