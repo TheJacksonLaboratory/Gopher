@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
@@ -46,6 +47,7 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLengthOfActiveSegments;
     @FXML private TableColumn<ViewPoint,String> viewpointTotalLength;
     @FXML private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
+    @FXML private TableColumn<ViewPoint,String> manuallyRevisedColumn;
 
 
    // private BooleanProperty editingStarted;
@@ -235,6 +237,8 @@ public class VPAnalysisPresenter implements Initializable {
 
         // ninth column -- is central digest with TSS selected?
         fragmentOverlappingTSSColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().isTSSfragmentChosen()?"yes":"no"));
+
+        manuallyRevisedColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getManuallyRevised()));
 
         viewPointTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }

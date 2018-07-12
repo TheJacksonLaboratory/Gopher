@@ -46,6 +46,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
 
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
+        logger.trace("calculating viewpoints for " + vpvgene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
         List<Integer> gPosList = vpvgene.getTSSlist();
         if (! vpvgene.isForward()) {
             Collections.reverse(gPosList);
@@ -54,6 +55,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
         for (Integer gPos : gPosList) {
+            logger.trace("Working on viewpoint for gPos=" + gPos);
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
                     upstreamLength(model.getSizeUp()).
@@ -109,7 +111,13 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
             logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
+            if (group.getGenes()==null) {
+                logger.error("Could not retrieve genes for " + referenceSequenceID);
+            } else {
+                logger.trace(String.format("Retrieved %d genes for %s",group.getGenes().size(),referenceSequenceID));
+            }
             group.getGenes().parallelStream().forEach(vpvGene -> {
+                logger.trace(String.format("Working on %s",vpvGene.getGeneSymbol() ));
                 calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
             });
         }

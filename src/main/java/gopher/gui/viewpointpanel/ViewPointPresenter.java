@@ -260,7 +260,8 @@ public class ViewPointPresenter implements Initializable {
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
-                    cdf.getValue().getSegment().setSelected(new_val); // changes the selected value of the Segment
+                    // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
+                    cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     Platform.runLater(new Runnable() {
                         @Override public void run() {
                             updateScore();
@@ -334,7 +335,7 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                        double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (rp > model.getMaxRepeatContent()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
@@ -408,12 +409,24 @@ public class ViewPointPresenter implements Initializable {
         this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }
 
+    /**
+     * Calling this method sets the "manually revised" flag of the selected ViewPoint to
+     * true and also refreshes the viewpoint table so that a check is shown.
+     */
+    private void setManuallyRevised() {
+        this.viewpoint.setManuallyRevised();
+        Platform.runLater( () -> this.analysisPresenter.refreshVPTable() );
+    }
+
+
+
     private void updateScore() {
         if(this.viewpoint.getDerivationApproach().equals("SIMPLE")) {
             this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
+        //setManuallyRevised();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
@@ -451,15 +464,30 @@ public class ViewPointPresenter implements Initializable {
     public void setViewPoint(ViewPoint vp) {
         this.viewpoint = vp;
         updateScore();
-        this.coloredsegments = vp.getAllSegments().stream()
+        showColoredSegmentsInTable();
+        showUcscView();
+    }
+
+
+    private void showColoredSegmentsInTable() {
+        segmentsTableView.getItems().clear();
+        this.coloredsegments = this.viewpoint.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
                 .collect(Collectors.toList());
         segmentsTableView.getItems().addAll(coloredsegments);
-        // create url & load content from UCSC
+    }
+
+    /**
+     * create url & load content from UCSC
+     */
+    private void showUcscView() {
         URLMaker maker = new URLMaker(this.model);
-        String url= maker.getImageURL(vp,getHighlightRegions());
+        String url= maker.getImageURL(this.viewpoint,getHighlightRegions());
         ucscWebEngine.load(url);
     }
+
+
+
 
     public void setTab(Tab tab) {
         this.tab = tab;
@@ -501,8 +529,19 @@ public class ViewPointPresenter implements Initializable {
 
 
     private void zoom(double factor) {
-        String path=this.model.getGenomeFastaFile();
+        //String path=this.model.getGenomeFastaFile();
+        logger.trace(String.format("Zooming with factor %.2f",factor));
         this.viewpoint.setManuallyRevised();
+        logger.trace(String.format("Before zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        this.viewpoint.zoom(factor);
+        logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        updateScore();
+        showColoredSegmentsInTable();
+        showUcscView();
+       // refreshUCSCButtonAction();
+
+
+        /*
         try {
             IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
             ViewPoint newVP = new ViewPoint(this.viewpoint,factor,fastaReader);
@@ -518,6 +557,7 @@ public class ViewPointPresenter implements Initializable {
             logger.error("Could not zoom for "+ viewpoint.getTargetName());
             logger.error(e,e);
         }
+        */
     }
 
 
@@ -561,7 +601,7 @@ public class ViewPointPresenter implements Initializable {
     /**
      * Container for binding Segment
      */
-    private class ColoredSegment {
+    private static class ColoredSegment {
         /** Color for highlighting an active segment. */
         private String color;
 

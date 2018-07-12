@@ -873,7 +873,7 @@ public class GopherMainPresenter implements Initializable {
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.setTitle("Creating Viewpoints ...4");
+        pbpresent.setTitle("Creating Viewpoints ...");
         pbpresent.initBindings(task,sp);
 
         Stage window = new Stage();
