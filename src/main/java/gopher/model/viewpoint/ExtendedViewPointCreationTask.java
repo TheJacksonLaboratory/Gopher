@@ -41,7 +41,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      */
     public ExtendedViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
         super(model, currentVPproperty);
-        //this.alignabilityMap=alignabilityMap;
+        this.alignabilityMap=alignabilityMap;
     }
 
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {

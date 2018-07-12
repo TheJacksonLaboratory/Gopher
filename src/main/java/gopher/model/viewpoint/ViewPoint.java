@@ -234,7 +234,7 @@ public class ViewPoint implements Serializable {
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
         setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
-        setMaximumAllowableEndPos(genomicPos * SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
+        setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
         logger.trace(String.format("CTOR - min allowable start %d max allow end %d",this.minimumAllowableStartPosition, this.maximumAllowableEndPosition ));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
@@ -279,7 +279,7 @@ public class ViewPoint implements Serializable {
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
-        }
+        } // this loop never ends
     }
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
