@@ -1,21 +1,20 @@
 package gopher.model;
 
 
-import gopher.io.RestrictionEnzymeParser;
-import gopher.model.viewpoint.AlignabilityMap;
-import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
-import gopher.model.genome.Genome;
-import gopher.model.genome.HumanHg19;
-import gopher.model.genome.HumanHg38;
-import gopher.model.genome.MouseMm9;
-import gopher.model.genome.MouseMm10;
+import gopher.io.RestrictionEnzymeParser;
+import gopher.model.genome.*;
+import gopher.model.viewpoint.AlignabilityMap;
 import gopher.model.viewpoint.ViewPoint;
+import org.apache.log4j.Logger;
 
-import java.beans.Transient;
-import java.io.*;
-import java.net.URL;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -310,7 +309,12 @@ public class Model implements Serializable {
     public Model() {
         this.genome=new HumanHg19(); /* the default genome */
         this.chosenEnzymelist=new ArrayList<>(); /* empty list for enzymes that have been chosen by user */
-        initializeEnzymesFromFile();
+        try {
+            this.enzymelist = RestrictionEnzymeParser.getEnzymes(Model.class.getResourceAsStream("/enzymelist.tab"));
+        } catch (IOException e) {
+            logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
+        }
+
     }
 
 
@@ -331,18 +335,6 @@ public class Model implements Serializable {
         return  dir + File.separator + genomeFa;
     }
 
-
-
-    /**
-     * This method expects there to be a file called enzymelist.tab in
-     * src/main/resources. This file has a header line (with #) and
-     * then a list of restriction enzymes structured as name\tsite
-     */
-    private void initializeEnzymesFromFile() {
-        URL location =  this.getClass().getResource("/enzymelist.tab");
-        RestrictionEnzymeParser parser = new RestrictionEnzymeParser(location.getPath());
-        this.enzymelist = parser.getEnzymes();
-    }
 
     public void setVPVGenes(List<GopherGene> vpvgenelist) {
         this.geneList = vpvgenelist;
