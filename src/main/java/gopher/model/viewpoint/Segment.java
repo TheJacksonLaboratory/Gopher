@@ -61,7 +61,7 @@ public class Segment implements Serializable {
 
     private double GCcontentUp;
 
-    private IndexedFastaSequenceFile fastaReader;
+    private transient IndexedFastaSequenceFile fastaReader;
 
     private List<Bait> baitListUpStreamMargin = null;
     private List<Bait> baitListDownStreamMargin = null;
