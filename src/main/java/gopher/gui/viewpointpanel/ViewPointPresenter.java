@@ -335,7 +335,7 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+                        double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
                     if (rp > model.getMaxRepeatContent()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
@@ -537,7 +537,8 @@ public class ViewPointPresenter implements Initializable {
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         updateScore();
         showColoredSegmentsInTable();
-        refreshUCSCButtonAction();
+        showUcscView();
+       // refreshUCSCButtonAction();
 
 
         /*
@@ -600,7 +601,7 @@ public class ViewPointPresenter implements Initializable {
     /**
      * Container for binding Segment
      */
-    private class ColoredSegment {
+    private static class ColoredSegment {
         /** Color for highlighting an active segment. */
         private String color;
 

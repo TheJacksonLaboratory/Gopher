@@ -197,16 +197,16 @@ public class ViewPoint implements Serializable {
         this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
         this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
         logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
-
-//        upstreamNucleotideLength = upstreamNucleotideLength>minimumAllowableStartPosition ?
-//                upstreamNucleotideLength :
-//                minimumAllowableStartPosition;
-//        downstreamNucleotideLength = downstreamNucleotideLength<maximumAllowableEndPosition ?
-//                downstreamNucleotideLength :
-//                maximumAllowableEndPosition;
+        // TODO do we need to worry about going over end of chromosome?
+        // or start before zero?
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
-        setFragmentsForExtendedApproach(this.startPos,this.endPos,false);
+        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
+        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
+        if (this.approach.equals(Approach.EXTENDED)) {
+            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
+        }
+
     }
 
 
@@ -458,7 +458,9 @@ public class ViewPoint implements Serializable {
             }
         }
         if (this.centerSegment==null) {
-            logger.error("center segment NUll for " + getTargetName());
+            logger.error("center segment NUll for " + getTargetName() + "\n\t" +
+            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList =" +
+            restrictionSegmentList.size());
         }
 
         // select segments
