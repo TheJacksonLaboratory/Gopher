@@ -279,7 +279,7 @@ public class ViewPoint implements Serializable {
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
-        } // this loop never ends
+        }
     }
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
