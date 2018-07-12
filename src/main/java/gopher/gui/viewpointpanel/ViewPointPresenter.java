@@ -1,6 +1,9 @@
 package gopher.gui.viewpointpanel;
 
-import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import gopher.gui.analysisPane.VPAnalysisPresenter;
+import gopher.model.Model;
+import gopher.model.viewpoint.Segment;
+import gopher.model.viewpoint.ViewPoint;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -21,13 +24,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import gopher.gui.analysisPane.VPAnalysisPresenter;
-import gopher.model.Model;
-import gopher.model.viewpoint.Segment;
-import gopher.model.viewpoint.ViewPoint;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
@@ -404,7 +401,7 @@ public class ViewPointPresenter implements Initializable {
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
-        this.segmentsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         /* the following will start us off with a different color each time. */
         this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
     }
