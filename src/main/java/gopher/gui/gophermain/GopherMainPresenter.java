@@ -1,33 +1,8 @@
 package gopher.gui.gophermain;
 
-import gopher.model.digest.DigestCreationTask;
-import gopher.model.viewpoint.*;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.layout.StackPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
-import org.apache.log4j.Logger;
 import gopher.exception.DownloadFileNotFoundException;
-
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
-import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
-import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
@@ -40,10 +15,33 @@ import gopher.gui.proxy.SetProxyView;
 import gopher.gui.qcCheckPane.QCCheckFactory;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.settings.SettingsViewFactory;
+import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
+import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.io.*;
 import gopher.model.*;
+import gopher.model.digest.DigestCreationTask;
+import gopher.model.viewpoint.*;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -543,7 +541,8 @@ public class GopherMainPresenter implements Initializable {
         logger.info("About to download genome for "+build +" (if necessary)");
         GenomeDownloader gdownloader = new GenomeDownloader(build);
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + build + " (will be downloaded if not found).");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        dirChooser.setTitle("Choose directory for genome build " + build + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
             logger.error("Could not set genome download path from Directory Chooser");
@@ -579,7 +578,9 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        dirChooser.setTitle("Choose directory where RefGene transcripts file for " + genomeBuild + " is located (will" +
+                " be downloaded if not found).");
+       dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
             PopupFactory.displayError("Error","Could not get path to download transcript file.");
@@ -673,7 +674,9 @@ public class GopherMainPresenter implements Initializable {
         String genomeBuild = genomeChoiceBox.getValue(); // e.g. hg19 or mm9
 
         DirectoryChooser dirChooser = new DirectoryChooser(); // choose directory to which the map will be downloaded
-        dirChooser.setTitle("Choose directory for " + genomeBuild + " (will be downloaded if not found).");
+        dirChooser.setTitle("Choose directory where the alignability map for " + genomeBuild + " is located (will be" +
+                " downloaded if not found).");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
             PopupFactory.displayError("Error","Could not get path to download alignabilty file.");
@@ -1106,6 +1109,7 @@ public class GopherMainPresenter implements Initializable {
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory for exporting BED files.");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
             PopupFactory.displayError("Error","Could not get path to export BED files.");
@@ -1182,6 +1186,7 @@ public class GopherMainPresenter implements Initializable {
         String initFileName=String.format("%s.ser",this.model.getProjectName());
         chooser.setInitialFileName(initFileName);
         chooser.setTitle("Choose file path to save project file");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showSaveDialog(null);
         String path = file.getAbsolutePath();
         serializeToLocation(path);
@@ -1236,6 +1241,7 @@ public class GopherMainPresenter implements Initializable {
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose directory to download regulatory build for " + genomeBuild + " (will be downloaded if not found).");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().isEmpty()) {
             PopupFactory.displayError("Error","Could not get path to download regulatory build file.");
@@ -1306,6 +1312,7 @@ public class GopherMainPresenter implements Initializable {
         GopherReport report = new GopherReport(this.model);
         String filename =String.format("%s-report.txt",model.getProjectName());
         FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         chooser.setInitialFileName(filename);
         File file=chooser.showSaveDialog(this.primaryStage);
         if (file==null) {
