@@ -45,6 +45,8 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -1057,45 +1059,53 @@ public class GopherMainPresenter implements Initializable {
 
 
     @FXML public void openGeneWindowWithExampleHumanGenes() {
-        File file = new File(getClass().getClassLoader().getResource("humangenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/humangenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example human gene list at path '/humangenesymbols.txt'");
             PopupFactory.displayError("Could not open example human gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
-        File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/flygenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example fly gene list at path '/flygenesymbols.txt'");
             PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
-        File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/mousegenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example fly gene list at path '/mousegenesymbols.txt'");
             PopupFactory.displayError("Could not open example mouse gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
-        File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/ratgenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example rat gene list at path '/ratgenesymbols.txt'");
             PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
