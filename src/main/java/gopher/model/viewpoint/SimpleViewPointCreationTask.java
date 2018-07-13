@@ -48,15 +48,14 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
-
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) { //throws GopherException{
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
         logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
-        Instrumentation inst=null;
+        //Instrumentation inst=null;
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
@@ -166,9 +165,10 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         for (ChromosomeGroup group : chromosomes.values()) {
             String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
             logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
-            group.getGenes().parallelStream().forEach(vpvGene -> {
-                calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
-            });
+            for (GopherGene gene : group.getGenes()) {
+           // group.getGenes().parallelStream().forEach(vpvGene -> {
+                calculateViewPoints(gene, referenceSequenceID, fastaReader);
+            }
         }
         long end = milli - System.currentTimeMillis();
         logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
@@ -178,8 +178,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
     /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
     private void updateLabelText(StringProperty sb, String msg) {
-        Platform.runLater( () ->{
-            sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg));
-        });
+        Platform.runLater( () -> sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg)) );
     }
 }

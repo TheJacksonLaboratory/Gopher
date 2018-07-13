@@ -3,25 +3,22 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import gopher.model.RestrictionEnzyme;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.List;
 
 public class RestrictionEnzymeParser {
 
-    private final String pathToRestrictionEnzymeFile;
+    private final File pathToRestrictionEnzymeFile;
 
-    public RestrictionEnzymeParser(String path) {
-        pathToRestrictionEnzymeFile=path;
+
+    public RestrictionEnzymeParser(File pathToRestrictionEnzymeFile) {
+        this.pathToRestrictionEnzymeFile = pathToRestrictionEnzymeFile;
     }
 
 
-    public List<RestrictionEnzyme> getEnzymes() {
+    public static List<RestrictionEnzyme> getEnzymes(InputStream inputStream) throws IOException {
         ImmutableList.Builder<RestrictionEnzyme> builder = new ImmutableList.Builder<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(pathToRestrictionEnzymeFile));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#"))
@@ -30,11 +27,13 @@ public class RestrictionEnzymeParser {
                 RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 builder.add(re);
             }
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return builder.build();
+    }
+
+
+    public List<RestrictionEnzyme> getEnzymes() throws IOException {
+        return getEnzymes(new FileInputStream(pathToRestrictionEnzymeFile));
     }
 
 }

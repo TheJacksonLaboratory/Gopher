@@ -24,6 +24,9 @@ On most systems you should be able to start VPV by double clicking on the
   $ java -jar GOPHER.jar
 
 
+**Note:** if you receive an `OutOfMemoryError` allow more memory to be allocated for Java heap using `-Xmx` option (e.g. `java -Xmx6g -jar GOPHER.jar`)
+
+
 Installing and running the prebuilt GOPHER app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The source code for GOPHER is available from the GOPHER GitHub page. ::

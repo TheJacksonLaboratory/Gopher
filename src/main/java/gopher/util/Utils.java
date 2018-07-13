@@ -1,5 +1,11 @@
 package gopher.util;
 
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.TextAlignment;
+
 public class Utils {
 
 
@@ -15,5 +21,25 @@ public class Utils {
         System.setProperty("https.proxyPort",port);
     }
 
+    /**
+     * Allow column name to be wrapped into multiple lines. Based on
+     * <a href="https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header">this
+     * post</a>.
+     *
+     * @param col {@link TableColumn} with a name that will be wrapped
+     */
+    public static void makeHeaderWrappable(TableColumn col) {
+        Label label = new Label(col.getText());
+        label.setStyle("-fx-padding: 8px;");
+        label.setWrapText(true);
+        label.setAlignment(Pos.CENTER);
+        label.setTextAlignment(TextAlignment.CENTER);
+
+        StackPane stack = new StackPane();
+        stack.getChildren().add(label);
+        stack.prefWidthProperty().bind(col.widthProperty().subtract(5));
+        label.prefWidthProperty().bind(stack.prefWidthProperty());
+        col.setGraphic(stack);
+    }
 
 }

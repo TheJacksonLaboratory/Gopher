@@ -1,6 +1,7 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
+import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
@@ -43,6 +44,9 @@ public class Segment implements Serializable {
     private boolean unselectable;
     private boolean targetable;
     private boolean rescuable;
+    /** This is true if the fragment was selected when the ViewPoint was originally created. If
+     * originallySelected != selected, then this Fragment was manually changed by the user. */
+    private boolean originallySelected;
 
     /** The repetitive content of an object of class Segment. */
     private double repeatContent;
@@ -57,7 +61,7 @@ public class Segment implements Serializable {
 
     private double GCcontentUp;
 
-    private IndexedFastaSequenceFile fastaReader = null;
+    private transient IndexedFastaSequenceFile fastaReader;
 
     private List<Bait> baitListUpStreamMargin = null;
     private List<Bait> baitListDownStreamMargin = null;
@@ -132,9 +136,15 @@ public class Segment implements Serializable {
         return endPos;
     }
 
-    /** @param selected true if the segment is to be included in a viewpoint. */
-    public void setSelected(boolean selected) {
+    /**
+     * @param selected true if the segment is to be included in a viewpoint.
+     * @param updateOrginallySelected if true, then we are creating the viewpoint and want to record the original state of this fragment
+     * */
+    public void setSelected(boolean selected, boolean updateOrginallySelected) {
         this.selected = selected;
+        if (updateOrginallySelected) {
+            originallySelected=selected;
+        }
     }
 
     /** @return true, if the Segment is selected, otherwise false. */
@@ -366,8 +376,12 @@ public class Segment implements Serializable {
         }
     }
 
-    public void setUsableBaits(Integer bmin, Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
-
+    public void setUsableBaits(Model model,  AlignabilityMap alignabilityMap,  Double maxAlignabilityScore) {
+        Integer bmin =model.getMinBaitCount();
+        Integer bmax = model.getMaxBaitCount();
+        Integer baitSize = model.getProbeLength();
+        Double minGCcontent = model.getMinGCcontent();
+        Double maxGCcontent = model.getMaxGCcontent();
         if (this.length() < baitSize) {
             // do not place baits in segments shorter than the bait size
             this.unselectable = true;
@@ -386,7 +400,6 @@ public class Segment implements Serializable {
             this.unselectable = false;
             this.targetable = true;
             this.rescuable = false;
-            return;
         } else {
             // try to rescue the segment by allowing unbalanced probes
             if (this.getBaitNumUp() < bmin && this.getBaitNumDown() < bmin) {
@@ -407,12 +420,10 @@ public class Segment implements Serializable {
                     this.unselectable = false;
                     this.targetable = false;
                     this.rescuable = true;
-                    return;
                 } else {
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = false;
-                    return;
                 }
             } else {
                 // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
@@ -424,12 +435,10 @@ public class Segment implements Serializable {
                     this.unselectable = false;
                     this.targetable = false;
                     this.rescuable = true;
-                    return;
                 } else {
                     this.unselectable = true;
                     this.targetable = false;
                     this.rescuable = false;
-                    return;
                 }
             }
         }
@@ -520,7 +529,7 @@ public class Segment implements Serializable {
         Integer numOfRedundantBaitsRemoved = 0;
 
         // put the the coordinates of all upstream baits in a string Set
-        Set upstreamCoordSet = new HashSet();
+        Set<String> upstreamCoordSet = new HashSet();
         for(Bait b : baitListUpStreamMargin) {
                 upstreamCoordSet.add(b.getRefId() + b.getStartPos());
         }

@@ -59,6 +59,10 @@ public class ViewPoint implements Serializable {
     private int startPos;
     /** end position of the viewpoint */
     private int endPos;
+    /** The minimum allowable start position if the user zooms. */
+    private int minimumAllowableStartPosition;
+    /** The maximum allowable end position if the user zooms. */
+    private int maximumAllowableEndPosition;
     /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
     private int minFragSize;
@@ -85,7 +89,7 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
-    private AlignabilityMap alignabilityMap = null;
+//    private AlignabilityMap alignabilityMap = null;
     /** This is the unicode character for a checkmark. We will use it to show that the user has
      * checked this viewpoint. */
     private static final String CHECK_MARK="\u2714";
@@ -156,32 +160,56 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-    /**
-     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
-     * @param vp An existing ViewPoint that is used as the center point of the zoom
-     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
-     * @param fastaReader The reader used to get new sequences.
-     */
+//    /**
+//     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
+//     * @param vp An existing ViewPoint that is used as the center point of the zoom
+//     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
+//     * @param fastaReader The reader used to get new sequences.
+//     */
+//    @Deprecated
+////    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
+//        this.chromosomeID =vp.chromosomeID;
+//        this.genomicPos=vp.genomicPos;
+//        this.targetName=vp.targetName;
+//        this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
+//        this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
+//        setStartPos(genomicPos - upstreamNucleotideLength);
+//        setEndPos(genomicPos + downstreamNucleotideLength);
+//        this.maxGcContent=vp.maxGcContent;
+//        this.minGcContent=vp.minGcContent;
+//        this.minFragSize=vp.minFragSize;
+//        this.marginSize= vp.marginSize;
+//        this.accession=vp.accession;
+//        this.isPositiveStrand=vp.isPositiveStrand;
+//        this.maximumRepeatContent=vp.maximumRepeatContent;
+//        logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
+//       // this.alignabilityMap=vp.alignabilityMap;
+//        //init(fastaReader, this.model);
+//    }
 
-    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
-        this.chromosomeID =vp.chromosomeID;
-        this.genomicPos=vp.genomicPos;
-        this.targetName=vp.targetName;
-        this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
-        this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
+    /**
+     * This function should only be used for the extended approach. It changes the start and end position
+     * of the ViewPoint so that more or less Segments can be selected.
+     * @param zoomfactor
+     */
+    public void zoom(double zoomfactor) {
+        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
+        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
+        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
+        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
+        // TODO do we need to worry about going over end of chromosome?
+        // or start before zero?
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
-        this.maxGcContent=vp.maxGcContent;
-        this.minGcContent=vp.minGcContent;
-        this.minFragSize=vp.minFragSize;
-        this.marginSize= vp.marginSize;
-        this.accession=vp.accession;
-        this.isPositiveStrand=vp.isPositiveStrand;
-        this.maximumRepeatContent=vp.maximumRepeatContent;
-         //logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
-        this.alignabilityMap=vp.alignabilityMap;
-        init(fastaReader, this.model);
+        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
+        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
+        if (this.approach.equals(Approach.EXTENDED)) {
+            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
+        }
+
     }
+
+
 
 
 
@@ -205,6 +233,9 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
+        setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
+        setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
+        logger.trace(String.format("CTOR - min allowable start %d max allow end %d",this.minimumAllowableStartPosition, this.maximumAllowableEndPosition ));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -212,14 +243,13 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
-        this.alignabilityMap=builder.alignabilityMap;
-        init(builder.fastaReader,builder.model);
+        init(builder.fastaReader,builder.model,builder.alignabilityMap);
     }
 
     /**
      * @param fastaReader file pointer to an index FASTA
      */
-    private void init(IndexedFastaSequenceFile fastaReader,Model model) {
+    private void init(IndexedFastaSequenceFile fastaReader,Model model, AlignabilityMap alignabilityMap) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -229,7 +259,8 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        initRestrictionFragments(fastaReader);
+        logger.trace("init; segmentFactory is "+ segmentFactory.toString());
+        initRestrictionFragments(fastaReader, alignabilityMap);
     }
 
 
@@ -237,15 +268,16 @@ public class ViewPoint implements Serializable {
      * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
      * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
      */
-    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader) {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
+            logger.trace("Creating restriction fragment " + restFrag.toString());
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits(model.getMinBaitCount(),model.getMaxBaitCount(),model.getProbeLength(),alignabilityMap,model.getMinGCcontent(),model.getMaxGCcontent(),maxMeanAlignabilityScore);
+            restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
@@ -268,9 +300,12 @@ public class ViewPoint implements Serializable {
     public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
 
 
-    private void setStartPos(Integer startPos) {
-        this.startPos = startPos;
+    private void setStartPos(int startPos) {
+        this.startPos = startPos>0?startPos:0;
     }
+
+    private void setMinimumAllowableStartPos(int pos) { this.minimumAllowableStartPosition = pos; }
+    private void setMaximumAllowableEndPos(int pos) { this.maximumAllowableEndPosition = pos; }
 
     public final Integer getStartPos() {
         return startPos;
@@ -341,6 +376,62 @@ public class ViewPoint implements Serializable {
 
 
     /**
+     * Select all valid fragments located between lowerLimit and upperLimit
+     * If this function is called when the viewpoint is being created for the first time, then
+     * updateOriginallySelected should be set to true. If we are modifying the viewpoint (e.g., zooming),
+     * then updateOriginallySelected should be false. This allows us to keep track of whether
+     * the current ViewPoint has been modified by the user.
+     * @param lowerLimit
+     * @param upperLimit
+     * @param updateOriginallySelected if true,alter the originallySelected field in {@link Segment}
+     */
+    private void setFragmentsForExtendedApproach(int lowerLimit, int upperLimit, boolean updateOriginallySelected) {
+        logger.trace("Setting fragements for extended approach. Lower limit is " + lowerLimit + " upper limit is " + upperLimit);
+        int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+        logger.trace(String.format("[%s] Before setting, %d of %d segments were selected",getTargetName(),restrictionSegmentList.size(),c ));
+
+        for (Segment segment:restrictionSegmentList) {
+
+            segment.setSelected(true,updateOriginallySelected); // initial segment selection is done here and nowhere else
+
+            // do not select fragments that are too small
+            if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
+                segment.setSelected(false,updateOriginallySelected);
+            }
+
+            // do not select segments that are entirely outside the allowed range
+            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) )
+            {
+                segment.setSelected(false,updateOriginallySelected);
+            }
+
+            // do not select segments that have less than 2 times bmin baits
+            if(segment.isUnselectable()) {
+                segment.setSelected(false,updateOriginallySelected);
+            }
+
+            // if allow single margin is false, do not select segments that are rescuable
+            if(!model.getAllowSingleMargin() && segment.isRescuable()) {
+                segment.setSelected(false,updateOriginallySelected);
+            }
+
+            if(segment.isSelected() && segment.isRescuable()) {
+                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
+            }
+
+            // if at least one segment is selected, declare viewpoint to be resolved
+            if(segment.isSelected()) {
+                this.resolved = true;
+            }
+        }
+        c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+        logger.trace(String.format("After setting, %d/%d segments were selected",c , restrictionSegmentList.size()));
+    }
+
+
+
+
+    /**
      * This function can be used to reshape the viewpoint according to rules that were developed in consultation with bench scientists.
      * In this approach, the viewpoint is seen as a set of selected fragments within a given range around {@link #genomicPos}.
      * Fragments can be discarded because they shorter, or because their margins a higher repetitive content than a given thresholds.
@@ -359,7 +450,7 @@ public class ViewPoint implements Serializable {
         boolean resolved = true;
         approach=Approach.EXTENDED;
         this.centerSegment=null; // the digest that contains the TSS. Always show it!
-        restrictionSegmentList.forEach(segment -> segment.setSelected(true));
+        restrictionSegmentList.forEach(segment -> segment.setSelected(true,true));
 
         for (Segment segment : restrictionSegmentList) {
             if (segment.getStartPos() <= genomicPos && genomicPos <= segment.getEndPos()) {
@@ -367,63 +458,16 @@ public class ViewPoint implements Serializable {
             }
         }
         if (this.centerSegment==null) {
-            logger.error("center segment NUll for " + getTargetName());
+            logger.error("center segment NUll for " + getTargetName() + "\n\t" +
+            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList =" +
+            restrictionSegmentList.size());
         }
 
         // select segments
-        Integer lowerLimit = genomicPos - maxSizeUp;
-        Integer upperLimit = genomicPos + maxSizeDown;
-        for (Segment segment:restrictionSegmentList) {
+        int lowerLimit = genomicPos - maxSizeUp;
+        int upperLimit = genomicPos + maxSizeDown;
+        setFragmentsForExtendedApproach(lowerLimit,upperLimit,true);
 
-            segment.setSelected(true); // initial segment selection is done here and nowhere else
-
-            // do not select fragments that are too small
-            if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
-                segment.setSelected(false);
-            }
-
-            // do not select segments that are entirely outside the allowed range
-            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) )
-            {
-                segment.setSelected(false);
-            }
-
-            // do not select segments that have less than 2 times bmin baits
-            if(segment.isUnselectable()) {
-                segment.setSelected(false);
-            }
-
-            // if allow single margin is false, do not select segments that are rescuable
-            if(!model.getAllowSingleMargin() && segment.isRescuable()) {
-                segment.setSelected(false);
-            }
-
-            if(segment.isSelected() && segment.isRescuable()) {
-                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
-            }
-
-            // if at least one segment is selected, declare viewpoint to be resolved
-            if(segment.isSelected()) {
-                this.resolved = true;
-            }
-        }
-
-        /*
-        OLD SELECTION RULES CAN BE REMOVED AS SOON AS WE DECIDE TO SWITCH TO THE NEW ONES
-        for (Segment segment:restrictionSegmentList) {
-            if (segment.length() < this.minFragSize) {
-                segment.setSelected(false);
-            } else if ( (segment.getStartPos() < lowerLimit && segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos() &&  upperLimit < segment.getEndPos()) ) {
-                    segment.setSelected(false);
-            } else if ( allowSingleMargin && !(isSegmentMarginValid(segment,"Up") || isSegmentMarginValid(segment,"Down"))) {
-                segment.setSelected(false);
-            } else if (!allowSingleMargin && !(isSegmentMarginValid(segment,"Up") && isSegmentMarginValid(segment,"Down"))) {
-                segment.setSelected(false);
-            } else {
-                resolved=true; // at least one segment OK, thus ViewPoint is OK
-            }
-        }
-        */
 
         // set start position of the viewpoint to start position of the most upstream SELECTED digest
         int start=Integer.MAX_VALUE;
@@ -436,9 +480,6 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(start);
         setEndPos(end);
-
-//        restrictionSegmentList.stream().filter(segment -> segment.isSelected()).forEach(segment -> { });
-
 
         // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
         // retain one unselected digest on each end
@@ -497,7 +538,7 @@ public class ViewPoint implements Serializable {
 
                     )
             {
-                centerSegment.setSelected(true);
+                centerSegment.setSelected(true,true);
                 this.setStartPos(centerSegment.getStartPos());
                 this.setEndPos(centerSegment.getEndPos());
 
@@ -523,7 +564,7 @@ public class ViewPoint implements Serializable {
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
                         // try to add adjacent segment in downstream direction
                         if(isSegmentValid(downstreamSegment)) {
-                            downstreamSegment.setSelected(true);
+                            downstreamSegment.setSelected(true,true);
                             calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
                             this.setStartPos(centerSegment.getStartPos());
                             this.setEndPos(downstreamSegment.getEndPos());
@@ -531,7 +572,7 @@ public class ViewPoint implements Serializable {
                     } else if (upstreamSegment != null) {
                         // try add adjacent segment in upstream direction
                         if(isSegmentValid(upstreamSegment)) {
-                            upstreamSegment.setSelected(true);
+                            upstreamSegment.setSelected(true,true);
                             calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
                             this.setStartPos(upstreamSegment.getStartPos());
                             this.setEndPos(centerSegment.getEndPos());
@@ -545,7 +586,7 @@ public class ViewPoint implements Serializable {
                 upstreamSegment=null;
                 centerSegment=null;
                 downstreamSegment=null;
-                this.alignabilityMap=null;
+               // this.alignabilityMap=null;
             }
         }
         setDerivationApproach(Approach.SIMPLE);
@@ -860,7 +901,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private transient static AlignabilityMap alignabilityMap;
+        private AlignabilityMap alignabilityMap;
 
         /**
          *

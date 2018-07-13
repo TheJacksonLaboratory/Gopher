@@ -1,8 +1,11 @@
 package gopher.gui.entrezgenetable;
 
 
-
+import gopher.framework.Signal;
+import gopher.gui.popupdialog.PopupFactory;
+import gopher.io.RefGeneParser;
 import gopher.model.GopherGene;
+import gopher.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,18 +14,15 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import gopher.framework.Signal;
-import gopher.gui.popupdialog.PopupFactory;
-import gopher.io.RefGeneParser;
-import gopher.model.Model;
-
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
@@ -136,6 +136,7 @@ public class EntrezGenePresenter implements Initializable {
     @FXML
     public void uploadGenes(ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = fileChooser.showOpenDialog(stage);
         if (file == null) {
             logger.error("Could not get name of file with gene symbols");
