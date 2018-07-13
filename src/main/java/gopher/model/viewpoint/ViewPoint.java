@@ -92,14 +92,14 @@ public class ViewPoint implements Serializable {
 //    private AlignabilityMap alignabilityMap = null;
     /** This is the unicode character for a checkmark. We will use it to show that the user has
      * checked this viewpoint. */
-    private static final String CHECK_MARK="\u2714";
+    //private static final String CHECK_MARK="\u2714";
     /** We will use the empty string to show that the user has not yet manually revised or saved this viewpoint.*/
-    private static final String EMPTY_STRING="";
+    //private static final String EMPTY_STRING="";
 
     /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
      * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
      */
-    private String manuallyRevised=EMPTY_STRING;
+    //private String manuallyRevised=EMPTY_STRING;
     /** @return true iff the user has revised of modified this viewpoint in any way. */
     //public boolean wasManuallyRevised() {  return manuallyRevised.equals(CHECK_MARK);  }
 
@@ -139,8 +139,12 @@ public class ViewPoint implements Serializable {
         }
     }
 
+
     /** This function is called if the user has worked on this viewpoint at all. */
+    /*
     public void setManuallyRevised() {  this.manuallyRevised=CHECK_MARK;  }
+    */
+
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
      * @return a list of Segments of a viewpoint that are active and will be displayed on the UCSC Browser. */
@@ -975,6 +979,19 @@ public class ViewPoint implements Serializable {
         }
         // if no modified segment was found return false
         return false;
+    }
+
+    /**
+     * This fuction can be used to reset the set of segments to the original state
+     */
+    public void resetSegmentsToOriginalState() {
+        for(Segment s : this.restrictionSegmentList) {
+            if(s.wasOriginallySelected()) {
+                s.setSelected(true,false);
+            } else {
+                s.setSelected(false, false);
+            }
+        }
     }
 
 
