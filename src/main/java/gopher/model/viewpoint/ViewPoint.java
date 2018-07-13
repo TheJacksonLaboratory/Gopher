@@ -101,7 +101,7 @@ public class ViewPoint implements Serializable {
      */
     private String manuallyRevised=EMPTY_STRING;
     /** @return true iff the user has revised of modified this viewpoint in any way. */
-    public boolean wasManuallyRevised() {  return manuallyRevised.equals(CHECK_MARK);  }
+    //public boolean wasManuallyRevised() {  return manuallyRevised.equals(CHECK_MARK);  }
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -132,7 +132,11 @@ public class ViewPoint implements Serializable {
     }
 
     public String getManuallyRevised() {
-        return manuallyRevised;
+        if(this.wasModified()) {
+            return "\u2714"; // unicode character for a checkmark
+        } else {
+          return "";
+        }
     }
 
     /** This function is called if the user has worked on this viewpoint at all. */
@@ -955,6 +959,22 @@ public class ViewPoint implements Serializable {
         public ViewPoint build() {
             return new ViewPoint(this);
         }
+    }
+
+    /**
+     * This function can be used in order to determine if the set of selected segments has changed after creation
+     * of the viewpoint.
+     */
+    public boolean wasModified() {
+        // iterate over all segments (selected and deselected)
+        for(Segment s : this.restrictionSegmentList) {
+            if(s.wasOriginallySelected() != s.isSelected()) {
+                // return true for at the first modified segment found
+                return true;
+            }
+        }
+        // if no modified segment was found return false
+        return false;
     }
 
 

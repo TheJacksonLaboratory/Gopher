@@ -250,6 +250,7 @@ public class ViewPointPresenter implements Initializable {
         isSelectedTableColumn.setCellValueFactory(cdf -> {
             // if we get here, the user has selected or deselected the checkbox
             this.viewpoint.setManuallyRevised();
+            this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly

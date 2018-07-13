@@ -147,6 +147,10 @@ public class Segment implements Serializable {
         }
     }
 
+    public boolean wasOriginallySelected() {
+        return this.originallySelected;
+    }
+
     /** @return true, if the Segment is selected, otherwise false. */
     public boolean isSelected() {
         return selected;
