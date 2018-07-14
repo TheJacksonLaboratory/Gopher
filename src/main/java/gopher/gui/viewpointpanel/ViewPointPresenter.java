@@ -249,7 +249,8 @@ public class ViewPointPresenter implements Initializable {
         colorTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getColor()));
         isSelectedTableColumn.setCellValueFactory(cdf -> {
             // if we get here, the user has selected or deselected the checkbox
-            this.viewpoint.setManuallyRevised();
+            //this.viewpoint.setManuallyRevised();
+            this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly
@@ -410,10 +411,10 @@ public class ViewPointPresenter implements Initializable {
      * Calling this method sets the "manually revised" flag of the selected ViewPoint to
      * true and also refreshes the viewpoint table so that a check is shown.
      */
-    private void setManuallyRevised() {
+    /*private void setManuallyRevised() {
         this.viewpoint.setManuallyRevised();
         Platform.runLater( () -> this.analysisPresenter.refreshVPTable() );
-    }
+    }*/
 
 
 
@@ -528,7 +529,7 @@ public class ViewPointPresenter implements Initializable {
     private void zoom(double factor) {
         //String path=this.model.getGenomeFastaFile();
         logger.trace(String.format("Zooming with factor %.2f",factor));
-        this.viewpoint.setManuallyRevised();
+        //this.viewpoint.setManuallyRevised();
         logger.trace(String.format("Before zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
