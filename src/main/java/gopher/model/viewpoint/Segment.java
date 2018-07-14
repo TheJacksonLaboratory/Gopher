@@ -491,7 +491,7 @@ public class Segment implements Serializable {
 
 
 
-    public List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
 
             Integer sta = this.getEndPos() - marginSize + 1;
@@ -533,7 +533,7 @@ public class Segment implements Serializable {
         Integer numOfRedundantBaitsRemoved = 0;
 
         // put the the coordinates of all upstream baits in a string Set
-        Set<String> upstreamCoordSet = new HashSet();
+        Set<String> upstreamCoordSet = new HashSet<>();
         for(Bait b : baitListUpStreamMargin) {
                 upstreamCoordSet.add(b.getRefId() + b.getStartPos());
         }
@@ -597,6 +597,11 @@ public class Segment implements Serializable {
         return meanRepeatContentOfBaits/this.getBaitNumTotal();
     }
 
+
+    @Override
+    public String toString() {
+        return String.format("%d-%d %s",getStartPos(),getEndPos(),isSelected()?"selected":"not selected");
+    }
 
 
 }

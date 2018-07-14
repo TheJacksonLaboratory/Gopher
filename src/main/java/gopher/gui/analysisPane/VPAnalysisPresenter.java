@@ -4,6 +4,7 @@ import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.viewpointpanel.ViewPointPresenter;
 import gopher.gui.viewpointpanel.ViewPointView;
 import gopher.model.Model;
+import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
 import gopher.util.Utils;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is the Tab that shows a table with all of the viewpoints created together with a sumnmary of the overall
@@ -42,42 +44,24 @@ public class VPAnalysisPresenter implements Initializable {
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
      * reference to a Tab that has been opened for it.
      */
-    private final Map<ViewPoint, Tab> openTabs = new HashMap<>();
+    private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
     @FXML
     private WebView contentWebView;
 
     private WebEngine contentWebEngine;
 
-    @FXML
-    private TableView<ViewPoint> viewPointTableView;
-
-    @FXML
-    private TableColumn<ViewPoint, Button> actionTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, Button> deleteTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> targetTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> genomicLocationColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> nSelectedTableColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> viewpointScoreColumn;
-
-    @FXML
-    private TableColumn<ViewPoint, String> viewpointTotalLengthOfActiveSegments;
-
-    @FXML
-    private TableColumn<ViewPoint, String> viewpointTotalLength;
-
-    @FXML
-    private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
+    @FXML private TableView<ViewPoint> viewPointTableView;
+    @FXML private TableColumn<ViewPoint, Button> actionTableColumn;
+    @FXML private TableColumn<ViewPoint, String> targetTableColumn;
+    @FXML private TableColumn<ViewPoint, String> genomicLocationColumn;
+    @FXML private TableColumn<ViewPoint, String> nSelectedTableColumn;
+    @FXML private TableColumn<ViewPoint, String> viewpointScoreColumn;
+    @FXML private TableColumn<ViewPoint, String> viewpointTotalLengthOfActiveSegments;
+    @FXML private TableColumn<ViewPoint, String> viewpointTotalLength;
+    @FXML private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
+    @FXML private TableColumn<ViewPoint, Button> deleteTableColumn;
+    @FXML private TableColumn<ViewPoint, Button> resetTableColumn;
 
 
     // private BooleanProperty editingStarted;
@@ -138,6 +122,19 @@ public class VPAnalysisPresenter implements Initializable {
             return new ReadOnlyObjectWrapper<>(btn);
         });
 
+        resetTableColumn.setSortable(false);
+        resetTableColumn.setCellValueFactory( cdf -> {
+            ViewPoint vp = cdf.getValue();
+            Button btn = new Button("Reset");
+            btn.setOnAction(e -> {
+                vp.resetSegmentsToOriginalState();
+                refreshVPTable();
+                updateViewPointInTab(vp);
+            });
+            return new ReadOnlyObjectWrapper<>(btn);
+
+        });
+
         // the third column
         targetTableColumn.setSortable(true);
         targetTableColumn.setEditable(false);
@@ -175,6 +172,16 @@ public class VPAnalysisPresenter implements Initializable {
         viewPointTableView.getColumns().forEach(Utils::makeHeaderWrappable);
     }
 
+
+
+    private void updateViewPointInTab(ViewPoint vp) {
+        if (openTabs.containsKey(vp)) {
+            Tab tab = openTabs.get(vp);
+            tabpane.getTabs().remove(tab);
+            openTabs.remove(vp);
+        }
+        openViewPointInTab(vp);
+    }
 
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
@@ -215,6 +222,10 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
         openTabs.put(vp, tab);
+        List<Segment> seglist=vp.getAllSegments();
+        for (Segment s : seglist) {
+            System.err.println(s);
+        }
     }
 
 

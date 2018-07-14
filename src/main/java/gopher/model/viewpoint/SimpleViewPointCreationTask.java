@@ -16,6 +16,7 @@ import java.lang.instrument.Instrumentation;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -30,7 +31,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     /** Index of current viewpoint */
     private int i;
 
-    private AlignabilityMap alignabilityMap = null;
+    private AlignabilityMap alignabilityMap;
 
 
   /**
@@ -120,14 +121,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         // estimate average size of restriction fragments
         // TODO: Move this code to a function getEstAvgRestFragLen
         logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
-        // Combine all patterns in one regular expression.
-        String regExCombinedCutPat ="";
-        for(int i=0; i < model.getChosenEnzymelist().size(); i++) {
-            regExCombinedCutPat +=  model.getChosenEnzymelist().get(i).getPlainSite();
-            if(i<model.getChosenEnzymelist().size()-1) {
-                regExCombinedCutPat += "|";
-            }
-        }
+        // Combine all patterns into one regular expression.
+        String regExCombinedCutPat = model.getChosenEnzymelist().
+                stream().
+                map(RestrictionEnzyme::getPlainSite).
+                collect(Collectors.joining("|"));
+
+
         // count all occurrences of the cutting motifs and divide by sequence length
         int totalNumOfCuts = 0;
         long totalLength = 0;
