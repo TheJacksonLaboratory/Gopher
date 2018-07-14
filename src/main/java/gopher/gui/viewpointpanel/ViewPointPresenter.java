@@ -80,6 +80,8 @@ public class ViewPointPresenter implements Initializable {
    // @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
     @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
+    @FXML private TableColumn<ColoredSegment, String> alignabilityContentColumn;
+
     @FXML private Button deleteButton;
     @FXML private Button copyToClipboardButton;
     @FXML private Button zoomInButton;
@@ -303,18 +305,41 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-        inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
-                .getSegment().getRepeatContentAsPercent())));
-        inRepetitiveTableColumn.setComparator(new PercentComparator());
-        // the following causes the contents of the repeat cell to be shown in red if the repeat threshold is surpassed.
-        inRepetitiveTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+//        inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
+//                .getSegment().getRepeatContentAsPercent())));
+//        inRepetitiveTableColumn.setComparator(new PercentComparator());
+//        // the following causes the contents of the repeat cell to be shown in red if the repeat threshold is surpassed.
+//        inRepetitiveTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+//            @Override
+//            protected void updateItem(String item, boolean empty) {
+//                super.updateItem(item,empty);
+//                if (item != null && !empty) {
+//                    setText(item);
+//                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+//                    if (rp > model.getMaxRepeatContent()) {
+//                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+//                    } else {
+//                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+//                    }
+//                }
+//            }
+//        });
+//        inRepetitiveTableColumn.setEditable(false);
+
+
+
+        alignabilityContentColumn.setCellValueFactory(cdf -> {
+            double alignability =cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
+            return new ReadOnlyStringWrapper(String.valueOf(alignability));
+        });
+        alignabilityContentColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (rp > model.getMaxRepeatContent()) {
+                    double rp =   Double.parseDouble(item);
+                    if (rp > model.getMaxMeanKmerAlignability()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
                         setStyle("-fx-text-fill: black; -fx-font-weight: normal");
@@ -322,19 +347,30 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-        inRepetitiveTableColumn.setEditable(false);
 
-        repeatContentUpColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getRepeatContentMarginUpAsPercent())));
-        repeatContentUpColumn.setComparator(new PercentComparator());
+
+
+
+        repeatContentUpColumn.setCellValueFactory(cdf -> {
+                String marginUp = cdf.getValue().getSegment().getRepeatContentMarginUpAsPercent();
+                String marginDown = cdf.getValue().getSegment().getRepeatContentMarginDownAsPercent();
+                String val = marginUp +"/"+marginDown;
+                return new ReadOnlyStringWrapper(val);
+        });
+       // repeatContentUpColumn.setComparator(new PercentComparator());
         repeatContentUpColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                        double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (rp > model.getMaxRepeatContent()) {
+                    String A[]=item.split("/");
+                    boolean red=false;
+                    for (String a : A) {
+                        double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
+                        if (rp>model.getMaxRepeatContent()) red = true;
+                    }
+                    if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
                         setStyle("-fx-text-fill: black; -fx-font-weight: normal");
@@ -342,24 +378,23 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-        repeatContentDownColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getRepeatContentMarginDownAsPercent())));
-        repeatContentDownColumn.setComparator(new PercentComparator());
-        repeatContentDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item,empty);
-                if (item != null && !empty) {
-                    setText(item);
-                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (rp > model.getMaxRepeatContent()) {
-                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-                    } else {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-                    }
-                }
-            }
-        });
+//        repeatContentDownColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper("remove me"));
+//        repeatContentDownColumn.setComparator(new PercentComparator());
+//        repeatContentDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+//            @Override
+//            protected void updateItem(String item, boolean empty) {
+//                super.updateItem(item,empty);
+//                if (item != null && !empty) {
+//                    setText(item);
+//                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
+//                    if (rp > model.getMaxRepeatContent()) {
+//                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+//                    } else {
+//                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+//                    }
+//                }
+//            }
+//        });
         gcContentUpColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getGCcontentUpAsPercent())));
         gcContentUpColumn.setComparator(new PercentComparator());
@@ -527,35 +562,12 @@ public class ViewPointPresenter implements Initializable {
 
 
     private void zoom(double factor) {
-        //String path=this.model.getGenomeFastaFile();
-        logger.trace(String.format("Zooming with factor %.2f",factor));
-        //this.viewpoint.setManuallyRevised();
-        logger.trace(String.format("Before zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         updateScore();
         showColoredSegmentsInTable();
         showUcscView();
-       // refreshUCSCButtonAction();
-
-
-        /*
-        try {
-            IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(path));
-            ViewPoint newVP = new ViewPoint(this.viewpoint,factor,fastaReader);
-            int maxSizeUp = (int) (viewpoint.getUpstreamNucleotideLength() * factor);
-            int maxSizeDown = (int) (viewpoint.getDownstreamNucleotideLength() * factor);
-            newVP.generateViewpointExtendedApproach(maxSizeUp,maxSizeDown,model);
-            segmentsTableView.getItems().clear();
-            this.coloredsegments.clear();
-            setViewPoint(newVP);
-            refreshUCSCButtonAction();
-            updateScore();
-        } catch (FileNotFoundException e) {
-            logger.error("Could not zoom for "+ viewpoint.getTargetName());
-            logger.error(e,e);
-        }
-        */
     }
 
 

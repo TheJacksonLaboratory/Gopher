@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
-<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.viewpointpanel.ViewPointPresenter">
+
+<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.viewpointpanel.ViewPointPresenter">
     <SplitPane dividerPositions="0.5" minHeight="510.0" minWidth="1165.0" orientation="VERTICAL">
         <WebView fx:id="ucscContentWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
         <VBox>
@@ -57,9 +66,8 @@
                     <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" resizable="false" sortable="false" text="Select" />
                     <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="250.0" prefWidth="-1.0" text="Location" />
                     <TableColumn fx:id="segmentLengthColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="160.0" prefWidth="-1.0" text="Length" />
-                    <TableColumn fx:id="inRepetitiveTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Repeat content" />
-                    <TableColumn fx:id="repeatContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Repeat content (up)" />
-                    <TableColumn fx:id="repeatContentDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="-1.0" text="Repeat content (down)" />
+                    <TableColumn fx:id="alignabilityContentColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Alignability" />
+                    <TableColumn fx:id="repeatContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Repeat content" />
                     <TableColumn fx:id="gcContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="GC content (up)" />
                     <TableColumn fx:id="gcContentDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="-1.0" text="GC content (down)" />
                     <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" resizable="false" sortable="false" text="Column X" />
