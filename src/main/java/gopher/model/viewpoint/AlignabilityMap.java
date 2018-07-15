@@ -31,6 +31,8 @@ import java.util.zip.GZIPInputStream;
 public class AlignabilityMap {
     private static Logger logger = Logger.getLogger(AlignabilityMap.class.getName());
 
+    private  final String chromInfoPath;
+
     private Integer kmerSize = null;
     public Integer getKmerSize() {
         return this.kmerSize;
@@ -121,9 +123,11 @@ public class AlignabilityMap {
      * @throws IOException
      */
     public AlignabilityMap(String chromInfoPathIncludingFileName, String alignabilityMapPathIncludingFileName, Integer kmerSize) throws IOException {
+        this.kmerSize = kmerSize;
+        this.chromInfoPath=chromInfoPathIncludingFileName;
         this.parseChromInfoFile(chromInfoPathIncludingFileName);
         this.parseBedGraphFile(alignabilityMapPathIncludingFileName);
-        this.kmerSize = kmerSize;
+
     }
 
     /**
@@ -170,140 +174,16 @@ public class AlignabilityMap {
 
         logger.debug("About to parse bedgraph file " + alignabilityMapPathIncludingFileName + "...");
 
-        InputStream fileStream = new FileInputStream(alignabilityMapPathIncludingFileName);
-        InputStream gzipStream = new GZIPInputStream(fileStream);
-        Reader decoder = new InputStreamReader(gzipStream);
-        BufferedReader br = new BufferedReader(decoder);
-
-
         alignabilityMap = new HashMap<>(chromSizesMap.size());
-
-        try {
-            String line;
-            String prevChr="chr0";
-            Integer prevEnd = 0;
-            String A[];
-            String chromosome;
-            Integer sta;
-            Integer end;
-            Integer alignabilityScore;
-            int number_integer_score_pairs = 0;
-            while ((line = br.readLine()) != null) {
-
-                // extract information from line
-                A = line.split("\t");
-                chromosome = A[0];
-                sta = Integer.parseInt(A[1]) + 1;             // start coordinates of the bedGraph format are 0-based
-                end = Integer.parseInt(A[2]);                 // end coordinates of the bedGraph format are 1-based
-                alignabilityScore = (int) Math.round(1.0/Double.parseDouble(A[3]));
-
-                int dist = sta - prevEnd;
-                if(!chromosome.equals(prevChr)) {
-                    // this is the first line for a new chromosome
-
-
-                    if(!prevChr.equals("chr0")) {
-                        // this is not the first line of the file
-                        alignabilityMap.get(prevChr).reSize();
-                        number_integer_score_pairs = number_integer_score_pairs + alignabilityMap.get(prevChr).getSize();
-                        logger.debug("\tEsimated size of AlignabiltyMap in memory: " + (number_integer_score_pairs*8)/1000000 + " MB");
-                        logger.debug("\tResized " + prevChr + ". Old length was: " + chromSizesMap.get(prevChr)/3 +  ". New length is: " + alignabilityMap.get(prevChr).getSize());
-                    }
-
-                    logger.trace("Reading " + chromosome + "...");
-
-
-                    if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
-                        // there were no alignability scores for the last postions of the last chromosome
-                        alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1);
-                    }
-
-                    //ArrayPair posVal = new ArrayPair();                     // create new pair of arrays for chromosome
-                    alignabilityMap.put(chromosome, new ArrayPair(chromSizesMap.get(chromosome)/3));         // and put array pair to hash map
-
-                    if (sta != 1) {
-                        // there is a gap before the first region of the chromosome
-                        alignabilityMap.get(chromosome).addCoordScorePair(1, -1);
-                        alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
-                    } else {
-                        alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
-                    }
-
-                } else {
-
-                    // this is NOT the first line for a new chromosome
-                    if (1 < dist) {
-                        // there is a gap before the current region
-                        alignabilityMap.get(chromosome).addCoordScorePair(prevEnd + 1, -1);
-                        alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
-                    } else {
-                        alignabilityMap.get(chromosome).addCoordScorePair(sta, alignabilityScore);
-                    }
-                }
-                prevChr = chromosome;
-                prevEnd = end;
-
-            } // end while
-
-
-            if(chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
-                // if the region of the last line of the bedpraph did not reach the end of the chromosome
-                alignabilityMap.get(prevChr).addCoordScorePair(prevEnd + 1, -1);
-            }
-            alignabilityMap.get(prevChr).reSize();
-
-        } finally {
-            br.close();
-            decoder.close();
-            gzipStream.close();
-            fileStream.close();
-            logger.debug("...done.");
+        ArrayPairIterator iterator = new ArrayPairIterator(alignabilityMapPathIncludingFileName, this.chromInfoPath);
+        while (iterator.hasNext()) {
+            ArrayPair ap = iterator.next();
+            alignabilityMap.put(ap.getChromName(),ap);
+            logger.trace("Put: "+ap.getChromName());
         }
     }
 
 
-    /**
-     * Consists of an Integer array containing to positions at which the alignability score changes in sorted order
-     * and a Double array with associtated scores.
-     */
-    private static class ArrayPair {
-
-        private int size;
-
-        private int coordArray[] = null;
-        private int scoreArray[] = null;
-        private int index;
-
-        private ArrayPair(int size) {
-            this.index = 0;
-            coordArray = new int[size];
-            scoreArray = new int[size];
-        }
-
-        public void addCoordScorePair(Integer sta, Integer score) {
-            coordArray[index] = sta;
-            scoreArray[index] = score;
-            index++;
-        }
-
-        public int getSize() {
-            return size;
-        }
-
-        public void reSize() {
-            size = index + 1;
-            int tmpArrC[];
-            int tmpArrS[];
-            tmpArrC = Arrays.copyOf(coordArray,size);
-            tmpArrS = Arrays.copyOf(scoreArray,size);
-            coordArray = null;
-            scoreArray = null;
-            coordArray = tmpArrC;
-            scoreArray = tmpArrS;
-            tmpArrC = null;
-            tmpArrS = null;
-        }
-    }
 
 
     /**
