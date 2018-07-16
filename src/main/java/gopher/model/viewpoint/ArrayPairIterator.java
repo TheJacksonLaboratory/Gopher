@@ -113,6 +113,13 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
                     // then this is the first line and we need to initialize stuff
                     this.coordinateList = new ArrayList<>();
                     this.scoreList = new ArrayList<>();
+                    if (sta != 1) {
+                        // there is a gap before the first region of the chromosome
+                        coordinateList.add(1);
+                        scoreList.add(-1);
+                    }
+                    coordinateList.add(sta);
+                    scoreList.add(alignabilityScore);
                     logger.trace("Making chromosome alignability map for " + chromosome);
                 } else if (!chromosome.equals(prevChr)) {
                     // this is the first line for a new chromosome
@@ -121,7 +128,7 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
                     // first we need to store the values on the current line,
                     // which are the first values for the "new" chromosome
                     logger.trace("Making chromosome alignability map for " + chromosome + " prev=" + prevChr);
-                    currentArrayPair = new ArrayPair(chromosome, coordinateList, scoreList);
+                    currentArrayPair = new ArrayPair(prevChr, coordinateList, scoreList);
                     coordinateList.clear();
                     scoreList.clear();
                     if (sta != 1) {
