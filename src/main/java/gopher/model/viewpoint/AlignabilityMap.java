@@ -182,6 +182,7 @@ public class AlignabilityMap {
             logger.trace("Put: "+ap.getChromName());
         }
         logger.trace(String.format("Got %d chromosomes for alignability map",alignabilityMap.size()));
+        printAlignabilityMap();
     }
 
 
@@ -193,7 +194,7 @@ public class AlignabilityMap {
     public void printAlignabilityMap() {
         for (String key : alignabilityMap.keySet()) {
             for (int j = 0; j < alignabilityMap.get(key).getSize(); j++) {
-                logger.trace(key + "\t" + alignabilityMap.get(key).coordArray[j] + "\t" + alignabilityMap.get(key).scoreArray[j]);
+                System.out.println(key + "\t" + alignabilityMap.get(key).coordArray[j] + "\t" + alignabilityMap.get(key).scoreArray[j]);
 
             }
         }
