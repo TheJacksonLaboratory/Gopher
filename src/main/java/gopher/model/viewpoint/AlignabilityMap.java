@@ -181,6 +181,7 @@ public class AlignabilityMap {
             alignabilityMap.put(ap.getChromName(),ap);
             logger.trace("Put: "+ap.getChromName());
         }
+        logger.trace(String.format("Got %d chromosomes for alignability map",alignabilityMap.size()));
     }
 
 
