@@ -24,7 +24,10 @@ import gopher.model.viewpoint.*;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -778,13 +781,15 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         String path = file.getAbsolutePath();
-        StringProperty sp=new SimpleStringProperty();
-        DigestCreationTask task = new DigestCreationTask(path,model,sp);
+        DigestCreationTask task = new DigestCreationTask(path,model);
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.setTitle("Creating Digest file");
-        pbpresent.initBindings(task,sp);
+
+        pbpresent.titleProperty().bind(task.titleProperty());
+        pbpresent.messageProperty().bind(task.messageProperty());
+        pbpresent.progressProperty().bind(task.progressProperty());
+
         Stage window = new Stage();
         String windowTitle = "Digest file creation";
         window.setOnCloseRequest( event -> window.close() );
@@ -858,7 +863,7 @@ public class GopherMainPresenter implements Initializable {
         if (! OK ) {
             return;
         }
-        StringProperty sp=new SimpleStringProperty();
+
         ViewPointCreationTask task;
 
         // TODO use boolean var allowSingleMargin
@@ -868,15 +873,17 @@ public class GopherMainPresenter implements Initializable {
         logger.trace("...done.");
 
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,sp,alignabilityMap);
+            task = new SimpleViewPointCreationTask(model,alignabilityMap);
         } else {
-            task = new ExtendedViewPointCreationTask(model,sp,alignabilityMap);
+            task = new ExtendedViewPointCreationTask(model,alignabilityMap);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.setTitle("Creating Viewpoints ...");
-        pbpresent.initBindings(task,sp);
+        pbpresent.titleProperty().bind(task.titleProperty());
+        pbpresent.messageProperty().bind(task.messageProperty());
+        pbpresent.progressProperty().bind(task.progressProperty());
+
 
         Stage window = new Stage();
         String windowTitle = "Viewpoint creation";
