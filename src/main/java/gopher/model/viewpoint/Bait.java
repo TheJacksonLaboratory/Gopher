@@ -49,6 +49,21 @@ public class Bait implements Serializable {
         this.setRepeatContent(fastaReader);
     }
 
+    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap alignabilityMap) {
+        this.refID = refID;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        this.setGCContent(fastaReader);
+        this.setAlignabilityScore(alignabilityMap);
+        this.setRepeatContent(fastaReader);
+    }
+
+
+
+
+
+
+
     public String getRefId() {
         return refID;
     }
@@ -127,6 +142,22 @@ public class Bait implements Serializable {
         }
         this.averageKmeralignabilty = score/alignabilityScoreList.size();
     }
+
+
+    private void setAlignabilityScore(Chromosome2AlignabilityMap alignabilityMap) {
+
+        Integer kmerSize = alignabilityMap.getKmersize();
+        Double score = 0.0;
+        ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(startPos, endPos - kmerSize + 1);
+
+        for (Integer d : alignabilityScoreList) {
+            if(d==(-1.0)) {score=-1.0; break;} // probe contains Ns, which have an alignability of -1
+            score = score + d;
+
+        }
+        this.averageKmeralignabilty = score/alignabilityScoreList.size();
+    }
+
 
 
     /**

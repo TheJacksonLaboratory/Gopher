@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
@@ -12,7 +11,7 @@ import java.util.zip.GZIPInputStream;
  * Created by hansep on 6/12/18.
  *
  * This class reads an array hash of pairs of arrays. The keys are chromosome names. The array pairs are combined
- * in a simple private sub class (ArrayPair) of this class and consists of an Integer and a Double array. The first
+ * in a simple private sub class (Chromosome2AlignabilityMap) of this class and consists of an Integer and a Double array. The first
  * array has all positions at which the alignability score changes in sorted order. The second array has the
  * associated scores.
  *
@@ -104,7 +103,7 @@ public class AlignabilityMap {
      * pairs of arrays, one Integer array for the positions at which the alignability score changes
      * and a Double array for alignabilty scores.
      */
-    private HashMap<String,ArrayPair> alignabilityMap = null;
+    private HashMap<String,Chromosome2AlignabilityMap> alignabilityMap = null;
 
     /**
      * The first and last positions of the chromosomes often consists of N's. For regions consisting of N's
@@ -175,9 +174,9 @@ public class AlignabilityMap {
         logger.debug("About to parse bedgraph file " + alignabilityMapPathIncludingFileName + "...");
 
         alignabilityMap = new HashMap<>(chromSizesMap.size());
-        ArrayPairIterator iterator = new ArrayPairIterator(alignabilityMapPathIncludingFileName, this.chromInfoPath);
+        AlignabilityMapIterator iterator = new AlignabilityMapIterator(alignabilityMapPathIncludingFileName, this.chromInfoPath, this.kmerSize);
         while (iterator.hasNext()) {
-            ArrayPair ap = iterator.next();
+            Chromosome2AlignabilityMap ap = iterator.next();
             alignabilityMap.put(ap.getChromName(),ap);
             logger.trace("Put: "+ap.getChromName());
         }

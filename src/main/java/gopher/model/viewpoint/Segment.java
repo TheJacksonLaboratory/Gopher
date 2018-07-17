@@ -450,6 +450,76 @@ public class Segment implements Serializable {
     }
 
 
+    public void setUsableBaits2(Model model,  Chromosome2AlignabilityMap chromosome2AlignabilityMap,  Double maxAlignabilityScore) {
+        Integer bmin =model.getMinBaitCount();
+        Integer bmax = model.getMaxBaitCount();
+        Integer baitSize = model.getProbeLength();
+        Double minGCcontent = model.getMinGCcontent();
+        Double maxGCcontent = model.getMaxGCcontent();
+        if (this.length() < baitSize) {
+            // do not place baits in segments shorter than the bait size
+            this.unselectable = true;
+            this.targetable = false;
+            this.rescuable = false;
+            return;
+        }
+
+        // try to set bmax usable baits independently for up and downstream margin
+        this.setUsableBaitsForUpstreamMargin(bmin, baitSize, chromosome2AlignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
+        this.setUsableBaitsForDownstreamMargin(bmin, baitSize, chromosome2AlignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore);
+        this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
+
+        if (bmin <= this.getBaitNumUp() && bmin <= this.getBaitNumDown()) {
+            // both margin have at least bmin non redundant baits -> this segment is targetable
+            this.unselectable = false;
+            this.targetable = true;
+            this.rescuable = false;
+        } else {
+            // try to rescue the segment by allowing unbalanced probes
+            if (this.getBaitNumUp() < bmin && this.getBaitNumDown() < bmin) {
+                // both margins have less than bmin baits this segment, i.e. bait cannot be rescued
+                this.unselectable = true;
+                this.targetable = false;
+                this.rescuable = false;
+                return;
+            }
+            if (this.getBaitNumUp() < bmin) {
+                // the upstream margin has less than bmin baits; try to set missing baits in downstream margin
+                Integer numOfMissingBaits = 2 * bmin - getBaitNumUp(); // determine number of missing baits
+                this.setUsableBaitsForDownstreamMargin(numOfMissingBaits, baitSize, chromosome2AlignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore); // try to set this number in downstream margin
+                this.removeRedundantBaits();
+
+                if (this.getBaitNumTotal() == 2 * bmin) {
+                    // segment can be rescued
+                    this.unselectable = false;
+                    this.targetable = false;
+                    this.rescuable = true;
+                } else {
+                    this.unselectable = true;
+                    this.targetable = false;
+                    this.rescuable = false;
+                }
+            } else {
+                // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
+                Integer numOfMissingBaits = 2 * bmin - getBaitNumDown(); // determine number of missing baits
+                this.setUsableBaitsForUpstreamMargin(numOfMissingBaits, baitSize, chromosome2AlignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore); // try to set this number in upstream margin
+                this.removeRedundantBaits();
+                if (this.getBaitNumTotal() == 2 * bmin) {
+                    // segment can be rescued
+                    this.unselectable = false;
+                    this.targetable = false;
+                    this.rescuable = true;
+                } else {
+                    this.unselectable = true;
+                    this.targetable = false;
+                    this.rescuable = false;
+                }
+            }
+        }
+
+    }
+
+
 
     public Integer getBaitNumTotal() { return this.baitListUpStreamMargin.size() + this.baitListDownStreamMargin.size(); }
 
@@ -483,6 +553,37 @@ public class Segment implements Serializable {
         this.baitListUpStreamMargin=baitListUpStreamMargin;
         return this.baitListUpStreamMargin;
     }
+
+    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+
+        Integer sta = this.getStartPos();
+        Integer end = this.getStartPos() + marginSize - 1;
+
+        ArrayList<Bait> baitListUpStreamMargin = new ArrayList<>();
+        for(int i = sta; i <= end - baitSize + 1; i++ ) { // from left to right because this is the upstream margin
+
+            // init bait
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize - 1, fastaReader, alignabilityMap);
+
+            // check for constraints and add if appropriate
+            if( b.isUsable(minGCcontent, maxGCcontent, maxAlignabilityScore) ) {
+                baitListUpStreamMargin.add(b);
+            }
+
+            // abort if bmax is reached
+            if(baitListUpStreamMargin.size()==bmax) { break; }
+
+            // abort if end of bait reaches end of segment
+            if(i + baitSize - 1 == this.getEndPos()) { break; }
+        }
+        this.baitListUpStreamMargin=baitListUpStreamMargin;
+        return this.baitListUpStreamMargin;
+    }
+
+
+
+
+
     public List<Bait> getBaitsForUpstreamMargin() {
             return this.baitListUpStreamMargin;
     }
@@ -518,6 +619,36 @@ public class Segment implements Serializable {
             this.baitListDownStreamMargin=baitListDownStreamMargin;
             return this.baitListDownStreamMargin;
     }
+
+    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+
+
+        Integer sta = this.getEndPos() - marginSize + 1;
+        Integer end = this.getEndPos();
+
+        ArrayList<Bait> baitListDownStreamMargin = new ArrayList<>();
+        for (int i = end - baitSize + 1; sta < i; i--) { // from right to left because this is the upstream margin
+
+            // init bait
+            Bait b = new Bait(this.referenceSequenceID, i, i + baitSize - 1, fastaReader, alignabilityMap);
+
+            // check for constraints and add if appropriate
+            if( b.isUsable(minGCcontent, maxGCcontent, maxAlignabilityScore) ) {
+                baitListDownStreamMargin.add(b);
+            }
+
+            // abort if bmax is reached
+            if(baitListDownStreamMargin.size()==bmax) { break; }
+
+            // abort if end of bait reaches start of segment
+            if(i == this.getStartPos()) { break; }
+
+        }
+        this.baitListDownStreamMargin=baitListDownStreamMargin;
+        return this.baitListDownStreamMargin;
+    }
+
+
     public List<Bait> getBaitsForDownstreamMargin()  { return this.baitListDownStreamMargin; }
 
 

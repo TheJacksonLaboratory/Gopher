@@ -12,7 +12,7 @@ import gopher.model.Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.instrument.Instrumentation;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +49,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     }
 
 
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) { //throws GopherException{
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
         logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
@@ -71,6 +71,46 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
                     alignabilityMap(this.alignabilityMap).
+                    model(this.model).
+                    build();
+
+            vp.setPromoterNumber(++n,gPosList.size());
+            updateProgress(i++, total); /* this will update the progress bar */
+            updateLabelText(this.currentVP, vpvgene.toString());
+            vp.generateViewpointSimple(model);
+            if (vp.getResolved()) {
+                viewpointlist.add(vp);
+                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
+            } else {
+                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
+            }
+        }
+    }
+
+
+    private void calculateViewPointsWithArrayPair(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap arrpair) {
+        int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
+        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
+        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+        List<Integer> gPosList = vpvgene.getTSSlist();
+        int n=0; // we will order the promoters from first (most upstream) to last
+        // Note we do this differently according to strand.
+        //Instrumentation inst=null;
+        for (Integer gPos : gPosList) {
+            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+                    targetName(vpvgene.getGeneSymbol()).
+                    upstreamLength(model.getSizeUp()).
+                    downstreamLength(model.getSizeDown()).
+                    maximumGcContent(model.getMaxGCcontent()).
+                    minimumGcContent(model.getMinGCcontent()).
+                    fastaReader(fastaReader).
+                    minimumFragmentSize(model.getMinFragSize()).
+                    maximumRepeatContent(model.getMaxRepeatContent()).
+                    marginSize(model.getMarginSize()).
+                    isForwardStrand(vpvgene.isForward()).
+                    accessionNr(vpvgene.getRefSeqID()).
+                   // alignabilityMap(this.alignabilityMap).
+                    c2alignabilityMap(arrpair).
                     model(this.model).
                     build();
 
@@ -175,6 +215,36 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         this.model.setViewPoints(viewpointlist);
         return null;
     }
+
+
+    private void testFunctionForAlignabilityMapIterator(IndexedFastaSequenceFile fastaReader) {
+        String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
+        String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
+        int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
+        try {
+            AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
+            while (apiterator.hasNext()) {
+                Chromosome2AlignabilityMap apair = apiterator.next();
+                String referenceSequenceID = apair.getChromName();
+                logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
+                ChromosomeGroup group = chromosomes.get(referenceSequenceID);
+                for (GopherGene gene : group.getGenes()) {
+                    // group.getGenes().parallelStream().forEach(vpvGene -> {
+                    calculateViewPointsWithArrayPair(gene, referenceSequenceID, fastaReader,apair);
+                }
+            }
+
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
+
 
     /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
     private void updateLabelText(StringProperty sb, String msg) {

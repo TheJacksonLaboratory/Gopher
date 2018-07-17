@@ -12,8 +12,8 @@ import java.util.zip.GZIPInputStream;
 /**
  *
  */
-public class ArrayPairIterator implements Iterator<ArrayPair> {
-    private static Logger logger = Logger.getLogger(ArrayPairIterator.class.getName());
+public class AlignabilityMapIterator implements Iterator<Chromosome2AlignabilityMap> {
+    private static Logger logger = Logger.getLogger(AlignabilityMapIterator.class.getName());
 
     /**
      * The reader that is being read.
@@ -33,7 +33,9 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
      */
     private ImmutableMap<String, Integer> chromSizesMap;
 
-    private ArrayPair currentArrayPair = null;
+    private Chromosome2AlignabilityMap currentArrayPair = null;
+
+    private final int kmerSize;
 
     private boolean ready;
 
@@ -50,12 +52,14 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
     private final static int NO_ALIGNABILITY_SCORE_AVAILABLE = -1;
 
 
+    public int getKmerSize() { return kmerSize; }
+
     /**
      * @param alignabilityMapPath Path of alignability map IncludingFileName
      * @param chromInfoPath       Path of chromInfo Including FileName
      * @throws IOException throws exception if file cannot be properly opened
      */
-    public ArrayPairIterator(String alignabilityMapPath, String chromInfoPath) throws IOException {
+    public AlignabilityMapIterator(String alignabilityMapPath, String chromInfoPath, int kmerSize) throws IOException {
         parseChromInfoFile(chromInfoPath);
         logger.debug("About to parse bedgraph file " + alignabilityMapPath + "...");
         InputStream fileStream = new FileInputStream(alignabilityMapPath);
@@ -65,6 +69,8 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
         ready = true;
         this.scoreList = new ArrayList<>();
         this.coordinateList = new ArrayList<>();
+        this.kmerSize=kmerSize;
+
     }
 
     /**
@@ -97,7 +103,7 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
 
 
     /**
-     * This checks if {@link #bufferedReader} is null -- if so, we are finished and there are no more ArrayPair objects.
+     * This checks if {@link #bufferedReader} is null -- if so, we are finished and there are no more Chromosome2AlignabilityMap objects.
      */
     @Override
     public boolean hasNext() {
@@ -111,7 +117,7 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
 
 
     @Override
-    public ArrayPair next() {
+    public Chromosome2AlignabilityMap next() {
         String line;
         String A[];
         String chromosome;
@@ -141,7 +147,7 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
                 } else if (!chromosome.equals(prevChr)) {
                     // this is the first line for a new chromosome
                     // we are finished with the previous chromosome and can
-                    // make a new ArrayPair object
+                    // make a new Chromosome2AlignabilityMap object
                     // first we need to store the values on the current line,
                     // which are the first values for the "new" chromosome
 
@@ -151,12 +157,12 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
                         scoreList.add(-1);
                     }
 
-                    currentArrayPair = new ArrayPair(prevChr, coordinateList, scoreList);
+                    currentArrayPair = new Chromosome2AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
                     coordinateList.clear();
                     scoreList.clear();
 
                     prevChr = chromosome;
-                    // when we get here, we are done making the ArrayPair object for the "previous" chromosome
+                    // when we get here, we are done making the Chromosome2AlignabilityMap object for the "previous" chromosome
                     logger.trace("Done makineg chromosome alignability map for " + chromosome + " prev=" + prevChr + " size=" + chromSizesMap.get(chromosome));
                     // now use the data from the "new" line for the first block of the "new chromosome"
 
@@ -185,14 +191,14 @@ public class ArrayPairIterator implements Iterator<ArrayPair> {
                 prevChr = chromosome;
                 prevEnd = endPos;
             } // end while
-            // When we get here, we want to return the very last ArrayPair object.
+            // When we get here, we want to return the very last Chromosome2AlignabilityMap object.
             logger.trace("Making last alignability map for " + prevChr);
             if (chromSizesMap.containsKey(prevChr) && (prevEnd < chromSizesMap.get(prevChr))) {
                 // there were no alignability scores for the last postions of the last chromosome
                 coordinateList.add(prevEnd + 1);
                 scoreList.add(-1);
             }
-            currentArrayPair = new ArrayPair(prevChr, coordinateList, scoreList);
+            currentArrayPair = new Chromosome2AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
             ready = false;
             return currentArrayPair;
 
