@@ -862,12 +862,13 @@ public class GopherMainPresenter implements Initializable {
         // TODO use boolean var allowSingleMargin
 
         logger.trace("Reading alignability map to memory...");
-        AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
-        logger.trace("...done.");
+       //
 
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,sp,alignabilityMap);
+            task = new SimpleViewPointCreationTask(model,sp);
         } else {
+            AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
+            logger.trace("...done.");
             task = new ExtendedViewPointCreationTask(model,sp,alignabilityMap);
         }
 

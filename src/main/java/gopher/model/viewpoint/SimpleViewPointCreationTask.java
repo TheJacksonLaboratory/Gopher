@@ -48,6 +48,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         this.alignabilityMap=alignabilityMap;
     }
 
+    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+        super(model,currentVPproperty);
+        this.alignabilityMap=alignabilityMap;
+    }
+
     /** This will be replace by the method below.*/
     @Deprecated
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
@@ -91,8 +96,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     /** This method will replace calculateViewPoints -- still needs to be tested */
     private void calculateViewPointsWithArrayPair(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap arrpair) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
-        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+        logger.trace(String.format("NEW Length of %s is %d", referenceSequenceID, chromosomeLength));
+        logger.error(String.format("NEW Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
@@ -158,49 +163,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         } catch (FileNotFoundException fnfe) {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
-
-        // estimate average size of restriction fragments
-        // TODO: Move this code to a function getEstAvgRestFragLen
-        logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
-        // Combine all patterns into one regular expression.
-        String regExCombinedCutPat = model.getChosenEnzymelist().
-                stream().
-                map(RestrictionEnzyme::getPlainSite).
-                collect(Collectors.joining("|"));
-
-
-        // count all occurrences of the cutting motifs and divide by sequence length
-        int totalNumOfCuts = 0;
-        long totalLength = 0;
-        ReferenceSequence rf = fastaReader.nextSequence();
-        while(rf != null) {
-            if(rf.getName().contains("_")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosomes
-            if(rf.getName().contains("chrM")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosome M
-
-            logger.trace("Cutting: " + rf.getName());
-            String sequence = fastaReader.getSequence(rf.getName()).getBaseString();
-            logger.trace("\tPattern: " + regExCombinedCutPat);
-            Pattern pattern = Pattern.compile(regExCombinedCutPat,Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(sequence);
-            while (matcher.find()) {
-                totalNumOfCuts++;
-            }
-
-            totalLength = totalLength + sequence.length();
-            logger.trace("\tCurrent number of cuts: " + totalNumOfCuts);
-            logger.trace("\tCurrent length: " + totalLength);
-            logger.trace("\tEstimated average length : " + (1.0*totalLength/totalNumOfCuts));
-            rf = fastaReader.nextSequence();
-            if(100000<totalNumOfCuts) {break;}
-        }
-
-        Double estAvgRestFragLen = 1.0*totalLength/totalNumOfCuts;
-        model.setEstAvgRestFragLen(estAvgRestFragLen);
-        logger.trace("Total number of cuts: " + totalNumOfCuts);
-        logger.trace("Total length: " + totalLength);
-        logger.trace("Estimated average length : " + (1.0*totalLength/totalNumOfCuts));
-        logger.trace("Average length: " + estAvgRestFragLen);
-        logger.trace("...done.");
+        //TODO -- PLEASE CHECK
+        double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
+        model.setEstAvgRestFragLen(meanLen);
 
         /*  NEW -- SEE testFunctionForAlignabilityMapIterator
         for (ChromosomeGroup group : chromosomes.values()) {

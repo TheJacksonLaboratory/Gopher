@@ -226,10 +226,12 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
+        // TODO -- remove alignabilitymapo
         if (builder.c2alignmap!=null) {
             initWithC2align(builder.fastaReader,builder.model,builder.c2alignmap);
+        } else {
+            init(builder.fastaReader, builder.model, builder.alignabilityMap);
         }
-        init(builder.fastaReader,builder.model,builder.alignabilityMap);
     }
 
     /**
@@ -245,7 +247,7 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        logger.trace("init; segmentFactory is "+ segmentFactory.toString());
+        logger.trace("init OLD; segmentFactory is "+ segmentFactory.toString());
         initRestrictionFragments(fastaReader, alignabilityMap);
     }
 
@@ -259,7 +261,7 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        logger.trace("init; segmentFactory is "+ segmentFactory.toString());
+        logger.trace("init NEW; segmentFactory is "+ segmentFactory.toString());
         initRestrictionFragmentsWithC2align(fastaReader, c2align);
     }
 
