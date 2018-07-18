@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -40,7 +41,7 @@ public class ProbeFactoryTest {
     @Test
     public void testGetSegmentMargins() {
 
-        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        List<IntPair> ip = testSeg.getSegmentMargins();
         Integer upStreamStaPos = ip.get(0).getStartPos();
         Integer upStreamEndPos = ip.get(0).getEndPos();
         Integer downStreamStaPos = ip.get(1).getStartPos();

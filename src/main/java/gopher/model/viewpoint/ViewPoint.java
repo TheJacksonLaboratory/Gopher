@@ -2,7 +2,6 @@ package gopher.model.viewpoint;
 
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import javafx.scene.control.CheckBox;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import gopher.model.Default;
@@ -226,32 +225,11 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
-        // TODO -- remove alignabilitymapo
-        if (builder.c2alignmap!=null) {
-            initWithC2align(builder.fastaReader,builder.model,builder.c2alignmap);
-        } else {
-            init(builder.fastaReader, builder.model, builder.alignabilityMap);
-        }
+        init(builder.fastaReader,builder.c2alignmap);
     }
 
-    /**
-     * @param fastaReader file pointer to an index FASTA
-     */
-    private void init(IndexedFastaSequenceFile fastaReader,Model model, AlignabilityMap alignabilityMap) {
-        this.restrictionSegmentList=new ArrayList<>();
-        setResolved(false);
-        /* Create segmentFactory */
-        segmentFactory = new SegmentFactory(this.chromosomeID,
-                this.genomicPos,
-                fastaReader,
-                this.upstreamNucleotideLength,
-                this.downstreamNucleotideLength,
-                ViewPoint.chosenEnzymes);
-        logger.trace("init OLD; segmentFactory is "+ segmentFactory.toString());
-        initRestrictionFragments(fastaReader, alignabilityMap);
-    }
 
-    private void initWithC2align(IndexedFastaSequenceFile fastaReader,Model model,Chromosome2AlignabilityMap c2align) {
+    private void init(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -262,7 +240,7 @@ public class ViewPoint implements Serializable {
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
         logger.trace("init NEW; segmentFactory is "+ segmentFactory.toString());
-        initRestrictionFragmentsWithC2align(fastaReader, c2align);
+        initRestrictionFragments(fastaReader, c2align);
     }
 
 
@@ -270,7 +248,7 @@ public class ViewPoint implements Serializable {
      * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
      * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
      */
-    private void initRestrictionFragmentsWithC2align(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
@@ -279,31 +257,12 @@ public class ViewPoint implements Serializable {
                     fastaReader(fastaReader).marginSize(marginSize).build();
             logger.trace("Creating restriction fragment " + restFrag.toString());
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits2(model,c2align,maxMeanAlignabilityScore);
+            restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
 
 
-
-    /**
-     * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
-     * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
-     */
-    @Deprecated
-    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
-        this.restrictionSegmentList = new ArrayList<>();
-        for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
-            Segment restFrag = new Segment.Builder(chromosomeID,
-                    segmentFactory.getUpstreamCut(j),
-                    segmentFactory.getDownstreamCut(j) - 1).
-                    fastaReader(fastaReader).marginSize(marginSize).build();
-            logger.trace("Creating restriction fragment " + restFrag.toString());
-            Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
-            restrictionSegmentList.add(restFrag);
-        }
-    }
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
         return chromosomeID;

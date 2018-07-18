@@ -867,9 +867,9 @@ public class GopherMainPresenter implements Initializable {
         if (model.useSimpleApproach()) {
             task = new SimpleViewPointCreationTask(model,sp);
         } else {
-            AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
+            //AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
             logger.trace("...done.");
-            task = new ExtendedViewPointCreationTask(model,sp,alignabilityMap);
+            task = new ExtendedViewPointCreationTask(model,sp);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
