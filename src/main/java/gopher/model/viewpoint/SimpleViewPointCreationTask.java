@@ -30,7 +30,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private int total;
     /** Index of current viewpoint */
     private int i;
-
+    @Deprecated
     private AlignabilityMap alignabilityMap;
 
 
@@ -41,14 +41,15 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * values for the enzymes.
      *  @param model
      * @param currentVPproperty
-   * @param alignabilityMap
+   * @param alignabilityMap TODO REMOVE THIS FROM CONSTRUCTOR
    */
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
         super(model,currentVPproperty);
         this.alignabilityMap=alignabilityMap;
     }
 
-
+    /** This will be replace by the method below.*/
+    @Deprecated
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
@@ -87,7 +88,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         }
     }
 
-
+    /** This method will replace calculateViewPoints -- still needs to be tested */
     private void calculateViewPointsWithArrayPair(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap arrpair) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
@@ -201,15 +202,16 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         logger.trace("Average length: " + estAvgRestFragLen);
         logger.trace("...done.");
 
-
+        /*  NEW -- SEE testFunctionForAlignabilityMapIterator
         for (ChromosomeGroup group : chromosomes.values()) {
-            String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
+            String referenceSequenceID = group.getReferenceSequenceID();
             logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
             for (GopherGene gene : group.getGenes()) {
            // group.getGenes().parallelStream().forEach(vpvGene -> {
                 calculateViewPoints(gene, referenceSequenceID, fastaReader);
             }
-        }
+        }*/
+        testFunctionForAlignabilityMapIterator(fastaReader);
         long end = milli - System.currentTimeMillis();
         logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
         this.model.setViewPoints(viewpointlist);
@@ -223,10 +225,12 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
         try {
             AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
+           logger.trace("About to start iteration in new function");
+
             while (apiterator.hasNext()) {
                 Chromosome2AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
-                logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
+                logger.trace("NEW--Creating viewpoints for RefID=" + referenceSequenceID);
                 ChromosomeGroup group = chromosomes.get(referenceSequenceID);
                 for (GopherGene gene : group.getGenes()) {
                     // group.getGenes().parallelStream().forEach(vpvGene -> {

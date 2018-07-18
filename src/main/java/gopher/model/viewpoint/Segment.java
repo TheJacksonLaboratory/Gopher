@@ -18,7 +18,7 @@ import java.util.Set;
  * This class represents a restriction digest that is a member of a viewpoint.
  * Note that {@link #startPos} and {@link #endPos} use one-based inclusive numbering.
  * @author Peter Hansen
- * @version 0.3.5 (2017-09-19)
+ * @version 0.3.6 (2018-07-17)
  */
 public class Segment implements Serializable {
     private static final Logger logger = Logger.getLogger(Segment.class.getName());
@@ -380,6 +380,7 @@ public class Segment implements Serializable {
         }
     }
 
+    @Deprecated
     public void setUsableBaits(Model model,  AlignabilityMap alignabilityMap,  Double maxAlignabilityScore) {
         Integer bmin =model.getMinBaitCount();
         Integer bmax = model.getMaxBaitCount();
@@ -449,7 +450,7 @@ public class Segment implements Serializable {
 
     }
 
-
+    /** NEW VERSION */
     public void setUsableBaits2(Model model,  Chromosome2AlignabilityMap chromosome2AlignabilityMap,  Double maxAlignabilityScore) {
         Integer bmin =model.getMinBaitCount();
         Integer bmax = model.getMaxBaitCount();
@@ -527,7 +528,7 @@ public class Segment implements Serializable {
 
     public Integer getBaitNumDown() {return this.baitListDownStreamMargin.size(); }
 
-
+    @Deprecated
     public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getStartPos();
@@ -554,6 +555,7 @@ public class Segment implements Serializable {
         return this.baitListUpStreamMargin;
     }
 
+    /** NEW VERSION */
     public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getStartPos();
@@ -591,7 +593,7 @@ public class Segment implements Serializable {
 
 
 
-
+    @Deprecated
     private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
 
@@ -620,6 +622,7 @@ public class Segment implements Serializable {
             return this.baitListDownStreamMargin;
     }
 
+    /** NEW VERSION */
     private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
 

@@ -27,6 +27,7 @@ import java.util.zip.GZIPInputStream;
  * First column (chromosome) lexicographically, second column numerically start position.
  * The downloadable files are sorted like this.
  */
+@Deprecated
 public class AlignabilityMap {
     private static Logger logger = Logger.getLogger(AlignabilityMap.class.getName());
 
@@ -181,7 +182,7 @@ public class AlignabilityMap {
             logger.trace("Put: "+ap.getChromName());
         }
         logger.trace(String.format("Got %d chromosomes for alignability map",alignabilityMap.size()));
-        printAlignabilityMap();
+       // printAlignabilityMap();
     }
 
 

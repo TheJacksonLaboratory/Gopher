@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
- *
+ * Input data for the alignability map, one chromosome at a time.
  */
 public class AlignabilityMapIterator implements Iterator<Chromosome2AlignabilityMap> {
     private static Logger logger = Logger.getLogger(AlignabilityMapIterator.class.getName());
@@ -81,12 +81,10 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
      */
     public void parseChromInfoFile(String chromInfoPathIncludingFileName) {
         ImmutableMap.Builder<String, Integer> builder = new ImmutableMap.Builder<>();
-        try (
-                InputStream fileStream = new FileInputStream(chromInfoPathIncludingFileName);
+        try (InputStream fileStream = new FileInputStream(chromInfoPathIncludingFileName);
                 InputStream gzipStream = new GZIPInputStream(fileStream);
                 Reader decoder = new InputStreamReader(gzipStream);
-                BufferedReader br = new BufferedReader(decoder)
-        ) {
+                BufferedReader br = new BufferedReader(decoder) ) {
             String line;
             while ((line = br.readLine()) != null) {
                 String A[] = line.split("\t");
@@ -163,7 +161,7 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
 
                     prevChr = chromosome;
                     // when we get here, we are done making the Chromosome2AlignabilityMap object for the "previous" chromosome
-                    logger.trace("Done makineg chromosome alignability map for " + chromosome + " prev=" + prevChr + " size=" + chromSizesMap.get(chromosome));
+                    logger.trace("Done making chromosome alignability map for " + chromosome + " prev=" + prevChr + " size=" + chromSizesMap.get(chromosome));
                     // now use the data from the "new" line for the first block of the "new chromosome"
 
                     if (startPos != 1) {

@@ -18,11 +18,10 @@ public class Bait implements Serializable {
     private static Logger logger = Logger.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
-
     // coordinates of the bait
     private String refID;
-    private Integer startPos;
-    private Integer endPos;
+    private int startPos;
+    private int endPos;
 
     // average kmer alignabilty of the bait
     private Double averageKmeralignabilty = null;
@@ -37,9 +36,9 @@ public class Bait implements Serializable {
     private Double meltingTemperature = null;
 
     /*
-    Interface of class Bait
+    * Todo --remove this and just use other constructor
      */
-
+    @Deprecated
     public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
         this.refID = refID;
         this.startPos = startPos;
@@ -180,7 +179,9 @@ public class Bait implements Serializable {
 
     /**
      * Calculate melting temperature of the bait.
+     * PROBLABLY DELETE THIS
      */
+    @Deprecated
     private void setMeltingTemperature() {
         // TODO: https://www.sigmaaldrich.com/technical-documents/articles/biology/oligos-melting-temp.html
     }
