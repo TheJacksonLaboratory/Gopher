@@ -100,26 +100,23 @@ public class Bait implements Serializable {
      * @param fastaReader
      * @return
      */
-    private Double setGCContent(IndexedFastaSequenceFile fastaReader) {
+    private void setGCContent(IndexedFastaSequenceFile fastaReader) {
+        String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
 
-//        if(this.GCcontent == null) {
-//            // GC content is not yet calculated
-            String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
-
-            // count Gs and Cs
-            int GC = 0;
-            for (int i = 0; i < subsequence.length(); i++) {
-                switch (subsequence.charAt(i)) {
-                    case 'G':
-                    case 'g':
-                    case 'C':
-                    case 'c':
-                        GC++;
-                }
+        // count Gs and Cs
+        int GC = 0;
+        for (int i = 0; i < subsequence.length(); i++) {
+            switch (subsequence.charAt(i)) {
+                case 'G':
+                case 'g':
+                case 'C':
+                case 'c':
+                    GC++;
             }
-            this.GCcontent = (double) GC / (double) subsequence.length();
-//        }
-        return this.GCcontent;
+        }
+        this.GCcontent = (double) GC / (double) subsequence.length();
+
+
     }
 
 //    /**
