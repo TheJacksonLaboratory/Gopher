@@ -4,7 +4,6 @@ package gopher.model;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.genome.*;
-import gopher.model.viewpoint.AlignabilityMap;
 import gopher.model.viewpoint.ViewPoint;
 import org.apache.log4j.Logger;
 
@@ -37,8 +36,6 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<GopherGene> geneList=null;
-
-    private transient AlignabilityMap alignabilityMap = null;
 
     public enum Approach {
         SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;

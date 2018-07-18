@@ -883,7 +883,6 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private AlignabilityMap alignabilityMap;
         private Chromosome2AlignabilityMap c2alignmap;
 
         /**
@@ -930,9 +929,6 @@ public class ViewPoint implements Serializable {
         }
         Builder model(Model model) {
             this.model=model; return this;
-        }
-        Builder alignabilityMap(AlignabilityMap alignabilityMap) {
-            this.alignabilityMap=alignabilityMap; return this;
         }
         Builder c2alignabilityMap(Chromosome2AlignabilityMap c2am) {
             this.c2alignmap = c2am; return this;

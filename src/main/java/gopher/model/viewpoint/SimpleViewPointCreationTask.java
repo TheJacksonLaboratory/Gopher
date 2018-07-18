@@ -25,8 +25,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private int total;
     /** Index of current viewpoint */
     private int i;
-    @Deprecated
-    private AlignabilityMap alignabilityMap;
 
 
   /**
@@ -36,16 +34,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * values for the enzymes.
      *  @param model
      * @param currentVPproperty
-   * @param alignabilityMap TODO REMOVE THIS FROM CONSTRUCTOR
-   */
-    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
-        super(model,currentVPproperty);
-        this.alignabilityMap=alignabilityMap;
-    }
 
+   */
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         super(model,currentVPproperty);
-       // this.alignabilityMap=alignabilityMap;
+
     }
 
     /** This will be replace by the method below.*/
