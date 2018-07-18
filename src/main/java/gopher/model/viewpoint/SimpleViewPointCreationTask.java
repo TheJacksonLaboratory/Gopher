@@ -1,9 +1,7 @@
 package gopher.model.viewpoint;
 
 import gopher.model.GopherGene;
-import gopher.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
@@ -12,11 +10,8 @@ import gopher.model.Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.instrument.Instrumentation;
+import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 /**
@@ -30,7 +25,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private int total;
     /** Index of current viewpoint */
     private int i;
-
+    @Deprecated
     private AlignabilityMap alignabilityMap;
 
 
@@ -41,18 +36,63 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * values for the enzymes.
      *  @param model
      * @param currentVPproperty
-   * @param alignabilityMap
+   * @param alignabilityMap TODO REMOVE THIS FROM CONSTRUCTOR
    */
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty, AlignabilityMap alignabilityMap) {
         super(model,currentVPproperty);
         this.alignabilityMap=alignabilityMap;
     }
 
+    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+        super(model,currentVPproperty);
+       // this.alignabilityMap=alignabilityMap;
+    }
 
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) { //throws GopherException{
+    /** This will be replace by the method below.*/
+  //  @Deprecated
+//    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
+//        int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
+//        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
+//        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+//        List<Integer> gPosList = vpvgene.getTSSlist();
+//        int n=0; // we will order the promoters from first (most upstream) to last
+//        // Note we do this differently according to strand.
+//        //Instrumentation inst=null;
+//        for (Integer gPos : gPosList) {
+//            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+//                    targetName(vpvgene.getGeneSymbol()).
+//                    upstreamLength(model.getSizeUp()).
+//                    downstreamLength(model.getSizeDown()).
+//                    maximumGcContent(model.getMaxGCcontent()).
+//                    minimumGcContent(model.getMinGCcontent()).
+//                    fastaReader(fastaReader).
+//                    minimumFragmentSize(model.getMinFragSize()).
+//                    maximumRepeatContent(model.getMaxRepeatContent()).
+//                    marginSize(model.getMarginSize()).
+//                    isForwardStrand(vpvgene.isForward()).
+//                    accessionNr(vpvgene.getRefSeqID()).
+//                    alignabilityMap(this.alignabilityMap).
+//                    model(this.model).
+//                    build();
+//
+//            vp.setPromoterNumber(++n,gPosList.size());
+//            updateProgress(i++, total); /* this will update the progress bar */
+//            updateLabelText(this.currentVP, vpvgene.toString());
+//            vp.generateViewpointSimple(model);
+//            if (vp.getResolved()) {
+//                viewpointlist.add(vp);
+//                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
+//            } else {
+//                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
+//            }
+//        }
+//    }
+
+    /** This method will replace calculateViewPoints -- still needs to be tested */
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap chr2alignMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
-        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+        logger.trace(String.format("NEW Length of %s is %d", referenceSequenceID, chromosomeLength));
+        logger.error(String.format("NEW Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
@@ -70,10 +110,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     marginSize(model.getMarginSize()).
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
-                    alignabilityMap(this.alignabilityMap).
+                    c2alignabilityMap(chr2alignMap).
                     model(this.model).
                     build();
-
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateLabelText(this.currentVP, vpvgene.toString());
@@ -117,64 +156,55 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         } catch (FileNotFoundException fnfe) {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
+        //TODO -- PLEASE CHECK
+        double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
+        model.setEstAvgRestFragLen(meanLen);
+        String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
+        String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
+        int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
+        try {
+            AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
+            logger.trace("About to start iteration in new function");
 
-        // estimate average size of restriction fragments
-        // TODO: Move this code to a function getEstAvgRestFragLen
-        logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
-        // Combine all patterns into one regular expression.
-        String regExCombinedCutPat = model.getChosenEnzymelist().
-                stream().
-                map(RestrictionEnzyme::getPlainSite).
-                collect(Collectors.joining("|"));
-
-
-        // count all occurrences of the cutting motifs and divide by sequence length
-        int totalNumOfCuts = 0;
-        long totalLength = 0;
-        ReferenceSequence rf = fastaReader.nextSequence();
-        while(rf != null) {
-            if(rf.getName().contains("_")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosomes
-            if(rf.getName().contains("chrM")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosome M
-
-            logger.trace("Cutting: " + rf.getName());
-            String sequence = fastaReader.getSequence(rf.getName()).getBaseString();
-            logger.trace("\tPattern: " + regExCombinedCutPat);
-            Pattern pattern = Pattern.compile(regExCombinedCutPat,Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(sequence);
-            while (matcher.find()) {
-                totalNumOfCuts++;
+            while (apiterator.hasNext()) {
+                Chromosome2AlignabilityMap apair = apiterator.next();
+                String referenceSequenceID = apair.getChromName();
+                logger.trace("NEW--Creating viewpoints for RefID=" + referenceSequenceID);
+                if (! chromosomes.containsKey(referenceSequenceID)) {
+                    continue; // skip if we have no gene on this chromosome
+                }
+                ChromosomeGroup group = chromosomes.get(referenceSequenceID);
+                if (group==null) {
+                    logger.error("group is null while searching for \"" + referenceSequenceID +"\"");
+                    for (ChromosomeGroup g : chromosomes.values()) {
+                        logger.error(g.getReferenceSequenceID());
+                    }
+                } else {
+                    logger.trace("group="+group.getReferenceSequenceID());
+                }
+                for (GopherGene gene : group.getGenes()) {
+                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
+                    // group.getGenes().parallelStream().forEach(vpvGene -> {
+                    calculateViewPoints(gene, referenceSequenceID, fastaReader,apair);
+                }
             }
 
-            totalLength = totalLength + sequence.length();
-            logger.trace("\tCurrent number of cuts: " + totalNumOfCuts);
-            logger.trace("\tCurrent length: " + totalLength);
-            logger.trace("\tEstimated average length : " + (1.0*totalLength/totalNumOfCuts));
-            rf = fastaReader.nextSequence();
-            if(100000<totalNumOfCuts) {break;}
-        }
 
-        Double estAvgRestFragLen = 1.0*totalLength/totalNumOfCuts;
-        model.setEstAvgRestFragLen(estAvgRestFragLen);
-        logger.trace("Total number of cuts: " + totalNumOfCuts);
-        logger.trace("Total length: " + totalLength);
-        logger.trace("Estimated average length : " + (1.0*totalLength/totalNumOfCuts));
-        logger.trace("Average length: " + estAvgRestFragLen);
-        logger.trace("...done.");
-
-
-        for (ChromosomeGroup group : chromosomes.values()) {
-            String referenceSequenceID = group.getReferenceSequenceID();/* Usually a chromosome */
-            logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
-            for (GopherGene gene : group.getGenes()) {
-           // group.getGenes().parallelStream().forEach(vpvGene -> {
-                calculateViewPoints(gene, referenceSequenceID, fastaReader);
-            }
+        } catch (IOException e){
+            e.printStackTrace();
         }
         long end = milli - System.currentTimeMillis();
         logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
         this.model.setViewPoints(viewpointlist);
         return null;
     }
+
+
+
+
+
+
+
 
     /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
     private void updateLabelText(StringProperty sb, String msg) {

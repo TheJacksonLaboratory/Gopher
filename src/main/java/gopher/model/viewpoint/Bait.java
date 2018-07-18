@@ -18,29 +18,37 @@ public class Bait implements Serializable {
     private static Logger logger = Logger.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
-
     // coordinates of the bait
     private String refID;
-    private Integer startPos;
-    private Integer endPos;
+    private int startPos;
+    private int endPos;
 
     // average kmer alignabilty of the bait
-    private Double averageKmeralignabilty = null;
+    private double averageKmeralignabilty;
 
     // GC content of the bait
-    private Double GCcontent = null;
+    private double GCcontent;
 
     // repeat content of the bait
-    private Double repeatContent = null;
+    private double repeatContent;
 
-    // melting temperature of the bait
-    private Double meltingTemperature = null;
+//    // melting temperature of the bait
+//    private Double meltingTemperature = null;
 
     /*
-    Interface of class Bait
+    * Todo --remove this and just use other constructor
      */
+//    @Deprecated
+//    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
+//        this.refID = refID;
+//        this.startPos = startPos;
+//        this.endPos = endPos;
+//        this.setGCContent(fastaReader);
+//        this.setAlignabilityScore(alignabilityMap);
+//        this.setRepeatContent(fastaReader);
+//    }
 
-    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
+    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap alignabilityMap) {
         this.refID = refID;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -49,24 +57,30 @@ public class Bait implements Serializable {
         this.setRepeatContent(fastaReader);
     }
 
+
+
+
+
+
+
     public String getRefId() {
         return refID;
     }
-    public Integer getStartPos() {
+    public int getStartPos() {
         return startPos;
     }
-    public Integer getEndPos() {
+    public int getEndPos() {
         return endPos;
     }
-    public Double getGCContent()  {
+    public double getGCContent()  {
         return this.GCcontent;
     }
-    public Double getAlignabilityScore() {
+    public double getAlignabilityScore() {
         return this.averageKmeralignabilty;
     }
-    public Double getRepeatContent() { return this.repeatContent; }
-    public Double getMeltingTemperature() { return this.meltingTemperature; }
-
+    public double getRepeatContent() { return this.repeatContent; }
+//    public Double getMeltingTemperature() { return this.meltingTemperature; }
+//
     public boolean isUsable(Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
         if(minGCcontent <= this.getGCContent() && this.getGCContent() <= maxGCcontent &&  this.getAlignabilityScore() <= maxAlignabilityScore) {
             return true;
@@ -86,39 +100,51 @@ public class Bait implements Serializable {
      * @param fastaReader
      * @return
      */
-    private Double setGCContent(IndexedFastaSequenceFile fastaReader) {
+    private void setGCContent(IndexedFastaSequenceFile fastaReader) {
+        String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
 
-        if(this.GCcontent == null) {
-            // GC content is not yet calculated
-            String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
-
-            // count Gs and Cs
-            int GC = 0;
-            for (int i = 0; i < subsequence.length(); i++) {
-                switch (subsequence.charAt(i)) {
-                    case 'G':
-                    case 'g':
-                    case 'C':
-                    case 'c':
-                        GC++;
-                }
+        // count Gs and Cs
+        int GC = 0;
+        for (int i = 0; i < subsequence.length(); i++) {
+            switch (subsequence.charAt(i)) {
+                case 'G':
+                case 'g':
+                case 'C':
+                case 'c':
+                    GC++;
             }
-            this.GCcontent = (double) GC / (double) subsequence.length();
         }
-        return this.GCcontent;
+        this.GCcontent = (double) GC / (double) subsequence.length();
+
+
     }
 
-    /**
-     * Calculate the average kmer alignability for the probe, which is defined to be the sum of the alignability
-     * scores of all kmers divided by the number of all kmers.
-     *
-     * @param alignabilityMap
-     */
-    private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
+//    /**
+//     * Calculate the average kmer alignability for the probe, which is defined to be the sum of the alignability
+//     * scores of all kmers divided by the number of all kmers.
+//     *
+//     * @param alignabilityMap
+//     */
+//    private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
+//
+//        Integer kmerSize = alignabilityMap.getKmerSize();
+//        Double score = 0.0;
+//        ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(refID, startPos, endPos - kmerSize + 1);
+//
+//        for (Integer d : alignabilityScoreList) {
+//            if(d==(-1.0)) {score=-1.0; break;} // probe contains Ns, which have an alignability of -1
+//            score = score + d;
+//
+//        }
+//        this.averageKmeralignabilty = score/alignabilityScoreList.size();
+//    }
 
-        Integer kmerSize = alignabilityMap.getKmerSize();
+
+    private void setAlignabilityScore(Chromosome2AlignabilityMap alignabilityMap) {
+
+        Integer kmerSize = alignabilityMap.getKmersize();
         Double score = 0.0;
-        ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(refID, startPos, endPos - kmerSize + 1);
+        ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(startPos, endPos - kmerSize + 1);
 
         for (Integer d : alignabilityScoreList) {
             if(d==(-1.0)) {score=-1.0; break;} // probe contains Ns, which have an alignability of -1
@@ -127,6 +153,7 @@ public class Bait implements Serializable {
         }
         this.averageKmeralignabilty = score/alignabilityScoreList.size();
     }
+
 
 
     /**
@@ -147,10 +174,4 @@ public class Bait implements Serializable {
         this.repeatContent = ((double) lowerCase / (lowerCase + (double) upperCase));
     }
 
-    /**
-     * Calculate melting temperature of the bait.
-     */
-    private void setMeltingTemperature() {
-        // TODO: https://www.sigmaaldrich.com/technical-documents/articles/biology/oligos-melting-temp.html
-    }
 }

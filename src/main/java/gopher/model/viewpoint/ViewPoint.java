@@ -2,7 +2,6 @@ package gopher.model.viewpoint;
 
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import javafx.scene.control.CheckBox;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import gopher.model.Default;
@@ -89,6 +88,8 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
+    private transient Chromosome2AlignabilityMap chromosome2AlignabilityMap;
+
 //    private AlignabilityMap alignabilityMap = null;
     /** This is the unicode character for a checkmark. We will use it to show that the user has
      * checked this viewpoint. */
@@ -168,33 +169,6 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-//    /**
-//     * This constructor is used to zoom in or out by applying a zoom factor to an existing ViewPoint object.
-//     * @param vp An existing ViewPoint that is used as the center point of the zoom
-//     * @param zoomfactor Make the viewpoint bigger for zoom factor greater than 1. Make it smaller for factor less than 1
-//     * @param fastaReader The reader used to get new sequences.
-//     */
-//    @Deprecated
-////    public ViewPoint(ViewPoint vp, double zoomfactor,IndexedFastaSequenceFile fastaReader) {
-//        this.chromosomeID =vp.chromosomeID;
-//        this.genomicPos=vp.genomicPos;
-//        this.targetName=vp.targetName;
-//        this.upstreamNucleotideLength =(int)(vp.upstreamNucleotideLength *zoomfactor);
-//        this.downstreamNucleotideLength =(int)(vp.downstreamNucleotideLength *zoomfactor);
-//        setStartPos(genomicPos - upstreamNucleotideLength);
-//        setEndPos(genomicPos + downstreamNucleotideLength);
-//        this.maxGcContent=vp.maxGcContent;
-//        this.minGcContent=vp.minGcContent;
-//        this.minFragSize=vp.minFragSize;
-//        this.marginSize= vp.marginSize;
-//        this.accession=vp.accession;
-//        this.isPositiveStrand=vp.isPositiveStrand;
-//        this.maximumRepeatContent=vp.maximumRepeatContent;
-//        logger.trace(String.format("max rep %.2f maxGC %.2f  minGC %.2f",this.maximumRepeatContent,this.maxGcContent,this.minGcContent ));
-//       // this.alignabilityMap=vp.alignabilityMap;
-//        //init(fastaReader, this.model);
-//    }
-
     /**
      * This function should only be used for the extended approach. It changes the start and end position
      * of the ViewPoint so that more or less Segments can be selected.
@@ -251,13 +225,11 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
-        init(builder.fastaReader,builder.model,builder.alignabilityMap);
+        init(builder.fastaReader,builder.c2alignmap);
     }
 
-    /**
-     * @param fastaReader file pointer to an index FASTA
-     */
-    private void init(IndexedFastaSequenceFile fastaReader,Model model, AlignabilityMap alignabilityMap) {
+
+    private void init(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -267,8 +239,8 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        logger.trace("init; segmentFactory is "+ segmentFactory.toString());
-        initRestrictionFragments(fastaReader, alignabilityMap);
+        logger.trace("init NEW; segmentFactory is "+ segmentFactory.toString());
+        initRestrictionFragments(fastaReader, c2align);
     }
 
 
@@ -276,7 +248,7 @@ public class ViewPoint implements Serializable {
      * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
      * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
      */
-    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
@@ -285,10 +257,12 @@ public class ViewPoint implements Serializable {
                     fastaReader(fastaReader).marginSize(marginSize).build();
             logger.trace("Creating restriction fragment " + restFrag.toString());
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits(model,alignabilityMap,maxMeanAlignabilityScore);
+            restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
     }
+
+
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
     public final String getReferenceID() {
         return chromosomeID;
@@ -910,6 +884,7 @@ public class ViewPoint implements Serializable {
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
         private AlignabilityMap alignabilityMap;
+        private Chromosome2AlignabilityMap c2alignmap;
 
         /**
          *
@@ -958,6 +933,9 @@ public class ViewPoint implements Serializable {
         }
         Builder alignabilityMap(AlignabilityMap alignabilityMap) {
             this.alignabilityMap=alignabilityMap; return this;
+        }
+        Builder c2alignabilityMap(Chromosome2AlignabilityMap c2am) {
+            this.c2alignmap = c2am; return this;
         }
 
         public ViewPoint build() {

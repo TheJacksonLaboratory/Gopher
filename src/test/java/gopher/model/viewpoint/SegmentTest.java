@@ -357,13 +357,24 @@ public class SegmentTest {
                 fastaReader(FastaReader).
                 marginSize(250).
                 build();
-        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        List<IntPair> ip = testSeg.getSegmentMargins();
         Integer upStreamStaPos = ip.get(0).getStartPos();
         Integer upStreamEndPos = ip.get(0).getEndPos();
 
-        AlignabilityMap testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
+        String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
+        String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
+        AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilityPath,chromInfoPath,50);
+        Chromosome2AlignabilityMap amp=null;
+        while (apiterator.hasNext()) {
+            Chromosome2AlignabilityMap c2m=apiterator.next();
+            if (c2m.getChromName().equals("chr1")) {
+                amp=c2m;
+                break;
+            }
+        }
+        assertNotNull(amp);
 
-        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,testMap,0.35,0.65,10.0);
+        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,amp,0.35,0.65,10.0);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
             logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore());
@@ -382,12 +393,24 @@ public class SegmentTest {
                 fastaReader(FastaReader).
                 marginSize(250).
                 build();
-        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        List<IntPair> ip = testSeg.getSegmentMargins();
 
         //AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
-        AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        //AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
+        String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
+        String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
+        AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilityPath,chromInfoPath,50);
+        Chromosome2AlignabilityMap amp=null;
+        while (apiterator.hasNext()) {
+            Chromosome2AlignabilityMap c2m=apiterator.next();
+            if (c2m.getChromName().equals("chr20")) {
+                amp=c2m;
+                break;
+            }
+        }
+        assertNotNull(amp);
 
-        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,testMap,0.35,0.65,10.0);
+        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,amp,0.35,0.65,10.0);
 
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
