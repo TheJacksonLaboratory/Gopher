@@ -86,6 +86,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
                 chromosomes.put(referenceseq, group);
             }
             group.addVPVGene(g);
+            logger.trace("Chrom group="+group.getReferenceSequenceID());
             n_totalGenes++;
             n_total_promoters += g.n_viewpointstarts();
         }

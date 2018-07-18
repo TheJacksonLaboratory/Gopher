@@ -174,6 +174,7 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
                     coordinateList.add(startPos);
                     scoreList.add(alignabilityScore);
                     prevEnd = endPos;
+                    logger.trace("returning array pair for " + currentArrayPair.getChromName());
                     return currentArrayPair; // THIS IS WHERE THE ITERATOR RETURNS THE NEXT OBJECT
                 } else {
                     // this is NOT the first line for a new chromosome

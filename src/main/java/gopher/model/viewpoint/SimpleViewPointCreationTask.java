@@ -50,7 +50,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         super(model,currentVPproperty);
-        this.alignabilityMap=alignabilityMap;
+       // this.alignabilityMap=alignabilityMap;
     }
 
     /** This will be replace by the method below.*/
@@ -196,8 +196,20 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 Chromosome2AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
                 logger.trace("NEW--Creating viewpoints for RefID=" + referenceSequenceID);
+                if (! chromosomes.containsKey(referenceSequenceID)) {
+                    continue; // skip if we have no gene on this chromosome
+                }
                 ChromosomeGroup group = chromosomes.get(referenceSequenceID);
+                if (group==null) {
+                    logger.error("group is null while searching for \"" + referenceSequenceID +"\"");
+                    for (ChromosomeGroup g : chromosomes.values()) {
+                        logger.error(g.getReferenceSequenceID());
+                    }
+                } else {
+                    logger.trace("group="+group.getReferenceSequenceID());
+                }
                 for (GopherGene gene : group.getGenes()) {
+                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
                     // group.getGenes().parallelStream().forEach(vpvGene -> {
                     calculateViewPointsWithArrayPair(gene, referenceSequenceID, fastaReader,apair);
                 }
