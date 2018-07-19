@@ -20,7 +20,10 @@ import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.io.*;
 import gopher.model.*;
 import gopher.model.digest.DigestCreationTask;
-import gopher.model.viewpoint.*;
+import gopher.model.viewpoint.ExtendedViewPointCreationTask;
+import gopher.model.viewpoint.SimpleViewPointCreationTask;
+import gopher.model.viewpoint.ViewPoint;
+import gopher.model.viewpoint.ViewPointCreationTask;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 import javafx.beans.binding.Bindings;
@@ -832,6 +835,9 @@ public class GopherMainPresenter implements Initializable {
                     window.close();
                     break;
                 case CANCEL:
+                    task.cancel();
+                    window.close();
+                    break;
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
@@ -840,7 +846,7 @@ public class GopherMainPresenter implements Initializable {
 
         task.setOnSucceeded(event -> {
             logger.trace("Finished creating digest file");
-            pbpresent.closeWindow();
+            window.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
@@ -904,9 +910,9 @@ public class GopherMainPresenter implements Initializable {
        //
 
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,alignabilityMap);
+            task = new SimpleViewPointCreationTask(model);
         } else {
-            task = new ExtendedViewPointCreationTask(model,alignabilityMap);
+            task = new ExtendedViewPointCreationTask(model);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
@@ -917,15 +923,17 @@ public class GopherMainPresenter implements Initializable {
 
 
         Stage window = new Stage();
-        String windowTitle = "Viewpoint creation";
+        window.setTitle("Viewpoint creation");
+        window.setAlwaysOnTop(true);
         window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
         pbpresent.setSignal(signal -> {
             switch (signal) {
                 case DONE:
                     window.close();
                     break;
                 case CANCEL:
+                    task.cancel();
+                    break;
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
@@ -938,13 +946,16 @@ public class GopherMainPresenter implements Initializable {
             this.vpanalysispresenter.showVPTable();
             selectionModel.select(this.analysistab);
             logger.trace("Finished createViewPoints()");
-            pbpresent.closeWindow();
+            window.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create viewpoints",
                     exc);
+        });
+        task.setOnCancelled(eh -> {
+            window.close();
         });
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));

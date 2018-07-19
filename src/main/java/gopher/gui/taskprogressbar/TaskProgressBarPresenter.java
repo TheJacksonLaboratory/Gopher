@@ -45,8 +45,7 @@ public class TaskProgressBarPresenter implements Initializable {
         this.signal = signal;
     }
 
-    public void closeWindow(){
-        signal.accept(Signal.DONE);
+    public void cancelButtonAction() {
+        signal.accept(Signal.CANCEL);
     }
-
 }

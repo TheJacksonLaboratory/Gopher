@@ -3,6 +3,8 @@ package gopher.model.viewpoint;
 import gopher.model.GopherGene;
 import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 

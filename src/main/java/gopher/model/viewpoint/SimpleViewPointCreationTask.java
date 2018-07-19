@@ -4,16 +4,12 @@ import gopher.exception.GopherException;
 import gopher.model.GopherGene;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import htsjdk.samtools.reference.ReferenceSequence;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 
 /**
@@ -35,15 +31,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
      *  @param model
-   * @param alignabilityMap
    */
-  public SimpleViewPointCreationTask(Model model, AlignabilityMap alignabilityMap) {
+  public SimpleViewPointCreationTask(Model model) {
       super(model);
-        this.alignabilityMap=alignabilityMap;
-    public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
-        super(model,currentVPproperty);
 
-    }
+  }
 
     /** This will be replace by the method below.*/
   //  @Deprecated

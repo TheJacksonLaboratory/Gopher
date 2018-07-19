@@ -166,6 +166,8 @@ public class DigestCreationTask extends Task<Void> {
         this.enzyme2number=new HashMap<>();
         int n=0;
         for (RestrictionEnzyme re  : this.restrictionEnzymeList) {
+            if (isCancelled()) // true if user has cancelled the task
+                return;
             if (re==null) {
                 throw new GopherException("Got null restriction enzyme");
             } else {
@@ -201,6 +203,8 @@ public class DigestCreationTask extends Task<Void> {
 
         ReferenceSequence refseq;
         while ((refseq=fastaReader.nextSequence())!=null) {
+            if (isCancelled()) // true if user has cancelled the task
+                return;
             String seqname = refseq.getName();
             // note fastaReader refers to one-based numbering scheme.
             String sequence = fastaReader.getSequence(seqname).getBaseString();
