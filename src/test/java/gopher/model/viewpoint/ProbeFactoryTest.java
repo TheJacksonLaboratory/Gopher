@@ -9,21 +9,33 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class ProbeFactoryTest {
     private static Logger logger = Logger.getLogger(ProbeFactoryTest.class.getName());
 
-    private static AlignabilityMap testMap = null;
     private static Segment testSeg = null;
     private static IndexedFastaSequenceFile FastaReader;
+    private static Chromosome2AlignabilityMap alignMap;
 
     @BeforeClass
     public static void setup() throws Exception {
 
         // create AlignabilityMap object for testing
-        testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
+        //testMap = new AlignabilityMap(, ,50);
+        String alignabilitypath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
+        String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
+        int kmerlen=50;
+        AlignabilityMapIterator iterator = new AlignabilityMapIterator(alignabilitypath,chromInfoPath,kmerlen);
+        while (iterator.hasNext()) {
+            Chromosome2AlignabilityMap c2amap=iterator.next();
+            if (c2amap.getChromName().equals("chr1")) {
+                alignMap = c2amap;
+                break;
+            }
+        }
 
         // create segments for testing
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
@@ -40,7 +52,7 @@ public class ProbeFactoryTest {
     @Test
     public void testGetSegmentMargins() {
 
-        ArrayList<IntPair> ip = testSeg.getSegmentMargins();
+        List<IntPair> ip = testSeg.getSegmentMargins();
         Integer upStreamStaPos = ip.get(0).getStartPos();
         Integer upStreamEndPos = ip.get(0).getEndPos();
         Integer downStreamStaPos = ip.get(1).getStartPos();
@@ -48,10 +60,10 @@ public class ProbeFactoryTest {
 
         logger.trace(upStreamStaPos);
         logger.trace(upStreamEndPos);
-        logger.trace(testMap.getScoreFromTo("chr1", upStreamStaPos, upStreamEndPos));
+        logger.trace(alignMap.getScoreFromTo(upStreamStaPos, upStreamEndPos));
         logger.trace(downStreamStaPos);
         logger.trace(downStreamEndPos);
-        logger.trace(testMap.getScoreFromTo("chr1", downStreamStaPos, downStreamEndPos));
+        logger.trace(alignMap.getScoreFromTo( downStreamStaPos, downStreamEndPos));
 
 
 

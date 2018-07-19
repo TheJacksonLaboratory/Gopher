@@ -1,5 +1,6 @@
 package gopher.gui.popupdialog;
 
+import gopher.model.Default;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
@@ -9,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import gopher.model.Default;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -345,9 +345,14 @@ public class PopupFactory {
         window.setMinWidth(250);
         Label label = new Label();
         label.setText(message);
+        label.setPadding(new Insets(5));
 
         Button yesButton = new Button("Yes");
+        yesButton.setDefaultButton(true);
+        yesButton.setMinWidth(80);
         Button noButton = new Button("No");
+        noButton.setCancelButton(true);
+        noButton.setMinWidth(80);
 
         yesButton.setOnAction(e -> {
             answer.setValue(true);
@@ -359,8 +364,12 @@ public class PopupFactory {
         });
 
         VBox layout = new VBox(10);
+        HBox buttonLayout = new HBox(20);
+        buttonLayout.setAlignment(Pos.CENTER);
+        buttonLayout.getChildren().addAll(noButton, yesButton);
+        buttonLayout.setPadding(new Insets(5));
 
-        layout.getChildren().addAll(label, yesButton, noButton);
+        layout.getChildren().addAll(label, buttonLayout);
         layout.setAlignment(Pos.CENTER);
         Scene scene = new Scene(layout);
         window.setScene(scene);

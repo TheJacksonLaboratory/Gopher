@@ -42,6 +42,8 @@ public class SegmentFactory implements Serializable {
     static void setRestrictionEnzymeMap(Map<String, RestrictionEnzyme> m) {
         restrictionEnzymeMap = m;
     }
+    /** This determines the maximum allowed zooming factor for the extended approach. */
+    static final int MAXIMUM_ZOOM_FACTOR=3;
 
 
 
@@ -65,11 +67,11 @@ public class SegmentFactory implements Serializable {
                           Integer maxDistToGenomicPosUp,
                           Integer maxDistToGenomicPosDown,
                           List<RestrictionEnzyme> chosenEnzymeList) {
-        maxDistToGenomicPosUp=maxDistToGenomicPosUp*3;
+        maxDistToGenomicPosUp=maxDistToGenomicPosUp*MAXIMUM_ZOOM_FACTOR;
         if(genomicPos<maxDistToGenomicPosUp) {
             maxDistToGenomicPosUp=genomicPos;
         }
-        maxDistToGenomicPosDown=maxDistToGenomicPosDown*3;
+        maxDistToGenomicPosDown=maxDistToGenomicPosDown*MAXIMUM_ZOOM_FACTOR;
         Integer referenceSequenceLen = fastaReader.getSequence(referenceSequenceID).length();
         if(referenceSequenceLen < genomicPos + maxDistToGenomicPosDown) {
             maxDistToGenomicPosDown = referenceSequenceLen - genomicPos;

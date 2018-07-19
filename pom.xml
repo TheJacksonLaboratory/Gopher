@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>jax</groupId>
-    <artifactId>vpvgui</artifactId>
+    <groupId>gopher</groupId>
+    <artifactId>GopherGui</artifactId>
     <version>0.3.9</version>
     <packaging>jar</packaging>
 
@@ -96,7 +96,8 @@
 
 
     <build>
-        <!--  <sourceDirectory>src</sourceDirectory> -->
+        <finalName>GopherGui-${project.version}</finalName>
+          <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -138,7 +139,7 @@
                 </includes>
             </resource>
         </resources>
-        <finalName>VpvGui-${project.version}</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -234,6 +235,34 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Build and assembly ZIP file -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>gopher.Gopher</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>create-archive</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -244,8 +273,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
-
 
     </build>
 

@@ -1,8 +1,11 @@
 package gopher.gui.entrezgenetable;
 
 
-
+import gopher.framework.Signal;
+import gopher.gui.popupdialog.PopupFactory;
+import gopher.io.RefGeneParser;
 import gopher.model.GopherGene;
+import gopher.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,18 +14,12 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import gopher.framework.Signal;
-import gopher.gui.popupdialog.PopupFactory;
-import gopher.io.RefGeneParser;
-import gopher.model.Model;
 
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
@@ -136,6 +133,7 @@ public class EntrezGenePresenter implements Initializable {
     @FXML
     public void uploadGenes(ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = fileChooser.showOpenDialog(stage);
         if (file == null) {
             logger.error("Could not get name of file with gene symbols");
@@ -154,10 +152,18 @@ public class EntrezGenePresenter implements Initializable {
      * @param file
      */
     public void uploadGenesFromFile(File file) {
+        try {
+            this.uploadGenesFromFile(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            logger.error("I/O Error reading file with target genes: '" + file.getAbsolutePath() + "'", e);
+        }
+    }
+
+    public void uploadGenesFromFile(Reader reader) {
         this.symbols = new ArrayList<>();
         try {
-            BufferedReader br =new BufferedReader(new FileReader(file));
-            String line =null;
+            BufferedReader br =new BufferedReader(reader);
+            String line;
             while ((line=br.readLine())!=null) {
                 symbols.add(line.trim());
             }
@@ -169,7 +175,6 @@ public class EntrezGenePresenter implements Initializable {
         logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));
         isvalidated=false;
     }
-
 
 
     private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {

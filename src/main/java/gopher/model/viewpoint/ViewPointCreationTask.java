@@ -1,16 +1,20 @@
 package gopher.model.viewpoint;
 
 import gopher.model.GopherGene;
-import javafx.beans.property.StringProperty;
-import javafx.concurrent.Task;
-import org.apache.log4j.Logger;
 import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
+import javafx.concurrent.Task;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Base class for the tasks that create viewpoints.
@@ -28,8 +32,6 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     private int n_total_promoters;
     /** Referece to the model with all project data. */
     protected Model model;
-    /** This is used to show the name of the current Gene on the viewpoint creation dialog. */
-    StringProperty currentVP = null;
 
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
@@ -39,12 +41,11 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     protected abstract Void call() throws Exception;
 
 
-    ViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+    ViewPointCreationTask(Model model) {
         this.model = model;
         this.viewpointlist = new ArrayList<>();
         assignVPVGenesToChromosomes(model.getVPVGeneList());
         logger.trace(String.format("ViewPointCreationTask -- we got %d total genes",n_totalGenes));
-        this.currentVP = currentVPproperty;
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
         SegmentFactory.restrictionEnzymeMap = new HashMap<>();
         List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
@@ -81,9 +82,55 @@ public abstract class ViewPointCreationTask extends Task<Void> {
                 chromosomes.put(referenceseq, group);
             }
             group.addVPVGene(g);
+            logger.trace("Chrom group="+group.getReferenceSequenceID());
             n_totalGenes++;
             n_total_promoters += g.n_viewpointstarts();
         }
+    }
+
+    /**
+     * Estimate the average size of restriction fragments for the chosen restriction enyzymes
+     * by looking at at least 100,000 fragments
+     * @param fastaReader
+     * @return
+     */
+    double getEstimatedMeanRestrictionFragmentLength(IndexedFastaSequenceFile fastaReader) {
+        logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
+        int THRESHOLD_NUMBER_OF_FRAGMENTS=100_000;
+        // Combine all patterns into one regular expression.
+        String regExCombinedCutPat = model.getChosenEnzymelist().
+                stream().
+                map(RestrictionEnzyme::getPlainSite).
+                collect(Collectors.joining("|"));
+        // count all occurrences of the cutting motifs and divide by sequence length
+        int totalNumOfCuts = 0;
+        long totalLength = 0;
+        ReferenceSequence rf = fastaReader.nextSequence();
+        while(rf != null) {
+            if(rf.getName().contains("_")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosomes
+            if(rf.getName().contains("chrM")) {rf = fastaReader.nextSequence(); continue;} // skip random chromosome M
+            logger.trace("Cutting: " + rf.getName());
+            String sequence = fastaReader.getSequence(rf.getName()).getBaseString();
+            logger.trace("\tPattern: " + regExCombinedCutPat);
+            Pattern pattern = Pattern.compile(regExCombinedCutPat,Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(sequence);
+            while (matcher.find()) {
+                totalNumOfCuts++;
+            }
+
+            totalLength = totalLength + sequence.length();
+            logger.trace("\tCurrent number of cuts: " + totalNumOfCuts);
+            logger.trace("\tCurrent length: " + totalLength);
+            logger.trace("\tEstimated average length : " + (1.0*totalLength/totalNumOfCuts));
+            rf = fastaReader.nextSequence();
+            if(THRESHOLD_NUMBER_OF_FRAGMENTS<totalNumOfCuts) {break;}
+        }
+
+        double estAvgRestFragLen = (double)totalLength/totalNumOfCuts;
+        model.setEstAvgRestFragLen(estAvgRestFragLen);
+        logger.trace("Total number of cuts: " + totalNumOfCuts +"; Total length: " + totalLength);
+        logger.trace("Estimated average length : " + estAvgRestFragLen);
+        return estAvgRestFragLen;
     }
 
 
