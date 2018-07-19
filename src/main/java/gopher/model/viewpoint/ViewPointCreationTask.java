@@ -1,13 +1,12 @@
 package gopher.model.viewpoint;
 
 import gopher.model.GopherGene;
-import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import htsjdk.samtools.reference.ReferenceSequence;
-import javafx.beans.property.StringProperty;
-import javafx.concurrent.Task;
-import org.apache.log4j.Logger;
 import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
+import javafx.concurrent.Task;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     private int n_total_promoters;
     /** Referece to the model with all project data. */
     protected Model model;
-    /** This is used to show the name of the current Gene on the viewpoint creation dialog. */
-    StringProperty currentVP = null;
 
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
@@ -44,12 +41,11 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     protected abstract Void call() throws Exception;
 
 
-    ViewPointCreationTask(Model model, StringProperty currentVPproperty) {
+    ViewPointCreationTask(Model model) {
         this.model = model;
         this.viewpointlist = new ArrayList<>();
         assignVPVGenesToChromosomes(model.getVPVGeneList());
         logger.trace(String.format("ViewPointCreationTask -- we got %d total genes",n_totalGenes));
-        this.currentVP = currentVPproperty;
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
         SegmentFactory.restrictionEnzymeMap = new HashMap<>();
         List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();

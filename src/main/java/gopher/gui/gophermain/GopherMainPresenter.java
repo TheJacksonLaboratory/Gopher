@@ -20,11 +20,17 @@ import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.io.*;
 import gopher.model.*;
 import gopher.model.digest.DigestCreationTask;
-import gopher.model.viewpoint.*;
+import gopher.model.viewpoint.ExtendedViewPointCreationTask;
+import gopher.model.viewpoint.SimpleViewPointCreationTask;
+import gopher.model.viewpoint.ViewPoint;
+import gopher.model.viewpoint.ViewPointCreationTask;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -45,6 +51,8 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -808,13 +816,15 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         String path = file.getAbsolutePath();
-        StringProperty sp=new SimpleStringProperty();
-        DigestCreationTask task = new DigestCreationTask(path,model,sp);
+        DigestCreationTask task = new DigestCreationTask(path,model);
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.setTitle("Creating Digest file");
-        pbpresent.initBindings(task,sp);
+
+        pbpresent.titleProperty().bind(task.titleProperty());
+        pbpresent.messageProperty().bind(task.messageProperty());
+        pbpresent.progressProperty().bind(task.progressProperty());
+
         Stage window = new Stage();
         String windowTitle = "Digest file creation";
         window.setOnCloseRequest( event -> window.close() );
@@ -825,6 +835,9 @@ public class GopherMainPresenter implements Initializable {
                     window.close();
                     break;
                 case CANCEL:
+                    task.cancel();
+                    window.close();
+                    break;
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
@@ -833,7 +846,7 @@ public class GopherMainPresenter implements Initializable {
 
         task.setOnSucceeded(event -> {
             logger.trace("Finished creating digest file");
-            pbpresent.closeWindow();
+            window.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
@@ -888,7 +901,7 @@ public class GopherMainPresenter implements Initializable {
         if (! OK ) {
             return;
         }
-        StringProperty sp=new SimpleStringProperty();
+
         ViewPointCreationTask task;
 
         // TODO use boolean var allowSingleMargin
@@ -897,28 +910,30 @@ public class GopherMainPresenter implements Initializable {
        //
 
         if (model.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model,sp);
+            task = new SimpleViewPointCreationTask(model);
         } else {
-            //AlignabilityMap alignabilityMap = new AlignabilityMap(model.getChromInfoPathIncludingFileNameGz(),model.getAlignabilityMapPathIncludingFileNameGz(),50);
-            logger.trace("...done.");
-            task = new ExtendedViewPointCreationTask(model,sp);
+            task = new ExtendedViewPointCreationTask(model);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.setTitle("Creating Viewpoints ...");
-        pbpresent.initBindings(task,sp);
+        pbpresent.titleProperty().bind(task.titleProperty());
+        pbpresent.messageProperty().bind(task.messageProperty());
+        pbpresent.progressProperty().bind(task.progressProperty());
+
 
         Stage window = new Stage();
-        String windowTitle = "Viewpoint creation";
+        window.setTitle("Viewpoint creation");
+        window.setAlwaysOnTop(true);
         window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
         pbpresent.setSignal(signal -> {
             switch (signal) {
                 case DONE:
                     window.close();
                     break;
                 case CANCEL:
+                    task.cancel();
+                    break;
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
@@ -931,13 +946,16 @@ public class GopherMainPresenter implements Initializable {
             this.vpanalysispresenter.showVPTable();
             selectionModel.select(this.analysistab);
             logger.trace("Finished createViewPoints()");
-            pbpresent.closeWindow();
+            window.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create viewpoints",
                     exc);
+        });
+        task.setOnCancelled(eh -> {
+            window.close();
         });
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
@@ -1090,45 +1108,53 @@ public class GopherMainPresenter implements Initializable {
 
 
     @FXML public void openGeneWindowWithExampleHumanGenes() {
-        File file = new File(getClass().getClassLoader().getResource("humangenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/humangenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example human gene list at path '/humangenesymbols.txt'");
             PopupFactory.displayError("Could not open example human gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleFlyGenes() {
-        File file = new File(getClass().getClassLoader().getResource("flygenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/flygenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example fly gene list at path '/flygenesymbols.txt'");
             PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleMouseGenes() {
-        File file = new File(getClass().getClassLoader().getResource("mousegenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/mousegenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example fly gene list at path '/mousegenesymbols.txt'");
             PopupFactory.displayError("Could not open example mouse gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
     @FXML public void openGeneWindowWithExampleRatGenes() {
-        File file = new File(getClass().getClassLoader().getResource("ratgenesymbols.txt").getFile());
-        if (! file.exists()) {
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/ratgenesymbols.txt");
+
+        if (is == null) {
+            logger.warn("Could not open bundled example rat gene list at path '/ratgenesymbols.txt'");
             PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,file);
+        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));

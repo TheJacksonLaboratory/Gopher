@@ -10,12 +10,9 @@ import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
-import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -80,8 +77,6 @@ public class DigestCreationTask extends Task<Void> {
     private final int marginSize;
     /** Name of output file. */
     private final String outfilename;
-    /** String property that will be displayed on the GUI as the digest is being created. */
-    private StringProperty sproperty;
     /** Reference to current model. */
     private final Model model;
     /**  We will use this to show progress in digest creation. */
@@ -118,14 +113,13 @@ public class DigestCreationTask extends Task<Void> {
      * @param outfile name of output file
      * @param model Reference to the model
      */
-    public DigestCreationTask(String outfile, Model model, StringProperty sp) {
+    public DigestCreationTask(String outfile, Model model) {
         int msize = model.getMarginSize();
         this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath=model.getGenomeFastaFile();
         outfilename=outfile;
         logger.trace(String.format("Digest Factory initialize with FASTA file=%s",this.genomeFastaFilePath));
         marginSize=msize;
-        this.sproperty=sp;
         this.model=model;
     }
 
@@ -147,36 +141,33 @@ public class DigestCreationTask extends Task<Void> {
     }
 
     public Void call() {
-        updateLabelText("Creating binary tree of selected fragments...");
+        updateTitle("Creating Digest file");
+        updateMessage("Creating binary tree of selected fragments...");
         extractChosenSegments(model);
         logger.trace(String.format("We got a total of %d chosen segments in the binary tree",
                 this.btree.getN_nodes()));
 
         try {
-            digestGenome(sproperty);
+            digestGenome();
         } catch (GopherException ge) {
             PopupFactory.displayException("Digest error","Exception encountered while processing digest",ge);
         }
         return null;
     }
 
-    /** This updates the message on the GUI on a JavaFX thread to show the user which digests are
-     * being generated. */
-    private void updateLabelText(String msg) {
-        Platform.runLater( () -> sproperty.setValue(msg) );
-    }
 
 
     /**
      *
      * @throws GopherException If an null restriction enzyme is passed that does not match  of the allowed enzymes
      */
-    private void digestGenome(StringProperty sprop) throws GopherException {
+    private void digestGenome() throws GopherException {
         this.number2enzyme =new HashMap<>();
         this.enzyme2number=new HashMap<>();
-        this.sproperty=sprop;
         int n=0;
         for (RestrictionEnzyme re  : this.restrictionEnzymeList) {
+            if (isCancelled()) // true if user has cancelled the task
+                return;
             if (re==null) {
                 throw new GopherException("Got null restriction enzyme");
             } else {
@@ -212,12 +203,14 @@ public class DigestCreationTask extends Task<Void> {
 
         ReferenceSequence refseq;
         while ((refseq=fastaReader.nextSequence())!=null) {
+            if (isCancelled()) // true if user has cancelled the task
+                return;
             String seqname = refseq.getName();
             // note fastaReader refers to one-based numbering scheme.
             String sequence = fastaReader.getSequence(seqname).getBaseString();
             //ReferenceSequence refseq = fastaReader.nextSequence();
             logger.trace(String.format("Cutting %s (length %d)",seqname,sequence.length() ));
-            updateLabelText(String.format("Digesting %s",seqname));
+            updateMessage(String.format("Digesting %s",seqname));
             cutOneChromosome(seqname, sequence);
         }
 
@@ -280,7 +273,7 @@ public class DigestCreationTask extends Task<Void> {
                     0,
                     0));
             if (counter%1000==0) {
-                updateLabelText(String.format("Digesting %s [%d digests so far]",scaffoldName,counter ));
+                updateMessage(String.format("Digesting %s [%d digests so far]",scaffoldName,counter ));
             }
             counter++;
             previousCutEnzyme=number2enzyme.get(f.enzymeNumber).getName();
