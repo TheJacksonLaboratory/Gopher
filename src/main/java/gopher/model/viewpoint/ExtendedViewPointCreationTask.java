@@ -1,12 +1,12 @@
 package gopher.model.viewpoint;
 
+import gopher.exception.GopherException;
 import gopher.model.GopherGene;
+import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import org.apache.log4j.Logger;
-import gopher.exception.GopherException;
-import gopher.model.Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,11 +35,14 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
      *  @param model
-     * @param currentVPproperty
+     * @param alignabilityMap
      */
     public ExtendedViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         super(model, currentVPproperty);
 
+    public ExtendedViewPointCreationTask(Model model, AlignabilityMap alignabilityMap) {
+        super(model);
+        this.alignabilityMap=alignabilityMap;
     }
 
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,Chromosome2AlignabilityMap c2aMap) {
@@ -72,7 +75,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateLabelText(this.currentVP, vpvgene.toString());
+            updateMessage(String.format("Creating view point for %s", vpvgene.toString()));
             vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model);
             viewpointlist.add(vp);
         }
@@ -87,6 +90,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * @throws Exception
      */
     protected Void call() throws GopherException {
+        updateTitle("Creating viewpoints using 'extended' approach");
         if (ViewPoint.chosenEnzymes == null) {
             logger.error("Attempt to start ViewPoint creation with chosenEnzymes=null");
             throw new GopherException("Attempt to start ViewPoint creation thread with null chosenEnzymes");

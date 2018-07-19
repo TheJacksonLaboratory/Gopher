@@ -1,15 +1,17 @@
 package gopher.model.viewpoint;
 
-import gopher.model.GopherGene;
-import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
-import org.apache.log4j.Logger;
 import gopher.exception.GopherException;
+import gopher.model.GopherGene;
 import gopher.model.Model;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.reference.ReferenceSequence;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.IOException;
 import java.util.*;
 
@@ -33,9 +35,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
      *  @param model
-     * @param currentVPproperty
-
+   * @param alignabilityMap
    */
+  public SimpleViewPointCreationTask(Model model, AlignabilityMap alignabilityMap) {
+      super(model);
+        this.alignabilityMap=alignabilityMap;
     public SimpleViewPointCreationTask(Model model, StringProperty currentVPproperty) {
         super(model,currentVPproperty);
 
@@ -108,7 +112,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateLabelText(this.currentVP, vpvgene.toString());
+            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene.toString()));
             vp.generateViewpointSimple(model);
             if (vp.getResolved()) {
                 viewpointlist.add(vp);
@@ -128,6 +132,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * @throws GopherException if we cannot create the viewpoints
      */
     protected Void call() throws GopherException {
+        updateTitle("Creating viewpoints using 'simple' approach");
         if (ViewPoint.chosenEnzymes == null) {
             logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
@@ -192,15 +197,4 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         return null;
     }
 
-
-
-
-
-
-
-
-    /** This updates the message on the GUI on a JavaFX thread to show the user which view points are being generated. */
-    private void updateLabelText(StringProperty sb, String msg) {
-        Platform.runLater( () -> sb.setValue(String.format("[%d/%d] Creating view point for %s",i,total, msg)) );
-    }
 }
