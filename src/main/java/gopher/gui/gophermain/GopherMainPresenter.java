@@ -116,6 +116,9 @@ public class GopherMainPresenter implements Initializable {
     @FXML private TextField baitLengthTextField;
     @FXML private TextField marginSizeTextField;
 
+    @FXML private CheckBox unbalancedMarginCheckbox;
+    @FXML private CheckBox patchedViewpointCheckbox;
+
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
     /** Show how many valid genes were uploaded by user. */
@@ -132,13 +135,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label downloadAlignabilityLabel;
     @FXML private Label decompressAlignabilityLabel;
 
-    @FXML RadioMenuItem tiling1;
-    @FXML RadioMenuItem tiling2;
-    @FXML RadioMenuItem tiling3;
-    @FXML RadioMenuItem tiling4;
-    @FXML RadioMenuItem tiling5;
-    @FXML RadioMenuItem singleMarginRadioMenuitem;
-    @FXML RadioMenuItem bothMarginsRadioMenuitem;
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
 
@@ -209,6 +205,9 @@ public class GopherMainPresenter implements Initializable {
     private void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
     private DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
+
+
+
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
@@ -268,20 +267,6 @@ public class GopherMainPresenter implements Initializable {
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
-        ToggleGroup tGroup = new ToggleGroup();
-        tGroup.getToggles().addAll(tiling1,tiling2,tiling3,tiling4,tiling5);
-        tiling1.setOnAction(e->{this.model.setTilingFactor(1);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling2.setOnAction(e->{this.model.setTilingFactor(2);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling2.setSelected(true);
-
-        ToggleGroup marginToggleGroup = new ToggleGroup();
-        marginToggleGroup.getToggles().addAll(singleMarginRadioMenuitem,bothMarginsRadioMenuitem);
-        singleMarginRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(true); e.consume();});
-        bothMarginsRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(false); e.consume();});
-        singleMarginRadioMenuitem.setSelected(true);
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -369,13 +354,9 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.nValidGenesLabel.setText(null);
         }
-        if (model.getAllowSingleMargin()) {
-            this.bothMarginsRadioMenuitem.setSelected(false);
-            this.singleMarginRadioMenuitem.setSelected(true);
-        } else {
-            this.bothMarginsRadioMenuitem.setSelected(true);
-            this.singleMarginRadioMenuitem.setSelected(false);
-        }
+        /// TODO -- ALSO FOR PATCHED.
+        this.unbalancedMarginCheckbox.setSelected(model.getAllowSingleMargin());
+
     }
 
     /**
@@ -1381,6 +1362,20 @@ public class GopherMainPresenter implements Initializable {
         }
         report.outputRegulatoryReport(file.getAbsolutePath());
         e.consume();
+    }
+
+
+    @FXML private void setUnbalancedMargin(ActionEvent e) {
+        if (unbalancedMarginCheckbox.isSelected()) {
+            this.model.setAllowSingleMargin(true);
+        } else {
+            this.model.setAllowSingleMargin(false);
+        }
+        e.consume();
+    }
+
+    @FXML private void setPatchedViewpoint() {
+        logger.error("TODO -- SET PATCHED VIEWPOINT IN MODEL?????");
     }
 }
 
