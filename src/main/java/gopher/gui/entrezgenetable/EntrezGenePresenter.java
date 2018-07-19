@@ -41,8 +41,10 @@ import java.util.function.Consumer;
  */
 public class EntrezGenePresenter implements Initializable {
     static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
-    @FXML
-    private WebView wview;
+    /** This webview explains how to enter genes */
+    @FXML private WebView wview;
+    /** This webview explains how to select all protein coding genes */
+    @FXML private WebView wview2;
     /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
     /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
@@ -117,7 +119,7 @@ public class EntrezGenePresenter implements Initializable {
         this.model.setUniqueChosenTSScount(uniqueChosenTSS);
         this.model.setChosenGeneCount(chosenGeneCount);
         model.setTotalRefGeneCount(n_genes);
-        setData(html);
+        setData(html,"");
         isvalidated=true;
     }
 
@@ -125,9 +127,12 @@ public class EntrezGenePresenter implements Initializable {
 
 
    /** Sets the text that will be shown in the HTML View. */
-    public void setData(String html) {
+    public void setData(String html, String html2) {
+        logger.trace("Setting data html2="+html2);
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
+        WebEngine engine2 = wview2.getEngine();
+        engine2.loadContent(html2);
     }
 
     @FXML
@@ -171,9 +176,14 @@ public class EntrezGenePresenter implements Initializable {
             logger.error("I/O Error reading file with target genes");
             logger.error(err,err);
         }
-        setData(getInitialGeneListHTML(symbols));
+        setData(getInitialGeneListHTML(symbols), "");
         logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));
         isvalidated=false;
+    }
+
+    @FXML private void allProteinCodingGenes(ActionEvent e) {
+        e.consume();
+        logger.trace("Getting all protein coding genes");
     }
 
 

@@ -65,7 +65,8 @@ public class EntrezGeneViewFactory {
 
         });
         String html=getHTML();
-        presenter.setData(html);
+        String html2=getHTML2();
+        presenter.setData(html,html2);
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
     }
@@ -88,8 +89,20 @@ public class EntrezGeneViewFactory {
         sb.append("</p>");
         sb.append("</body></html>");
         return sb.toString();
-
     }
+
+
+    private static String getHTML2() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body><h3>All protein-coding genes</h3>");
+        sb.append("<p>");
+        sb.append("Click on the <b><TT>All protein-coding genes</TT></b> button to load all the protein-coding genes for a Capture Hi-C experiment. ");
+        sb.append("The list of protein coding genes is determined from the downloaded transcript file. This option is typically selected for global promoterome experiments.");
+        sb.append("</p>");
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+
 
 
 }
