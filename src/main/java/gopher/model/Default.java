@@ -37,4 +37,6 @@ public class Default {
 
     public final static int MAX_BAIT_NUMBER = 3;
 
+    public final static int DEFAULT_BAIT_LENGTH=120;
+
 }

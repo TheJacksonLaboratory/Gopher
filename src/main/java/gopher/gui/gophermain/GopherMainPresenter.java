@@ -50,12 +50,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-
 /**
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.2.8 (2017-11-12)
+ * @version 0.2.9 (2018-07-17)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
@@ -106,6 +105,8 @@ public class GopherMainPresenter implements Initializable {
     @FXML private TextField maxGCContentTextField;
     @FXML private TextField minBaitCountTextField;
     @FXML private TextField maxBaitCountTextField;
+    @FXML private TextField baitLengthTextField;
+    @FXML private TextField marginSizeTextField;
 
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
@@ -173,6 +174,16 @@ public class GopherMainPresenter implements Initializable {
     private int getMinimumBaitCount(){ return minBaitCount.get();}
     private void setMinimumBaitCount(int bc) { this.minBaitCount.set(bc);}
     private IntegerProperty minimumBaitCountProperty() { return minBaitCount; }
+
+    transient private IntegerProperty baitLength = new SimpleIntegerProperty();
+    private int getBaitLength() { return baitLength.get();}
+    private void setBaitLength(int len) { this.baitLength.set(len);}
+    private IntegerProperty baitLengthProperty() { return baitLength; }
+
+    transient private IntegerProperty marginLength = new SimpleIntegerProperty();
+    private int getMarginLength(){ return marginLength.get(); }
+    private void setMarginLength(int len) { this.marginLength.set(len);}
+    private IntegerProperty marginLengthProperty() { return  marginLength; }
 
     transient private IntegerProperty maxBaitCount = new SimpleIntegerProperty();
     private int getMaximumBaitCount(){ return maxBaitCount.get();}
@@ -423,6 +434,17 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText("not initialized");
         }
+        if (model.getProbeLength()==0) {
+            this.baitLengthTextField.setText(String.valueOf(Default.PROBE_LENGTH));
+        } else {
+            this.baitLengthTextField.setText(String.valueOf(model.getProbeLength()));
+        }
+        if (model.getMarginSize()==0) {
+            this.marginSizeTextField.setText(String.valueOf(Default.MARGIN_SIZE));
+        } else {
+            this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
+        }
+
         if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
             this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                     this.model.getChosenGeneCount(),
@@ -448,6 +470,8 @@ public class GopherMainPresenter implements Initializable {
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
+        this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
+        this.baitLengthTextField.setPromptText(String.valueOf(Default.DEFAULT_BAIT_LENGTH));
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -462,9 +486,11 @@ public class GopherMainPresenter implements Initializable {
         this.maxGCContentTextField.setText(null);
         this.minFragSizeTextField.setText(null);
         this.maxKmerAlignabilityTextField.setText(null);
+        this.marginSizeTextField.setText(null);
+        this.baitLengthTextField.setText(null);
     }
 
-    /** Keep the six fields in the GUI in synch with the corresponding variables in this class. */
+    /** Keep the fields in the GUI in synch with the corresponding variables in this class. */
     private void setBindings() {
         StringConverter<Number> converter = new NumberStringConverter();
         Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
@@ -475,6 +501,8 @@ public class GopherMainPresenter implements Initializable {
         Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
         Bindings.bindBidirectional(this.maxBaitCountTextField.textProperty(),maximumBaitCountProperty(),converter);
+        Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),converter);
+        Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),converter);
         sizeDownTextField.clear();
         sizeUpTextField.clear();
         minFragSizeTextField.clear();
@@ -483,6 +511,8 @@ public class GopherMainPresenter implements Initializable {
         maxGCContentTextField.clear();
         minBaitCountTextField.clear();
         maxBaitCountTextField.clear();
+        baitLengthTextField.clear();
+        marginSizeTextField.clear();
 
     }
 
@@ -508,6 +538,10 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinBaitCount(minbait);
         int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
         this.model.setMaxBaitCount(maxbait);
+        int baitlen = getBaitLength()>0?getBaitLength() : Default.DEFAULT_BAIT_LENGTH;
+        this.model.setProbeLength(baitlen);
+        int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
+        this.model.setMarginSize(marginsize);
     }
 
 
@@ -698,7 +732,7 @@ public class GopherMainPresenter implements Initializable {
 
         // check if the file that is going to be downloaded already exists
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
-            logger.trace(String.format("Found " +  alignabilityMapPathIncludingFileNameGz + ". No need to download"));
+            logger.trace(String.format("Found %s. No need to download",alignabilityMapPathIncludingFileNameGz));
             this.alignabilityDownloadPI.setProgress(1.0);
             this.downloadAlignabilityLabel.setText("Download complete");
             return;
@@ -725,9 +759,7 @@ public class GopherMainPresenter implements Initializable {
         th.start();
 
         Downloader downloadTask = new Downloader(file, url, basenameGz, alignabilityDownloadPI);
-        downloadTask.setOnSucceeded( event -> {
-            this.downloadAlignabilityLabel.setText("Download complete");
-        });
+        downloadTask.setOnSucceeded( event -> this.downloadAlignabilityLabel.setText("Download complete")  );
         th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();
@@ -848,7 +880,7 @@ public class GopherMainPresenter implements Initializable {
      * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
-    public void createViewPoints() throws IOException {
+    public void createViewPoints()  {
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
@@ -1128,17 +1160,18 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML
     public void setProbeLength(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        Integer len= factory.setProbeLength(model.getProbeLength());
-        if (factory.wasCancelled())
-            return; // do nothing, the user cancelled!
-        if (len == null || len <=0) {
-            PopupFactory.displayError("Could not get probe length", "enter a positive integer value!");
-            return;
-        }
-        this.model.setProbeLength(len);
-        this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("probe length set to %d", model.getProbeLength()));
+//        PopupFactory factory = new PopupFactory();
+//        Integer len= factory.setProbeLength(model.getProbeLength());
+//        if (factory.wasCancelled())
+//            return; // do nothing, the user cancelled!
+//        if (len == null || len <=0) {
+//            PopupFactory.displayError("Could not get probe length", "enter a positive integer value!");
+//            return;
+//        }
+//        this.model.setProbeLength(len);
+//        this.vpanalysispresenter.refreshVPTable();
+//        logger.trace(String.format("probe length set to %d", model.getProbeLength()));
+        logger.error("THIS METHOD SHOULD BE DELETED ONCE REFACTORING OF MENU IS COMPLETE");
     }
 
 

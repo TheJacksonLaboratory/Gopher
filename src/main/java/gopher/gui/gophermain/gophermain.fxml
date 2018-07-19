@@ -272,6 +272,7 @@
                                 <RowConstraints minHeight="40.0" />
                                 <RowConstraints minHeight="40.0" />
                         <RowConstraints minHeight="40.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="40.0" prefHeight="30.0" />
                                 <RowConstraints minHeight="45.0" />
                             </rowConstraints>
                             <Label fx:id="sizeUpLabel" text="Upstream size">
@@ -358,7 +359,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Button alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@gophermain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                            <Button alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@gophermain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
@@ -379,6 +380,26 @@
                         </GridPane.margin>
                      </TextField>
                      <TextField fx:id="maxBaitCountTextField" minHeight="30.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                        <GridPane.margin>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </GridPane.margin>
+                     </TextField>
+                     <Label text="Bait size" GridPane.rowIndex="4">
+                        <GridPane.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </GridPane.margin>
+                     </Label>
+                     <Label text="Margin size" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                        <GridPane.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </GridPane.margin>
+                     </Label>
+                     <TextField fx:id="baitLengthTextField" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <GridPane.margin>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </GridPane.margin>
+                     </TextField>
+                     <TextField fx:id="marginSizeTextField" GridPane.columnIndex="3" GridPane.rowIndex="4">
                         <GridPane.margin>
                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                         </GridPane.margin>
