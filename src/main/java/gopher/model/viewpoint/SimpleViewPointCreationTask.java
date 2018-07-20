@@ -42,8 +42,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * */
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap chr2alignMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
-        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
@@ -108,7 +106,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         } catch (FileNotFoundException fnfe) {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
-        //TODO -- PLEASE CHECK
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
         model.setEstAvgRestFragLen(meanLen);
         String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
@@ -116,12 +113,10 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
         try {
             AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
-            logger.trace("About to start iteration in new function");
-
             while (apiterator.hasNext()) {
                 Chromosome2AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
-                logger.trace("NEW--Creating viewpoints for RefID=" + referenceSequenceID);
+                logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
                 if (! chromosomes.containsKey(referenceSequenceID)) {
                     continue; // skip if we have no gene on this chromosome
                 }
@@ -134,11 +129,11 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 } else {
                     logger.trace("group="+group.getReferenceSequenceID());
                 }
-                for (GopherGene gene : group.getGenes()) {
-                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
-                    // group.getGenes().parallelStream().forEach(vpvGene -> {
-                    calculateViewPoints(gene, referenceSequenceID, fastaReader,apair);
-                }
+                //for (GopherGene gene : group.getGenes()) {
+                    group.getGenes().parallelStream().forEach(vpvGene -> {
+                        calculateViewPoints(vpvGene, referenceSequenceID, fastaReader, apair);
+                    });
+
             }
 
 
