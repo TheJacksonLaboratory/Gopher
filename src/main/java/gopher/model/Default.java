@@ -32,6 +32,7 @@ public class Default {
     public final static int MARGIN_SIZE = 250;
 
     public final static Boolean ALLOW_SINGLE_MARGIN=true;
+    public final static Boolean ALLOW_PATCHING=false;
 
     public final static int MIN_BAIT_NUMBER = 1;
 

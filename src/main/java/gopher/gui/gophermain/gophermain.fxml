@@ -402,7 +402,7 @@
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
                      </CheckBox>
-                     <CheckBox fx:id="patchedViewpointCheckbox" mnemonicParsing="false" onAction="#setPatchedViewpoint" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                     <CheckBox fx:id="patchedViewpointCheckbox" mnemonicParsing="false" onAction="#setAllowPatching" GridPane.columnIndex="3" GridPane.rowIndex="5">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>

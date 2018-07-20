@@ -1374,6 +1374,15 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
+    @FXML private void setAllowPatching(ActionEvent e) {
+        if (patchedViewpointCheckbox.isSelected()) {
+            this.model.setAllowPatching(true);
+        } else {
+            this.model.setAllowPatching(false);
+        }
+        e.consume();
+    }
+
     @FXML private void setPatchedViewpoint() {
         logger.error("TODO -- SET PATCHED VIEWPOINT IN MODEL?????");
     }

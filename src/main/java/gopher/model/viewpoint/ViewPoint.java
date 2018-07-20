@@ -496,6 +496,7 @@ public class ViewPoint implements Serializable {
     public void generateViewpointSimple(Model model) {
 
         boolean allowSingleMargin = model.getAllowSingleMargin();
+        boolean allowPatchedViewpoints = model.getAllowPatching();
         boolean resolved = true;
         approach = Approach.SIMPLE;
 
@@ -541,7 +542,7 @@ public class ViewPoint implements Serializable {
                 }
                 resolved = true;
                 Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
-                if(score < 0.6) {
+                if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
                         // try to add adjacent segment in downstream direction

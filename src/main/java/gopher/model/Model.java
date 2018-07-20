@@ -177,9 +177,15 @@ public class Model implements Serializable {
     public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
+
     private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
     public boolean getAllowSingleMargin() { return allowSingleMargin; }
     public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
+
+    private boolean allowPatching=Default.ALLOW_PATCHING; // false
+    public boolean getAllowPatching() { return this.allowPatching; }
+    public void setAllowPatching(boolean b) { this.allowPatching=b; }
+
     /** Minimum number of baits (probes) per valid margin */
     private int minBaitCount;
     public int getMinBaitCount(){return minBaitCount;}
