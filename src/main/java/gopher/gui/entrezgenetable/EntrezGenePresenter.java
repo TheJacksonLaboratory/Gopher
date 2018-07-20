@@ -1,6 +1,7 @@
 package gopher.gui.entrezgenetable;
 
 
+import com.google.common.collect.ImmutableList;
 import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RefGeneParser;
@@ -184,7 +185,39 @@ public class EntrezGenePresenter implements Initializable {
     @FXML private void allProteinCodingGenes(ActionEvent e) {
         e.consume();
         logger.trace("Getting all protein coding genes");
+        String path = this.model.getRefGenePath();
+        if (path==null) {
+            logger.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
+        try {
+            this.parser = new RefGeneParser(path);
+            //parser.checkGenes(this.symbols);
+        } catch (Exception exc) {
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
+        List<String>  validGeneSymbols = parser.getAllProteinCodingGeneSymbols();
+        List<String> invalidGeneSymbols= ImmutableList.of();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
+       // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
+        isvalidated=true;
+        this.model.setVPVGenes(this.parser.getVPVGeneList());
+        this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
+        signal.accept(Signal.DONE);
     }
+
+
 
 
     private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {

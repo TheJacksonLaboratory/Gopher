@@ -34,19 +34,18 @@ import java.util.stream.Collectors;
 /**
  * This class acts as a controller of the TabPanes which confirmDialog individual ViewPoints.
  * @author Peter Robinson
- * @version 0.2.7 (2017-11-12)
+ * @version 0.2.8 (2018-07-12)
  */
 public class ViewPointPresenter implements Initializable {
-
     private static final Logger logger = Logger.getLogger(ViewPointPresenter.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
-
-
-    private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
-            "EC96A4", "E6DF44", "F76FDA","E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5"};
+    private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
+            "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
+            "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
+            "FFE4E1","F0FFF0","F0FFFF"};
 
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
@@ -99,8 +98,11 @@ public class ViewPointPresenter implements Initializable {
 
     /** Instance of {@link ViewPoint} presented by this presenter. */
     private ViewPoint viewpoint;
-
-    private int coloridx = 0;
+    /** If {@link #coloridx} is set to this, then we know we need to set it to a random number. Otherwise
+     * leave if unchanged so that the color remains the same.  */
+    private static final int UNINITIALIZED=-1;
+    /** The (random) starting index in our list of colors. */
+    private int coloridx = UNINITIALIZED;
     /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
      * well as in the table.
      */
@@ -165,16 +167,16 @@ public class ViewPointPresenter implements Initializable {
     }
 
 //  TODO - save action here
-    @FXML
-    void saveButtonAction() {
-        // choose Segments that were selected by user.
-        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
-                .filter(ColoredSegment::isSelected)
-                .collect(Collectors
-                        .toList());
-        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
-                (Collectors.joining(","))));
-    }
+//    @FXML
+//    void saveButtonAction() {
+//        // choose Segments that were selected by user.
+//        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
+//                .filter(ColoredSegment::isSelected)
+//                .collect(Collectors
+//                        .toList());
+//        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
+//                (Collectors.joining(","))));
+//    }
 
     public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
         this.analysisPresenter=vpAnalysisPresenter;
@@ -438,8 +440,10 @@ public class ViewPointPresenter implements Initializable {
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
 
-        /* the following will start us off with a different color each time. */
-        this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        /* the following will start us off with a different color for each ViewPoint. */
+        if (coloridx == UNINITIALIZED) {
+            this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        }
     }
 
     /**

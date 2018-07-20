@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -27,6 +28,7 @@ public class AlignabilityMapTest {
         String alignabilitypath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
         String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
         int kmerlen=50;
+        chr2alMap=new HashMap<>();
         AlignabilityMapIterator iterator = new AlignabilityMapIterator(alignabilitypath,chromInfoPath,kmerlen);
         while (iterator.hasNext()) {
             Chromosome2AlignabilityMap c2amap=iterator.next();

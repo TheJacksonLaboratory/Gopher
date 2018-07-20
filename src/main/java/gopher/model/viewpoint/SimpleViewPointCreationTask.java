@@ -37,51 +37,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
   }
 
-    /** This will be replace by the method below.*/
-  //  @Deprecated
-//    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader) {
-//        int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-//        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
-//        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
-//        List<Integer> gPosList = vpvgene.getTSSlist();
-//        int n=0; // we will order the promoters from first (most upstream) to last
-//        // Note we do this differently according to strand.
-//        //Instrumentation inst=null;
-//        for (Integer gPos : gPosList) {
-//            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
-//                    targetName(vpvgene.getGeneSymbol()).
-//                    upstreamLength(model.getSizeUp()).
-//                    downstreamLength(model.getSizeDown()).
-//                    maximumGcContent(model.getMaxGCcontent()).
-//                    minimumGcContent(model.getMinGCcontent()).
-//                    fastaReader(fastaReader).
-//                    minimumFragmentSize(model.getMinFragSize()).
-//                    maximumRepeatContent(model.getMaxRepeatContent()).
-//                    marginSize(model.getMarginSize()).
-//                    isForwardStrand(vpvgene.isForward()).
-//                    accessionNr(vpvgene.getRefSeqID()).
-//                    alignabilityMap(this.alignabilityMap).
-//                    model(this.model).
-//                    build();
-//
-//            vp.setPromoterNumber(++n,gPosList.size());
-//            updateProgress(i++, total); /* this will update the progress bar */
-//            updateLabelText(this.currentVP, vpvgene.toString());
-//            vp.generateViewpointSimple(model);
-//            if (vp.getResolved()) {
-//                viewpointlist.add(vp);
-//                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
-//            } else {
-//                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
-//            }
-//        }
-//    }
-
-    /** This method will replace calculateViewPoints -- still needs to be tested */
+    /** TODO document me
+     *
+     * */
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap chr2alignMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        logger.trace(String.format("NEW Length of %s is %d", referenceSequenceID, chromosomeLength));
-        logger.error(String.format("NEW Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
+        logger.trace(String.format("Length of %s is %d", referenceSequenceID, chromosomeLength));
+        logger.error(String.format("Getting TSS for vpv %s", vpvgene.getGeneSymbol()));
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.

@@ -1,5 +1,8 @@
 package gopher.model;
 
+import gopher.io.RefGeneParser;
+import org.apache.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,16 +18,19 @@ import java.util.stream.Collectors;
  * @version 0.1.3 (2017-10-02)
  */
 public class GopherGene implements Comparable<GopherGene>, Serializable {
+    static Logger logger = Logger.getLogger(GopherGene.class.getName());
     /** serialization version ID */
-    static final long serialVersionUID = 2L;
+    static final long serialVersionUID = 3L;
     /** An NCBI RefSeq id such as NM_001353311. */
-    private String refSeqID =null;
-    /** A gene symbolsuch as IGSF11 */
-    private String geneSymbol=null;
+    private final String refSeqID;
+    /** A gene symbol such as IGSF11 */
+    private final String geneSymbol;
     /** The contig where the RefSeq lives, e.g., chr8.*/
-    private String contigID =null;
+    private final String contigID;
     /** Is this a plus strand gene? */
-    private boolean forward;
+    private final boolean forward;
+    /** Is this a non-coding gene? */
+    private final boolean noncoding;
     /** The transcript start site positions that correspond to this gene. We use a TreeSet to avoid duplicates and keep
      * the entries sorted in ascending order.   */
     private TreeSet<Integer> positions;
@@ -33,9 +39,17 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
      * @param geneid The RefSeq id (e.g., NM_12345)
      * @param symbol The official gene symbol
      */
-    public GopherGene(String geneid, String symbol) {
+    public GopherGene(String geneid, String symbol,boolean isNoncoding, String contig, String strand) {
         this.refSeqID =geneid;
         this.geneSymbol=symbol;
+        this.noncoding=isNoncoding;
+        this.contigID=contig;
+        if (strand.equals("+")) forward=true;
+        else if (strand.equals("-")) forward=false;
+        else {
+            logger.error("[ERROR] did not recognize strand \""+ strand + "\"");
+            forward=false; // this never happens
+        }
         this.positions =new TreeSet<>();
     }
     /** @return a list of TSS sorted in ascending order with one-based numbering. */
@@ -43,21 +57,12 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
         return new ArrayList<>(positions);
     }
 
-    public void setChromosome(String c) {
-        this.contigID =c;
-    }
-    public String getChromosome() { return this.contigID; }
 
+    public String getChromosome() { return this.contigID; }
     public String getGeneSymbol() { return this.geneSymbol;}
     public String getRefSeqID() { return this.refSeqID;}
-    /** Set this GopherGene to be on the forward strand */
-    public  void setForwardStrand() {
-        this.forward=true;
-    }
-    /** Set this GopherGene to be on the reverse strand */
-    public void setReverseStrand() {
-        this.forward=false;
-    }
+   public boolean isCoding() { return !noncoding;}
+   public boolean isNonCoding() { return noncoding; }
 
     /** This function adds a position (such as a transcription start site) that is the
      * "central" or "important" position around which we want to construct a ViewPoint.

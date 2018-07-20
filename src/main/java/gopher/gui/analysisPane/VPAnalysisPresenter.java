@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 0.1.3 (2018-06-07).
  */
 public class VPAnalysisPresenter implements Initializable {
-
     private static final Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
 
     /**

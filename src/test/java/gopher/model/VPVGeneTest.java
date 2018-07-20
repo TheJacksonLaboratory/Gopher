@@ -17,7 +17,10 @@ public class VPVGeneTest {
 
     @Test
     public void testVPVGeneCTOR() {
-        GopherGene gene = new GopherGene(geneid,symbol);
+        boolean isNoncoding=false;
+        String contig="chr2";
+        String strand="+";
+        GopherGene gene = new GopherGene(geneid,symbol,isNoncoding,contig,strand);
         Assert.assertEquals(symbol,gene.getGeneSymbol());
         Assert.assertEquals(geneid,gene.getRefSeqID());
     }
