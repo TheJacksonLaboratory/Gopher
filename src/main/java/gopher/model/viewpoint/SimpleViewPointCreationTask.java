@@ -1,6 +1,7 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
+import gopher.model.Default;
 import gopher.model.GopherGene;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
@@ -30,7 +31,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
-     *  @param model
+     *  @param model Model of the panel design project
    */
   public SimpleViewPointCreationTask(Model model) {
       super(model);
@@ -79,8 +80,6 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     /**
      * This is the method that will create the viewpoints.
      * We have placed it in a task because it takes a while.
-     *
-     * @return
      * @throws GopherException if we cannot create the viewpoints
      */
     protected Void call() throws GopherException {
@@ -110,7 +109,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         model.setEstAvgRestFragLen(meanLen);
         String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
         String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
-        int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
+        int kmerSize=Default.KMER_SIZE;
         try {
             AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
             while (apiterator.hasNext()) {
@@ -130,10 +129,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     logger.trace("group="+group.getReferenceSequenceID());
                 }
                 //for (GopherGene gene : group.getGenes()) {
-                    group.getGenes().parallelStream().forEach(vpvGene -> {
-                        calculateViewPoints(vpvGene, referenceSequenceID, fastaReader, apair);
-                    });
-
+                    group.getGenes().parallelStream().forEach(vpvGene ->
+                        calculateViewPoints(vpvGene, referenceSequenceID, fastaReader, apair)
+                    );
             }
 
 

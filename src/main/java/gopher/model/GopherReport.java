@@ -46,8 +46,6 @@ public class GopherReport {
         double avg_size=design.getAvgVPsize();
         double avg_score=design.getAvgVPscore();
         int n_totalNucleotidesInProbes=design.getN_nucleotides_in_unique_fragment_margins();
-        int totalEffectiveNucleotides=design.totalEffectiveSize();
-        int tilingFactor=model.getTilingFactor();
 
         StringBuilder sb = new StringBuilder("Panel design results\n");
 
@@ -56,16 +54,16 @@ public class GopherReport {
         sb.append(String.format("Total margin size: %s nucleotides\n", dformater.format(n_totalNucleotidesInProbes)));
         sb.append(String.format("Number of viewpoints: %d\n",nviewpoints));
         sb.append(String.format("Average viewpoint score: %.2f%%\n",100*avg_score));
-        sb.append(String.format("Tiling factor: %dx\n",tilingFactor));
+        sb.append(String.format("TODO NEW !!!!!!!!!!!!!!!: %dx\n",42));
         sb.append(String.format("Number of unique fragments: %d\n",total_active_frags));
         sb.append(String.format("Average viewpoint size: %.1f nucleotides\n",avg_size));
-        sb.append(String.format("Total effective size: %s kb\n", dformater.format(totalEffectiveNucleotides/100)));
+        sb.append(String.format("TODO NEW !!!!!: %s kb\n", dformater.format(42.0/100)));
         if (model==null) {
             logger.error("Model is null");
+            sb.append(String.format("Approach: %s",model.getApproach().toString()));
         } else if (model.getApproach()==null) {
             logger.error("Approach is null");
         }
-        sb.append(String.format("Approach: %s",model.getApproach().toString()));
         return sb.toString();
     }
 

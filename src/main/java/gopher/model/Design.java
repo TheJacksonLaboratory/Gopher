@@ -90,16 +90,12 @@ public class Design {
         this.model = mod;
     }
 
-    public int totalEffectiveSize() {
-        return model.getTilingFactor() * n_nucleotides_in_unique_fragment_margins;
-    }
 
 
     private void calculateEstimatedProbeNumber() {
         int nProbes = 0;
         n_nucleotides_in_unique_fragment_margins =0;// total length in nt of all unique probes
         int probelen = model.getProbeLength();
-        int tilingFactor = model.getTilingFactor();
         double RC=0d;
         int N=0;
         Set<String> uniqueFragmentMargins = new HashSet<>();
@@ -123,7 +119,7 @@ public class Design {
                         continue;
                     else {
                         uniqueFragmentMargins.add(target);
-                        nProbes += tilingFactor * (1-RC2) * (fmEndPos - fmStaPos) / probelen;
+                        nProbes +=  (1-RC2) * (fmEndPos - fmStaPos) / probelen;
                         n_nucleotides_in_unique_fragment_margins += fmEndPos - fmStaPos + 1;
                         N++;
                     }
@@ -132,7 +128,7 @@ public class Design {
         }
         n_estimatedProbeCount = nProbes;
         RC /=(double)N;
-        n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) *  model.getTilingFactor()) / model.getProbeLength();
+        n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / model.getProbeLength();
     }
 
 
@@ -179,9 +175,9 @@ public class Design {
 
         this.n_nucleotides_in_unique_fragment_margins = 0;
 
-        uniqueRestrictionFragments.stream().forEach(segment -> {
-            n_nucleotides_in_unique_fragment_margins += Math.min(2 * probeLength, segment.length());
-        });
+        uniqueRestrictionFragments.stream().forEach(segment ->
+            n_nucleotides_in_unique_fragment_margins += Math.min(2 * probeLength, segment.length())
+        );
         if (n_viewpoints > 0) {
             this.avgFragmentsPerVP = (double) n_unique_fragments / (double) n_viewpoints;
             this.avgVPsize /= (double) n_viewpoints;

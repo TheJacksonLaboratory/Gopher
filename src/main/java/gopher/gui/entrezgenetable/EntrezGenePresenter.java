@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGenePresenter implements Initializable {
-    static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
+    private static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
     /** This webview explains how to enter genes */
     @FXML private WebView wview;
     /** This webview explains how to select all protein coding genes */
@@ -49,7 +49,7 @@ public class EntrezGenePresenter implements Initializable {
     /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
     /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
-    RefGeneParser parser=null;
+    private RefGeneParser parser=null;
     /** reference to the stage of the primary App. */
     private Stage stage = null;
     /** List of the uploaded symbols prior to validation, i.e., may contain invalid symbols. */
@@ -90,7 +90,6 @@ public class EntrezGenePresenter implements Initializable {
 
     /** Transfer the genes to the model.
      * Use the refGene.txt.gz data to validate the uploaded gene symbols.
-     * @param e
      */
     @FXML public void validateGeneSymbols(ActionEvent e) {
         e.consume();
@@ -128,7 +127,7 @@ public class EntrezGenePresenter implements Initializable {
 
 
    /** Sets the text that will be shown in the HTML View. */
-    public void setData(String html, String html2) {
+    void setData(String html, String html2) {
         logger.trace("Setting data html2="+html2);
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
@@ -155,7 +154,7 @@ public class EntrezGenePresenter implements Initializable {
     /** This function is responsibble for extracting gene symbols from a file that is uploaded to VPV by the user.
      * It initializes the List {@link #symbols}, which may contain correct and/or incorrect symbols -- the validity
      * of the uploaded gene symbols will be checked in the next step.
-     * @param file
+     * @param file a text file with one gene symbol per line
      */
     public void uploadGenesFromFile(File file) {
         try {
@@ -212,7 +211,7 @@ public class EntrezGenePresenter implements Initializable {
         this.model.setChosenGeneCount(chosenGeneCount);
         model.setTotalRefGeneCount(n_genes);
         isvalidated=true;
-        this.model.setVPVGenes(this.parser.getVPVGeneList());
+        this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
         signal.accept(Signal.DONE);
     }
@@ -283,7 +282,7 @@ public class EntrezGenePresenter implements Initializable {
             PopupFactory.displayError("Error","Please validate genes for accepting them!");
             return;
         }
-        this.model.setVPVGenes(this.parser.getVPVGeneList());
+        this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
         signal.accept(Signal.DONE);
     }

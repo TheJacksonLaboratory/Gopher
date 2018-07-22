@@ -8,13 +8,13 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * The analysis panel of VPVGui shows a summary of the design on the top and a table with individual viewpoints on the
+ * The analysis panel of Gopher shows a summary of the design on the top and a table with individual viewpoints on the
  * bottom part of the panel. The top part of the panel is implemented with a JavaFX WebView. This class generates
  * HTML code that shows a summary of the probe design parameters based on calculations in the {@link Design} class.
  * @author Peter Robinson
  * @version 0.1.1 (2017-10-29)
  */
-public class ViewPointAnalysisSummaryHTMLGenerator {
+class ViewPointAnalysisSummaryHTMLGenerator {
     private static final Logger logger = Logger.getLogger(ViewPointAnalysisSummaryHTMLGenerator.class.getName());
     private Model model;
 
@@ -23,7 +23,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
     private static final String HTML_FOOTER = "</body></html>";
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
 
-    public ViewPointAnalysisSummaryHTMLGenerator(Model model) {
+    ViewPointAnalysisSummaryHTMLGenerator(Model model) {
         this.model=model;
     }
 
@@ -86,7 +86,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         }
         Design design = new Design(this.model);
         design.calculateDesignParameters();
-       String lst = getHTMLTable(design,model.getTilingFactor());
+       String lst = getHTMLTable(design);
        String expl = getEvaluationHTML(design);
         return String.format("%s\n%s\n%s\n%s\n", String.format(HTML_HEADER,getCSSblock()), lst,expl, HTML_FOOTER);
     }
@@ -94,10 +94,9 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
 
     /**
      * @param design The parameters used to generate probes (see {@link Design}).
-     * @param tilingFactor coverage factor (how many probes per digest position).
      * @return HTML string to be displayed on the analysis panel.
      */
-    private static String getHTMLTable(Design design,int tilingFactor) {
+    private static String getHTMLTable(Design design) {
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead><tr>");
@@ -112,7 +111,6 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         double avg_size=design.getAvgVPsize();
         double avg_score=design.getAvgVPscore();
         int n_totalNucleotidesInProbes=design.getN_nucleotides_in_unique_fragment_margins();
-        int totalEffectiveNucleotides=design.totalEffectiveSize();
 
         sb.append(String.format("<tr><td>Number of genes: %d</td>"+
                 "<td>Average number of active fragments per viewpoint: %.1f</td><td>Total margin size: %s nucleotides</td></tr>",
@@ -133,7 +131,7 @@ public class ViewPointAnalysisSummaryHTMLGenerator {
         int resolvedVP = design.getN_resolvedViewpoints();
         int resolvedGenes = design.getN_resolvedGenes();
         StringBuilder sb = new StringBuilder();
-        sb.append("<p>The table shows all Viewpoints that VPV attempted to create. If no restriction fragments " +
+        sb.append("<p>The table shows all Viewpoints that Gopher attempted to create. If no restriction fragments " +
                 "were found that satisfy the selection criteria, the Viewpoint is empty (has no fragments) " +
                 "and will not be represented in the final set of probes for the capture Hi-C panel design. " +
                 "Users can manually choose fragments in the panels for individual viewpoints. " +

@@ -210,7 +210,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
-        logger.info("Closing VPV Gui");
+        logger.info("Closing Gopher Gui");
         serialize();
         javafx.application.Platform.exit();
     }
@@ -345,8 +345,8 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
-        if (this.model.getVPVGeneList()!=null && this.model.getVPVGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getVPVGeneList().size() ));
+        if (this.model.getGopherGeneList()!=null && this.model.getGopherGeneList().size()>0) {
+            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getGopherGeneList().size() ));
         } else {
             this.nValidGenesLabel.setText(null);
         }
@@ -430,7 +430,7 @@ public class GopherMainPresenter implements Initializable {
             this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
         }
 
-        if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
+        if (model.getGopherGeneList()!=null && model.getGopherGeneList().size()>0) {
             this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                     this.model.getChosenGeneCount(),
                     this.model.getUniqueChosenTSScount()));
@@ -456,7 +456,7 @@ public class GopherMainPresenter implements Initializable {
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
-        this.baitLengthTextField.setPromptText(String.valueOf(Default.DEFAULT_BAIT_LENGTH));
+        this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -523,7 +523,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinBaitCount(minbait);
         int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
         this.model.setMaxBaitCount(maxbait);
-        int baitlen = getBaitLength()>0?getBaitLength() : Default.DEFAULT_BAIT_LENGTH;
+        int baitlen = getBaitLength()>0?getBaitLength() : Default.PROBE_LENGTH;
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.model.setMarginSize(marginsize);
@@ -799,7 +799,7 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
-        RefGeneParser parser=null;
+        RefGeneParser parser;
         try {
             parser = new RefGeneParser(path);
             //parser.checkGenes(this.symbols);
@@ -819,7 +819,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setUniqueChosenTSScount(uniqueChosenTSS);
         this.model.setChosenGeneCount(chosenGeneCount);
         model.setTotalRefGeneCount(n_genes);
-        this.model.setVPVGenes(parser.getVPVGeneList());
+        this.model.setGopherGenes(parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
     }
 
@@ -972,9 +972,7 @@ public class GopherMainPresenter implements Initializable {
                     "Exception encountered while attempting to create viewpoints",
                     exc);
         });
-        task.setOnCancelled(eh -> {
-            window.close();
-        });
+        task.setOnCancelled( e -> window.close() );
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();

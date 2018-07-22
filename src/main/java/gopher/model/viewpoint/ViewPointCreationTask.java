@@ -44,7 +44,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     ViewPointCreationTask(Model model) {
         this.model = model;
         this.viewpointlist = new ArrayList<>();
-        assignVPVGenesToChromosomes(model.getVPVGeneList());
+        assignGopherGenesToChromosomes(model.getGopherGeneList());
         logger.trace(String.format("ViewPointCreationTask -- we got %d total genes",n_totalGenes));
         ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
         SegmentFactory.restrictionEnzymeMap = new HashMap<>();
@@ -66,13 +66,13 @@ public abstract class ViewPointCreationTask extends Task<Void> {
      * Here, we assign the {@link GopherGene} objects to the corresponding chromosomes. This allows us to
      * create a FastReader only once for each chromosome (and thereby be much more efficient than going through
      * the  {@link GopherGene} obejcts in no particular order).
-     * @param vgenes
+     * @param gopherGenes List of genes chosen by the user
      */
-    private void assignVPVGenesToChromosomes(List<GopherGene> vgenes) {
+    private void assignGopherGenesToChromosomes(List<GopherGene> gopherGenes) {
         this.chromosomes = new HashMap<>();
         n_totalGenes =0;
         this.n_total_promoters=0;
-        for (GopherGene g : vgenes) {
+        for (GopherGene g : gopherGenes) {
             String referenceseq = g.getContigID();
             ChromosomeGroup group;
             if (chromosomes.containsKey(referenceseq)) {
@@ -81,7 +81,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
                 group = new ChromosomeGroup(referenceseq);
                 chromosomes.put(referenceseq, group);
             }
-            group.addVPVGene(g);
+            group.addGopherGene(g);
             n_totalGenes++;
             n_total_promoters += g.n_viewpointstarts();
         }
@@ -90,8 +90,8 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     /**
      * Estimate the average size of restriction fragments for the chosen restriction enyzymes
      * by looking at at least 100,000 fragments
-     * @param fastaReader
-     * @return
+     * @param fastaReader HTSJDK object to read the genome FASTA file
+     * @return Estimate of the average fragment length in the genome for the selected restriction enzyme(s)
      */
     double getEstimatedMeanRestrictionFragmentLength(IndexedFastaSequenceFile fastaReader) {
         logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");

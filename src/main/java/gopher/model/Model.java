@@ -271,13 +271,7 @@ public class Model implements Serializable {
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
-    /** This is the number of times we will tile the target regions with probes. */
-    private Integer tilingFactor =Default.TILING_FACTOR;
-    public int getTilingFactor(){return tilingFactor; }
-    public void setTilingFactor(Integer tilingFactor) {
-        logger.trace(String.format("Setting tiling factor to %d",tilingFactor));
-        this.tilingFactor=tilingFactor;
-    }
+
 
     private Integer marginSize =Default.MARGIN_SIZE;
     public int getMarginSize(){return marginSize;}
@@ -289,7 +283,7 @@ public class Model implements Serializable {
     public void setIndexedGenomeFastaIndexFile(String path) { indexedGenomeFastaIndexFile=path;}
     public String getIndexedGenomeFastaIndexFile() { return indexedGenomeFastaIndexFile; }
 
-    public List<GopherGene> getVPVGeneList() { return this.geneList; }
+    public List<GopherGene> getGopherGeneList() { return this.geneList; }
 
     public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
     public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
@@ -339,16 +333,16 @@ public class Model implements Serializable {
     }
 
 
-    public void setVPVGenes(List<GopherGene> vpvgenelist) {
+    public void setGopherGenes(List<GopherGene> vpvgenelist) {
         this.geneList = vpvgenelist;
     }
 
     public void debugPrintVPVGenes() {
         if (this.geneList==null || this.geneList.size()==0) {
-            System.err.println("No VPV Genes in Model!");
+            System.err.println("No Gopher Genes in Model!");
             return;
         }
-        System.err.println("VPV Genes in Model:");
+        System.err.println("Gopher Genes in Model:");
         for (GopherGene vg : geneList) {
             System.err.println(vg);
         }
@@ -416,21 +410,16 @@ public class Model implements Serializable {
     public void setAlignabilityMapPathIncludingFileNameGz(String p) { alignabilityMapPathIncludingFileNameGz = p; }
     public String getAlignabilityMapPathIncludingFileNameGz() { return this.alignabilityMapPathIncludingFileNameGz; }
     public boolean alignabilityMapPathIncludingFileNameGzExists() {
-        if(alignabilityMapPathIncludingFileNameGz != null && (new File(alignabilityMapPathIncludingFileNameGz)).exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        return ( alignabilityMapPathIncludingFileNameGz != null &&
+                (new File(alignabilityMapPathIncludingFileNameGz)).exists()
+        );
     }
 
     public void setChromInfoPathIncludingFileNameGz(String p) { chromInfoPathIncludingFileNameGz = p; }
     public String getChromInfoPathIncludingFileNameGz() { return this.chromInfoPathIncludingFileNameGz; }
     public boolean chromInfoPathIncludingFileNameGzExists() {
-        if(chromInfoPathIncludingFileNameGz != null && (new File(chromInfoPathIncludingFileNameGz)).exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        return ( chromInfoPathIncludingFileNameGz != null &&
+                (new File(chromInfoPathIncludingFileNameGz)).exists());
     }
 
 
