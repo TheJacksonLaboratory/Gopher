@@ -56,17 +56,16 @@ public class EntrezGeneViewFactory {
         presenter.setSignal(signal -> {
             switch (signal) {
                 case DONE:
+                case CANCEL:
                     window.close();
                     break;
-                case CANCEL:
                 case FAILED:
                     throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
 
         });
         String html=getHTML();
-        String html2=getHTML2();
-        presenter.setData(html,html2);
+        presenter.setData(html);
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
     }
@@ -76,33 +75,16 @@ public class EntrezGeneViewFactory {
         sb.append("<html><body><h3>Enter genes</h3>");
         sb.append("<p>");
         sb.append("Use the <b><TT>Upload</TT></b> button to load a file containing the target genes for a Capture Hi-C experiment. ");
-        sb.append("The file must have one gene on a line and use HGNC gene symbols");
+        sb.append("The file must have one gene on a line and use HGNC gene symbols. Alternatively copy the list of genes with the " +
+                "<b><TT>Clipboard</TT></b> button.");
         sb.append("</p>");
         sb.append("<p>");
-        sb.append("Following this, click on <b><TT>Validate</TT></b> to check whether your list contains valid HGNC gene symbols ");
-        sb.append("(This step may take 10-20 seconds to complete). ");
+        sb.append("Then click on <b><TT>Validate</TT></b> to check whether your list contains valid HGNC gene symbols ");
         sb.append("If your gene list contains invalid gene symbols, revise your file before proceeding.");
-        sb.append("</p>");
-        sb.append("<p>");
-        sb.append("Finally, click on <b><TT>Accept</TT></b> to import the corresponding genes and transcripts into. ");
-        sb.append("the GOPHER app.");
+        sb.append("Finally, click on <b><TT>Accept</TT></b> or <b><TT>Cancel</TT></b>. ");
         sb.append("</p>");
         sb.append("</body></html>");
         return sb.toString();
     }
-
-
-    private static String getHTML2() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body><h3>All protein-coding genes</h3>");
-        sb.append("<p>");
-        sb.append("Click on the <b><TT>All protein-coding genes</TT></b> button to load all the protein-coding genes for a Capture Hi-C experiment. ");
-        sb.append("The list of protein coding genes is determined from the downloaded transcript file. This option is typically selected for global promoterome experiments.");
-        sb.append("</p>");
-        sb.append("</body></html>");
-        return sb.toString();
-    }
-
-
 
 }
