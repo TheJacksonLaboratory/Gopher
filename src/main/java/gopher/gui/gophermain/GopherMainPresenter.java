@@ -2,6 +2,7 @@ package gopher.gui.gophermain;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
+import gopher.exception.GopherException;
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
 import gopher.gui.deletepane.delete.DeleteFactory;
@@ -58,6 +59,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -784,7 +786,37 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML private void enterBedFile(ActionEvent e) {
         e.consume();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file == null) {
+            logger.error("Could not get name of BED file");
+            return;
+        } else {
+            logger.info("Uploading targets from "+file.getAbsolutePath());
+            this.model.setTargetGenesPath(file.getAbsolutePath());
+        }
         logger.trace("Entering bed file");
+        try {
+            BedFileParser parser = new BedFileParser(file.getAbsolutePath());
+            List<GopherGene> genelist = parser.getGopherGeneList();
+            List<String>  validGeneSymbols = genelist.stream().map(GopherGene::getGeneSymbol).collect(Collectors.toList());
+            List<String> invalidGeneSymbols= ImmutableList.of();
+            int uniqueTSSpositions = genelist.size();
+            int n_genes=genelist.size();
+            int chosenGeneCount=genelist.size();
+            int uniqueChosenTSS=genelist.size();
+            // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+            this.model.setN_validGeneSymbols(validGeneSymbols.size());
+            this.model.setUniqueTSScount(uniqueTSSpositions);
+            this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+            this.model.setChosenGeneCount(chosenGeneCount);
+            model.setTotalRefGeneCount(n_genes);
+            this.model.setGopherGenes(parser.getGopherGeneList());
+            this.model.setUniqueChosenTSScount(genelist.size());
+        } catch (GopherException ge) {
+            PopupFactory.displayException("Error","Could not input BED file",ge);
+        }
     }
 
     @FXML private void allProteinCodingGenes(ActionEvent e) {
