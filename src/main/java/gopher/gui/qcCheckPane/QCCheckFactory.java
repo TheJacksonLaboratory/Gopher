@@ -54,45 +54,8 @@ public class QCCheckFactory {
     private static String getHTML(Model model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
-       // String expla=getExplanations();
         return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
     }
-
-
-    private static String getExplanations() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Explanations</h3>");
-        sb.append("<p>Values shown in red may be incorrect and should be carefully examined by users. Click <tt>Cancel</tt> to "+
-        "go back and correct entries or <tt>Continue</tt> to generate viewpoints.</p>");
-        sb.append("<h4>Data</h4>");
-        sb.append("<p class=\"ex\">Use the VPVGui Genome: <tt>Download</tt> button to set the location of the genome directory. "+
-                " If the directory is empty (or does not contain UCSC genome files) then VPVGui will download the genome file to "+
-                " this directory. Use the Decompress genome: <tt>Start</tt> button to extract the genome file (which is provided" +
-                " as a gzipped archive file). Use the Index genome FASTA: <tt>Start</tt> button to create index files (*.fai) " +
-                " for the FASTA files that are extracted from the gzipped file.</p>");
-        sb.append("<p class=\"ex\">Similarly, the Transcripts: <tt>Download</tt> button will download the indicated transcript definition file to the" +
-                " indicated directory unless a transcript file is already present. Be careful not to mix up assemblies; for instance, " +
-                "using a transcript file for hg38 will lead to incorrect results if used for a genome file for hg19.</p> ");
-        sb.append("<h4>Parameters</h4>");
-        sb.append("<p class=\"ex\">Upstream and Downstream are the lengths with respect to the transcript start sites that will be included in" +
-                " the search for viewpoints and fragments. All fragments that are located within or overlap with these positions will be included" +
-                " in the probe design created by VPVGui if they fulfil the remaining criteria listed below.<p>");
-        sb.append("<p class=\"ex\">The minimum probe size refers to the size of the restriction digest. Any candidate digest smaller than this " +
-                "size is rejected because it is unlikely to enrich well in the capture Hi-C procedure and may be difficult to map.</p>");
-        sb.append("<p class=\"ex\">The minimum and maximum GC content parameters determine the minimum and maximum allowed content of G and C bases" +
-                " for a digest. Values above and below these criteria are difficult to enrich and sequence and are therefore rejected from the" +
-                " probe design.</p>");
-        sb.append("<p class=\"ex\">The maximum repeat content parameter uses the determination of repeat sequences of the UCSC Genome Browser " +
-                "(which in turn is based on repeatmasker). Fragments with a higher repeat content than this value are reject because they" +
-                " are difficult to map.</p>");
-        sb.append("<h4>Design Parameters</h4>");
-        sb.append("<p class=\"ex\">The probe length is the length of probes that will be ordered and usually is determined by the" +
-                " technology of the capture probe vendor. Ensure that the value you use matches the length that will be manufactured" +
-                " by the chosen capture probe vendor. The tiling factor refers to the number of probes that on" +
-                " average cover any given nucletide of the target region.</p>");
-        return sb.toString();
-    }
-
 
 
 
@@ -232,7 +195,7 @@ public class QCCheckFactory {
         if (alignabilityMap!=null) {
             sb.append("<td>"+alignabilityMap+"</td>");
         } else {
-            sb.append(String.format("<td class=\"red\">Alignability map not found</td>"));
+            sb.append("<td class=\"red\">Alignability map not found</td>");
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");

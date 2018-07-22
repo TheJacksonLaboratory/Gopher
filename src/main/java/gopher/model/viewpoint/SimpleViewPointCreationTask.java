@@ -90,7 +90,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         }
         this.total = getTotalPromoterCount();
         this.i = 0;
-        logger.trace(String.format("extracting VPVGenes & have %d chromosome groups ", chromosomes.size()));
+        logger.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
 
         String faipath = this.model.getIndexedGenomeFastaIndexFile();
