@@ -16,7 +16,6 @@ import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;

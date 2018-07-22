@@ -1,6 +1,5 @@
 package gopher.model.viewpoint;
 
-import gopher.exception.GopherException;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 

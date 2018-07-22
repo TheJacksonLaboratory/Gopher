@@ -1,6 +1,5 @@
 package gopher.model;
 
-import gopher.io.RefGeneParser;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;

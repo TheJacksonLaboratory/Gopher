@@ -4,7 +4,6 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import gopher.model.GopherGene;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 

@@ -1,7 +1,6 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
-import gopher.io.RestrictionEnzymeParser;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
@@ -12,10 +11,7 @@ import org.junit.Test;
 import gopher.model.Default;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;

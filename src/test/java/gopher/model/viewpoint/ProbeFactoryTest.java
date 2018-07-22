@@ -1,6 +1,5 @@
 package gopher.model.viewpoint;
 
-import gopher.model.Default;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
@@ -8,10 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class ProbeFactoryTest {
     private static Logger logger = Logger.getLogger(ProbeFactoryTest.class.getName());

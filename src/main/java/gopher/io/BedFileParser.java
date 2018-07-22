@@ -1,13 +1,11 @@
 package gopher.io;
 
-import gopher.Gopher;
 import gopher.exception.GopherException;
 import gopher.model.GopherGene;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 /**
  * The intended use case for this file is to import a BED6 file that contains single positions of interest,

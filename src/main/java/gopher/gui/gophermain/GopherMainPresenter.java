@@ -117,6 +117,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML private TextField baitLengthTextField;
     @FXML private TextField marginSizeTextField;
 
+    @FXML private Label patchedViewpointLabel;
     @FXML private CheckBox unbalancedMarginCheckbox;
     @FXML private CheckBox patchedViewpointCheckbox;
 
@@ -259,7 +260,7 @@ public class GopherMainPresenter implements Initializable {
         approachChoiceBox.getSelectionModel().selectFirst();
         setGUItoSimple();
 
-        initializePromptTextsToDefaultValues();
+        initializePromptTexts();
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
@@ -284,17 +285,21 @@ public class GopherMainPresenter implements Initializable {
 
     /** makes the upstream and downstream size fields invisible because they are irrelevant to the simple approach.*/
     private void setGUItoSimple() {
-        this.sizeUpTextField.setVisible(false);
-        this.sizeDownTextField.setVisible(false);
-        this.sizeDownLabel.setVisible(false);
-        this.sizeUpLabel.setVisible(false);
+        this.sizeUpTextField.setDisable(true);
+        this.sizeDownTextField.setDisable(true);
+        this.sizeDownLabel.setDisable(true);
+        this.sizeUpLabel.setDisable(true);
+        this.patchedViewpointCheckbox.setDisable(false);
+        this.patchedViewpointLabel.setDisable(false);
     }
     /** makes the upstream and downstream size fields visible because they are needed for the extended approach.*/
     private void setGUItoExtended() {
-        this.sizeUpTextField.setVisible(true);
-        this.sizeDownTextField.setVisible(true);
-        this.sizeDownLabel.setVisible(true);
-        this.sizeUpLabel.setVisible(true);
+        this.sizeUpTextField.setDisable(false);
+        this.sizeDownTextField.setDisable(false);
+        this.sizeDownLabel.setDisable(false);
+        this.sizeUpLabel.setDisable(false);
+        this.patchedViewpointCheckbox.setDisable(true);
+        this.patchedViewpointLabel.setDisable(true);
     }
 
 
@@ -347,13 +352,8 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
-        if (this.model.getGopherGeneList()!=null && this.model.getGopherGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getGopherGeneList().size() ));
-        } else {
-            this.nValidGenesLabel.setText(null);
-        }
-        /// TODO -- ALSO FOR PATCHED.
         this.unbalancedMarginCheckbox.setSelected(model.getAllowSingleMargin());
+        this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
 
     }
 
@@ -391,11 +391,6 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
         }
-        if (model.getMaxBaitCount()>0) {
-            this.maxBaitCountTextField.setText(String.valueOf(model.getMaxBaitCount()));
-        } else {
-            this.maxBaitCountTextField.setText(String.valueOf(Default.MAX_BAIT_NUMBER));
-        }
         if (model.getMinFragSize()>0) {
             this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
         } else {
@@ -432,13 +427,7 @@ public class GopherMainPresenter implements Initializable {
             this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
         }
 
-        if (model.getGopherGeneList()!=null && model.getGopherGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                    this.model.getChosenGeneCount(),
-                    this.model.getUniqueChosenTSScount()));
-        } else {
-            this.nValidGenesLabel.setText("not initialized");
-        }
+
         if (model.useSimpleApproach()) {
             this.approachChoiceBox.setValue("Simple");
         } else if (model.useExtendedApproach()){
@@ -448,17 +437,18 @@ public class GopherMainPresenter implements Initializable {
 
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
-    private void initializePromptTextsToDefaultValues() {
+    private void initializePromptTexts() {
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
         this.minBaitCountTextField.setPromptText(String.valueOf(Default.MIN_BAIT_NUMBER));
-        this.maxBaitCountTextField.setPromptText(String.valueOf(Default.MAX_BAIT_NUMBER));
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
         this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
+
+
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -469,7 +459,6 @@ public class GopherMainPresenter implements Initializable {
         this.sizeDownTextField.setText(null);
         this.minGCContentTextField.setText(null);
         this.minBaitCountTextField.setText(null);
-        this.maxBaitCountTextField.setText(null);
         this.maxGCContentTextField.setText(null);
         this.minFragSizeTextField.setText(null);
         this.maxKmerAlignabilityTextField.setText(null);
@@ -487,7 +476,6 @@ public class GopherMainPresenter implements Initializable {
         Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
-        Bindings.bindBidirectional(this.maxBaitCountTextField.textProperty(),maximumBaitCountProperty(),converter);
         Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),converter);
         Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),converter);
         sizeDownTextField.clear();
@@ -497,7 +485,6 @@ public class GopherMainPresenter implements Initializable {
         minGCContentTextField.clear();
         maxGCContentTextField.clear();
         minBaitCountTextField.clear();
-        maxBaitCountTextField.clear();
         baitLengthTextField.clear();
         marginSizeTextField.clear();
 
