@@ -1143,7 +1143,7 @@ public class GopherMainPresenter implements Initializable {
 
 
     @FXML public void openGeneWindowWithExampleHumanGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/humangenesymbols.txt");
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/humangenesymbols.txt");
 
         if (is == null) {
             logger.warn("Could not open bundled example human gene list at path '/humangenesymbols.txt'");
@@ -1155,21 +1155,10 @@ public class GopherMainPresenter implements Initializable {
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
-    @FXML public void openGeneWindowWithExampleFlyGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/flygenesymbols.txt");
 
-        if (is == null) {
-            logger.warn("Could not open bundled example fly gene list at path '/flygenesymbols.txt'");
-            PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
-            return;
-        }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
-    }
+
     @FXML public void openGeneWindowWithExampleMouseGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/mousegenesymbols.txt");
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/mousegenesymbols.txt");
 
         if (is == null) {
             logger.warn("Could not open bundled example fly gene list at path '/mousegenesymbols.txt'");
@@ -1181,19 +1170,7 @@ public class GopherMainPresenter implements Initializable {
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
     }
-    @FXML public void openGeneWindowWithExampleRatGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/ratgenesymbols.txt");
 
-        if (is == null) {
-            logger.warn("Could not open bundled example rat gene list at path '/ratgenesymbols.txt'");
-            PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
-            return;
-        }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
-    }
 
     @FXML public void exportBEDFiles(ActionEvent e) {
         List<ViewPoint> vplist=this.model.getViewPointList();
@@ -1219,37 +1196,21 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
-    @FXML
-    public void setProbeLength(ActionEvent e) {
+
+//    @FXML
+//    public void setMarginSize(ActionEvent e) {
 //        PopupFactory factory = new PopupFactory();
-//        Integer len= factory.setProbeLength(model.getProbeLength());
+//        Integer len= factory.setMarginSize(model.getMarginSize());
 //        if (factory.wasCancelled())
 //            return; // do nothing, the user cancelled!
 //        if (len == null || len <=0) {
-//            PopupFactory.displayError("Could not get probe length", "enter a positive integer value!");
+//            PopupFactory.displayError("Could not get margin size length", "enter a positive integer value!");
 //            return;
 //        }
-//        this.model.setProbeLength(len);
+//        this.model.setMarginSize(len);
 //        this.vpanalysispresenter.refreshVPTable();
-//        logger.trace(String.format("probe length set to %d", model.getProbeLength()));
-        logger.error("THIS METHOD SHOULD BE DELETED ONCE REFACTORING OF MENU IS COMPLETE");
-    }
-
-
-    @FXML
-    public void setMarginSize(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        Integer len= factory.setMarginSize(model.getMarginSize());
-        if (factory.wasCancelled())
-            return; // do nothing, the user cancelled!
-        if (len == null || len <=0) {
-            PopupFactory.displayError("Could not get margin size length", "enter a positive integer value!");
-            return;
-        }
-        this.model.setMarginSize(len);
-        this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("MarginSize set to %d", model.getMarginSize()));
-    }
+//        logger.trace(String.format("MarginSize set to %d", model.getMarginSize()));
+//    }
 
     @FXML
     public void showLog(ActionEvent e) {
