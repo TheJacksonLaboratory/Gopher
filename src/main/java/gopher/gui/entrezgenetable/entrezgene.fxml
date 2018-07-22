@@ -29,9 +29,4 @@
    <HBox alignment="CENTER" style="-fx-background-color: #e1c1c1;" VBox.vgrow="SOMETIMES">
          <WebView fx:id="wview2" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
    </HBox>
-   <HBox alignment="CENTER" prefHeight="51.0" prefWidth="510.0">
-      <children>
-         <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#allProteinCodingGenes" stylesheets="@entrezgene.css" text="All protein coding genes" />
-      </children>
-   </HBox>
 </VBox>

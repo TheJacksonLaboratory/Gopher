@@ -129,7 +129,7 @@ public class RefGeneParser {
         n_totalGenes=geneSymbolMap.size();
         n_totalTSS=0;
         // Now collect the unique transcription start site positions.
-        gene2chromosomePosMap.values().stream().forEach(vpvGene -> n_totalTSS += vpvGene.n_viewpointstarts());
+        gene2chromosomePosMap.values().forEach(vpvGene -> n_totalTSS += vpvGene.n_viewpointstarts());
     }
 
     public List<String>  getAllProteinCodingGeneSymbols() {

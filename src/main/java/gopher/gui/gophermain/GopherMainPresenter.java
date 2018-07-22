@@ -1,5 +1,6 @@
 package gopher.gui.gophermain;
 
+import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
@@ -88,8 +89,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label genomeBuildLabel;
     /** Label for the transcripts we want to download.*/
     @FXML private Label transcriptsLabel;
-    /** Show which design approach */
-    @FXML private Label approachLabel;
     /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
@@ -257,9 +256,6 @@ public class GopherMainPresenter implements Initializable {
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
         setGUItoSimple();
-        approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) ->
-            this.approachLabel.setText(newValue) );
-        this.approachLabel.setText(approachChoiceBox.getValue());
 
         initializePromptTextsToDefaultValues();
 
@@ -778,12 +774,53 @@ public class GopherMainPresenter implements Initializable {
      *
      * @param e event triggered by enter gene command.
      */
-    @FXML public void enterGeneList(ActionEvent e) {
+    @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
         this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                 this.model.getChosenGeneCount(),
                 this.model.getUniqueChosenTSScount()));
         e.consume();
+    }
+
+    @FXML private void enterBedFile(ActionEvent e) {
+        e.consume();
+        logger.trace("Entering bed file");
+    }
+
+    @FXML private void allProteinCodingGenes(ActionEvent e) {
+        e.consume();
+        String path = model.getRefGenePath();
+
+        logger.trace("Getting all protein coding genes");
+
+        if (path==null) {
+            logger.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
+        RefGeneParser parser=null;
+        try {
+            parser = new RefGeneParser(path);
+            //parser.checkGenes(this.symbols);
+        } catch (Exception exc) {
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
+        List<String>  validGeneSymbols = parser.getAllProteinCodingGeneSymbols();
+        List<String> invalidGeneSymbols= ImmutableList.of();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
+        // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
+        this.model.setVPVGenes(parser.getVPVGeneList());
+        this.model.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
     }
 
 

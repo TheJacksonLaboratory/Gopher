@@ -554,7 +554,6 @@ public class Segment implements Serializable {
             // abort if end of bait reaches end of segment
             if(i + baitSize - 1 == this.getEndPos()) { break; }
         }
-        this.baitListUpStreamMargin=baitListUpStreamMargin;
         return this.baitListUpStreamMargin;
     }
 

@@ -133,14 +133,12 @@ public class Downloader extends Task<Void> {
      * @param pr Current progress.
      */
     private void updateProgress(double pr) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override public void run() {
-                if (progress==null) {
-                    logger.error("NULL pointer to download progress indicator");
-                    return;
-                }
-                progress.setProgress(pr);
+        javafx.application.Platform.runLater(() -> {
+            if (progress==null) {
+                logger.error("NULL pointer to download progress indicator");
+                return;
             }
+            progress.setProgress(pr);
         });
     }
 

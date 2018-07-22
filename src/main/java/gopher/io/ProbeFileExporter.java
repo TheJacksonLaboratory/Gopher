@@ -73,7 +73,7 @@ public class ProbeFileExporter {
                     String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
                     uniqueProbes.add(key);
                     if(!uniqueBaits.containsKey(b.getRefId())) {
-                        ArrayList<Integer> staPosList = new ArrayList<Integer>();
+                        ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
                         uniqueBaits.put(b.getRefId(),staPosList);
                     } else {
@@ -84,7 +84,7 @@ public class ProbeFileExporter {
                     String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
                     uniqueProbes.add(key);
                     if(!uniqueBaits.containsKey(b.getRefId())) {
-                        ArrayList<Integer> staPosList = new ArrayList<Integer>();
+                        ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
                         uniqueBaits.put(b.getRefId(),staPosList);
                     } else {
@@ -102,9 +102,9 @@ public class ProbeFileExporter {
         for(Object key : sortedKeyList) {
             String refID = key.toString();
             // convert ArrayList to set to get rid of duplicated baits
-            Set<Integer> foo = new HashSet<Integer>(uniqueBaits.get(refID));
+            Set<Integer> foo = new HashSet<>(uniqueBaits.get(refID));
             // convert back to ArrayList for sorting
-            ArrayList<Integer> sortedPositions = new ArrayList<Integer>(foo);
+            ArrayList<Integer> sortedPositions = new ArrayList<>(foo);
 
             Collections.sort(sortedPositions);
             for(int i = 0; i < sortedPositions.size(); i++) {

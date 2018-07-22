@@ -34,11 +34,7 @@ public class HelpPresenter implements Initializable {
         engine.locationProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> ov, final String oldLoc, final String loc) {
                 if (!loc.contains("google.com")) {
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            engine.load(oldLoc);
-                        }
-                    });
+                    Platform.runLater(() -> engine.load(oldLoc)); // new Runnable
                 }
             }
         });
