@@ -1,7 +1,9 @@
 package gopher.model.viewpoint;
 
+import com.google.common.collect.ImmutableList;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import gopher.model.Default;
@@ -240,6 +242,26 @@ public class ViewPoint implements Serializable {
             }
         }
     }
+
+    /** @return a 2-tuple with the number of baits: <up,down>. */
+    public List<Integer> getNumberOfBaitsUpDown() {
+        ImmutableList.Builder<Integer> builder = new ImmutableList.Builder<>();
+        Integer up=0;
+        Integer down=0;
+        for (Segment seg : this.getActiveSegments()) {
+            up +=seg.getBaitNumUp();
+            down += seg.getBaitNumDown();
+        }
+        builder.add(up);
+        builder.add(down);
+        return builder.build();
+    }
+
+    public String getNumberOfBaitsUpDownAsString() {
+        List<Integer> updown = getNumberOfBaitsUpDown();
+        return updown.stream().map(String::valueOf).collect(Collectors.joining("/"));
+    }
+
 
 
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/

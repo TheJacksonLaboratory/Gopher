@@ -276,6 +276,16 @@ public class Segment implements Serializable {
         return String.format("%.2f%%",100*GCcontentUp);
     }
 
+    public String getGCcontentUpDownAsPercent() {
+        return String.format("%.1f%%/%.1f%%",100*GCcontentUp,100*GCcontentDown);
+    }
+
+    public String getNumberOfBaitsUpDownAsString() {
+        return String.format("%d/%d",getBaitNumUp(),getBaitNumDown());
+    }
+
+
+
     public String getGCcontentDownAsPercent() {
         return String.format("%.2f%%",100*GCcontentDown);
     }

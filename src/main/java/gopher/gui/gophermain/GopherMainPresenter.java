@@ -1196,22 +1196,6 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
-
-//    @FXML
-//    public void setMarginSize(ActionEvent e) {
-//        PopupFactory factory = new PopupFactory();
-//        Integer len= factory.setMarginSize(model.getMarginSize());
-//        if (factory.wasCancelled())
-//            return; // do nothing, the user cancelled!
-//        if (len == null || len <=0) {
-//            PopupFactory.displayError("Could not get margin size length", "enter a positive integer value!");
-//            return;
-//        }
-//        this.model.setMarginSize(len);
-//        this.vpanalysispresenter.refreshVPTable();
-//        logger.trace(String.format("MarginSize set to %d", model.getMarginSize()));
-//    }
-
     @FXML
     public void showLog(ActionEvent e) {
         LogViewerFactory factory = new LogViewerFactory();

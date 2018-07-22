@@ -68,8 +68,8 @@
                     <TableColumn fx:id="segmentLengthColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="160.0" prefWidth="-1.0" text="Length" />
                     <TableColumn fx:id="alignabilityContentColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Alignability" />
                     <TableColumn fx:id="repeatContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Repeat content" />
-                    <TableColumn fx:id="gcContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="GC content (up)" />
-                    <TableColumn fx:id="gcContentDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="-1.0" text="GC content (down)" />
+                    <TableColumn fx:id="gcContentUpDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="GC content" />
+                    <TableColumn fx:id="numberOfBaitsColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="-1.0" text="Baits" />
                     <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" resizable="false" sortable="false" text="Column X" />
                 </columns>
             <columnResizePolicy>
