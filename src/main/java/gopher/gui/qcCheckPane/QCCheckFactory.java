@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 
 import gopher.model.Model;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -20,7 +21,7 @@ public class QCCheckFactory {
 
     public static boolean showQCCheck(Model model) {
         Stage window;
-        String windowTitle = "VPV Parameter Check";
+        String windowTitle = "Gopher Parameter Check";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
@@ -53,9 +54,8 @@ public class QCCheckFactory {
     private static String getHTML(Model model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
-        String designQC=validateDesignParams(model);
-        String expla=getExplanations();
-        return String.format("%s%s%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,designQC,expla,HTML_FOOTER);
+       // String expla=getExplanations();
+        return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
     }
 
 
@@ -96,45 +96,11 @@ public class QCCheckFactory {
 
 
 
-    private static String validateDesignParams(Model model) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Panel design parameters</h3>");
-        sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
-        sb.append("<tbody>");
-        sb.append("<tr><td>Probe length</td>");
-        if (model.getProbeLength()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
-        } else {
-            sb.append(String.format("<td>%d</td>",model.getProbeLength()));
-        }
-        sb.append("</tr>");
-        sb.append("<tr><td>TODO NEW FIELD</td>");
-        sb.append(String.format("<td>%d</td>",42));
-        sb.append("</tr>");
-        sb.append("<tr><td>Margin size</td>");
-        if (model.getMarginSize()>250 || model.getMarginSize()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
-        } else {
-            sb.append(String.format("<td>%d</td>",model.getMarginSize()));
-        }
-        sb.append("</tr>");
-        sb.append("</tbody>\n</table>");
-
-        return sb.toString();
-    }
-
-
     private static String validateParams(Model model) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Viewpoint parameters</h3>");
-        sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
-        sb.append("<tbody>");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
+        sb.append("</thead>");
         sb.append("<tr><td>Upstream size</td>");
         if (model.getSizeUp()<100) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeUp()));
@@ -149,7 +115,7 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getSizeDown()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Minimum digest size</td>");
+        sb.append("<tr><td>Minimum fragment size</td>");
         if (model.getMinFragSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
         } else {
@@ -170,17 +136,54 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCContentPercent()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Maximum repeat content</td>");
-        if (model.getMaxRepeatContent()>0.65) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContentPercent()));
+        sb.append("<tr><td>Maximum kmer alignability</td>");
+        if (model.getMaxMeanKmerAlignability()>10) {
+            sb.append(String.format("<td class=\"red\">%d</td>",model.getMaxMeanKmerAlignability()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContentPercent()));
+            sb.append(String.format("<td>%d</td>",model.getMaxMeanKmerAlignability()));
         }
         sb.append("</tr>");
         String approach=model.getApproach().toString();
         sb.append(String.format("<tr><td>Design approach</td><td>%s</td></tr>",approach));
+        sb.append("<tr><td>Probe length</td>");
+        if (model.getProbeLength()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
+        } else {
+            sb.append(String.format("<td>%d</td>",model.getProbeLength()));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Minimum bait count</td>");
+        sb.append(String.format("<td>%d</td>",model.getMinBaitCount()));
+        sb.append("</tr>");
+        sb.append("<tr><td>Patched viewpoints (simple only)</td>");
+        if (model.getAllowPatching()) {
+            sb.append("<td>yes</td>");
+        } else {
+            sb.append("<td>no</td>");
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Unbalanced margins</td>");
+        if (model.getAllowSingleMargin()) {
+            sb.append("<td>yes</td>");
+        } else {
+            sb.append("<td>no</td>");
+        }
+        sb.append("</tr>");
 
+
+        sb.append("<tr><td>Margin size</td>");
+        if (model.getMarginSize()>250 || model.getMarginSize()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
+        } else {
+            sb.append(String.format("<td>%d</td>",model.getMarginSize()));
+        }
+        sb.append("</tr>");
         sb.append("</tbody>\n</table>");
+
+
+        sb.append("<p>Click <b><tt>Cancel</tt></b> to go back and adjust parameters. Red values are outside of the usual " +
+                "recommended range but may be appropriate depending on experimental needs and goals. " +
+                "Click <b><tt>Continue</tt></b> to generate Capture Hi-C probes.</p>");
 
         return sb.toString();
     }
@@ -194,12 +197,10 @@ public class QCCheckFactory {
      */
     private static String validateData(Model model) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Data section</h3>");
-//        sb.append("<p>This section provides a summary of the input data required for VPVGui.</p>");
         sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Data sources</th></tr>");
+        sb.append("</thead>");
         sb.append("<tbody>");
         sb.append("<tr><td>Genome</td>");
         if (model.getGenomeDirectoryPath()==null) {
@@ -222,6 +223,42 @@ public class QCCheckFactory {
             sb.append(String.format("<td class=\"red\">%s</td>",msg));
         }
         sb.append("</tr>");
+        sb.append("<tr><td>Alignability map</td>");
+        String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
+        int i=alignabilityMap.lastIndexOf(File.separator);
+        if (i>0) {
+            alignabilityMap=alignabilityMap.substring(i+1);
+        }
+        if (alignabilityMap!=null) {
+            sb.append("<td>"+alignabilityMap+"</td>");
+        } else {
+            sb.append(String.format("<td class=\"red\">Alignability map not found</td>"));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Restriction enzyme</td>");
+        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
+            sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Project file</td>");
+        if (model.getProjectName()==null) {
+            sb.append("<td class=\"red\">Project file name not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%s</td>",model.getProjectName()));
+        }
+        sb.append("</tr>");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Enrichment targets</th></tr>");
+        sb.append("</thead>");
+        sb.append("<tr><td>Target file</td>");
+        if (model.getRefGenePath()==null) {
+            sb.append("<td class=\"red\">Targets not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
+        }
+        sb.append("</tr>");
         sb.append("<tr><td>Gene list</td>");
         if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
@@ -236,29 +273,6 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Restriction enzyme</td>");
-        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
-            sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
-        } else {
-            sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
-        }
-        sb.append("</tr>");
-        sb.append("<tr><td>Transcripts</td>");
-        if (model.getRefGenePath()==null) {
-            sb.append("<td class=\"red\">Transcript list not initialized.</td>");
-        } else {
-            sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
-        }
-        sb.append("</tr>");
-        sb.append("<tr><td>Project file</td>");
-        if (model.getProjectName()==null) {
-            sb.append("<td class=\"red\">Project file name not initialized.</td>");
-        } else {
-            sb.append(String.format("<td>%s</td>",model.getProjectName()));
-        }
-        sb.append("</tr>");
-        sb.append("</tbody>\n</table>");
-
         return sb.toString();
     }
 
