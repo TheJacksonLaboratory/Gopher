@@ -256,7 +256,6 @@ public class ViewPointPresenter implements Initializable {
             //this.viewpoint.setManuallyRevised();
             this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
-
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isUnselectable()) {
                 checkBox.setDisable(true);
