@@ -331,7 +331,7 @@ public class ViewPointPresenter implements Initializable {
 
 
         alignabilityContentColumn.setCellValueFactory(cdf -> {
-            double alignability =cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
+            double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
         });
         alignabilityContentColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
