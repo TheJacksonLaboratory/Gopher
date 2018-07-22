@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * Created by peterrobinson on 7/11/17.
  */
-public class VPVGeneTest {
+public class GopherGeneTest {
 
     private static String symbol="FAM216B";
     private static String geneid="NM_182508";
@@ -16,7 +16,7 @@ public class VPVGeneTest {
 
 
     @Test
-    public void testVPVGeneCTOR() {
+    public void testGopherGeneCTOR() {
         boolean isNoncoding=false;
         String contig="chr2";
         String strand="+";

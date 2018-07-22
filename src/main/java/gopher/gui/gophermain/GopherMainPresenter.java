@@ -2,6 +2,7 @@ package gopher.gui.gophermain;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
+import gopher.exception.GopherException;
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
 import gopher.gui.deletepane.delete.DeleteFactory;
@@ -58,6 +59,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -210,7 +212,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
-        logger.info("Closing VPV Gui");
+        logger.info("Closing Gopher Gui");
         serialize();
         javafx.application.Platform.exit();
     }
@@ -345,8 +347,8 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
-        if (this.model.getVPVGeneList()!=null && this.model.getVPVGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getVPVGeneList().size() ));
+        if (this.model.getGopherGeneList()!=null && this.model.getGopherGeneList().size()>0) {
+            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getGopherGeneList().size() ));
         } else {
             this.nValidGenesLabel.setText(null);
         }
@@ -430,7 +432,7 @@ public class GopherMainPresenter implements Initializable {
             this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
         }
 
-        if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
+        if (model.getGopherGeneList()!=null && model.getGopherGeneList().size()>0) {
             this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
                     this.model.getChosenGeneCount(),
                     this.model.getUniqueChosenTSScount()));
@@ -456,7 +458,7 @@ public class GopherMainPresenter implements Initializable {
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
-        this.baitLengthTextField.setPromptText(String.valueOf(Default.DEFAULT_BAIT_LENGTH));
+        this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -523,7 +525,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinBaitCount(minbait);
         int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
         this.model.setMaxBaitCount(maxbait);
-        int baitlen = getBaitLength()>0?getBaitLength() : Default.DEFAULT_BAIT_LENGTH;
+        int baitlen = getBaitLength()>0?getBaitLength() : Default.PROBE_LENGTH;
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.model.setMarginSize(marginsize);
@@ -784,7 +786,37 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML private void enterBedFile(ActionEvent e) {
         e.consume();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file == null) {
+            logger.error("Could not get name of BED file");
+            return;
+        } else {
+            logger.info("Uploading targets from "+file.getAbsolutePath());
+            this.model.setTargetGenesPath(file.getAbsolutePath());
+        }
         logger.trace("Entering bed file");
+        try {
+            BedFileParser parser = new BedFileParser(file.getAbsolutePath());
+            List<GopherGene> genelist = parser.getGopherGeneList();
+            List<String>  validGeneSymbols = genelist.stream().map(GopherGene::getGeneSymbol).collect(Collectors.toList());
+            List<String> invalidGeneSymbols= ImmutableList.of();
+            int uniqueTSSpositions = genelist.size();
+            int n_genes=genelist.size();
+            int chosenGeneCount=genelist.size();
+            int uniqueChosenTSS=genelist.size();
+            // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+            this.model.setN_validGeneSymbols(validGeneSymbols.size());
+            this.model.setUniqueTSScount(uniqueTSSpositions);
+            this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+            this.model.setChosenGeneCount(chosenGeneCount);
+            model.setTotalRefGeneCount(n_genes);
+            this.model.setGopherGenes(parser.getGopherGeneList());
+            this.model.setUniqueChosenTSScount(genelist.size());
+        } catch (GopherException ge) {
+            PopupFactory.displayException("Error","Could not input BED file",ge);
+        }
     }
 
     @FXML private void allProteinCodingGenes(ActionEvent e) {
@@ -799,7 +831,7 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
-        RefGeneParser parser=null;
+        RefGeneParser parser;
         try {
             parser = new RefGeneParser(path);
             //parser.checkGenes(this.symbols);
@@ -819,7 +851,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setUniqueChosenTSScount(uniqueChosenTSS);
         this.model.setChosenGeneCount(chosenGeneCount);
         model.setTotalRefGeneCount(n_genes);
-        this.model.setVPVGenes(parser.getVPVGeneList());
+        this.model.setGopherGenes(parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
     }
 
@@ -972,9 +1004,7 @@ public class GopherMainPresenter implements Initializable {
                     "Exception encountered while attempting to create viewpoints",
                     exc);
         });
-        task.setOnCancelled(eh -> {
-            window.close();
-        });
+        task.setOnCancelled( e -> window.close() );
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();

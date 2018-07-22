@@ -42,15 +42,15 @@ import java.util.zip.GZIPInputStream;
  * @version 0.2.4 (2017-11-26)
  */
 public class RefGeneParser {
-    static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
+    private static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
-    private Map<String, GopherGene> geneSymbolMap =null;
+    private final Map<String, GopherGene> geneSymbolMap;
     /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen.
      * This map should contain all symbols in the refGene file.
      *  */
-    private Map<String, GopherGene> gene2chromosomePosMap =null;
+    private final Map<String, GopherGene> gene2chromosomePosMap;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
@@ -148,16 +148,14 @@ public class RefGeneParser {
 
     /** @return A sorted list of those symbols uploaded by the user that could NOT be found in the {@code refGene.txt.gz} file.*/
     public List<String> getInvalidGeneSymbols() {
-        List<String> lst = new ArrayList<>();
-        lst.addAll(invalidGeneSymbols);
+        List<String> lst = new ArrayList<>(invalidGeneSymbols);
         Collections.sort(lst);
         return lst;
     }
 
     /** @return A sorted list of those symbols uploaded by the user that could be found in the {@code refGene.txt.gz} file.*/
     public List<String> getValidGeneSymbols() {
-        List<String> lst = new ArrayList<>();
-        lst.addAll(validGeneSymbols);
+        List<String> lst = new ArrayList<>(validGeneSymbols);
         Collections.sort(lst);
         return lst;
     }
@@ -191,7 +189,7 @@ public class RefGeneParser {
      * represent valid gene symbols uploaded by the user
      * @return List of VPVGenes representing valid uploaded gene symbols.
      */
-    public List<GopherGene> getVPVGeneList() {
+    public List<GopherGene> getGopherGeneList() {
         List<GopherGene> genelist=new ArrayList<>();
         this.n_chosenTSS=0;
         for (GopherGene g: gene2chromosomePosMap.values()) {

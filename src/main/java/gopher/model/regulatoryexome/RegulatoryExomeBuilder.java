@@ -197,7 +197,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
             return null;
         }
-        int n_genesTimesTen=model.getVPVGeneList().size()*10;
+        int n_genesTimesTen=model.getGopherGeneList().size()*10;
         int j=0;
         //read in the regulatory build and save the intervals that are in the right place.
         GeneRegGTFParser parser = new GeneRegGTFParser(model.getRegulatoryBuildPath());
@@ -253,9 +253,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         if (progressInd ==null) {
             return; // do nothing
         }
-        javafx.application.Platform.runLater(()-> {
-                progressInd.setProgress(pr);
-        });
+        javafx.application.Platform.runLater( ()-> progressInd.setProgress(pr) );
     }
 
     /** This information will be used in the "report" dialog that gives the User feedbqck about the data and the chosen

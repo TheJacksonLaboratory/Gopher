@@ -22,7 +22,7 @@ public class QCCheckFactory {
         Stage window;
         String windowTitle = "VPV Parameter Check";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         QCCheckView view = new QCCheckView();
@@ -111,8 +111,8 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getProbeLength()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Tiling factor</td>");
-        sb.append(String.format("<td>%d</td>",model.getTilingFactor()));
+        sb.append("<tr><td>TODO NEW FIELD</td>");
+        sb.append(String.format("<td>%d</td>",42));
         sb.append("</tr>");
         sb.append("<tr><td>Margin size</td>");
         if (model.getMarginSize()>250 || model.getMarginSize()<120) {
@@ -223,14 +223,14 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Gene list</td>");
-        if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
         } else {
             sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Unique TSS</td>");
-        if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
             sb.append("<td class=\"red\">TSS list not initialized.</td>");
         } else {
             sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
