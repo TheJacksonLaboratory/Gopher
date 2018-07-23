@@ -136,9 +136,10 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                 logger.trace("group="+group.getReferenceSequenceID());
             }
             for (GopherGene gene : group.getGenes()) {
-                logger.trace("About to calculate gene "+gene.getGeneSymbol());
-                // group.getGenes().parallelStream().forEach(vpvGene -> {
+               // group.getGenes().parallelStream().forEach(gene -> {
+                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
                 calculateViewPoints(gene, referenceSequenceID, fastaReader,apair);
+                break;
             }
         }
 

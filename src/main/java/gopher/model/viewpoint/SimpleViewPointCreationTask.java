@@ -128,10 +128,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 } else {
                     logger.trace("group="+group.getReferenceSequenceID());
                 }
-                //for (GopherGene gene : group.getGenes()) {
-                    group.getGenes().parallelStream().forEach(vpvGene ->
-                        calculateViewPoints(vpvGene, referenceSequenceID, fastaReader, apair)
-                    );
+                for (GopherGene gene : group.getGenes()) {
+                    //group.getGenes().parallelStream().forEach(vpvGene ->
+                        calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);}
             }
 
 

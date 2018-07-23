@@ -311,29 +311,6 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-//        inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
-//                .getSegment().getRepeatContentAsPercent())));
-//        inRepetitiveTableColumn.setComparator(new PercentComparator());
-//        // the following causes the contents of the repeat cell to be shown in red if the repeat threshold is surpassed.
-//        inRepetitiveTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
-//            @Override
-//            protected void updateItem(String item, boolean empty) {
-//                super.updateItem(item,empty);
-//                if (item != null && !empty) {
-//                    setText(item);
-//                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-//                    if (rp > model.getMaxRepeatContent()) {
-//                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-//                    } else {
-//                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-//                    }
-//                }
-//            }
-//        });
-//        inRepetitiveTableColumn.setEditable(false);
-
-
-
         alignabilityContentColumn.setCellValueFactory(cdf -> {
             double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
@@ -343,12 +320,17 @@ public class ViewPointPresenter implements Initializable {
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
-                    setText(item);
-                    double rp =   Double.parseDouble(item);
-                    if (rp > model.getMaxMeanKmerAlignability()) {
+                    Double rp =   Double.parseDouble(item);
+                    if (rp.isNaN()) {
+                        setText("n/a");
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                        setText(String.format("%.1f",rp));
+                        if (rp > model.getMaxMeanKmerAlignability()) {
+                            setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                        } else {
+                            setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                        }
                     }
                 }
             }
