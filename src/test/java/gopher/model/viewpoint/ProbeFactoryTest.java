@@ -9,12 +9,14 @@ import org.junit.Test;
 import java.io.File;
 import java.util.List;
 
+import static junit.framework.TestCase.assertNotNull;
+
 public class ProbeFactoryTest {
     private static Logger logger = Logger.getLogger(ProbeFactoryTest.class.getName());
 
     private static Segment testSeg = null;
     private static IndexedFastaSequenceFile FastaReader;
-    private static Chromosome2AlignabilityMap alignMap;
+    private static AlignabilityMap alignMap;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -26,7 +28,7 @@ public class ProbeFactoryTest {
         int kmerlen=50;
         AlignabilityMapIterator iterator = new AlignabilityMapIterator(alignabilitypath,chromInfoPath,kmerlen);
         while (iterator.hasNext()) {
-            Chromosome2AlignabilityMap c2amap=iterator.next();
+            AlignabilityMap c2amap=iterator.next();
             if (c2amap.getChromName().equals("chr1")) {
                 alignMap = c2amap;
                 break;
@@ -53,18 +55,15 @@ public class ProbeFactoryTest {
         Integer upStreamEndPos = ip.get(0).getEndPos();
         Integer downStreamStaPos = ip.get(1).getStartPos();
         Integer downStreamEndPos = ip.get(1).getEndPos();
+        assertNotNull(upStreamEndPos); // todo -- need to test something
 
-        logger.trace(upStreamStaPos);
-        logger.trace(upStreamEndPos);
-        logger.trace(alignMap.getScoreFromTo(upStreamStaPos, upStreamEndPos));
-        logger.trace(downStreamStaPos);
-        logger.trace(downStreamEndPos);
-        logger.trace(alignMap.getScoreFromTo( downStreamStaPos, downStreamEndPos));
-
-
-
-
-
+//        logger.trace(upStreamStaPos);
+//        logger.trace(upStreamEndPos);
+//        logger.trace(alignMap.getScoreFromTo(upStreamStaPos, upStreamEndPos));
+//        logger.trace(downStreamStaPos);
+//        logger.trace(downStreamEndPos);
+//        logger.trace(alignMap.getScoreFromTo( downStreamStaPos, downStreamEndPos));
+//
     }
 
 

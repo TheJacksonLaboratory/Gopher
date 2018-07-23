@@ -3,7 +3,6 @@ package gopher.model.viewpoint;
 import com.google.common.collect.ImmutableList;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 import gopher.model.Default;
@@ -90,7 +89,7 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
-    private transient Chromosome2AlignabilityMap chromosome2AlignabilityMap;
+    private transient AlignabilityMap chromosome2AlignabilityMap;
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -210,7 +209,7 @@ public class ViewPoint implements Serializable {
     }
 
 
-    private void init(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
+    private void init(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -228,7 +227,7 @@ public class ViewPoint implements Serializable {
      * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
      * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
      */
-    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
@@ -878,7 +877,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private Chromosome2AlignabilityMap c2alignmap;
+        private AlignabilityMap c2alignmap;
 
         /**
          *
@@ -925,7 +924,7 @@ public class ViewPoint implements Serializable {
         Builder model(Model model) {
             this.model=model; return this;
         }
-        Builder c2alignabilityMap(Chromosome2AlignabilityMap c2am) {
+        Builder c2alignabilityMap(AlignabilityMap c2am) {
             this.c2alignmap = c2am; return this;
         }
 

@@ -26,7 +26,7 @@ public class Segment implements Serializable {
         return overlapsTSS;
     }
 
-    public void setOverlapsTSS(boolean overlapsTSS) {
+    void setOverlapsTSS(boolean overlapsTSS) {
         this.overlapsTSS = overlapsTSS;
     }
 
@@ -398,7 +398,7 @@ public class Segment implements Serializable {
      * @param chromosome2AlignabilityMap
      * @param maxAlignabilityScore
      */
-    public void setUsableBaits(Model model, Chromosome2AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
+    public void setUsableBaits(Model model, AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
         Integer bmin =model.getMinBaitCount();
         Integer bmax = model.getMaxBaitCount();
         Integer baitSize = model.getProbeLength();
@@ -477,7 +477,7 @@ public class Segment implements Serializable {
 
 
     /** NEW VERSION */
-    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getStartPos();
         Integer end = this.getStartPos() + marginSize - 1;
@@ -513,7 +513,7 @@ public class Segment implements Serializable {
 
 
     /** NEW VERSION */
-    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getEndPos() - marginSize + 1;
         Integer end = this.getEndPos();

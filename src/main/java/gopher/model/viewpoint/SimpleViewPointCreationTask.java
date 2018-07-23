@@ -41,7 +41,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     /** TODO document me
      *
      * */
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap chr2alignMap) {
+    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, AlignabilityMap chr2alignMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
@@ -113,7 +113,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         try {
             AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
             while (apiterator.hasNext()) {
-                Chromosome2AlignabilityMap apair = apiterator.next();
+                AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
                 logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
                 if (! chromosomes.containsKey(referenceSequenceID)) {

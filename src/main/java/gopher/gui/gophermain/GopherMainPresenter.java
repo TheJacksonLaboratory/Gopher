@@ -1151,9 +1151,9 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
+//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+//                this.model.getChosenGeneCount(),
+//                this.model.getUniqueChosenTSScount()));
     }
 
 
@@ -1166,9 +1166,9 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
+//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+//                this.model.getChosenGeneCount(),
+//                this.model.getUniqueChosenTSScount()));
     }
 
 

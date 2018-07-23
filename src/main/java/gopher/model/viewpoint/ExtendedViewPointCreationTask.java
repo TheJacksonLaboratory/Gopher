@@ -41,7 +41,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         super(model);
     }
 
-    private void calculateViewPoints(GopherGene gopherGene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,Chromosome2AlignabilityMap c2aMap) {
+    private void calculateViewPoints(GopherGene gopherGene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,AlignabilityMap c2aMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         updateMessage("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
         logger.trace("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
@@ -120,7 +120,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         while (apiterator.hasNext()) {
             if (isCancelled()) // true if user has cancelled the task
                 return null;
-            Chromosome2AlignabilityMap apair = apiterator.next();
+            AlignabilityMap apair = apiterator.next();
             String referenceSequenceID = apair.getChromName();
             logger.trace("NEW--Creating viewpoints for RefID Extended=" + referenceSequenceID);
             if (! chromosomes.containsKey(referenceSequenceID)) {
