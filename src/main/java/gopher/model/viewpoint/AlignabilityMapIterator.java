@@ -12,7 +12,7 @@ import java.util.zip.GZIPInputStream;
 /**
  * Input data for the alignability map, one chromosome at a time.
  */
-public class AlignabilityMapIterator implements Iterator<Chromosome2AlignabilityMap> {
+public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
     private static Logger logger = Logger.getLogger(AlignabilityMapIterator.class.getName());
 
     /**
@@ -33,7 +33,7 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
      */
     private ImmutableMap<String, Integer> chromSizesMap;
 
-    private Chromosome2AlignabilityMap currentArrayPair = null;
+    private AlignabilityMap currentArrayPair = null;
 
     private final int kmerSize;
 
@@ -77,9 +77,8 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
      * Parses the content of a 'chromInfo.txt.gz' file and stores the chromosome sizes in the hash map 'chromSizesMap'.
      *
      * @param chromInfoPathIncludingFileName Path to the chromosome info file.
-     * @throws IOException if the
      */
-    public void parseChromInfoFile(String chromInfoPathIncludingFileName) {
+    private void parseChromInfoFile(String chromInfoPathIncludingFileName) {
         ImmutableMap.Builder<String, Integer> builder = new ImmutableMap.Builder<>();
         try (InputStream fileStream = new FileInputStream(chromInfoPathIncludingFileName);
                 InputStream gzipStream = new GZIPInputStream(fileStream);
@@ -115,7 +114,7 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
 
 
     @Override
-    public Chromosome2AlignabilityMap next() {
+    public AlignabilityMap next() {
         String line;
         String A[];
         String chromosome;
@@ -155,7 +154,7 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
                         scoreList.add(-1);
                     }
 
-                    currentArrayPair = new Chromosome2AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
+                    currentArrayPair = new AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
                     coordinateList.clear();
                     scoreList.clear();
 
@@ -197,16 +196,13 @@ public class AlignabilityMapIterator implements Iterator<Chromosome2Alignability
                 coordinateList.add(prevEnd + 1);
                 scoreList.add(-1);
             }
-            currentArrayPair = new Chromosome2AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
+            currentArrayPair = new AlignabilityMap(prevChr, coordinateList, scoreList, this.kmerSize);
             ready = false;
             return currentArrayPair;
 
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-
         }
-
         return null;
     }
 

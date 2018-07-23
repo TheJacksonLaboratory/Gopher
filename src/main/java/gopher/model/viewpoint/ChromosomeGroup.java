@@ -18,21 +18,21 @@ import java.util.List;
  */
 public class ChromosomeGroup {
     private static final Logger logger = Logger.getLogger(ChromosomeGroup.class.getName());
-    private String referenceSequenceID=null;
+    private final String referenceSequenceID;
 
-    private List<GopherGene> genes=null;
+    private final List<GopherGene> genes;
 
-    public ChromosomeGroup(String ref) {
+    ChromosomeGroup(String ref) {
         this.referenceSequenceID=ref;
-        genes=new ArrayList<>();
+        this.genes=new ArrayList<>();
     }
 
-    public void addVPVGene(GopherGene g) { genes.add(g);}
+    void addGopherGene(GopherGene g) { genes.add(g);}
 
     public List<GopherGene> getGenes() {
         Collections.sort(genes);
         return genes;
     }
 
-    public String getReferenceSequenceID() { return referenceSequenceID;}
+    String getReferenceSequenceID() { return referenceSequenceID;}
 }

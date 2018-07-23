@@ -1,6 +1,8 @@
 package gopher.io;
 
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import gopher.model.GopherGene;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
@@ -39,15 +41,15 @@ import java.util.zip.GZIPInputStream;
  * @version 0.2.4 (2017-11-26)
  */
 public class RefGeneParser {
-    static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
+    private static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
-    private Map<String, GopherGene> geneSymbolMap =null;
+    private final Map<String, GopherGene> geneSymbolMap;
     /** This  map contains keys like APOC3_chr11_116700608, so that if genes have positions on  in the genome, each position is chosen.
      * This map should contain all symbols in the refGene file.
      *  */
-    private Map<String, GopherGene> gene2chromosomePosMap =null;
+    private final Map<String, GopherGene> gene2chromosomePosMap;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
     private Set<String> invalidGeneSymbols=null;
@@ -59,8 +61,10 @@ public class RefGeneParser {
     private int n_chosenGenes;
     private int n_totalTSS;
     private int n_chosenTSS;
-
-
+    /** index of the coding sequence start position in the UCSC file. */
+    private static final int CDS_START_IDX=6;
+    /** index of the coding sequence end position in the UCSC file. */
+    private static final int CDS_END_IDX=7;
 
 
     /**
@@ -99,24 +103,17 @@ public class RefGeneParser {
                 } else {
                     gPos = Integer.parseInt(A[5]);
                 }
+                // if the CDS is indicated at the same position for start and end,
+                // then the transcript is non-coding
+                boolean isNoncoding = A[CDS_START_IDX].equals(A[CDS_END_IDX]);
                 String name2=A[12]; // this is the gene symbol
                 //String key = name2.concat(chrom);
                 String key=String.format("%s_%s_%d",name2,chrom,gPos);
-                GopherGene gene=null;
+                GopherGene gene;
                 if (gene2chromosomePosMap.containsKey(key)) {
                     gene = gene2chromosomePosMap.get(key);
                 } else {
-                    gene = new GopherGene(accession, name2);
-                    gene.setChromosome(chrom);
-                    if (strand.equals("+")){
-                        gene.setForwardStrand();
-                    } else if (strand.equals("-")){
-                        gene.setReverseStrand();
-                    } else {
-                        // this should never happen
-                        logger.error("[ERROR] did not recognize strand \""+ strand + "\"");
-                        continue;
-                    }
+                    gene = new GopherGene(accession, name2, isNoncoding, chrom, strand);
                     geneSymbolMap.put(name2,gene);
                     gene2chromosomePosMap.put(key,gene);
                 }
@@ -131,24 +128,33 @@ public class RefGeneParser {
         n_totalGenes=geneSymbolMap.size();
         n_totalTSS=0;
         // Now collect the unique transcription start site positions.
-        gene2chromosomePosMap.values().stream().forEach(vpvGene -> n_totalTSS += vpvGene.n_viewpointstarts());
+        gene2chromosomePosMap.values().forEach(vpvGene -> n_totalTSS += vpvGene.n_viewpointstarts());
     }
 
-
+    public List<String>  getAllProteinCodingGeneSymbols() {
+        ImmutableList.Builder<String> builder=new ImmutableList.Builder<>();
+        ImmutableSet.Builder<String> setbuilder=new ImmutableSet.Builder<>();
+        for (Map.Entry<String,GopherGene> entry : this.geneSymbolMap.entrySet()) {
+            if (entry.getValue().isCoding()) {
+                builder.add(entry.getKey());
+                setbuilder.add(entry.getKey());
+            }
+        }
+        this.validGeneSymbols=setbuilder.build();
+        return builder.build();
+    }
 
 
     /** @return A sorted list of those symbols uploaded by the user that could NOT be found in the {@code refGene.txt.gz} file.*/
     public List<String> getInvalidGeneSymbols() {
-        List<String> lst = new ArrayList<>();
-        lst.addAll(invalidGeneSymbols);
+        List<String> lst = new ArrayList<>(invalidGeneSymbols);
         Collections.sort(lst);
         return lst;
     }
 
     /** @return A sorted list of those symbols uploaded by the user that could be found in the {@code refGene.txt.gz} file.*/
     public List<String> getValidGeneSymbols() {
-        List<String> lst = new ArrayList<>();
-        lst.addAll(validGeneSymbols);
+        List<String> lst = new ArrayList<>(validGeneSymbols);
         Collections.sort(lst);
         return lst;
     }
@@ -182,7 +188,7 @@ public class RefGeneParser {
      * represent valid gene symbols uploaded by the user
      * @return List of VPVGenes representing valid uploaded gene symbols.
      */
-    public List<GopherGene> getVPVGeneList() {
+    public List<GopherGene> getGopherGeneList() {
         List<GopherGene> genelist=new ArrayList<>();
         this.n_chosenTSS=0;
         for (GopherGene g: gene2chromosomePosMap.values()) {

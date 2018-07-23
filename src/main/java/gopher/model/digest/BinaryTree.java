@@ -66,4 +66,20 @@ class BinaryTree {
                     : containsNodeRecursive(current.left, chrom, pos);
         }
     }
+
+    /** @return corresponding Node iff the chromosome and position correspond to one of the selected {@link gopher.model.viewpoint.Segment}s otherwise return null*/
+    Node getNode(String chrom, int pos) {
+        return getNodeRecursive(root,chrom,pos);
+    }
+
+    private Node getNodeRecursive(Node current, String chrom, int pos) {
+        if (current == null) {
+            return null;
+        } else if (chrom.equals(current.segment.getReferenceSequenceID()) &&
+                current.segment.getStartPos().equals(pos) ){
+            return current;
+        } else return current.segment.preceeds(chrom, pos)
+                ? getNodeRecursive(current.right, chrom, pos)
+                : getNodeRecursive(current.left, chrom, pos);
+    }
 }

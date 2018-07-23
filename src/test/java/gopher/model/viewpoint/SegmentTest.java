@@ -1,7 +1,6 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
-import gopher.io.RestrictionEnzymeParser;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
@@ -12,10 +11,7 @@ import org.junit.Test;
 import gopher.model.Default;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -348,7 +344,7 @@ public class SegmentTest {
     }
 
     @Test
-    public void getBaitsForUpstreamMargin() throws IOException, GopherException {
+    public void getBaitsForUpstreamMargin() throws IOException {
 
         // create segment for testing
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
@@ -364,9 +360,9 @@ public class SegmentTest {
         String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
         String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
         AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilityPath,chromInfoPath,50);
-        Chromosome2AlignabilityMap amp=null;
+        AlignabilityMap amp=null;
         while (apiterator.hasNext()) {
-            Chromosome2AlignabilityMap c2m=apiterator.next();
+            AlignabilityMap c2m=apiterator.next();
             if (c2m.getChromName().equals("chr1")) {
                 amp=c2m;
                 break;
@@ -384,7 +380,7 @@ public class SegmentTest {
 
     @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
     @Test
-    public void getBaitsForUpstreamMarginRealData() throws IOException, GopherException {
+    public void getBaitsForUpstreamMarginRealData() throws IOException {
 
         // create segment for testing
         File fasta = new File("/home/peter/storage_1/VPV_data/hg19/hg19.fa");
@@ -400,9 +396,9 @@ public class SegmentTest {
         String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
         String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
         AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilityPath,chromInfoPath,50);
-        Chromosome2AlignabilityMap amp=null;
+        AlignabilityMap amp=null;
         while (apiterator.hasNext()) {
-            Chromosome2AlignabilityMap c2m=apiterator.next();
+            AlignabilityMap c2m=apiterator.next();
             if (c2m.getChromName().equals("chr20")) {
                 amp=c2m;
                 break;

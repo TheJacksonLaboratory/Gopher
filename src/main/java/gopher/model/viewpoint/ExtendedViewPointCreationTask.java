@@ -1,6 +1,7 @@
 package gopher.model.viewpoint;
 
 import gopher.exception.GopherException;
+import gopher.model.Default;
 import gopher.model.GopherGene;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
@@ -34,19 +35,18 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
-     *  @param model
-     *
+     *  @param model Model of the panel design project
      */
     public ExtendedViewPointCreationTask(Model model) {
         super(model);
     }
 
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,Chromosome2AlignabilityMap c2aMap) {
+    private void calculateViewPoints(GopherGene gopherGene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,AlignabilityMap c2aMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        updateMessage("calculating viewpoints for " + vpvgene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
-        logger.trace("calculating viewpoints for " + vpvgene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
-        List<Integer> gPosList = vpvgene.getTSSlist();
-        if (! vpvgene.isForward()) {
+        updateMessage("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
+        logger.trace("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
+        List<Integer> gPosList = gopherGene.getTSSlist();
+        if (! gopherGene.isForward()) {
             Collections.reverse(gPosList);
         }
 
@@ -57,24 +57,24 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                 return;
             logger.trace("Working on viewpoint for gPos=" + gPos);
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
-                    targetName(vpvgene.getGeneSymbol()).
+                    targetName(gopherGene.getGeneSymbol()).
                     upstreamLength(model.getSizeUp()).
                     downstreamLength(model.getSizeDown()).
                     maximumGcContent(model.getMaxGCcontent()).
                     minimumGcContent(model.getMinGCcontent()).
                     fastaReader(fastaReader).
-                    isForwardStrand(vpvgene.isForward()).
+                    isForwardStrand(gopherGene.isForward()).
                     minimumFragmentSize(model.getMinFragSize()).
                     maximumRepeatContent(model.getMaxRepeatContent()).
                     marginSize(model.getMarginSize()).
-                    isForwardStrand(vpvgene.isForward()).
-                    accessionNr(vpvgene.getRefSeqID()).
+                    isForwardStrand(gopherGene.isForward()).
+                    accessionNr(gopherGene.getRefSeqID()).
                     c2alignabilityMap(c2aMap).
                     model(this.model).
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateMessage(String.format("Creating view point for %s", vpvgene.toString()));
+            updateMessage(String.format("Creating view point for %s", gopherGene.toString()));
             vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model);
             viewpointlist.add(vp);
         }
@@ -84,9 +84,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     /**
      * This is the method that will create the viewpoints.
      * We have placed it in a task because it takes a while.
-     *
-     * @return
-     * @throws Exception
+     * @throws GopherException if there is an I/O issue with reading the genome sequences.
      */
     protected Void call() throws GopherException {
         updateTitle("Creating viewpoints using 'extended' approach");
@@ -113,22 +111,8 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         model.setEstAvgRestFragLen(meanLen);
         String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
         String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
-        int kmerSize=50; // TODO WHERE DOES THIS COME FROM?
+        int kmerSize=Default.KMER_SIZE;
 
-        /*
-        for (ChromosomeGroup group : chromosomes.values()) {
-            String referenceSequenceID = group.getReferenceSequenceID();// Usually a chromosome
-            logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
-            if (group.getGenes()==null) {
-                logger.error("Could not retrieve genes for " + referenceSequenceID);
-            } else {
-                logger.trace(String.format("Retrieved %d genes for %s",group.getGenes().size(),referenceSequenceID));
-            }
-            group.getGenes().parallelStream().forEach(vpvGene -> {
-                logger.trace(String.format("Working on %s",vpvGene.getGeneSymbol() ));
-                calculateViewPoints(vpvGene, referenceSequenceID, fastaReader);
-            });
-        }*/
         try {
         AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
         logger.trace("About to start iteration in new function");
@@ -136,7 +120,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         while (apiterator.hasNext()) {
             if (isCancelled()) // true if user has cancelled the task
                 return null;
-            Chromosome2AlignabilityMap apair = apiterator.next();
+            AlignabilityMap apair = apiterator.next();
             String referenceSequenceID = apair.getChromName();
             logger.trace("NEW--Creating viewpoints for RefID Extended=" + referenceSequenceID);
             if (! chromosomes.containsKey(referenceSequenceID)) {
@@ -152,9 +136,10 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                 logger.trace("group="+group.getReferenceSequenceID());
             }
             for (GopherGene gene : group.getGenes()) {
-                logger.trace("About to calculate gene "+gene.getGeneSymbol());
-                // group.getGenes().parallelStream().forEach(vpvGene -> {
+               // group.getGenes().parallelStream().forEach(gene -> {
+                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
                 calculateViewPoints(gene, referenceSequenceID, fastaReader,apair);
+                break;
             }
         }
 
@@ -174,12 +159,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
      * @param msg Name of the current viewpoint
      */
     private void updateLabelText(StringProperty sb, String msg) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                sb.setValue(String.format("Creating view point for %s", msg));
-            }
-        });
+        Platform.runLater( () -> sb.setValue(String.format("Creating view point for %s", msg)));
     }
 
 

@@ -1,5 +1,6 @@
 package gopher.model.viewpoint;
 
+import com.google.common.collect.ImmutableList;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -88,21 +89,7 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
-    private transient Chromosome2AlignabilityMap chromosome2AlignabilityMap;
-
-//    private AlignabilityMap alignabilityMap = null;
-    /** This is the unicode character for a checkmark. We will use it to show that the user has
-     * checked this viewpoint. */
-    //private static final String CHECK_MARK="\u2714";
-    /** We will use the empty string to show that the user has not yet manually revised or saved this viewpoint.*/
-    //private static final String EMPTY_STRING="";
-
-    /** This flag is set to true of the user has manually changed anything in the viewpoint (even if the
-     * user has changed back to the original state -- this indicates that the user has worked on this viewpoiunt
-     */
-    //private String manuallyRevised=EMPTY_STRING;
-    /** @return true iff the user has revised of modified this viewpoint in any way. */
-    //public boolean wasManuallyRevised() {  return manuallyRevised.equals(CHECK_MARK);  }
+    private transient AlignabilityMap chromosome2AlignabilityMap;
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -139,12 +126,6 @@ public class ViewPoint implements Serializable {
           return "";
         }
     }
-
-
-    /** This function is called if the user has worked on this viewpoint at all. */
-    /*
-    public void setManuallyRevised() {  this.manuallyRevised=CHECK_MARK;  }
-    */
 
     /**
      * Gets a list of all active (chosen) {@link Segment} objects.
@@ -217,7 +198,6 @@ public class ViewPoint implements Serializable {
         setEndPos(genomicPos + downstreamNucleotideLength);
         setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
         setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
-        logger.trace(String.format("CTOR - min allowable start %d max allow end %d",this.minimumAllowableStartPosition, this.maximumAllowableEndPosition ));
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -229,7 +209,7 @@ public class ViewPoint implements Serializable {
     }
 
 
-    private void init(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
+    private void init(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
@@ -239,7 +219,6 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
-        logger.trace("init NEW; segmentFactory is "+ segmentFactory.toString());
         initRestrictionFragments(fastaReader, c2align);
     }
 
@@ -248,19 +227,40 @@ public class ViewPoint implements Serializable {
      * This function uses the information about cutting position sites from the {@link #segmentFactory} to build
      * a list of {@link Segment} objects in {@link #restrictionSegmentList}.
      */
-    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap c2align) {
+    private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-            logger.trace("Creating restriction fragment " + restFrag.toString());
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
-            restrictionSegmentList.add(restFrag);
+            if(!restFrag.isUnselectable()) {
+                restrictionSegmentList.add(restFrag);
+            }
         }
     }
+
+    /** @return a 2-tuple with the number of baits: <up,down>. */
+    public List<Integer> getNumberOfBaitsUpDown() {
+        ImmutableList.Builder<Integer> builder = new ImmutableList.Builder<>();
+        Integer up=0;
+        Integer down=0;
+        for (Segment seg : this.getActiveSegments()) {
+            up +=seg.getBaitNumUp();
+            down += seg.getBaitNumDown();
+        }
+        builder.add(up);
+        builder.add(down);
+        return builder.build();
+    }
+
+    public String getNumberOfBaitsUpDownAsString() {
+        List<Integer> updown = getNumberOfBaitsUpDown();
+        return updown.stream().map(String::valueOf).collect(Collectors.joining("/"));
+    }
+
 
 
     /** @return The reference ID of the reference sequence (usually, a chromosome) .*/
@@ -368,9 +368,7 @@ public class ViewPoint implements Serializable {
      * @param updateOriginallySelected if true,alter the originallySelected field in {@link Segment}
      */
     private void setFragmentsForExtendedApproach(int lowerLimit, int upperLimit, boolean updateOriginallySelected) {
-        logger.trace("Setting fragements for extended approach. Lower limit is " + lowerLimit + " upper limit is " + upperLimit);
         int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
-        logger.trace(String.format("[%s] Before setting, %d of %d segments were selected",getTargetName(),restrictionSegmentList.size(),c ));
 
         for (Segment segment:restrictionSegmentList) {
 
@@ -407,7 +405,6 @@ public class ViewPoint implements Serializable {
             }
         }
         c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
-        logger.trace(String.format("After setting, %d/%d segments were selected",c , restrictionSegmentList.size()));
     }
 
 
@@ -496,6 +493,7 @@ public class ViewPoint implements Serializable {
     public void generateViewpointSimple(Model model) {
 
         boolean allowSingleMargin = model.getAllowSingleMargin();
+        boolean allowPatchedViewpoints = model.getAllowPatching();
         boolean resolved = true;
         approach = Approach.SIMPLE;
 
@@ -541,7 +539,7 @@ public class ViewPoint implements Serializable {
                 }
                 resolved = true;
                 Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
-                if(score < 0.6) {
+                if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
                         // try to add adjacent segment in downstream direction
@@ -565,10 +563,6 @@ public class ViewPoint implements Serializable {
                 if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
                 if(centerSegment != null) {restrictionSegmentList.add(centerSegment);}
                 if(downstreamSegment != null) {restrictionSegmentList.add(downstreamSegment);}
-                upstreamSegment=null;
-                centerSegment=null;
-                downstreamSegment=null;
-               // this.alignabilityMap=null;
             }
         }
         setDerivationApproach(Approach.SIMPLE);
@@ -883,7 +877,7 @@ public class ViewPoint implements Serializable {
         private double minGcContent=Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
         private Model model;
-        private Chromosome2AlignabilityMap c2alignmap;
+        private AlignabilityMap c2alignmap;
 
         /**
          *
@@ -930,7 +924,7 @@ public class ViewPoint implements Serializable {
         Builder model(Model model) {
             this.model=model; return this;
         }
-        Builder c2alignabilityMap(Chromosome2AlignabilityMap c2am) {
+        Builder c2alignabilityMap(AlignabilityMap c2am) {
             this.c2alignmap = c2am; return this;
         }
 

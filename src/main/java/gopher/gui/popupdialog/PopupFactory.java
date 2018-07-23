@@ -144,9 +144,9 @@ public class PopupFactory {
     }
 
     private static String getProjectNameHTML() {
-        return  "<h1>VPV Projects</h1>\n"+
-                "<p>Enter a name for a new VPV project. Names should start with letters, numbers, or an underscore." +
-                " By default, VPV stores the projects in a hidden .gopher directory in the user's home directory." +
+        return  "<h1>Gopher Projects</h1>\n"+
+                "<p>Enter a name for a new Gopher project. Names should start with letters, numbers, or an underscore." +
+                " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
                 " Projects can also be exported to other locations on the file system using the File|Export... menu item." +
                 " Projects can be imported with Project|Import.</p>";
     }
@@ -412,12 +412,12 @@ public class PopupFactory {
 
 
     private static String getPreHTML(String text) {
-       return String.format("<html><body><h1>VPV Report</h1><pre>%s</pre></body></html>",text);
+       return String.format("<html><body><h1>Gopher Report</h1><pre>%s</pre></body></html>",text);
     }
 
     public static  void showSummaryDialog(String text) {
         Stage window;
-        String windowTitle = "VPV Report";
+        String windowTitle = "Gopher Report";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);

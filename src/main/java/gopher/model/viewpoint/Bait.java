@@ -1,6 +1,5 @@
 package gopher.model.viewpoint;
 
-import gopher.exception.GopherException;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
 
@@ -48,7 +47,7 @@ public class Bait implements Serializable {
 //        this.setRepeatContent(fastaReader);
 //    }
 
-    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, Chromosome2AlignabilityMap alignabilityMap) {
+    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
         this.refID = refID;
         this.startPos = startPos;
         this.endPos = endPos;
@@ -79,30 +78,21 @@ public class Bait implements Serializable {
         return this.averageKmeralignabilty;
     }
     public double getRepeatContent() { return this.repeatContent; }
-//    public Double getMeltingTemperature() { return this.meltingTemperature; }
-//
+
     public boolean isUsable(Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
-        if(minGCcontent <= this.getGCContent() && this.getGCContent() <= maxGCcontent &&  this.getAlignabilityScore() <= maxAlignabilityScore) {
-            return true;
-        } else {
-            return false;
-        }
+        return  (minGCcontent <= this.getGCContent() &&
+                this.getGCContent() <= maxGCcontent &&
+                this.getAlignabilityScore() <= maxAlignabilityScore);
     }
 
 
-    /*
-    Private functions
-     */
-
     /**
      * Calculate GC content of the bait.
-     *
      * @param fastaReader
      * @return
      */
     private void setGCContent(IndexedFastaSequenceFile fastaReader) {
         String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
-
         // count Gs and Cs
         int GC = 0;
         for (int i = 0; i < subsequence.length(); i++) {
@@ -116,31 +106,10 @@ public class Bait implements Serializable {
         }
         this.GCcontent = (double) GC / (double) subsequence.length();
 
-
     }
 
-//    /**
-//     * Calculate the average kmer alignability for the probe, which is defined to be the sum of the alignability
-//     * scores of all kmers divided by the number of all kmers.
-//     *
-//     * @param alignabilityMap
-//     */
-//    private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
-//
-//        Integer kmerSize = alignabilityMap.getKmerSize();
-//        Double score = 0.0;
-//        ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(refID, startPos, endPos - kmerSize + 1);
-//
-//        for (Integer d : alignabilityScoreList) {
-//            if(d==(-1.0)) {score=-1.0; break;} // probe contains Ns, which have an alignability of -1
-//            score = score + d;
-//
-//        }
-//        this.averageKmeralignabilty = score/alignabilityScoreList.size();
-//    }
 
-
-    private void setAlignabilityScore(Chromosome2AlignabilityMap alignabilityMap) {
+    private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
 
         Integer kmerSize = alignabilityMap.getKmersize();
         Double score = 0.0;

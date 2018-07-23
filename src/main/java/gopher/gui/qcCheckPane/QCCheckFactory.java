@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 
 import gopher.model.Model;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -20,9 +21,9 @@ public class QCCheckFactory {
 
     public static boolean showQCCheck(Model model) {
         Stage window;
-        String windowTitle = "VPV Parameter Check";
+        String windowTitle = "Gopher Parameter Check";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
         QCCheckView view = new QCCheckView();
@@ -53,88 +54,16 @@ public class QCCheckFactory {
     private static String getHTML(Model model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
-        String designQC=validateDesignParams(model);
-        String expla=getExplanations();
-        return String.format("%s%s%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,designQC,expla,HTML_FOOTER);
+        return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
     }
 
-
-    private static String getExplanations() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Explanations</h3>");
-        sb.append("<p>Values shown in red may be incorrect and should be carefully examined by users. Click <tt>Cancel</tt> to "+
-        "go back and correct entries or <tt>Continue</tt> to generate viewpoints.</p>");
-        sb.append("<h4>Data</h4>");
-        sb.append("<p class=\"ex\">Use the VPVGui Genome: <tt>Download</tt> button to set the location of the genome directory. "+
-                " If the directory is empty (or does not contain UCSC genome files) then VPVGui will download the genome file to "+
-                " this directory. Use the Decompress genome: <tt>Start</tt> button to extract the genome file (which is provided" +
-                " as a gzipped archive file). Use the Index genome FASTA: <tt>Start</tt> button to create index files (*.fai) " +
-                " for the FASTA files that are extracted from the gzipped file.</p>");
-        sb.append("<p class=\"ex\">Similarly, the Transcripts: <tt>Download</tt> button will download the indicated transcript definition file to the" +
-                " indicated directory unless a transcript file is already present. Be careful not to mix up assemblies; for instance, " +
-                "using a transcript file for hg38 will lead to incorrect results if used for a genome file for hg19.</p> ");
-        sb.append("<h4>Parameters</h4>");
-        sb.append("<p class=\"ex\">Upstream and Downstream are the lengths with respect to the transcript start sites that will be included in" +
-                " the search for viewpoints and fragments. All fragments that are located within or overlap with these positions will be included" +
-                " in the probe design created by VPVGui if they fulfil the remaining criteria listed below.<p>");
-        sb.append("<p class=\"ex\">The minimum probe size refers to the size of the restriction digest. Any candidate digest smaller than this " +
-                "size is rejected because it is unlikely to enrich well in the capture Hi-C procedure and may be difficult to map.</p>");
-        sb.append("<p class=\"ex\">The minimum and maximum GC content parameters determine the minimum and maximum allowed content of G and C bases" +
-                " for a digest. Values above and below these criteria are difficult to enrich and sequence and are therefore rejected from the" +
-                " probe design.</p>");
-        sb.append("<p class=\"ex\">The maximum repeat content parameter uses the determination of repeat sequences of the UCSC Genome Browser " +
-                "(which in turn is based on repeatmasker). Fragments with a higher repeat content than this value are reject because they" +
-                " are difficult to map.</p>");
-        sb.append("<h4>Design Parameters</h4>");
-        sb.append("<p class=\"ex\">The probe length is the length of probes that will be ordered and usually is determined by the" +
-                " technology of the capture probe vendor. Ensure that the value you use matches the length that will be manufactured" +
-                " by the chosen capture probe vendor. The tiling factor refers to the number of probes that on" +
-                " average cover any given nucletide of the target region.</p>");
-        return sb.toString();
-    }
-
-
-
-
-    private static String validateDesignParams(Model model) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Panel design parameters</h3>");
-        sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
-        sb.append("<tbody>");
-        sb.append("<tr><td>Probe length</td>");
-        if (model.getProbeLength()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
-        } else {
-            sb.append(String.format("<td>%d</td>",model.getProbeLength()));
-        }
-        sb.append("</tr>");
-        sb.append("<tr><td>Tiling factor</td>");
-        sb.append(String.format("<td>%d</td>",model.getTilingFactor()));
-        sb.append("</tr>");
-        sb.append("<tr><td>Margin size</td>");
-        if (model.getMarginSize()>250 || model.getMarginSize()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
-        } else {
-            sb.append(String.format("<td>%d</td>",model.getMarginSize()));
-        }
-        sb.append("</tr>");
-        sb.append("</tbody>\n</table>");
-
-        return sb.toString();
-    }
 
 
     private static String validateParams(Model model) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Viewpoint parameters</h3>");
-        sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
-        sb.append("<tbody>");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
+        sb.append("</thead>");
         sb.append("<tr><td>Upstream size</td>");
         if (model.getSizeUp()<100) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeUp()));
@@ -149,7 +78,7 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getSizeDown()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Minimum digest size</td>");
+        sb.append("<tr><td>Minimum fragment size</td>");
         if (model.getMinFragSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
         } else {
@@ -170,17 +99,54 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCContentPercent()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Maximum repeat content</td>");
-        if (model.getMaxRepeatContent()>0.65) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxRepeatContentPercent()));
+        sb.append("<tr><td>Maximum kmer alignability</td>");
+        if (model.getMaxMeanKmerAlignability()>10) {
+            sb.append(String.format("<td class=\"red\">%d</td>",model.getMaxMeanKmerAlignability()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMaxRepeatContentPercent()));
+            sb.append(String.format("<td>%d</td>",model.getMaxMeanKmerAlignability()));
         }
         sb.append("</tr>");
         String approach=model.getApproach().toString();
         sb.append(String.format("<tr><td>Design approach</td><td>%s</td></tr>",approach));
+        sb.append("<tr><td>Probe length</td>");
+        if (model.getProbeLength()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
+        } else {
+            sb.append(String.format("<td>%d</td>",model.getProbeLength()));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Minimum bait count</td>");
+        sb.append(String.format("<td>%d</td>",model.getMinBaitCount()));
+        sb.append("</tr>");
+        sb.append("<tr><td>Patched viewpoints (simple only)</td>");
+        if (model.getAllowPatching()) {
+            sb.append("<td>yes</td>");
+        } else {
+            sb.append("<td>no</td>");
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Unbalanced margins</td>");
+        if (model.getAllowSingleMargin()) {
+            sb.append("<td>yes</td>");
+        } else {
+            sb.append("<td>no</td>");
+        }
+        sb.append("</tr>");
 
+
+        sb.append("<tr><td>Margin size</td>");
+        if (model.getMarginSize()>250 || model.getMarginSize()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
+        } else {
+            sb.append(String.format("<td>%d</td>",model.getMarginSize()));
+        }
+        sb.append("</tr>");
         sb.append("</tbody>\n</table>");
+
+
+        sb.append("<p>Click <b><tt>Cancel</tt></b> to go back and adjust parameters. Red values are outside of the usual " +
+                "recommended range but may be appropriate depending on experimental needs and goals. " +
+                "Click <b><tt>Continue</tt></b> to generate Capture Hi-C probes.</p>");
 
         return sb.toString();
     }
@@ -194,12 +160,10 @@ public class QCCheckFactory {
      */
     private static String validateData(Model model) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h3>Data section</h3>");
-//        sb.append("<p>This section provides a summary of the input data required for VPVGui.</p>");
         sb.append("<table class=\"vpvTable\">");
-        sb.append("<thead><tr>");
-        sb.append("<th>Item</th><th>Result</th>");
-        sb.append("</tr></thead>");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Data sources</th></tr>");
+        sb.append("</thead>");
         sb.append("<tbody>");
         sb.append("<tr><td>Genome</td>");
         if (model.getGenomeDirectoryPath()==null) {
@@ -222,18 +186,16 @@ public class QCCheckFactory {
             sb.append(String.format("<td class=\"red\">%s</td>",msg));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Gene list</td>");
-        if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
-            sb.append("<td class=\"red\">Gene list not initialized.</td>");
-        } else {
-            sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
+        sb.append("<tr><td>Alignability map</td>");
+        String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
+        int i=alignabilityMap.lastIndexOf(File.separator);
+        if (i>0) {
+            alignabilityMap=alignabilityMap.substring(i+1);
         }
-        sb.append("</tr>");
-        sb.append("<tr><td>Unique TSS</td>");
-        if (model.getVPVGeneList()==null|| model.getVPVGeneList().size()==0) {
-            sb.append("<td class=\"red\">TSS list not initialized.</td>");
+        if (alignabilityMap!=null) {
+            sb.append("<td>"+alignabilityMap+"</td>");
         } else {
-            sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
+            sb.append("<td class=\"red\">Alignability map not found</td>");
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");
@@ -243,13 +205,6 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Transcripts</td>");
-        if (model.getRefGenePath()==null) {
-            sb.append("<td class=\"red\">Transcript list not initialized.</td>");
-        } else {
-            sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
-        }
-        sb.append("</tr>");
         sb.append("<tr><td>Project file</td>");
         if (model.getProjectName()==null) {
             sb.append("<td class=\"red\">Project file name not initialized.</td>");
@@ -257,8 +212,30 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%s</td>",model.getProjectName()));
         }
         sb.append("</tr>");
-        sb.append("</tbody>\n</table>");
-
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Enrichment targets</th></tr>");
+        sb.append("</thead>");
+        sb.append("<tr><td>Target file</td>");
+        if (model.getRefGenePath()==null) {
+            sb.append("<td class=\"red\">Targets not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Gene list</td>");
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+            sb.append("<td class=\"red\">Gene list not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
+        }
+        sb.append("</tr>");
+        sb.append("<tr><td>Unique TSS</td>");
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+            sb.append("<td class=\"red\">TSS list not initialized.</td>");
+        } else {
+            sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
+        }
+        sb.append("</tr>");
         return sb.toString();
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
  * Created by hansep on 6/12/18.
  *
  * This class reads an array hash of pairs of arrays. The keys are chromosome names. The array pairs are combined
- * in a simple private sub class (Chromosome2AlignabilityMap) of this class and consists of an Integer and a Double array. The first
+ * in a simple private sub class (AlignabilityMap) of this class and consists of an Integer and a Double array. The first
  * array has all positions at which the alignability score changes in sorted order. The second array has the
  * associated scores.
  *
@@ -25,24 +25,24 @@ import java.util.List;
  * First column (chromosome) lexicographically, second column numerically start position.
  * The downloadable files are sorted like this.
  */
-public class Chromosome2AlignabilityMap {
+public class AlignabilityMap {
     /** Array of coordinates with boundaries of the region that has a certain score. TODO what? */
-    final int coordArray[];
+    private final int coordArray[];
      /** Array of alignability score entries */
-    final int scoreArray[];
+    private final int scoreArray[];
 
-    final String chromName;
+    private final String chromName;
 
-    final private int kmersize;
+    private final int kmersize;
 
 
-    public String getChromName() {
+    String getChromName() {
         return chromName;
     }
 
-    public int getKmersize() { return kmersize; }
+    int getKmersize() { return kmersize; }
 
-    Chromosome2AlignabilityMap(String chrom, List<Integer> coordinateList, List<Integer> scoreList, int kmer) {
+    AlignabilityMap(String chrom, List<Integer> coordinateList, List<Integer> scoreList, int kmer) {
         this.coordArray = coordinateList.stream().mapToInt(Integer::intValue).toArray();
         this.scoreArray = scoreList.stream().mapToInt(Integer::intValue).toArray();
         this.chromName=chrom;
@@ -57,8 +57,8 @@ public class Chromosome2AlignabilityMap {
     }
 
     /** @return */
-    public ArrayList<Integer> getScoreFromTo(int fromPos, int toPos) {
-        ArrayList scoreArrayForRegion = new ArrayList<Double>();
+    ArrayList<Integer> getScoreFromTo(int fromPos, int toPos) {
+        ArrayList<Integer> scoreArrayForRegion = new ArrayList<>();
         // get start index from binary search
         int index = Arrays.binarySearch(coordArray, fromPos);
         if(index < 0) {

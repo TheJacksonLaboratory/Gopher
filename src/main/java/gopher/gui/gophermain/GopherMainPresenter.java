@@ -1,6 +1,8 @@
 package gopher.gui.gophermain;
 
+import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
+import gopher.exception.GopherException;
 import gopher.gui.analysisPane.VPAnalysisPresenter;
 import gopher.gui.analysisPane.VPAnalysisView;
 import gopher.gui.deletepane.delete.DeleteFactory;
@@ -57,6 +59,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -88,8 +91,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label genomeBuildLabel;
     /** Label for the transcripts we want to download.*/
     @FXML private Label transcriptsLabel;
-    /** Show which design approach */
-    @FXML private Label approachLabel;
     /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
@@ -116,6 +117,10 @@ public class GopherMainPresenter implements Initializable {
     @FXML private TextField baitLengthTextField;
     @FXML private TextField marginSizeTextField;
 
+    @FXML private Label patchedViewpointLabel;
+    @FXML private CheckBox unbalancedMarginCheckbox;
+    @FXML private CheckBox patchedViewpointCheckbox;
+
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
     /** Show how many valid genes were uploaded by user. */
@@ -132,13 +137,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Label downloadAlignabilityLabel;
     @FXML private Label decompressAlignabilityLabel;
 
-    @FXML RadioMenuItem tiling1;
-    @FXML RadioMenuItem tiling2;
-    @FXML RadioMenuItem tiling3;
-    @FXML RadioMenuItem tiling4;
-    @FXML RadioMenuItem tiling5;
-    @FXML RadioMenuItem singleMarginRadioMenuitem;
-    @FXML RadioMenuItem bothMarginsRadioMenuitem;
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
 
@@ -209,10 +207,13 @@ public class GopherMainPresenter implements Initializable {
     private void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
     private DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
+
+
+
     @FXML
     void exitButtonClicked(ActionEvent e) {
         e.consume();
-        logger.info("Closing VPV Gui");
+        logger.info("Closing Gopher Gui");
         serialize();
         javafx.application.Platform.exit();
     }
@@ -258,30 +259,13 @@ public class GopherMainPresenter implements Initializable {
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
         setGUItoSimple();
-        approachChoiceBox.valueProperty().addListener((observable, oldValue, newValue) ->
-            this.approachLabel.setText(newValue) );
-        this.approachLabel.setText(approachChoiceBox.getValue());
 
-        initializePromptTextsToDefaultValues();
+        initializePromptTexts();
 
         this.vpanalysisview = new VPAnalysisView();
         this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
-        ToggleGroup tGroup = new ToggleGroup();
-        tGroup.getToggles().addAll(tiling1,tiling2,tiling3,tiling4,tiling5);
-        tiling1.setOnAction(e->{this.model.setTilingFactor(1);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling2.setOnAction(e->{this.model.setTilingFactor(2);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling3.setOnAction(e->{this.model.setTilingFactor(3);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling4.setOnAction(e->{this.model.setTilingFactor(4);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling5.setOnAction(e->{this.model.setTilingFactor(5);this.vpanalysispresenter.refreshVPTable();e.consume(); });
-        tiling2.setSelected(true);
-
-        ToggleGroup marginToggleGroup = new ToggleGroup();
-        marginToggleGroup.getToggles().addAll(singleMarginRadioMenuitem,bothMarginsRadioMenuitem);
-        singleMarginRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(true); e.consume();});
-        bothMarginsRadioMenuitem.setOnAction(e -> {this.model.setAllowSingleMargin(false); e.consume();});
-        singleMarginRadioMenuitem.setSelected(true);
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -301,17 +285,21 @@ public class GopherMainPresenter implements Initializable {
 
     /** makes the upstream and downstream size fields invisible because they are irrelevant to the simple approach.*/
     private void setGUItoSimple() {
-        this.sizeUpTextField.setVisible(false);
-        this.sizeDownTextField.setVisible(false);
-        this.sizeDownLabel.setVisible(false);
-        this.sizeUpLabel.setVisible(false);
+        this.sizeUpTextField.setDisable(true);
+        this.sizeDownTextField.setDisable(true);
+        this.sizeDownLabel.setDisable(true);
+        this.sizeUpLabel.setDisable(true);
+        this.patchedViewpointCheckbox.setDisable(false);
+        this.patchedViewpointLabel.setDisable(false);
     }
     /** makes the upstream and downstream size fields visible because they are needed for the extended approach.*/
     private void setGUItoExtended() {
-        this.sizeUpTextField.setVisible(true);
-        this.sizeDownTextField.setVisible(true);
-        this.sizeDownLabel.setVisible(true);
-        this.sizeUpLabel.setVisible(true);
+        this.sizeUpTextField.setDisable(false);
+        this.sizeDownTextField.setDisable(false);
+        this.sizeDownLabel.setDisable(false);
+        this.sizeUpLabel.setDisable(false);
+        this.patchedViewpointCheckbox.setDisable(true);
+        this.patchedViewpointLabel.setDisable(true);
     }
 
 
@@ -364,18 +352,9 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
-        if (this.model.getVPVGeneList()!=null && this.model.getVPVGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid target genes",this.model.getVPVGeneList().size() ));
-        } else {
-            this.nValidGenesLabel.setText(null);
-        }
-        if (model.getAllowSingleMargin()) {
-            this.bothMarginsRadioMenuitem.setSelected(false);
-            this.singleMarginRadioMenuitem.setSelected(true);
-        } else {
-            this.bothMarginsRadioMenuitem.setSelected(true);
-            this.singleMarginRadioMenuitem.setSelected(false);
-        }
+        this.unbalancedMarginCheckbox.setSelected(model.getAllowSingleMargin());
+        this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
+
     }
 
     /**
@@ -411,11 +390,6 @@ public class GopherMainPresenter implements Initializable {
             this.minBaitCountTextField.setText(String.valueOf(model.getMinBaitCount()));
         } else {
             this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
-        }
-        if (model.getMaxBaitCount()>0) {
-            this.maxBaitCountTextField.setText(String.valueOf(model.getMaxBaitCount()));
-        } else {
-            this.maxBaitCountTextField.setText(String.valueOf(Default.MAX_BAIT_NUMBER));
         }
         if (model.getMinFragSize()>0) {
             this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
@@ -453,13 +427,7 @@ public class GopherMainPresenter implements Initializable {
             this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
         }
 
-        if (model.getVPVGeneList()!=null && model.getVPVGeneList().size()>0) {
-            this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                    this.model.getChosenGeneCount(),
-                    this.model.getUniqueChosenTSScount()));
-        } else {
-            this.nValidGenesLabel.setText("not initialized");
-        }
+
         if (model.useSimpleApproach()) {
             this.approachChoiceBox.setValue("Simple");
         } else if (model.useExtendedApproach()){
@@ -469,17 +437,18 @@ public class GopherMainPresenter implements Initializable {
 
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
-    private void initializePromptTextsToDefaultValues() {
+    private void initializePromptTexts() {
         this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
         this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
         this.minGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MIN_GC_CONTENT));
         this.minBaitCountTextField.setPromptText(String.valueOf(Default.MIN_BAIT_NUMBER));
-        this.maxBaitCountTextField.setPromptText(String.valueOf(Default.MAX_BAIT_NUMBER));
         this.maxGCContentTextField.setPromptText(String.format("%.1f %%",100*Default.MAX_GC_CONTENT));
         this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
-        this.baitLengthTextField.setPromptText(String.valueOf(Default.DEFAULT_BAIT_LENGTH));
+        this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
+
+
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -490,7 +459,6 @@ public class GopherMainPresenter implements Initializable {
         this.sizeDownTextField.setText(null);
         this.minGCContentTextField.setText(null);
         this.minBaitCountTextField.setText(null);
-        this.maxBaitCountTextField.setText(null);
         this.maxGCContentTextField.setText(null);
         this.minFragSizeTextField.setText(null);
         this.maxKmerAlignabilityTextField.setText(null);
@@ -508,7 +476,6 @@ public class GopherMainPresenter implements Initializable {
         Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
         Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
-        Bindings.bindBidirectional(this.maxBaitCountTextField.textProperty(),maximumBaitCountProperty(),converter);
         Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),converter);
         Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),converter);
         sizeDownTextField.clear();
@@ -518,7 +485,6 @@ public class GopherMainPresenter implements Initializable {
         minGCContentTextField.clear();
         maxGCContentTextField.clear();
         minBaitCountTextField.clear();
-        maxBaitCountTextField.clear();
         baitLengthTextField.clear();
         marginSizeTextField.clear();
 
@@ -546,7 +512,7 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinBaitCount(minbait);
         int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
         this.model.setMaxBaitCount(maxbait);
-        int baitlen = getBaitLength()>0?getBaitLength() : Default.DEFAULT_BAIT_LENGTH;
+        int baitlen = getBaitLength()>0?getBaitLength() : Default.PROBE_LENGTH;
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.model.setMarginSize(marginsize);
@@ -797,12 +763,83 @@ public class GopherMainPresenter implements Initializable {
      *
      * @param e event triggered by enter gene command.
      */
-    @FXML public void enterGeneList(ActionEvent e) {
+    @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
+//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+//                this.model.getChosenGeneCount(),
+//                this.model.getUniqueChosenTSScount()));
         e.consume();
+    }
+
+    @FXML private void enterBedFile(ActionEvent e) {
+        e.consume();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file == null) {
+            logger.error("Could not get name of BED file");
+            return;
+        } else {
+            logger.info("Uploading targets from "+file.getAbsolutePath());
+            this.model.setTargetGenesPath(file.getAbsolutePath());
+        }
+        logger.trace("Entering bed file");
+        try {
+            BedFileParser parser = new BedFileParser(file.getAbsolutePath());
+            List<GopherGene> genelist = parser.getGopherGeneList();
+            List<String>  validGeneSymbols = genelist.stream().map(GopherGene::getGeneSymbol).collect(Collectors.toList());
+            List<String> invalidGeneSymbols= ImmutableList.of();
+            int uniqueTSSpositions = genelist.size();
+            int n_genes=genelist.size();
+            int chosenGeneCount=genelist.size();
+            int uniqueChosenTSS=genelist.size();
+            // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+            this.model.setN_validGeneSymbols(validGeneSymbols.size());
+            this.model.setUniqueTSScount(uniqueTSSpositions);
+            this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+            this.model.setChosenGeneCount(chosenGeneCount);
+            model.setTotalRefGeneCount(n_genes);
+            this.model.setGopherGenes(parser.getGopherGeneList());
+            this.model.setUniqueChosenTSScount(genelist.size());
+        } catch (GopherException ge) {
+            PopupFactory.displayException("Error","Could not input BED file",ge);
+        }
+    }
+
+    @FXML private void allProteinCodingGenes(ActionEvent e) {
+        e.consume();
+        String path = model.getRefGenePath();
+
+        logger.trace("Getting all protein coding genes");
+
+        if (path==null) {
+            logger.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
+        RefGeneParser parser;
+        try {
+            parser = new RefGeneParser(path);
+            //parser.checkGenes(this.symbols);
+        } catch (Exception exc) {
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
+        List<String>  validGeneSymbols = parser.getAllProteinCodingGeneSymbols();
+        List<String> invalidGeneSymbols= ImmutableList.of();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
+        // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
+        this.model.setGopherGenes(parser.getGopherGeneList());
+        this.model.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
     }
 
 
@@ -954,9 +991,7 @@ public class GopherMainPresenter implements Initializable {
                     "Exception encountered while attempting to create viewpoints",
                     exc);
         });
-        task.setOnCancelled(eh -> {
-            window.close();
-        });
+        task.setOnCancelled( e -> window.close() );
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
@@ -1108,7 +1143,7 @@ public class GopherMainPresenter implements Initializable {
 
 
     @FXML public void openGeneWindowWithExampleHumanGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/humangenesymbols.txt");
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/humangenesymbols.txt");
 
         if (is == null) {
             logger.warn("Could not open bundled example human gene list at path '/humangenesymbols.txt'");
@@ -1116,25 +1151,14 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
+//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+//                this.model.getChosenGeneCount(),
+//                this.model.getUniqueChosenTSScount()));
     }
-    @FXML public void openGeneWindowWithExampleFlyGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/flygenesymbols.txt");
 
-        if (is == null) {
-            logger.warn("Could not open bundled example fly gene list at path '/flygenesymbols.txt'");
-            PopupFactory.displayError("Could not open example fly gene list","Please report to developers");
-            return;
-        }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
-    }
+
     @FXML public void openGeneWindowWithExampleMouseGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/mousegenesymbols.txt");
+        InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/mousegenesymbols.txt");
 
         if (is == null) {
             logger.warn("Could not open bundled example fly gene list at path '/mousegenesymbols.txt'");
@@ -1142,23 +1166,11 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
+//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
+//                this.model.getChosenGeneCount(),
+//                this.model.getUniqueChosenTSScount()));
     }
-    @FXML public void openGeneWindowWithExampleRatGenes() {
-        InputStream is = GopherMainPresenter.class.getResourceAsStream("/ratgenesymbols.txt");
 
-        if (is == null) {
-            logger.warn("Could not open bundled example rat gene list at path '/ratgenesymbols.txt'");
-            PopupFactory.displayError("Could not open example rat gene list","Please report to developers");
-            return;
-        }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-                this.model.getChosenGeneCount(),
-                this.model.getUniqueChosenTSScount()));
-    }
 
     @FXML public void exportBEDFiles(ActionEvent e) {
         List<ViewPoint> vplist=this.model.getViewPointList();
@@ -1182,38 +1194,6 @@ public class GopherMainPresenter implements Initializable {
             PopupFactory.displayException("Could not save data to BED files", exc.getMessage(),exc);
         }
         e.consume();
-    }
-
-    @FXML
-    public void setProbeLength(ActionEvent e) {
-//        PopupFactory factory = new PopupFactory();
-//        Integer len= factory.setProbeLength(model.getProbeLength());
-//        if (factory.wasCancelled())
-//            return; // do nothing, the user cancelled!
-//        if (len == null || len <=0) {
-//            PopupFactory.displayError("Could not get probe length", "enter a positive integer value!");
-//            return;
-//        }
-//        this.model.setProbeLength(len);
-//        this.vpanalysispresenter.refreshVPTable();
-//        logger.trace(String.format("probe length set to %d", model.getProbeLength()));
-        logger.error("THIS METHOD SHOULD BE DELETED ONCE REFACTORING OF MENU IS COMPLETE");
-    }
-
-
-    @FXML
-    public void setMarginSize(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        Integer len= factory.setMarginSize(model.getMarginSize());
-        if (factory.wasCancelled())
-            return; // do nothing, the user cancelled!
-        if (len == null || len <=0) {
-            PopupFactory.displayError("Could not get margin size length", "enter a positive integer value!");
-            return;
-        }
-        this.model.setMarginSize(len);
-        this.vpanalysispresenter.refreshVPTable();
-        logger.trace(String.format("MarginSize set to %d", model.getMarginSize()));
     }
 
     @FXML
@@ -1381,6 +1361,29 @@ public class GopherMainPresenter implements Initializable {
         }
         report.outputRegulatoryReport(file.getAbsolutePath());
         e.consume();
+    }
+
+
+    @FXML private void setUnbalancedMargin(ActionEvent e) {
+        if (unbalancedMarginCheckbox.isSelected()) {
+            this.model.setAllowSingleMargin(true);
+        } else {
+            this.model.setAllowSingleMargin(false);
+        }
+        e.consume();
+    }
+
+    @FXML private void setAllowPatching(ActionEvent e) {
+        if (patchedViewpointCheckbox.isSelected()) {
+            this.model.setAllowPatching(true);
+        } else {
+            this.model.setAllowPatching(false);
+        }
+        e.consume();
+    }
+
+    @FXML private void setPatchedViewpoint() {
+        logger.error("TODO -- SET PATCHED VIEWPOINT IN MODEL?????");
     }
 }
 

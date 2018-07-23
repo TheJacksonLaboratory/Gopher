@@ -86,9 +86,9 @@ public class RefGeneParserTest {
         int expected=1;
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        List<GopherGene> gophergenes=parser.getGopherGeneList();
         GopherGene gene=null;
-        for (GopherGene g:vpvgenes) {
+        for (GopherGene g:gophergenes) {
             if (g.getGeneSymbol().equals("FAM216B")){
                 gene=g; break;
             }
@@ -98,7 +98,7 @@ public class RefGeneParserTest {
         Assert.assertEquals(exp,gene.getContigID());
         exp="NM_182508";
         Assert.assertEquals(exp,gene.getRefSeqID());
-        Assert.assertEquals(true,gene.isForward());
+        Assert.assertTrue(gene.isForward());
         List<Integer> gPosList = gene.getTSSlist();
         Assert.assertEquals(1,gPosList.size());
         Integer expectedPos=43355686; /* Note: one based fully closed numbering! */
@@ -128,7 +128,7 @@ public class RefGeneParserTest {
     public void testGenomicPosNegStrandExample() {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        List<GopherGene> vpvgenes=parser.getGopherGeneList();
         GopherGene gene=null;
         for (GopherGene g:vpvgenes) {
             if (g.getGeneSymbol().equals("WASH7P")){
@@ -155,7 +155,7 @@ public class RefGeneParserTest {
     public void testGenomicPosPlusStrandExample() {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
-        List<GopherGene> vpvgenes=parser.getVPVGeneList();
+        List<GopherGene> vpvgenes=parser.getGopherGeneList();
         GopherGene gene=null;
         for (GopherGene g:vpvgenes) {
             if (g.getGeneSymbol().equals("LINC01010")){

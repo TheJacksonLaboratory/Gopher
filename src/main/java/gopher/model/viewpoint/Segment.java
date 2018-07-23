@@ -1,6 +1,5 @@
 package gopher.model.viewpoint;
 
-import gopher.exception.GopherException;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
@@ -453,7 +452,7 @@ public class Segment implements Serializable {
 //    }
 
     /** NEW VERSION */
-    public void setUsableBaits(Model model, Chromosome2AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
+    public void setUsableBaits(Model model, AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
         Integer bmin =model.getMinBaitCount();
         Integer bmax = model.getMaxBaitCount();
         Integer baitSize = model.getProbeLength();
@@ -522,7 +521,9 @@ public class Segment implements Serializable {
 
     }
 
-
+    public String getNumberOfBaitsUpDownAsString() {
+        return String.format("%d/%d",this.baitListUpStreamMargin.size(),this.baitListDownStreamMargin.size() );
+    }
 
     public Integer getBaitNumTotal() { return this.baitListUpStreamMargin.size() + this.baitListDownStreamMargin.size(); }
 
@@ -532,7 +533,7 @@ public class Segment implements Serializable {
 
 
     /** NEW VERSION */
-    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getStartPos();
         Integer end = this.getStartPos() + marginSize - 1;
@@ -554,7 +555,6 @@ public class Segment implements Serializable {
             // abort if end of bait reaches end of segment
             if(i + baitSize - 1 == this.getEndPos()) { break; }
         }
-        this.baitListUpStreamMargin=baitListUpStreamMargin;
         return this.baitListUpStreamMargin;
     }
 
@@ -563,13 +563,13 @@ public class Segment implements Serializable {
 
 
     public List<Bait> getBaitsForUpstreamMargin() {
-            return this.baitListUpStreamMargin;
+        return this.baitListUpStreamMargin;
     }
 
 
 
     /** NEW VERSION */
-    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, Chromosome2AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    private List<Bait> setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
 
         Integer sta = this.getEndPos() - marginSize + 1;
@@ -615,7 +615,7 @@ public class Segment implements Serializable {
         // put the the coordinates of all upstream baits in a string Set
         Set<String> upstreamCoordSet = new HashSet<>();
         for(Bait b : baitListUpStreamMargin) {
-                upstreamCoordSet.add(b.getRefId() + b.getStartPos());
+            upstreamCoordSet.add(b.getRefId() + b.getStartPos());
         }
 
         // iterate over downstream baits and skip those also contained in set for upstream baits

@@ -2,15 +2,16 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
@@ -35,44 +36,24 @@
                         <MenuItem accelerator="Shortcut+S" mnemonicParsing="false" onAction="#saveProject" text="Save project" />
                         <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..." />
                         <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
-                        <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..." />
-                        <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file as ..." />
-                        <MenuItem mnemonicParsing="false" onAction="#saveProbeFileAs" text="Save probe file as ..." />
                         <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
                         <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#closeWindow" text="Quit" />
                     </Menu>
                     <Menu mnemonicParsing="false" text="Edit">
                         <MenuItem mnemonicParsing="false" onAction="#showSettingsOfCurrentProject" text="Show settings of current project" />
+                        <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
                         <MenuItem mnemonicParsing="false" onAction="#deleteProjectFiles" text="Delete project files ..." />
                     </Menu>
-                    <Menu mnemonicParsing="false" text="Design parameters">
-                        <MenuItem mnemonicParsing="false" onAction="#setProbeLength" text="Set probe length" />
-                        <Menu mnemonicParsing="false" text="Set Tiling Factor">
-                            <RadioMenuItem fx:id="tiling1" mnemonicParsing="false" text="1" />
-                            <RadioMenuItem fx:id="tiling2" mnemonicParsing="false" text="2" />
-                            <RadioMenuItem fx:id="tiling3" mnemonicParsing="false" text="3" />
-                            <RadioMenuItem fx:id="tiling4" mnemonicParsing="false" text="4" />
-                            <RadioMenuItem fx:id="tiling5" mnemonicParsing="false" text="5" />
-                        </Menu>
-                        <MenuItem mnemonicParsing="false" onAction="#setMarginSize" text="Set margin size" />
-                        <Menu mnemonicParsing="false" text="Set margin strategy">
-                            <RadioMenuItem fx:id="singleMarginRadioMenuitem" mnemonicParsing="false" text="allow single margin" />
-                            <RadioMenuItem fx:id="bothMarginsRadioMenuitem" mnemonicParsing="false" text="require both margins" />
-                        </Menu>
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Proxy">
-                        <MenuItem mnemonicParsing="false" onAction="#setProxyDialog" text="Set proxy" />
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Log">
-                        <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Exome">
-                        <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData" text="Download Regulation Data" />
-                        <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Report">
+                    <Menu mnemonicParsing="false" text="Export">
                         <MenuItem mnemonicParsing="false" onAction="#displayReport" text="Display report" />
                         <MenuItem mnemonicParsing="false" onAction="#exportReport" text="Export report" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData" text="Download Regulation Data" />
+                        <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..." />
+                        <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file as ..." />
+                        <MenuItem mnemonicParsing="false" onAction="#saveProbeFileAs" text="Save probe file as ..." />
                     </Menu>
                 </MenuBar>
                 <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="menu-bar" HBox.hgrow="ALWAYS" />
@@ -82,9 +63,8 @@
                         <Menu mnemonicParsing="false" text="Example gene sets">
                             <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleHumanGenes" text="human" />
                             <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleMouseGenes" text="mouse" />
-                            <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleRatGenes" text="rat" />
-                            <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleFlyGenes" text="fly" />
                         </Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
                         <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
                     </Menu>
                 </MenuBar>
@@ -105,24 +85,17 @@
                                 <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="420.0" />
                             </columnConstraints>
                             <rowConstraints>
+                        <RowConstraints minHeight="50.0" prefHeight="30.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
-                                <RowConstraints minHeight="50.0" />
-                                <RowConstraints minHeight="50.0" />
-                        <RowConstraints />
                             </rowConstraints>
                             <VBox.margin>
                                 <Insets />
                             </VBox.margin>
-                            <Label text="Approach">
-                                <GridPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                </GridPane.margin>
-                            </Label>
                             <Label text="Genome build" GridPane.rowIndex="1">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -153,21 +126,6 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="7">
-                                <GridPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label text="Target genes" GridPane.rowIndex="8">
-                                <GridPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </ChoiceBox>
                             <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0" stylesheets="@gophermain.css" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -198,26 +156,11 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Button>
-                            <Button mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter gene list" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Button>
                             <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                             <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                             <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                             <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                             <ProgressIndicator fx:id="alignabilityDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                            <Label fx:id="approachLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
                             <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -248,18 +191,70 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="7">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="nValidGenesLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="8">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
+                     <Label styleClass="biglabel" stylesheets="@gophermain.css" text="Data sources" GridPane.columnIndex="1">
+                        <GridPane.margin>
+                           <Insets left="10.0" />
+                        </GridPane.margin>
+                     </Label>
+                     <Separator prefWidth="200.0" styleClass="sep" stylesheets="@gophermain.css">
+                        <GridPane.margin>
+                           <Insets left="10.0" />
+                        </GridPane.margin>
+                     </Separator>
                         </GridPane>
-                        <Separator minHeight="50.0" minWidth="830.0" styleClass="grid" />
+                        <VBox minWidth="785.0" prefHeight="69.0" styleClass="grid" stylesheets="@gophermain.css">
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="424.0">
+                                <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep" stylesheets="@gophermain.css">
+                                    <HBox.margin>
+                                        <Insets left="10.0" top="20.0" />
+                                    </HBox.margin>
+                                </Separator>
+                                <Label styleClass="biglabel" stylesheets="@gophermain.css" text="Enrichment targets">
+                                    <padding>
+                                        <Insets left="10.0" />
+                                    </padding>
+                                    <HBox.margin>
+                                        <Insets left="10.0" top="20.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </HBox>
+                            <HBox prefHeight="46.0" prefWidth="830.0">
+                                <Region prefHeight="46.0" prefWidth="55.0" />
+                                <Button mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="250.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter gene list">
+                                    <HBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Region prefHeight="200.0" prefWidth="200.0" />
+                                <Button mnemonicParsing="false" onAction="#allProteinCodingGenes" prefHeight="30.0" prefWidth="300.0" styleClass="Button" stylesheets="@gophermain.css" text="All protein-coding genes">
+                                    <HBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Region prefHeight="200.0" prefWidth="200.0" />
+                                <Button mnemonicParsing="false" onAction="#enterBedFile" prefHeight="30.0" prefWidth="250.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter BED file">
+                                    <HBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Region prefHeight="200.0" prefWidth="200.0" />
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="424.0">
+                                <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep" stylesheets="@gophermain.css">
+                                    <HBox.margin>
+                                        <Insets bottom="10.0" left="10.0" top="20.0" />
+                                    </HBox.margin>
+                                </Separator>
+                                <Label styleClass="biglabel" stylesheets="@gophermain.css" text="Design parameters">
+                                    <HBox.margin>
+                                        <Insets bottom="10.0" left="10.0" top="20.0" />
+                                    </HBox.margin>
+                                </Label>
+                            </HBox>
+                        </VBox>
                         <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
                             <columnConstraints>
                                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
@@ -268,14 +263,17 @@
                                 <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0" />
                             </columnConstraints>
                             <rowConstraints>
+                        <RowConstraints minHeight="40.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="40.0" prefHeight="30.0" />
                                 <RowConstraints minHeight="40.0" />
                                 <RowConstraints minHeight="40.0" />
                                 <RowConstraints minHeight="40.0" />
+                        <RowConstraints minHeight="40.0" prefHeight="30.0" />
                         <RowConstraints minHeight="40.0" prefHeight="30.0" />
                         <RowConstraints minHeight="40.0" prefHeight="30.0" />
                                 <RowConstraints minHeight="45.0" />
                             </rowConstraints>
-                            <Label fx:id="sizeUpLabel" text="Upstream size">
+                            <Label fx:id="sizeUpLabel" text="Upstream size" GridPane.rowIndex="2">
                                 <tooltip>
                                     <Tooltip text="Number of nucleotides 5' of the target start position in which fragments will be sought" wrapText="true" />
                                 </tooltip>
@@ -283,7 +281,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Minimum fragment size" GridPane.rowIndex="1">
+                            <Label text="Minimum fragment size" GridPane.rowIndex="3">
                                 <tooltip>
                                     <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
                                 </tooltip>
@@ -291,7 +289,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Minimum GC content (%)" GridPane.rowIndex="2">
+                            <Label text="Minimum GC content (%)" GridPane.rowIndex="4">
                                 <tooltip>
                                     <Tooltip text="Minimum percent GC content for a fragment to be selected" />
                                 </tooltip>
@@ -299,7 +297,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500" GridPane.columnIndex="1">
+                            <TextField fx:id="sizeUpTextField" minHeight="30.0" promptText="1500" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
@@ -307,7 +305,7 @@
                                     <Tooltip text="Range (5')  to search for fragments (only used in extended approach)" />
                                 </tooltip>
                             </TextField>
-                            <TextField fx:id="sizeDownTextField" minHeight="30.0" promptText="5000" GridPane.columnIndex="3">
+                            <TextField fx:id="sizeDownTextField" minHeight="30.0" promptText="5000" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
@@ -315,27 +313,27 @@
                                     <Tooltip text="Range (3') to search for fragments (only used in extended approach)" />
                                 </tooltip>
                             </TextField>
-                            <TextField fx:id="minFragSizeTextField" minHeight="30.0" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <TextField fx:id="minFragSizeTextField" minHeight="30.0" promptText="130" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </TextField>
-                            <TextField fx:id="maxKmerAlignabilityTextField" minHeight="30.0" promptText="10" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                            <TextField fx:id="maxKmerAlignabilityTextField" minHeight="30.0" promptText="10" GridPane.columnIndex="3" GridPane.rowIndex="3">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </TextField>
-                            <TextField fx:id="minGCContentTextField" minHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <TextField fx:id="minGCContentTextField" minHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </TextField>
-                            <TextField fx:id="maxGCContentTextField" minHeight="30.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                            <TextField fx:id="maxGCContentTextField" minHeight="30.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </TextField>
-                            <Label fx:id="sizeDownLabel" text="Downstream size" GridPane.columnIndex="2">
+                            <Label fx:id="sizeDownLabel" text="Downstream size" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                 <tooltip>
                                     <Tooltip text="Number of nucleotides 3' of the target start position in which fragments will be sought" />
                                 </tooltip>
@@ -343,7 +341,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Max. kmer alignability" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                            <Label text="Max. kmer alignability" GridPane.columnIndex="2" GridPane.rowIndex="3">
                                 <tooltip>
                                     <Tooltip text="Maximum repeat content for a fragment to be selected" />
                                 </tooltip>
@@ -351,7 +349,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Maximum GC content (%)" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                            <Label text="Maximum GC content (%)" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                 <tooltip>
                                     <Tooltip text="Maximum percent GC content for a fragment to be selected" />
                                 </tooltip>
@@ -359,51 +357,86 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Button alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@gophermain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                            <Button alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button" stylesheets="@gophermain.css" text="Create Viewpoints!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="8">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                     <Label text="Minimum bait count" GridPane.rowIndex="3">
+                     <Label text="Minimum bait count" GridPane.rowIndex="5">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
                      </Label>
-                     <Label text="Maximum bait count" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                     <TextField fx:id="minBaitCountTextField" minHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <GridPane.margin>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </GridPane.margin>
+                     </TextField>
+                     <Label text="Bait size" GridPane.rowIndex="6">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
                      </Label>
-                     <TextField fx:id="minBaitCountTextField" minHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                        <GridPane.margin>
-                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                        </GridPane.margin>
-                     </TextField>
-                     <TextField fx:id="maxBaitCountTextField" minHeight="30.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
-                        <GridPane.margin>
-                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                        </GridPane.margin>
-                     </TextField>
-                     <Label text="Bait size" GridPane.rowIndex="4">
+                     <Label text="Margin size" GridPane.columnIndex="2" GridPane.rowIndex="5">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
                      </Label>
-                     <Label text="Margin size" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                     <TextField fx:id="baitLengthTextField" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                        <GridPane.margin>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </GridPane.margin>
+                     </TextField>
+                     <TextField fx:id="marginSizeTextField" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <GridPane.margin>
+                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </GridPane.margin>
+                     </TextField>
+                     <Label text="Unbalanced margins?" GridPane.rowIndex="7">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
                      </Label>
-                     <TextField fx:id="baitLengthTextField" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <Label fx:id="patchedViewpointLabel" text="Patched viewpoints?" GridPane.columnIndex="2" GridPane.rowIndex="7">
                         <GridPane.margin>
-                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
-                     </TextField>
-                     <TextField fx:id="marginSizeTextField" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                     </Label>
+                     <CheckBox fx:id="unbalancedMarginCheckbox" mnemonicParsing="false" onAction="#setUnbalancedMargin" GridPane.columnIndex="1" GridPane.rowIndex="7">
                         <GridPane.margin>
-                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
-                     </TextField>
+                     </CheckBox>
+                     <CheckBox fx:id="patchedViewpointCheckbox" mnemonicParsing="false" onAction="#setAllowPatching" GridPane.columnIndex="3" GridPane.rowIndex="7">
+                        <GridPane.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </GridPane.margin>
+                     </CheckBox>
+                            <Label text="Approach">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </GridPane.margin>
+                            </Label>
+                            <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </GridPane.margin>
+                            </ChoiceBox>
+                            <Label text="Restriction enzyme(s)" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </GridPane.margin>
+                            </Label>
+                            <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Choose" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </GridPane.margin>
+                            </Button>
+                            <Label fx:id="restrictionEnzymeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </GridPane.margin>
+                            </Label>
                         </GridPane>
                     </VBox>
                 </Tab>

@@ -16,7 +16,6 @@ import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -80,12 +79,7 @@ public class SplashPresenter implements Initializable {
     /** @return list of project serialized files in the user's gopher directory. */
     private ObservableList<String> getExistingProjectNames() {
         File dir= getGopherDir();
-       File[] files = dir.listFiles(new FileFilter() {
-           @Override
-           public boolean accept(File pathname) {
-               return pathname.getAbsolutePath().endsWith(".ser");
-           }
-       });
+       File[] files = dir.listFiles(pathname -> pathname.getAbsolutePath().endsWith(".ser"));//FileFilter
         ObservableList<String> lst = FXCollections.observableArrayList();
        for (File f : files) {
            /* We want to show just the base name without "ser". Also, transform underscores to spaces */

@@ -1,6 +1,7 @@
 package gopher.gui.entrezgenetable;
 
 
+import com.google.common.collect.ImmutableList;
 import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RefGeneParser;
@@ -9,6 +10,7 @@ import gopher.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.input.Clipboard;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -31,7 +33,7 @@ import java.util.function.Consumer;
  *     {@link RefGeneParser} object to store {@link GopherGene} objects for each gene/distinct TSS in the RefGene.txt.gz file.
  *     only one transcriptmodel is stored per distinct transcription start site. The function also displays lists of valid and invalid
  *     gene symbols in the dialog</li>
- *     <li>Accept causes {@link #acceptGenes()} to be run, which creates a list of {@link GopherGene} objects - one for
+ *     <li>Accept causes {@link #acceptGenes(ActionEvent)} to be run, which creates a list of {@link GopherGene} objects - one for
  *     each valid symbol -- and passes this to the {@link Model}. It also causes the dialog to close</li>
  * </ol>
  * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link GopherGene} objects to the model.
@@ -40,13 +42,13 @@ import java.util.function.Consumer;
  * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGenePresenter implements Initializable {
-    static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
-    @FXML
-    private WebView wview;
+    private static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
+    /** This webview explains how to enter genes */
+    @FXML private WebView wview;
     /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
     /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
-    RefGeneParser parser=null;
+    private RefGeneParser parser=null;
     /** reference to the stage of the primary App. */
     private Stage stage = null;
     /** List of the uploaded symbols prior to validation, i.e., may contain invalid symbols. */
@@ -87,9 +89,8 @@ public class EntrezGenePresenter implements Initializable {
 
     /** Transfer the genes to the model.
      * Use the refGene.txt.gz data to validate the uploaded gene symbols.
-     * @param e
      */
-    @FXML public void validateGeneSymbols(ActionEvent e) {
+    @FXML private void validateGeneSymbols(ActionEvent e) {
         e.consume();
         String path = this.model.getRefGenePath();
         if (path==null) {
@@ -125,13 +126,13 @@ public class EntrezGenePresenter implements Initializable {
 
 
    /** Sets the text that will be shown in the HTML View. */
-    public void setData(String html) {
+    void setData(String html) {
         WebEngine engine = wview.getEngine();
         engine.loadContent(html);
     }
 
     @FXML
-    public void uploadGenes(ActionEvent e) {
+    private void uploadGenes(ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = fileChooser.showOpenDialog(stage);
@@ -149,9 +150,9 @@ public class EntrezGenePresenter implements Initializable {
     /** This function is responsibble for extracting gene symbols from a file that is uploaded to VPV by the user.
      * It initializes the List {@link #symbols}, which may contain correct and/or incorrect symbols -- the validity
      * of the uploaded gene symbols will be checked in the next step.
-     * @param file
+     * @param file a text file with one gene symbol per line
      */
-    public void uploadGenesFromFile(File file) {
+    void uploadGenesFromFile(File file) {
         try {
             this.uploadGenesFromFile(new FileReader(file));
         } catch (FileNotFoundException e) {
@@ -159,7 +160,7 @@ public class EntrezGenePresenter implements Initializable {
         }
     }
 
-    public void uploadGenesFromFile(Reader reader) {
+    void uploadGenesFromFile(Reader reader) {
         this.symbols = new ArrayList<>();
         try {
             BufferedReader br =new BufferedReader(reader);
@@ -175,6 +176,43 @@ public class EntrezGenePresenter implements Initializable {
         logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));
         isvalidated=false;
     }
+
+    @FXML private void allProteinCodingGenes(ActionEvent e) {
+        e.consume();
+        logger.trace("Getting all protein coding genes");
+        String path = this.model.getRefGenePath();
+        if (path==null) {
+            logger.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        logger.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
+        try {
+            this.parser = new RefGeneParser(path);
+            //parser.checkGenes(this.symbols);
+        } catch (Exception exc) {
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
+        List<String>  validGeneSymbols = parser.getAllProteinCodingGeneSymbols();
+        List<String> invalidGeneSymbols= ImmutableList.of();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
+       // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
+        isvalidated=true;
+        this.model.setGopherGenes(this.parser.getGopherGeneList());
+        this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
+        signal.accept(Signal.DONE);
+    }
+
+
 
 
     private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {
@@ -230,8 +268,33 @@ public class EntrezGenePresenter implements Initializable {
         return sb.toString();
     }
 
+    /**
+     * When the user hits the button, the contents of the system clipboard will be ingested and shown on
+     * the HTML window to allow the user to validate the genes.
+     */
+    @FXML private void getGenesFromClipboard(ActionEvent e) {
+        final Clipboard systemClipboard = Clipboard.getSystemClipboard();
+        if (!systemClipboard.hasString()) return;
+        String clip = systemClipboard.getString();
+        // The following is necessary in case the clipboard is empty.
+        if (clip.startsWith("ActionEvent")) return;
+        String A[] = clip.split("\\s+");
+        if (A.length==0) return;
+        this.symbols = new ArrayList<>();
+        for (String  sym : A) {
+            symbols.add(sym);
+        }
+        setData(getInitialGeneListHTML(symbols));
+        logger.info(String.format("Copied a total of %d genes from clipboard",this.symbols.size()));
+        isvalidated=false;
+        e.consume();
+    }
+
+
+
+
     /** This function closes the dialog for entering genes, and passes the GopherGene list to the model. */
-    @FXML public void acceptGenes() {
+    @FXML private void acceptGenes(ActionEvent e) {
         if (!isvalidated) {
             PopupFactory.displayError("Error","Please validate genes for accepting them!");
             return;
@@ -240,9 +303,15 @@ public class EntrezGenePresenter implements Initializable {
             PopupFactory.displayError("Error","Please validate genes for accepting them!");
             return;
         }
-        this.model.setVPVGenes(this.parser.getVPVGeneList());
+        this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
         signal.accept(Signal.DONE);
+        e.consume();
+    }
+
+    @FXML private void cancel(ActionEvent e) {
+        e.consume();
+        signal.accept(Signal.CANCEL);
     }
 
 }

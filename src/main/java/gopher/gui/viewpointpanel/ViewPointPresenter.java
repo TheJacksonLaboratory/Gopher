@@ -34,19 +34,18 @@ import java.util.stream.Collectors;
 /**
  * This class acts as a controller of the TabPanes which confirmDialog individual ViewPoints.
  * @author Peter Robinson
- * @version 0.2.7 (2017-11-12)
+ * @version 0.2.8 (2018-07-12)
  */
 public class ViewPointPresenter implements Initializable {
-
     private static final Logger logger = Logger.getLogger(ViewPointPresenter.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
-
-
-    private final static String colors[] = {"F08080", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
-            "EC96A4", "E6DF44", "F76FDA","E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5"};
+    private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
+            "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
+            "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
+            "FFE4E1","F0FFF0","F0FFFF"};
 
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
@@ -72,11 +71,11 @@ public class ViewPointPresenter implements Initializable {
     @FXML private TableColumn<ColoredSegment, String> colorTableColumn;
     @FXML private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
     @FXML private TableColumn<ColoredSegment, String> locationTableColumn;
-    @FXML private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
+   // @FXML private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
     @FXML private TableColumn<ColoredSegment, String> repeatContentUpColumn;
-    @FXML private TableColumn<ColoredSegment, String> repeatContentDownColumn;
-    @FXML private TableColumn<ColoredSegment, String> gcContentUpColumn;
-    @FXML private TableColumn<ColoredSegment, String> gcContentDownColumn;
+   // @FXML private TableColumn<ColoredSegment, String> repeatContentDownColumn;
+    @FXML private TableColumn<ColoredSegment, String> gcContentUpDownColumn;
+    @FXML private TableColumn<ColoredSegment, String> numberOfBaitsColumn;
    // @FXML private TableColumn<ColoredSegment, String> gcContentTableColumn;
     @FXML private TableColumn<ColoredSegment,String> segmentLengthColumn;
 
@@ -99,8 +98,11 @@ public class ViewPointPresenter implements Initializable {
 
     /** Instance of {@link ViewPoint} presented by this presenter. */
     private ViewPoint viewpoint;
-
-    private int coloridx = 0;
+    /** If {@link #coloridx} is set to this, then we know we need to set it to a random number. Otherwise
+     * leave if unchanged so that the color remains the same.  */
+    private static final int UNINITIALIZED=-1;
+    /** The (random) starting index in our list of colors. */
+    private int coloridx = UNINITIALIZED;
     /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
      * well as in the table.
      */
@@ -165,16 +167,16 @@ public class ViewPointPresenter implements Initializable {
     }
 
 //  TODO - save action here
-    @FXML
-    void saveButtonAction() {
-        // choose Segments that were selected by user.
-        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
-                .filter(ColoredSegment::isSelected)
-                .collect(Collectors
-                        .toList());
-        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
-                (Collectors.joining(","))));
-    }
+//    @FXML
+//    void saveButtonAction() {
+//        // choose Segments that were selected by user.
+//        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
+//                .filter(ColoredSegment::isSelected)
+//                .collect(Collectors
+//                        .toList());
+//        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
+//                (Collectors.joining(","))));
+//    }
 
     public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
         this.analysisPresenter=vpAnalysisPresenter;
@@ -206,27 +208,27 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
-    /** Class for sorting items like 2.3% and 34.5% */
-    class PercentComparator implements Comparator<String> {
-        @Override
-        public int compare(String s1, String s2) {
-            int i=s1.indexOf("%");
-            if (i>0)
-                s1=s1.substring(0,i);
-            i=s2.indexOf("%");
-            if (i>0)
-                s2=s2.substring(0,i);
-            try {
-                Double d1 = Double.parseDouble(s1);
-                Double d2=Double.parseDouble(s2);
-                return d1.compareTo(d2);
-            } catch (Exception e) {
-                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
-                logger.error(e,e);
-                return 0;
-            }
-        }
-    }
+//    /** Class for sorting items like 2.3% and 34.5% */
+//    class PercentComparator implements Comparator<String> {
+//        @Override
+//        public int compare(String s1, String s2) {
+//            int i=s1.indexOf("%");
+//            if (i>0)
+//                s1=s1.substring(0,i);
+//            i=s2.indexOf("%");
+//            if (i>0)
+//                s2=s2.substring(0,i);
+//            try {
+//                Double d1 = Double.parseDouble(s1);
+//                Double d2=Double.parseDouble(s2);
+//                return d1.compareTo(d2);
+//            } catch (Exception e) {
+//                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
+//                logger.error(e,e);
+//                return 0;
+//            }
+//        }
+//    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -255,15 +257,19 @@ public class ViewPointPresenter implements Initializable {
             this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
-            if (segment.isSelected()) // inspect state of the segment and initialize CheckBox state accordingly
+            if (segment.isUnselectable()) {
+                checkBox.setDisable(true);
+            } else if (segment.isSelected()) {// inspect state of the segment and initialize CheckBox state accordingly
                 checkBox.setSelected(true);
+            }
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
                     // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     Platform.runLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             updateScore();
                             refreshUCSCButtonAction();
                             colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
@@ -305,31 +311,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-//        inRepetitiveTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue()
-//                .getSegment().getRepeatContentAsPercent())));
-//        inRepetitiveTableColumn.setComparator(new PercentComparator());
-//        // the following causes the contents of the repeat cell to be shown in red if the repeat threshold is surpassed.
-//        inRepetitiveTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
-//            @Override
-//            protected void updateItem(String item, boolean empty) {
-//                super.updateItem(item,empty);
-//                if (item != null && !empty) {
-//                    setText(item);
-//                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-//                    if (rp > model.getMaxRepeatContent()) {
-//                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-//                    } else {
-//                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-//                    }
-//                }
-//            }
-//        });
-//        inRepetitiveTableColumn.setEditable(false);
-
-
-
         alignabilityContentColumn.setCellValueFactory(cdf -> {
-            double alignability =cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
+            double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
         });
         alignabilityContentColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
@@ -337,12 +320,17 @@ public class ViewPointPresenter implements Initializable {
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
-                    setText(item);
-                    double rp =   Double.parseDouble(item);
-                    if (rp > model.getMaxMeanKmerAlignability()) {
+                    Double rp =   Double.parseDouble(item);
+                    if (rp.isNaN()) {
+                        setText("n/a");
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                        setText(String.format("%.1f",rp));
+                        if (rp > model.getMaxMeanKmerAlignability()) {
+                            setStyle("-fx-text-fill: red; -fx-font-weight: bold");
+                        } else {
+                            setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                        }
                     }
                 }
             }
@@ -378,35 +366,26 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-//        repeatContentDownColumn.setCellValueFactory(cdf ->new ReadOnlyStringWrapper("remove me"));
-//        repeatContentDownColumn.setComparator(new PercentComparator());
-//        repeatContentDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
-//            @Override
-//            protected void updateItem(String item, boolean empty) {
-//                super.updateItem(item,empty);
-//                if (item != null && !empty) {
-//                    setText(item);
-//                    double rp = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-//                    if (rp > model.getMaxRepeatContent()) {
-//                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-//                    } else {
-//                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-//                    }
-//                }
-//            }
-//        });
-        gcContentUpColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getGCcontentUpAsPercent())));
-        gcContentUpColumn.setComparator(new PercentComparator());
-        gcContentUpColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+
+        gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+                getSegment().getGCcontentUpAsPercent()))); // TODO MAKE UPDOWN
+        gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
-                    double gc = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (gc < model.getMinGCcontent() || gc > model.getMaxGCcontent()) { // GC content is like 0.25
+                    String A[]=item.split("/");
+                    boolean red=false;
+                    for (String a : A) {
+                        // maxGcContent is a proportion (not a percentage) so we need to convert back
+                        double rp = 0.01* ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
+                        // Show red if we are above or below threshold for either threshold
+                        if (rp>model.getMaxGCcontent()) red = true;
+                        if (rp<model.getMinGCcontent()) red = true;
+                    }
+                    if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
                         setStyle("-fx-text-fill: black; -fx-font-weight: normal");
@@ -414,22 +393,15 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-        gcContentDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getGCcontentDownAsPercent())));
-        gcContentDownColumn.setComparator(new PercentComparator());
-        gcContentDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        numberOfBaitsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
+                getSegment().getNumberOfBaitsUpDownAsString())));
+        numberOfBaitsColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
-                    double gc = 0.01 * ((item.endsWith("%")) ? Double.parseDouble(item.substring(0, item.length() -1)): Double.parseDouble(item));
-                    if (gc < model.getMinGCcontent() || gc > model.getMaxGCcontent()) { // GC content is like 0.25
-                        setStyle("-fx-text-fill: red; -fx-font-weight: bold");
-                    } else {
-                        setStyle("-fx-text-fill: black; -fx-font-weight: normal");
-                    }
                 }
             }
         });
@@ -438,18 +410,11 @@ public class ViewPointPresenter implements Initializable {
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
 
-        /* the following will start us off with a different color each time. */
-        this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        /* the following will start us off with a different color for each ViewPoint. */
+        if (coloridx == UNINITIALIZED) {
+            this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        }
     }
-
-    /**
-     * Calling this method sets the "manually revised" flag of the selected ViewPoint to
-     * true and also refreshes the viewpoint table so that a check is shown.
-     */
-    /*private void setManuallyRevised() {
-        this.viewpoint.setManuallyRevised();
-        Platform.runLater( () -> this.analysisPresenter.refreshVPTable() );
-    }*/
 
 
 

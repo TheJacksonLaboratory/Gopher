@@ -255,7 +255,16 @@ public class DigestCreationTask extends Task<Void> {
             // leave endpos as is--it is one past the end in zero-based numbering.
             String subsequence=sequence.substring(startpos-1,endpos);
             Result result = getGcAndRepeat(subsequence, this.marginSize);
-            boolean selected = btree.containsNode(scaffoldName,startpos);
+
+            boolean selected = false;
+            Integer baitNumUp = 0;
+            Integer baitNumDown = 0;
+            if(btree.containsNode(scaffoldName,startpos)) {
+                selected = true;
+                Segment seg = btree.getNode(scaffoldName, startpos).segment;
+                baitNumUp = seg.getBaitNumUp();
+                baitNumDown = seg.getBaitNumDown();
+            }
 
             out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
                     scaffoldName,
@@ -270,8 +279,8 @@ public class DigestCreationTask extends Task<Void> {
                     result.getFivePrimeRepeatContent(),
                     result.getThreePrimeRepeatContent(),
                     selected ? "T" : "F",
-                    0,
-                    0));
+                    baitNumUp,
+                    baitNumDown));
             if (counter%1000==0) {
                 updateMessage(String.format("Digesting %s [%d digests so far]",scaffoldName,counter ));
             }
@@ -285,9 +294,18 @@ public class DigestCreationTask extends Task<Void> {
         int startpos= (previousCutPosition+1);
         // Note: to get subsequence, decrement startpos by one to get zero-based numbering
         // leave endpos as is--it is one past the end in zero-based numbering.
+
         String subsequence=sequence.substring(startpos-1,endpos);
         Result result = getGcAndRepeat(subsequence,marginSize);
-        boolean selected = btree.containsNode(scaffoldName,startpos);
+        boolean selected = false;
+        Integer baitNumUp = 0;
+        Integer baitNumDown = 0;
+        if(btree.containsNode(scaffoldName,startpos)) {
+            selected = true;
+            Segment seg = btree.getNode(scaffoldName, startpos).segment;
+            baitNumUp = seg.getBaitNumUp();
+            baitNumDown = seg.getBaitNumDown();
+        }
         if (selected) {
             System.out.println(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
                     scaffoldName,
@@ -302,8 +320,8 @@ public class DigestCreationTask extends Task<Void> {
                     result.getFivePrimeRepeatContent(),
                     result.getThreePrimeRepeatContent(),
                     selected ? "T" : "F",
-                    0,
-                    0));
+                    baitNumUp,
+                    baitNumDown));
             System.out.println("SELECTED: " + scaffoldName + ": "+startpos);
         }
         out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
@@ -319,8 +337,8 @@ public class DigestCreationTask extends Task<Void> {
                 result.getFivePrimeRepeatContent(),
                 result.getThreePrimeRepeatContent(),
                 selected ? "T" : "F",
-                0,
-                0));
+                baitNumUp,
+                baitNumDown));
     }
 
 
