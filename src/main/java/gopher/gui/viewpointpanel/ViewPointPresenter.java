@@ -368,7 +368,7 @@ public class ViewPointPresenter implements Initializable {
         });
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getGCcontentUpDownAsPercent())));
+                getSegment().getGCcontentUpAsPercent()))); // TODO MAKE UPDOWN
         gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.entrezgenetable.EntrezGenePresenter">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.entrezgenetable.EntrezGenePresenter">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -46,9 +46,9 @@
    <HBox alignment="CENTER" prefHeight="41.0" prefWidth="510.0">
       <children>
          <Region prefHeight="200.0" prefWidth="200.0" />
-         <Button minWidth="150.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@entrezgene.css" text="Accept" />
-         <Region prefHeight="200.0" prefWidth="200.0" />
            <Button alignment="CENTER" minWidth="150.0" mnemonicParsing="false" onAction="#cancel" stylesheets="@entrezgene.css" text="Cancel" />
+         <Region prefHeight="200.0" prefWidth="200.0" />
+         <Button minWidth="150.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@entrezgene.css" text="Accept" />
          <Region prefHeight="200.0" prefWidth="200.0" />
       </children>
    </HBox>
