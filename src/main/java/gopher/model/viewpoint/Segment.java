@@ -41,8 +41,8 @@ public class Segment implements Serializable {
     /** The value of this variable is true if this Segment is selected (and will thus be used for Capture HiC probe production). */
     private boolean selected;
     private boolean unselectable;
-    private boolean targetable;
-    private boolean rescuable;
+    private boolean balanced;
+    private boolean unbalanced;
     /** This is true if the fragment was selected when the ViewPoint was originally created. If
      * originallySelected != selected, then this Fragment was manually changed by the user. */
     private boolean originallySelected;
@@ -395,8 +395,8 @@ public class Segment implements Serializable {
 //        if (this.length() < baitSize) {
 //            // do not place baits in segments shorter than the bait size
 //            this.unselectable = true;
-//            this.targetable = false;
-//            this.rescuable = false;
+//            this.balanced = false;
+//            this.unbalanced = false;
 //            return;
 //        }
 //
@@ -406,17 +406,17 @@ public class Segment implements Serializable {
 //        this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
 //
 //        if (bmin <= this.getBaitNumUp() && bmin <= this.getBaitNumDown()) {
-//            // both margin have at least bmin non redundant baits -> this segment is targetable
+//            // both margin have at least bmin non redundant baits -> this segment is balanced
 //            this.unselectable = false;
-//            this.targetable = true;
-//            this.rescuable = false;
+//            this.balanced = true;
+//            this.unbalanced = false;
 //        } else {
 //            // try to rescue the segment by allowing unbalanced probes
 //            if (this.getBaitNumUp() < bmin && this.getBaitNumDown() < bmin) {
 //                // both margins have less than bmin baits this segment, i.e. bait cannot be rescued
 //                this.unselectable = true;
-//                this.targetable = false;
-//                this.rescuable = false;
+//                this.balanced = false;
+//                this.unbalanced = false;
 //                return;
 //            }
 //            if (this.getBaitNumUp() < bmin) {
@@ -428,12 +428,12 @@ public class Segment implements Serializable {
 //                if (this.getBaitNumTotal() == 2 * bmin) {
 //                    // segment can be rescued
 //                    this.unselectable = false;
-//                    this.targetable = false;
-//                    this.rescuable = true;
+//                    this.balanced = false;
+//                    this.unbalanced = true;
 //                } else {
 //                    this.unselectable = true;
-//                    this.targetable = false;
-//                    this.rescuable = false;
+//                    this.balanced = false;
+//                    this.unbalanced = false;
 //                }
 //            } else {
 //                // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
@@ -443,12 +443,12 @@ public class Segment implements Serializable {
 //                if (this.getBaitNumTotal() == 2 * bmin) {
 //                    // segment can be rescued
 //                    this.unselectable = false;
-//                    this.targetable = false;
-//                    this.rescuable = true;
+//                    this.balanced = false;
+//                    this.unbalanced = true;
 //                } else {
 //                    this.unselectable = true;
-//                    this.targetable = false;
-//                    this.rescuable = false;
+//                    this.balanced = false;
+//                    this.unbalanced = false;
 //                }
 //            }
 //        }
@@ -465,8 +465,8 @@ public class Segment implements Serializable {
         if (this.length() < baitSize) {
             // do not place baits in segments shorter than the bait size
             this.unselectable = true;
-            this.targetable = false;
-            this.rescuable = false;
+            this.balanced = false;
+            this.unbalanced = false;
             return;
         }
 
@@ -476,17 +476,17 @@ public class Segment implements Serializable {
         this.removeRedundantBaits(); // remove redundant baits that may occur for segments shorter than 2 times the margin size
 
         if (bmin <= this.getBaitNumUp() && bmin <= this.getBaitNumDown()) {
-            // both margin have at least bmin non redundant baits -> this segment is targetable
+            // both margin have at least bmin non redundant baits -> this segment is balanced
             this.unselectable = false;
-            this.targetable = true;
-            this.rescuable = false;
+            this.balanced = true;
+            this.unbalanced = false;
         } else {
             // try to rescue the segment by allowing unbalanced probes
             if (this.getBaitNumUp() < bmin && this.getBaitNumDown() < bmin) {
                 // both margins have less than bmin baits this segment, i.e. bait cannot be rescued
                 this.unselectable = true;
-                this.targetable = false;
-                this.rescuable = false;
+                this.balanced = false;
+                this.unbalanced = false;
                 return;
             }
             if (this.getBaitNumUp() < bmin) {
@@ -498,12 +498,12 @@ public class Segment implements Serializable {
                 if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
                     this.unselectable = false;
-                    this.targetable = false;
-                    this.rescuable = true;
+                    this.balanced = false;
+                    this.unbalanced = true;
                 } else {
                     this.unselectable = true;
-                    this.targetable = false;
-                    this.rescuable = false;
+                    this.balanced = false;
+                    this.unbalanced = false;
                 }
             } else {
                 // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
@@ -513,12 +513,12 @@ public class Segment implements Serializable {
                 if (this.getBaitNumTotal() == 2 * bmin) {
                     // segment can be rescued
                     this.unselectable = false;
-                    this.targetable = false;
-                    this.rescuable = true;
+                    this.balanced = false;
+                    this.unbalanced = true;
                 } else {
                     this.unselectable = true;
-                    this.targetable = false;
-                    this.rescuable = false;
+                    this.balanced = false;
+                    this.unbalanced = false;
                 }
             }
         }
@@ -636,12 +636,12 @@ public class Segment implements Serializable {
         return numOfRedundantBaitsRemoved;
     }
 
-    public boolean isTargetable() {
-        return this.targetable;
+    public boolean isBalanced() {
+        return this.balanced;
     }
 
-    public boolean isRescuable() {
-        return this.rescuable;
+    public boolean isUnbalanced() {
+        return this.unbalanced;
     }
 
     public boolean isUnselectable() {

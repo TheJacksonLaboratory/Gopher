@@ -117,10 +117,10 @@ class ViewPointAnalysisSummaryHTMLGenerator {
                 ngenes, resolvedVP, total_active_frags));
 
         sb.append(String.format("<tr><td>Genes with &geq; 1 viewpoint: %d</td><td>Average viewpoint score: %.2f%%</td>" +
-                        "<td>Selected targetable fragments: %d</td></tr>",
+                        "<td>Selected balanced digests: %d</td></tr>",
                 resolvedGenes, 100 * avg_score, 42));
         sb.append(String.format("<tr><td></td><td>Average viewpoint size: %.1f bp</td>" +
-                        "<td>Rescued targetable fragments: %d</td></tr>",
+                        "<td>Selected unbalanced digests: %d</td></tr>",
                 avVpSize, 42));
         sb.append(String.format("<tr><td></td>" +
                         "<td></td><td>Number of baits: %d</td></tr>",

@@ -19,6 +19,8 @@ public class Design {
     static Logger logger = Logger.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
+
+
     /** total length in nt of all unique digest margins  */
     private int n_nucleotides_in_unique_fragment_margins;
 
@@ -158,6 +160,7 @@ public class Design {
             uniqueGeneSymbols.add(vp.getTargetName());
             avgVPscore += vp.getScore();
             avgVPsize += vp.getTotalLengthOfViewpoint();
+            //avgVPsize += vp.getEndPos()-vp.getStartPos()+1;
             if (vp.getResolved()) {
                 uniqueGeneSymbols.add(vp.getTargetName());
             }
