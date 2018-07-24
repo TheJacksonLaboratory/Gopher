@@ -236,9 +236,7 @@ public class ViewPoint implements Serializable {
                     fastaReader(fastaReader).marginSize(marginSize).build();
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
-            if(!restFrag.isUnselectable()) {
-                restrictionSegmentList.add(restFrag);
-            }
+            restrictionSegmentList.add(restFrag);
         }
     }
 

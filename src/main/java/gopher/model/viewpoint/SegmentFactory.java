@@ -95,7 +95,7 @@ public class SegmentFactory implements Serializable {
             }
             // note fastaReader refers to one-based numbering scheme.
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
-            Pattern pattern = Pattern.compile(cutpat);
+            Pattern pattern = Pattern.compile(cutpat,Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(genomicPosRegionString);
             ArrayList<Integer> cuttingPositionList = new ArrayList<>();
             int fragmentStart=genomicPos - maxDistToGenomicPosUp; /* one-based position of first nucleotide in the entire subsequence returned by fasta reader */
