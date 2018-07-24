@@ -237,6 +237,10 @@ public class Segment implements Serializable {
         }
     }
 
+    private void calculateMeanGcContentOfBaits() {
+
+    }
+
     public String getReferenceSequenceID() { return referenceSequenceID; }
     /**
      * This function returns the repeat content calculated by the function {@link #calculateGCandRepeatContent}.
@@ -655,6 +659,11 @@ public class Segment implements Serializable {
         return meanGCcontentOfBaits/this.getBaitNumTotal();
     }
 
+    public String getMeanGCcontentOfBaitsAsPercent() {
+        Double meanGCcontentOfBaits = getMeanGCcontentOfBaits();
+        return String.format("%.2f%%",100*meanGCcontentOfBaits);
+    }
+
     public Double getMeanAlignabilityOfBaits() {
         Double meanAlignabilityOfBaits = 0.0;
         for(Bait b : baitListUpStreamMargin) {
@@ -675,6 +684,10 @@ public class Segment implements Serializable {
             meanRepeatContentOfBaits = meanRepeatContentOfBaits + b.getRepeatContent();
         }
         return meanRepeatContentOfBaits/this.getBaitNumTotal();
+    }
+    public String getMeanRepeatContentOfBaitsAsPercent() {
+        Double meanRepeatContentOfBaits = getMeanRepeatContentOfBaits();
+        return String.format("%.2f%%",100*meanRepeatContentOfBaits);
     }
 
 
