@@ -123,19 +123,19 @@ public class GopherMainPresenter implements Initializable {
 
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
-    /** Show how many valid genes were uploaded by user. */
-    @FXML private Label nValidGenesLabel;
-    /** Show the name of the downloaded genome we areusing. */
-    @FXML private Label downloadedGenomeLabel;
-    /** Show status of unpacking the downloaded genome. */
-    @FXML private Label decompressGenomeLabel;
-    /** Show status of indexing the downloaded genome. */
-    @FXML private Label indexGenomeLabel;
-    /** Show name of downloaded transcripts file. */
-    @FXML private Label downloadedTranscriptsLabel;
-    /** Show name of downloaded transcripts file. */
-    @FXML private Label downloadAlignabilityLabel;
-    @FXML private Label decompressAlignabilityLabel;
+//    /** Show how many valid genes were uploaded by user. */
+//    @FXML private Label nValidGenesLabel;
+//    /** Show the name of the downloaded genome we areusing. */
+//    @FXML private Label downloadedGenomeLabel;
+//    /** Show status of unpacking the downloaded genome. */
+//    @FXML private Label decompressGenomeLabel;
+//    /** Show status of indexing the downloaded genome. */
+//    @FXML private Label indexGenomeLabel;
+//    /** Show name of downloaded transcripts file. */
+//    @FXML private Label downloadedTranscriptsLabel;
+//    /** Show name of downloaded transcripts file. */
+//    @FXML private Label downloadAlignabilityLabel;
+//    @FXML private Label decompressAlignabilityLabel;
 
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
@@ -306,45 +306,45 @@ public class GopherMainPresenter implements Initializable {
 
     private void setInitializedValuesInGUI() {
         String genomebuild=model.getGenomeBuild();
-        if (genomebuild!=null)
-            this.genomeBuildLabel.setText(genomebuild);
+//        if (genomebuild!=null)
+//            this.genomeBuildLabel.setText(genomebuild);
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory!= null) {
-            this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
+           // this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
         } else {
-            this.downloadedGenomeLabel.setText("...");
+           // this.downloadedGenomeLabel.setText("...");
             this.genomeDownloadPI.setProgress(0);
         }
         if (model.isGenomeUnpacked()) {
-            this.decompressGenomeLabel.setText("Extraction previously completed");
+           // this.decompressGenomeLabel.setText("Extraction previously completed");
             this.genomeDecompressPI.setProgress(1.00);
         } else {
-            this.decompressGenomeLabel.setText("...");
+           // this.decompressGenomeLabel.setText("...");
             this.genomeDecompressPI.setProgress(0.0);
         }
         String refGenePath=this.model.getRefGenePath();
         if (refGenePath!=null) {
-            this.downloadedTranscriptsLabel.setText(refGenePath);
+           // this.downloadedTranscriptsLabel.setText(refGenePath);
             this.transcriptDownloadPI.setProgress(1.0);
         } else {
-            this.downloadedTranscriptsLabel.setText("...");
+           // this.downloadedTranscriptsLabel.setText("...");
             this.transcriptDownloadPI.setProgress(0.0);
         }
 
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
-            this.downloadAlignabilityLabel.setText("Download complete");
+           // this.downloadAlignabilityLabel.setText("Download complete");
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
-            this.downloadAlignabilityLabel.setText("...");
+           // this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
 
         if (model.isGenomeIndexed()) {
-            this.indexGenomeLabel.setText("Genome files successfully indexed");
+           // this.indexGenomeLabel.setText("Genome files successfully indexed");
             this.genomeIndexPI.setProgress(1.00);
         } else {
-            this.indexGenomeLabel.setText("...");
+           // this.indexGenomeLabel.setText("...");
             this.genomeIndexPI.setProgress(0.00);
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
@@ -560,12 +560,12 @@ public class GopherMainPresenter implements Initializable {
         logger.info("downloadGenome to directory  "+ file.getAbsolutePath());
         if (this.model.checkDownloadComplete(file.getAbsolutePath())) {
             // we're done!
-            this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
+            //this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
             this.genomeDownloadPI.setProgress(1.0);
         } else {
             gdownloader.downloadGenome(file.getAbsolutePath(), model.getGenomeBasename(), genomeDownloadPI);
             model.setGenomeDirectoryPath(file.getAbsolutePath());
-            this.downloadedGenomeLabel.setText(file.getAbsolutePath());
+            //this.downloadedGenomeLabel.setText(file.getAbsolutePath());
         }
     }
 
@@ -597,7 +597,7 @@ public class GopherMainPresenter implements Initializable {
         if (! rgd.needToDownload(file.getAbsolutePath())) {
             logger.trace(String.format("Found refGene.txt.gz file at %s. No need to download",file.getAbsolutePath()));
             this.transcriptDownloadPI.setProgress(1.0);
-            this.downloadedTranscriptsLabel.setText(transcriptName);
+           // this.downloadedTranscriptsLabel.setText(transcriptName);
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
             this.model.setRefGenePath(abspath);
             return;
@@ -607,7 +607,7 @@ public class GopherMainPresenter implements Initializable {
         downloadTask.setOnSucceeded( event -> {
             String abspath=(new File(file.getAbsolutePath() + File.separator + basename)).getAbsolutePath();
             this.model.setRefGenePath(abspath);
-            this.downloadedTranscriptsLabel.setText(transcriptName);
+            //this.downloadedTranscriptsLabel.setText(transcriptName);
         });
        Thread th = new Thread(downloadTask);
        th.setDaemon(true);
@@ -622,7 +622,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML public void decompressGenome(ActionEvent e) {
         e.consume();
         if (this.model.getGenome().isIndexingComplete()) {
-            decompressGenomeLabel.setText("Chromosome files extracted");
+           // decompressGenomeLabel.setText("Chromosome files extracted");
             genomeDecompressPI.setProgress(1.00);
             model.setGenomeUnpacked();
             return;
@@ -630,7 +630,7 @@ public class GopherMainPresenter implements Initializable {
         GenomeGunZipper genomeGunZipper = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
         genomeGunZipper.setOnSucceeded( event -> {
-            decompressGenomeLabel.setText(genomeGunZipper.getStatus());
+           // decompressGenomeLabel.setText(genomeGunZipper.getStatus());
             if (genomeGunZipper.OK()) {
                 model.setGenomeUnpacked();
             } else {
@@ -638,7 +638,7 @@ public class GopherMainPresenter implements Initializable {
             }
         });
         genomeGunZipper.setOnFailed(eventh -> {
-            decompressGenomeLabel.setText("Decompression failed");
+            //decompressGenomeLabel.setText("Decompression failed");
             PopupFactory.displayError("Could not decompress genome file" ,genomeGunZipper.getException().getMessage());
         });
         Thread th = new Thread(genomeGunZipper);
@@ -658,13 +658,13 @@ public class GopherMainPresenter implements Initializable {
             String message = String.format("%d chromosomes in %s successfully indexed.",
                     n_chroms,
                     model.getGenome().getGenomeFastaName());
-            indexGenomeLabel.setText(message);
+           // indexGenomeLabel.setText(message);
             logger.debug(message);
             model.setIndexedGenomeFastaIndexFile(manager.getGenomeFastaIndexPath());
            model.setGenomeIndexed();
         } );
         manager.setOnFailed(event-> {
-            indexGenomeLabel.setText("FASTA indexing failed");
+          //  indexGenomeLabel.setText("FASTA indexing failed");
             PopupFactory.displayError("Failure to index Genome FASTA file.",
                     manager.getException().getMessage());
         });
@@ -708,7 +708,7 @@ public class GopherMainPresenter implements Initializable {
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
             logger.trace(String.format("Found %s. No need to download",alignabilityMapPathIncludingFileNameGz));
             this.alignabilityDownloadPI.setProgress(1.0);
-            this.downloadAlignabilityLabel.setText("Download complete");
+           // this.downloadAlignabilityLabel.setText("Download complete");
             return;
         }
 
@@ -724,7 +724,7 @@ public class GopherMainPresenter implements Initializable {
             url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
             url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
         } else {
-            this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
+            //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
             return;
         }
         // also download chromosme file
@@ -733,7 +733,7 @@ public class GopherMainPresenter implements Initializable {
         th.start();
 
         Downloader downloadTask = new Downloader(file, url, basenameGz, alignabilityDownloadPI);
-        downloadTask.setOnSucceeded( event -> this.downloadAlignabilityLabel.setText("Download complete")  );
+        //downloadTask.setOnSucceeded( event -> this.downloadAlignabilityLabel.setText("Download complete")  );
         th = new Thread(downloadTask);
         th.setDaemon(true);
         th.start();
