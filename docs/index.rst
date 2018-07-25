@@ -9,9 +9,11 @@ Welcome to GOPHER's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   CHC
    installation
-   setup
+   chc_intro
+   concepts
+   approaches
+   graphical_user_interface
    parameters
    designparameters
    running

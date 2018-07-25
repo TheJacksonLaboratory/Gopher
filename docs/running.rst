@@ -1,5 +1,5 @@
-Running GOPHER
-==============
+Running GOPHER **(deprecated)**
+===============================
 
 Assuming you have built or downloaded the `GOPHER.jar` file as described in :doc:`installation`, it is simple to start the program. Enter  ::
 

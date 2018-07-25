@@ -31,9 +31,8 @@ Installing and running the prebuilt GOPHER app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The source code for GOPHER is available from the GOPHER GitHub page. ::
 
-  https://github.com/TheJacksonLaboratory/Gopher
+  $ git clone https://github.com/TheJacksonLaboratory/Gopher
 
-You can clone or download the source as with any project hosted at GitHub.
 GOPHER used the maven build system. To build the App simply enter the following command. ::
 
   $ mvn package

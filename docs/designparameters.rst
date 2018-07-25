@@ -1,5 +1,5 @@
-Panel design
-============
+Panel design **(deprecated)**
+=============================
 
 
 

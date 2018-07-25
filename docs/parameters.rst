@@ -1,5 +1,5 @@
-Parameters and Settings for GOPHER
-==================================
+Parameters and Settings for GOPHER **(deprecated)**
+===================================================
 
 Parameters that affect the overall size of the viewpoints and the thresholds for GC and repeat content are set in the main `Setup` tab.
 
