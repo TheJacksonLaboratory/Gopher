@@ -26,7 +26,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
     <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0" minWidth="830.0" stylesheets="@gophermain.css">
         <top>
             <HBox maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
@@ -77,18 +77,17 @@
                         <effect>
                             <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0" />
                         </effect>
-                        <GridPane minWidth="785.0" styleClass="grid" VBox.vgrow="NEVER">
+                        <GridPane minWidth="800.0" prefHeight="200.0" prefWidth="832.0" styleClass="grid" VBox.vgrow="NEVER">
                             <columnConstraints>
                                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
                                 <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="160.0" prefWidth="160.0" />
                                 <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
-                                <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="420.0" />
+                                <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="180.0" />
+                        <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="160.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="ALWAYS" maxWidth="420.0" minWidth="50.0" prefWidth="50.0" />
                             </columnConstraints>
                             <rowConstraints>
                         <RowConstraints minHeight="50.0" prefHeight="30.0" />
-                                <RowConstraints minHeight="50.0" />
-                                <RowConstraints minHeight="50.0" />
-                                <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
                                 <RowConstraints minHeight="50.0" />
@@ -111,17 +110,17 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Index Genome FASTA" GridPane.rowIndex="4">
+                            <Label text="Index Genome FASTA" GridPane.columnIndex="3" GridPane.rowIndex="1">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.rowIndex="5">
+                            <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Alignability map" GridPane.rowIndex="6">
+                            <Label text="Alignability map" GridPane.columnIndex="3" GridPane.rowIndex="3">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
@@ -141,56 +140,26 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Start" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Start" GridPane.columnIndex="4" GridPane.rowIndex="1">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                            <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                            <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false" onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="4" GridPane.rowIndex="2">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                            <Button mnemonicParsing="false" onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                            <Button mnemonicParsing="false" onAction="#downloadAlignabilityMap" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@gophermain.css" text="Download" GridPane.columnIndex="4" GridPane.rowIndex="3">
                                 <GridPane.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
                             <ProgressIndicator fx:id="genomeDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                             <ProgressIndicator fx:id="genomeDecompressPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                            <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                            <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                            <ProgressIndicator fx:id="alignabilityDownloadPI" progress="0.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                            <Label fx:id="genomeBuildLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="1">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="downloadedGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="decompressGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="3">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="indexGenomeLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="4">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="downloadedTranscriptsLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="5">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
-                            <Label fx:id="downloadAlignabilityLabel" styleClass="bluelabel" text="..." GridPane.columnIndex="3" GridPane.rowIndex="6">
-                                <GridPane.margin>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </GridPane.margin>
-                            </Label>
+                            <ProgressIndicator fx:id="genomeIndexPI" progress="0.0" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                            <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                            <ProgressIndicator fx:id="alignabilityDownloadPI" progress="0.0" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                      <Label styleClass="biglabel" stylesheets="@gophermain.css" text="Data sources" GridPane.columnIndex="1">
                         <GridPane.margin>
                            <Insets left="10.0" />
