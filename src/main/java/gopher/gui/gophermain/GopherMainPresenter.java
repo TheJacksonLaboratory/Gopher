@@ -934,6 +934,14 @@ public class GopherMainPresenter implements Initializable {
         String approach = this.approachChoiceBox.getValue();
         this.model.setApproach(approach);
         updateModel();
+        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty() ) {
+            PopupFactory.displayError("Data incomplete", "Choose a restriction enzyme before proceding");
+            return;
+        }
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+            PopupFactory.displayError("Data incomplete", "Choose target genes/regions before proceding");
+            return;
+        }
         boolean OK=QCCheckFactory.showQCCheck(model);
         if (! OK ) {
             return;
@@ -1142,7 +1150,7 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
-    @FXML public void openGeneWindowWithExampleHumanGenes() {
+    @FXML private void openGeneWindowWithExampleHumanGenes() {
         InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/humangenesymbols.txt");
 
         if (is == null) {
@@ -1157,7 +1165,7 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
-    @FXML public void openGeneWindowWithExampleMouseGenes() {
+    @FXML private void openGeneWindowWithExampleMouseGenes() {
         InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/mousegenesymbols.txt");
 
         if (is == null) {

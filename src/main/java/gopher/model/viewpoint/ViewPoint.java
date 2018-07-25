@@ -236,9 +236,7 @@ public class ViewPoint implements Serializable {
                     fastaReader(fastaReader).marginSize(marginSize).build();
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
-            if(!restFrag.isUnselectable()) {
-                restrictionSegmentList.add(restFrag);
-            }
+            restrictionSegmentList.add(restFrag);
         }
     }
 
@@ -391,11 +389,11 @@ public class ViewPoint implements Serializable {
             }
 
             // if allow single margin is false, do not select segments that are rescuable
-            if(!model.getAllowSingleMargin() && segment.isRescuable()) {
+            if(!model.getAllowSingleMargin() && segment.isUnbalanced()) {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
-            if(segment.isSelected() && segment.isRescuable()) {
+            if(segment.isSelected() && segment.isUnbalanced()) {
                 //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
             }
 
@@ -512,9 +510,9 @@ public class ViewPoint implements Serializable {
 
             // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
             int length = centerSegment.length();
-            if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isTargetable())
+            if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isBalanced())
                    ||
-                    ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isRescuable() && allowSingleMargin)
+                    ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isUnbalanced() && allowSingleMargin)
 
                     )
             {
@@ -575,10 +573,10 @@ public class ViewPoint implements Serializable {
         if(seg.length() < minFragSize || seg.length()>= SIMPLE_APPROACH_MAXSIZE) {
             return false;
         }
-        if(seg.isTargetable()) {
+        if(seg.isBalanced()) {
             return true;
         }
-        return (model.getAllowSingleMargin() && seg.isRescuable());
+        return (model.getAllowSingleMargin() && seg.isUnbalanced());
     }
 
 

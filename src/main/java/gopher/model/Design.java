@@ -19,6 +19,8 @@ public class Design {
     static Logger logger = Logger.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
+
+
     /** total length in nt of all unique digest margins  */
     private int n_nucleotides_in_unique_fragment_margins;
 
@@ -158,6 +160,7 @@ public class Design {
             uniqueGeneSymbols.add(vp.getTargetName());
             avgVPscore += vp.getScore();
             avgVPsize += vp.getTotalLengthOfViewpoint();
+            //avgVPsize += vp.getEndPos()-vp.getStartPos()+1;
             if (vp.getResolved()) {
                 uniqueGeneSymbols.add(vp.getTargetName());
             }
@@ -192,5 +195,58 @@ public class Design {
         calculateEstimatedProbeNumber();
 //        logger.trace(String.format("Calculate params, n genes=%d [%s]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; "))));
     }
+
+    public Integer getTotalNumOfUniqueBaits() {
+        // get rid of redundant segments emerging from overlapping viewpoints
+        Set<Segment> uniqueDigests = new HashSet<>();
+        List<ViewPoint> viewPointList = model.getViewPointList();
+        for(ViewPoint vp : viewPointList) {
+            uniqueDigests.addAll(vp.getActiveSegments());
+        }
+        // count number of baits
+        Integer n_baits = 0;
+        for(Segment seg : uniqueDigests) {
+            n_baits += seg.getBaitNumTotal();
+        }
+        return n_baits;
+    }
+
+    public Integer getTotalNumBalancedDigests() {
+        // get rid of redundant segments emerging from overlapping viewpoints
+        Set<Segment> uniqueDigests = new HashSet<>();
+        List<ViewPoint> viewPointList = model.getViewPointList();
+        for (ViewPoint vp : viewPointList) {
+            uniqueDigests.addAll(vp.getActiveSegments());
+        }
+        // count number balanced
+        Integer n_balanced_digests = 0;
+        logger.trace(uniqueDigests.size());
+        for (Segment seg : uniqueDigests) {
+            if(seg.isBalanced()) {
+                n_balanced_digests++;
+            }
+        }
+        return n_balanced_digests;
+    }
+
+    public Integer getTotalNumUnbalancedDigests() {
+        // get rid of redundant segments emerging from overlapping viewpoints
+        Set<Segment> uniqueDigests = new HashSet<>();
+        List<ViewPoint> viewPointList = model.getViewPointList();
+        for (ViewPoint vp : viewPointList) {
+            uniqueDigests.addAll(vp.getActiveSegments());
+        }
+        // count number balanced
+        Integer n_unbalanced_digests = 0;
+        logger.trace(uniqueDigests.size());
+        for (Segment seg : uniqueDigests) {
+            if(seg.isUnbalanced()) {
+                n_unbalanced_digests++;
+            }
+        }
+        return n_unbalanced_digests;
+    }
+
+
 
 }

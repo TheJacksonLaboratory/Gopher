@@ -97,7 +97,7 @@ class ViewPointAnalysisSummaryHTMLGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead><tr>");
-        sb.append("<th>Genes</th><th>Viewpoints</th><th>Fragments</th>");
+        sb.append("<th>Genes</th><th>Viewpoints</th><th>Digests and baits</th>");
         sb.append("</tr></thead>");
         sb.append("<tbody>");
 
@@ -112,19 +112,23 @@ class ViewPointAnalysisSummaryHTMLGenerator {
         int nfrags = design.getN_unique_fragments();
         int resolvedVP = design.getN_resolvedViewpoints();
 
+        int n_baits = design.getTotalNumOfUniqueBaits();
+        int n_balancedDigests = design.getTotalNumBalancedDigests();
+        int n_unbalanced = design.getTotalNumUnbalancedDigests();
+
         sb.append(String.format("<tr><td>Number of genes: %d</td>" +
                         "<td>Number of valid viewpoints: %d</td><td>Number of unique fragments: %d</td></tr>",
                 ngenes, resolvedVP, total_active_frags));
 
         sb.append(String.format("<tr><td>Genes with &geq; 1 viewpoint: %d</td><td>Average viewpoint score: %.2f%%</td>" +
-                        "<td>Selected targetable fragments: %d</td></tr>",
-                resolvedGenes, 100 * avg_score, 42));
+                        "<td>Selected balanced digests: %d</td></tr>",
+                resolvedGenes, 100 * avg_score, n_balancedDigests));
         sb.append(String.format("<tr><td></td><td>Average viewpoint size: %.1f bp</td>" +
-                        "<td>Rescued targetable fragments: %d</td></tr>",
-                avVpSize, 42));
+                        "<td>Selected unbalanced digests: %d</td></tr>",
+                avVpSize, n_unbalanced));
         sb.append(String.format("<tr><td></td>" +
                         "<td></td><td>Number of baits: %d</td></tr>",
-                42));
+                n_baits));
         sb.append("</tbody>\n</table>");
         return sb.toString();
     }

@@ -307,7 +307,7 @@ public class Model implements Serializable {
         this.genome=new HumanHg19(); /* the default genome */
         this.chosenEnzymelist=new ArrayList<>(); /* empty list for enzymes that have been chosen by user */
         try {
-            this.enzymelist = RestrictionEnzymeParser.getEnzymes(Model.class.getResourceAsStream("/enzymelist.tab"));
+            this.enzymelist = RestrictionEnzymeParser.getEnzymes(Model.class.getResourceAsStream("/data/enzymelist.tab"));
         } catch (IOException e) {
             logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
         }

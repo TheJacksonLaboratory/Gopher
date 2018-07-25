@@ -65,7 +65,7 @@
                 <columns>
                     <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" resizable="false" sortable="false" text="Select" />
                     <TableColumn fx:id="locationTableColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="250.0" prefWidth="-1.0" text="Location" />
-                    <TableColumn fx:id="segmentLengthColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="160.0" prefWidth="-1.0" text="Length" />
+                    <TableColumn fx:id="segmentLengthColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="160.0" prefWidth="-1.0" text="bp" />
                     <TableColumn fx:id="alignabilityContentColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Alignability" />
                     <TableColumn fx:id="repeatContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="Repeat content" />
                     <TableColumn fx:id="gcContentUpDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" text="GC content" />

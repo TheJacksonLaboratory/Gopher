@@ -340,9 +340,7 @@ public class ViewPointPresenter implements Initializable {
 
 
         repeatContentUpColumn.setCellValueFactory(cdf -> {
-                String marginUp = cdf.getValue().getSegment().getRepeatContentMarginUpAsPercent();
-                String marginDown = cdf.getValue().getSegment().getRepeatContentMarginDownAsPercent();
-                String val = marginUp +"/"+marginDown;
+                String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();
                 return new ReadOnlyStringWrapper(val);
         });
        // repeatContentUpColumn.setComparator(new PercentComparator());
@@ -368,7 +366,7 @@ public class ViewPointPresenter implements Initializable {
         });
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getGCcontentUpAsPercent()))); // TODO MAKE UPDOWN
+                getSegment().getMeanGCcontentOfBaitsAsPercent()))); // TODO MAKE UPDOWN
         gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
