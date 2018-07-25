@@ -124,6 +124,7 @@ public class GenomeGunZipper extends Task<Void>  {
             } // end of loop over Tar archive contents
             dest.close();
             this.status=String.format("extracted %d chromosomes",n_extracted_chromosomes);
+            OK=true;
         } catch (IOException e) {
             logger.error("Unable to decompress "+INPUT_GZIP_FILE);
             logger.error(e,e);
