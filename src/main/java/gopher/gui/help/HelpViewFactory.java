@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public class HelpViewFactory {
     private static final Logger logger = Logger.getLogger(HelpViewFactory.class.getName());
-    private static final String READTHEDOCS_SITE = "http://vpv.readthedocs.io/en/latest/";
+    private static final String READTHEDOCS_SITE = "http://gopher.readthedocs.io/en/latest/";
 
 
     public static void display() {
