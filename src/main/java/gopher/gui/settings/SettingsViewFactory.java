@@ -16,7 +16,7 @@ public class SettingsViewFactory {
 
     public static void showSettings(Properties properties) {
         Stage window;
-        String windowTitle = "VPV Settings";
+        String windowTitle = "Gopher Settings";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);

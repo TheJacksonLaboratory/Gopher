@@ -241,7 +241,7 @@ public class GopherMainPresenter implements Initializable {
         try {
             SerializationManager.serializeModel(this.model, path);
         } catch (IOException e) {
-            PopupFactory.displayException("Error","Unable to serialize VPV viewpoint",e);
+            PopupFactory.displayException("Error","Unable to serialize Gopher viewpoint",e);
             return false;
         }
         logger.trace("Serialization successful to file "+path);
@@ -1015,7 +1015,7 @@ public class GopherMainPresenter implements Initializable {
     public void closeWindow(ActionEvent e) {
         boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
         if (answer) {
-            logger.info("Closing VPV Gui");
+            logger.info("Closing Gopher Gui");
             serialize();
             javafx.application.Platform.exit();
         }
@@ -1246,7 +1246,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML
     public void importProject(ActionEvent e) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Open VPV project file");
+        chooser.setTitle("Open Gopher project file");
         File file = chooser.showOpenDialog(null);
         if (file==null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;
