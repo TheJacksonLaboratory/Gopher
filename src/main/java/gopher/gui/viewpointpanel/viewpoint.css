@@ -6,4 +6,8 @@
    -fx-font-size: 14;
 }
 
+.mycolumn {
+ -fx-alignment: CENTER-RIGHT;
+}
+
 
