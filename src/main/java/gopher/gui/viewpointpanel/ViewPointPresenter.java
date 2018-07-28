@@ -166,18 +166,6 @@ public class ViewPointPresenter implements Initializable {
                 });
     }
 
-//  TODO - save action here
-//    @FXML
-//    void saveButtonAction() {
-//        // choose Segments that were selected by user.
-//        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
-//                .filter(ColoredSegment::isSelected)
-//                .collect(Collectors
-//                        .toList());
-//        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
-//                (Collectors.joining(","))));
-//    }
-
     public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
         this.analysisPresenter=vpAnalysisPresenter;
     }
@@ -350,11 +338,14 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                    String A[]=item.split("/");
                     boolean red=false;
-                    for (String a : A) {
-                        double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
-                        if (rp>model.getMaxRepeatContent()) red = true;
+                    if (item.equals("n/a")) red=true;
+                    else { // in this case we expect something like 35.2%/34.8%
+                        String A[] = item.split("/");
+                        for (String a : A) {
+                            double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
+                            if (rp > model.getMaxRepeatContent()) red = true;
+                        }
                     }
                     if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
@@ -366,7 +357,7 @@ public class ViewPointPresenter implements Initializable {
         });
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getMeanGCcontentOfBaitsAsPercent()))); // TODO MAKE UPDOWN
+                getSegment().getMeanGCcontentOfBaitsAsPercent())));
         gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
@@ -374,14 +365,17 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
-                    String A[]=item.split("/");
                     boolean red=false;
-                    for (String a : A) {
-                        // maxGcContent is a proportion (not a percentage) so we need to convert back
-                        double rp = 0.01* ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
-                        // Show red if we are above or below threshold for either threshold
-                        if (rp>model.getMaxGCcontent()) red = true;
-                        if (rp<model.getMinGCcontent()) red = true;
+                    if (item.equals("n/a")) red=true;
+                    else {
+                        String A[] = item.split("/");
+                        for (String a : A) {
+                            // maxGcContent is a proportion (not a percentage) so we need to convert back
+                            double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
+                            // Show red if we are above or below threshold for either threshold
+                            if (rp > model.getMaxGCcontent()) red = true;
+                            if (rp < model.getMinGCcontent()) red = true;
+                        }
                     }
                     if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");

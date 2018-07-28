@@ -34,22 +34,21 @@
       </Button>
       <Region />
     </HBox>
-   <HBox alignment="CENTER" prefHeight="43.0" prefWidth="510.0">
-      <children>
-           <Button alignment="CENTER" minWidth="120.0" mnemonicParsing="false" onAction="#validateGeneSymbols" stylesheets="@entrezgene.css" text="Validate">
-               <HBox.margin>
-                   <Insets right="30.0" />
-               </HBox.margin>
-           </Button>
-      </children>
-   </HBox>
-   <HBox alignment="CENTER" prefHeight="41.0" prefWidth="510.0">
-      <children>
-         <Region prefHeight="200.0" prefWidth="200.0" />
-           <Button alignment="CENTER" minWidth="150.0" mnemonicParsing="false" onAction="#cancel" stylesheets="@entrezgene.css" text="Cancel" />
-         <Region prefHeight="200.0" prefWidth="200.0" />
-         <Button minWidth="150.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@entrezgene.css" text="Accept" />
-         <Region prefHeight="200.0" prefWidth="200.0" />
-      </children>
-   </HBox>
+    <HBox alignment="CENTER" prefHeight="43.0" prefWidth="510.0">
+        <Button alignment="CENTER" minWidth="120.0" mnemonicParsing="false" onAction="#validateGeneSymbols"
+                stylesheets="@entrezgene.css" text="Validate">
+            <HBox.margin>
+                <Insets right="30.0"/>
+            </HBox.margin>
+        </Button>
+    </HBox>
+    <HBox alignment="CENTER" prefHeight="41.0" prefWidth="510.0">
+        <Region prefHeight="200.0" prefWidth="200.0"/>
+        <Button alignment="CENTER" minWidth="150.0" mnemonicParsing="false" onAction="#cancel"
+                stylesheets="@entrezgene.css" text="Cancel"/>
+        <Region prefHeight="200.0" prefWidth="200.0"/>
+        <Button minWidth="150.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@entrezgene.css"
+                text="Accept"/>
+        <Region prefHeight="200.0" prefWidth="200.0"/>
+    </HBox>
 </VBox>
