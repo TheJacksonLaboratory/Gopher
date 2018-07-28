@@ -76,8 +76,7 @@ public class GenomeGunZipper extends Task<Void>  {
                 " and genome filename=" + genomeFileNameTarGZ);
         boolean needToCreateDirectory=true;
         int n_extracted_chromosomes=0;
-        int blocks = genome.getNumberOfCanonicalChromosomes() + 1;
-        double blocksize = 1D/blocks;
+        double extracted_bytes_estimate = 3100000000D;
         double currentProgress=0.0D;
         updateProgress(currentProgress);
         try {
@@ -92,8 +91,7 @@ public class GenomeGunZipper extends Task<Void>  {
             BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
 
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-                currentProgress+=blocksize;
-                updateProgress(currentProgress);
+                updateProgress(Math.min(0.99, gzipIn.getBytesRead()/extracted_bytes_estimate));
                 // If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway.
                 if (entry.isDirectory()) {
                     continue;
@@ -124,6 +122,7 @@ public class GenomeGunZipper extends Task<Void>  {
             } // end of loop over Tar archive contents
             dest.close();
             this.status=String.format("extracted %d chromosomes",n_extracted_chromosomes);
+            updateProgress(100.0);
             OK=true;
         } catch (IOException e) {
             logger.error("Unable to decompress "+INPUT_GZIP_FILE);
