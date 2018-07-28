@@ -87,10 +87,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Button downloadGenome;
     @FXML private Button decompressGenomeButton;
     @FXML private Button indexGenomeButton;
-    /** Label for the genome build we want to download. */
-    @FXML private Label genomeBuildLabel;
-    /** Label for the transcripts we want to download.*/
-    @FXML private Label transcriptsLabel;
     /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
@@ -123,19 +119,6 @@ public class GopherMainPresenter implements Initializable {
 
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
-//    /** Show how many valid genes were uploaded by user. */
-//    @FXML private Label nValidGenesLabel;
-//    /** Show the name of the downloaded genome we areusing. */
-//    @FXML private Label downloadedGenomeLabel;
-//    /** Show status of unpacking the downloaded genome. */
-//    @FXML private Label decompressGenomeLabel;
-//    /** Show status of indexing the downloaded genome. */
-//    @FXML private Label indexGenomeLabel;
-//    /** Show name of downloaded transcripts file. */
-//    @FXML private Label downloadedTranscriptsLabel;
-//    /** Show name of downloaded transcripts file. */
-//    @FXML private Label downloadAlignabilityLabel;
-//    @FXML private Label decompressAlignabilityLabel;
 
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
@@ -525,7 +508,6 @@ public class GopherMainPresenter implements Initializable {
      */
     private void setGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
-        this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
         this.alignabilityDownloadPI.setProgress(0.0);
