@@ -314,7 +314,8 @@ public class Model implements Serializable {
         } catch (IOException e) {
             logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
         }
-
+        this.allowSingleMargin=false;
+        this.allowPatching=false;
     }
 
 

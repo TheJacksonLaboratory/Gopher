@@ -748,9 +748,6 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-//                this.model.getChosenGeneCount(),
-//                this.model.getUniqueChosenTSScount()));
         e.consume();
     }
 
@@ -931,11 +928,6 @@ public class GopherMainPresenter implements Initializable {
         }
 
         ViewPointCreationTask task;
-
-        // TODO use boolean var allowSingleMargin
-
-        logger.trace("Reading alignability map to memory...");
-       //
 
         if (model.useSimpleApproach()) {
             task = new SimpleViewPointCreationTask(model);
