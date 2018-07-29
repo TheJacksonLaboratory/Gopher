@@ -3,6 +3,7 @@ package gopher.gui.analysisPane;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.viewpointpanel.ViewPointPresenter;
 import gopher.gui.viewpointpanel.ViewPointView;
+import gopher.model.Design;
 import gopher.model.Model;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
@@ -29,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class VPAnalysisPresenter implements Initializable {
     private static final Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
-
-    /**
-     * This is the message users will see if they open the analysis tab before they have entered the genes
-     * and started the analysis of the viewpoints.
-     */
-    private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p>Please set up and " +
-            "initialize analysis using the Set Up Tab.</p></body></html>";
 
     /**
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
@@ -249,8 +243,7 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     private void updateListView() {
-        ViewPointAnalysisSummaryHTMLGenerator summaryGen = new ViewPointAnalysisSummaryHTMLGenerator(model);
-        Map<String,String> summaryMap = summaryGen.createListViewContent();
+        Map<String,String> summaryMap = createListViewContent();
        ObservableList<String> keys = FXCollections.observableArrayList(summaryMap.keySet());
         ObservableList<String> values = FXCollections.observableArrayList(summaryMap.values());
         lviewKey.setItems(keys);
@@ -258,29 +251,61 @@ public class VPAnalysisPresenter implements Initializable {
 
     }
 
+    /**
+     * Creates a map with the information that we will display in the two ListView objects of this Tab.
+     * @return Map with info about the panel design
+     */
+    private Map<String,String>  createListViewContent() {
+        Design design = new Design(this.model);
+        design.calculateDesignParameters();
+        Map<String,String> listItems=new LinkedHashMap<>();
+
+        int ngenes = design.getN_genes();
+        int resolvedGenes = design.getN_resolvedGenes();
+        String geneV = String.format("n=%d of which %d have \u2265 valid viewpoint",ngenes,resolvedGenes);
+        listItems.put("Genes",geneV);
+
+        int nviewpoints = design.getN_viewpoints();
+        int resolvedVP = design.getN_resolvedViewpoints();
+        double avVpSize = design.getAvgVPsize();
+        double avgVpScore = design.getAvgVPscore();
+        String vpointV = String.format("n=%d of which %d have \u2265 valid fragment. Mean size=%.1f bp. Mean score=%.1f",
+                nviewpoints,resolvedVP,avVpSize,avgVpScore);
+        listItems.put("Viewpoints",vpointV);
+
+        int nfrags = design.getN_unique_fragments();
+        int total_active_frags = design.getN_unique_fragments();
+        double avg_n_frag = design.getAvgFragmentsPerVP();
+        String fragmentV = String.format("Total unique digests=%d; active digests: %d; mean digests/viewpoint: %.1f",
+                nfrags,total_active_frags,avg_n_frag);
+        listItems.put("Digests",fragmentV);
+
+        int n_balancedDigests = design.getTotalNumBalancedDigests();
+        int n_unbalanced = design.getTotalNumUnbalancedDigests();
+        int n_baits = design.getTotalNumOfUniqueBaits();
+        String fragmentBalanceV = String.format("n=%d (Balanced digests: %d; unbalanced digests: %d)",
+                n_baits,n_balancedDigests,n_unbalanced);
+        listItems.put("Probes",fragmentBalanceV);
+        return listItems;
+    }
+
+
 
 
     /** This method is called to refresh the values of the ViewPoint in the table of the analysis tab. */
     public void refreshVPTable() {
-        logger.trace("refreshing the VP Table");
         if (model == null) {
             logger.fatal("Model null--should never happen");
             return;
         }
-        updateListView();
-        // update WebView with N loaded ViewPoints
-        ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
-        javafx.application.Platform.runLater(() -> {
+          javafx.application.Platform.runLater(() -> {
             updateListView();
-
-            ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
             if (model == null) {
                 logger.error("model was null while trying to refresh VP table, should never happen");
                 return;
             }
             List<ViewPoint> vpl = this.model.getViewPointList();
             logger.trace("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
-            viewpointlist.addAll(vpl);
             viewPointTableView.getItems().clear(); /* clear previous rows, if any */
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
