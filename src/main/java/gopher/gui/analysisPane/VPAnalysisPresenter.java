@@ -14,8 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
 
 import java.net.URL;
@@ -45,10 +43,9 @@ public class VPAnalysisPresenter implements Initializable {
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
-    @FXML
-    private WebView contentWebView;
 
-    private WebEngine contentWebEngine;
+    @FXML private ListView<String> lviewKey;
+    @FXML private ListView<String> lviewValue;
 
     @FXML private TableView<ViewPoint> viewPointTableView;
     @FXML private TableColumn<ViewPoint, Button> actionTableColumn;
@@ -85,8 +82,6 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     private void init() {
-        this.contentWebEngine = contentWebView.getEngine();
-        this.contentWebEngine.loadContent(INITIAL_HTML_CONTENT);
         initTable();
     }
 
@@ -253,6 +248,18 @@ public class VPAnalysisPresenter implements Initializable {
     }
 
 
+    private void updateListView() {
+        ViewPointAnalysisSummaryHTMLGenerator summaryGen = new ViewPointAnalysisSummaryHTMLGenerator(model);
+        Map<String,String> summaryMap = summaryGen.createListViewContent();
+       ObservableList<String> keys = FXCollections.observableArrayList(summaryMap.keySet());
+        ObservableList<String> values = FXCollections.observableArrayList(summaryMap.values());
+        lviewKey.setItems(keys);
+        lviewValue.setItems(values);
+
+    }
+
+
+
     /** This method is called to refresh the values of the ViewPoint in the table of the analysis tab. */
     public void refreshVPTable() {
         logger.trace("refreshing the VP Table");
@@ -260,10 +267,11 @@ public class VPAnalysisPresenter implements Initializable {
             logger.fatal("Model null--should never happen");
             return;
         }
+        updateListView();
         // update WebView with N loaded ViewPoints
         ViewPointAnalysisSummaryHTMLGenerator htmlgen = new ViewPointAnalysisSummaryHTMLGenerator(model);
         javafx.application.Platform.runLater(() -> {
-            contentWebEngine.loadContent(htmlgen.getHTML());
+            updateListView();
 
             ObservableList<ViewPoint> viewpointlist = FXCollections.observableArrayList(); /* todo Do we need this? */
             if (model == null) {
