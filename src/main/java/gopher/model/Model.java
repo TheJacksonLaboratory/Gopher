@@ -299,6 +299,9 @@ public class Model implements Serializable {
     public String getTranscriptsBasename() {
         return transcriptsBasename;
     }
+    public void setTranscriptsBasename(String bname) {
+        this.transcriptsBasename=bname;
+    }
 
     public int getN_validGeneSymbols() { return n_validGeneSymbols; }
     public void setN_validGeneSymbols(int n_validGeneSymbols) { this.n_validGeneSymbols = n_validGeneSymbols; }

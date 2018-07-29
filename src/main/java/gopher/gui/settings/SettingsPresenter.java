@@ -1,15 +1,19 @@
 package gopher.gui.settings;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import gopher.framework.Signal;
 
 
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -18,16 +22,15 @@ import java.util.function.Consumer;
  */
 public class SettingsPresenter  implements Initializable {
 
-    /**
-     * WebView will show the settings text
-     */
-    @FXML
-    private WebView wview;
+
+    @FXML private ListView<String> lviewKey;
+    @FXML private ListView<String> lviewValue;
 
     @FXML
-    private Button okButon;
+    private Button closeButton;
 
     private Consumer<Signal> signal;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -38,13 +41,19 @@ public class SettingsPresenter  implements Initializable {
         this.signal = signal;
     }
 
-    public void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
-    }
 
-    public void okButtonClicked(ActionEvent e){
+
+    public void closeButtonClicked(ActionEvent e){
         e.consume();
         signal.accept(Signal.DONE);
     }
+
+
+    void setSettingsMap(Map<String,String> settings) {
+        ObservableList<String> keys = FXCollections.observableArrayList(settings.keySet());
+        ObservableList<String> values = FXCollections.observableArrayList(settings.values());
+        lviewKey.setItems(keys);
+        lviewValue.setItems(values);
+    }
+
 }

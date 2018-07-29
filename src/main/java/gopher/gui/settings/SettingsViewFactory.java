@@ -1,9 +1,14 @@
 package gopher.gui.settings;
 
+import gopher.model.Model;
+import gopher.model.RestrictionEnzyme;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 
 /**
@@ -14,7 +19,7 @@ import java.util.Properties;
 public class SettingsViewFactory {
 
 
-    public static void showSettings(Properties properties) {
+    public static void showSettings(Model model) {
         Stage window;
         String windowTitle = "Gopher Settings";
         window = new Stage();
@@ -34,55 +39,39 @@ public class SettingsViewFactory {
             }
 
         });
-        String html=getHTML(properties);
-        presenter.setData(html);
+        Map<String,String> settingsMap=getSettingsMap(model);
+        presenter.setSettingsMap(settingsMap);
 
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
     }
 
-    /**
-     * @param properties Various items from the settings.
-     * @return String containing HTML to confirmDialog in WebView pane
-     */
-    private static String getHTML(Properties properties) {
-        String[] nonNumericProps = new String[] {
-                "genome_build",  "path_to_downloaded_genome_directory", "genome_unpacked",
-                "genome_indexed", "transcript_url", "target_genes_path", "refgene_path"
-        };
-        String[] nonNumericPropNames = new String[] {
-                "Genome build", "Path to downloaded genome", "Genome decompressed",
-                "Genome indexed", "Transcripts", "Path to target genes file",
-                "Path to reference gene"
-        };
-        String[] numericProps = new String[] {
-                "getFragNumUp", "fragNumDown", "getMinSizeUp", "getMaxSizeUp", "getMinSizeDown",
-                "getMaxSizeDown", "getMinFragSize", "maxRepeatContent"
-        };
-        String[] numericPropNames = new String[] {
-                "# Fragments upstream", "# Fragments downstream", "Minimum size upstream",
-                "Maximum size upstream", "Minimum size downstream", "Maximum size downstream",
-                "Minimum digest size", "Maximum repeat content"
-        };
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body><h3>");
-        sb.append(properties.getProperty("project_name"));
-        sb.append("</h3><p><ul style=\"list-style: none;\">");
-        for (int i = 0; i < nonNumericProps.length; i++) {
-            sb.append(String.format("<li>%s: %s</li>", nonNumericPropNames[i],
-                    properties.getProperty(nonNumericProps[i])));
+    private static Map<String,String> getSettingsMap(Model model) {
+        Map<String,String> orderedmap = new LinkedHashMap<>();
+        orderedmap.put("Genome build",model.getGenomeBuild());
+        orderedmap.put("Path to genome directory",model.getGenomeDirectoryPath());
+        orderedmap.put("Genome unpacked?",model.isGenomeUnpacked() ? "yes":"no");
+        orderedmap.put("Genome indexed?",model.isGenomeIndexed() ? "yes":"no");
+        orderedmap.put("Transcript file",model.getTranscriptsBasename());
+        orderedmap.put("Targets path",model.getTargetGenesPath());
+        orderedmap.put("RefGene path", model.getRefGenePath());
+        orderedmap.put("Alignability map",model.getAlignabilityMapPathIncludingFileNameGz());
+        orderedmap.put("Approach" ,model.getApproach().toString());
+        if (model.getApproach().equals(Model.Approach.SIMPLE)) {
+            orderedmap.put("Allow patching?", model.getAllowPatching()? "yes":"no");
         }
-        sb.append(String.format("<li>%s: %s</li>", "Restriction enzymes",
-                properties.getProperty("restriction_enzymes")));
-        for (int i = 0; i < numericProps.length; i++) {
-            sb.append(String.format("<li>%s: %s</li>",numericPropNames[i],
-                    properties.getProperty(numericProps[i])));
-        }
-
-        sb.append("</ul></p>");
-        sb.append("</body></html>");
-        return sb.toString();
+        orderedmap.put("Upstream size", String.format("%s bp",model.getSizeUp()));
+        orderedmap.put("Downstream size", String.format("%s bp",model.getSizeDown()));
+        orderedmap.put("Minimum fragment size", String.format("%s bp",model.getMinFragSize()));
+        orderedmap.put("Minimum probe/fragment count", String.valueOf(model.getMinBaitCount()));
+        orderedmap.put("Max. k-mer alignability", String.valueOf(model.getMaxMeanKmerAlignability()));
+        orderedmap.put("Allow unbalanced margins?", model.getAllowSingleMargin()? "yes":"no");
+        orderedmap.put("Restriction enzymes", model.getAllSelectedEnzymeString());
+        return orderedmap;
     }
+
+
+
 
 
 }

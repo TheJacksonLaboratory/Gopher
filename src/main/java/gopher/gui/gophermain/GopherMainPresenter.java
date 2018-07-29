@@ -563,6 +563,7 @@ public class GopherMainPresenter implements Initializable {
         String url;
         try {
             url = rgd.getURL();
+            model.setTranscriptsBasename(transcriptName);
         } catch (DownloadFileNotFoundException dfne) {
             PopupFactory.displayError("Could not identify RefGene file for genome",dfne.getMessage());
             return;
@@ -1052,7 +1053,7 @@ public class GopherMainPresenter implements Initializable {
 
     /** Display the settings (parameters) of the current viewpoint. */
     public void showSettingsOfCurrentProject() {
-        SettingsViewFactory.showSettings(model.getProperties());
+        SettingsViewFactory.showSettings(model);
     }
 
     /**

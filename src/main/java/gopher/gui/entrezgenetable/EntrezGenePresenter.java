@@ -147,14 +147,15 @@ public class EntrezGenePresenter implements Initializable {
         e.consume();
     }
 
-    /** This function is responsibble for extracting gene symbols from a file that is uploaded to VPV by the user.
+    /** This function is responsible for extracting gene symbols from a file that is uploaded to VPV by the user.
      * It initializes the List {@link #symbols}, which may contain correct and/or incorrect symbols -- the validity
      * of the uploaded gene symbols will be checked in the next step.
      * @param file a text file with one gene symbol per line
      */
-    void uploadGenesFromFile(File file) {
+    private void uploadGenesFromFile(File file) {
         try {
             this.uploadGenesFromFile(new FileReader(file));
+            this.model.setTargetGenesPath(file.getAbsolutePath());
         } catch (FileNotFoundException e) {
             logger.error("I/O Error reading file with target genes: '" + file.getAbsolutePath() + "'", e);
         }
@@ -206,6 +207,7 @@ public class EntrezGenePresenter implements Initializable {
         this.model.setUniqueChosenTSScount(uniqueChosenTSS);
         this.model.setChosenGeneCount(chosenGeneCount);
         model.setTotalRefGeneCount(n_genes);
+        model.setTargetGenesPath("All coding genes");
         isvalidated=true;
         this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
@@ -286,6 +288,7 @@ public class EntrezGenePresenter implements Initializable {
         }
         setData(getInitialGeneListHTML(symbols));
         logger.info(String.format("Copied a total of %d genes from clipboard",this.symbols.size()));
+        model.setTargetGenesPath("from clipboard");
         isvalidated=false;
         e.consume();
     }
