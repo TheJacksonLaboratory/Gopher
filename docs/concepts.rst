@@ -5,13 +5,13 @@ For Hi-C **restriction enzymes** are employed that cut the genome at specific nu
 DpnII cuts at all occurrences of the pattern GATC. The resulting DNA fragments are referred to as **digests**.
 The resolution of Hi-C is at the digest level, i.e. detected interactions are between digests,
 which is why the target regions for capture Hi-C consists of digests.
-Due to the Hi-C protocol the **baits** used for enrichment need to be placed within the **margins** of digests only.
+Due to the Hi-C protocol the **probes** (aka **baits**) used for enrichment should be placed within the **margins** of digests only.
 
 
 Usable baits
 ~~~~~~~~~~~~
 
-Within the framework of Gopher, a digest can only be selected, if enough usable baits can be placed within margins.
+Within the framework of Gopher, a digest can only be selected if sufficient usable baits can be placed within margins.
 A bait is **usable** if it satisfy constraint regarding repeat and GC content.
 The uniquness of any given bait is measured as its mean **alignabilty**,
 and the the **GC content** is the proportion of Gs and Cs within the bait sequence.

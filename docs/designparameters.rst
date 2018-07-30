@@ -15,17 +15,6 @@ The ``Probe length`` should be set according to the length that will be ordered 
 120 bp (this is the default in GOPHER).
 
 
-
-Tiling Factor
-~~~~~~~~~~~~~
-
-The tiling factor specifies the aimed probe coverage within the margins. For example, if the tiling factor is 2, each
-position within the margins will be covered by two probes, if possible, i.e. repetitive regions will be left. In
- GOPHER this parameter is only used to predict the expected overall number of probes for cost estimate, since GOPHER
-  only preselects regions for enrichment. The actual probe design for these regions is done by the SureDesign wizard,
-  which has also the parameter tiling factor or density (default 2x).
-
-
 Margin size
 ~~~~~~~~~~~
  The ``margin size`` defines the width of the targeted regions at the outermost ends of restriction fragments that are
@@ -35,7 +24,7 @@ Margin size
  DNA into two or more smaller fragments, and the fragment that is attached to the biotin marker will be enriched.
  The baits are therefore typically designed to hybridize to the margins (and not to the center) of the restriction fragments.
  The margin size parameter should thus be set according to the expected experimental fragmentation size. We have found
- that 250 bp is a good starting point, and this value is the default in VPV.
+ that 250 bp is a good starting point, and this value is the default in GOPHER.
 
 
 

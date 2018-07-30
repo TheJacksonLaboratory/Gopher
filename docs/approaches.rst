@@ -3,7 +3,8 @@ Approaches for viewpoint design
 
 GOPHER offers two approaches for choosing viewpoints and probes.
 
-To choose one of the two viewpoint design approaches, select Simple or Extended from the pulldown menu at the top of the setup pane.
+To choose one of the three viewpoint design approaches, select Simple or Extended from the pulldown menu at the top of the setup pane.
+Simple-patched is performed if the user selects Simple and additional marks to checkbox in the setup pane to allow patching.
 
 Simple viewpoints
 ~~~~~~~~~~~~~~~~~
@@ -19,8 +20,8 @@ satisfies the following requirements.
 If the restriction fragment that overlaps the TSS does not satisfy all of these criteria, then no restriction fragment is selected.
 
  .. figure:: img/simple_approach.png
-:scale: 70 %
-   :alt: Simple approach
+    :scale: 70 %
+    :alt: Simple approach
 
 Simple patched viewpoints
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,5 +35,5 @@ In the extended approach, GOPHER tries to select multiple restrictions fragments
 GOPHER will choose every fragment within the boundaries defined by Upstream size and Downstream size in the setup tab. For instance, if upstream size is set to 5000 and downstream size is set to 2000, then GOPHER will select all restriction fragments that are at least partially located within the 5000 nucleotides 5' (upstream) of the TSS and within 2000 nucleotides 3' (downstream) of the TSS. Note that if a fragment overlaps the upstream or downstream limit by at least one nucleotide it will be chosen if the criteria are fulfiled. The criteria for GC and repeat content are identical to those of the simple approach.
 
  .. figure:: img/extended_approach.png
-:scale: 70 %
-   :alt: Extended approach
+    :scale: 70 %
+    :alt: Extended approach

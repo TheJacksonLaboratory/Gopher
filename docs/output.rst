@@ -1,7 +1,7 @@
 Examining GOPHER BED files in the UCSC Browser
 ==============================================
 
-VPV can produce a number of different output files for different analyses. Many users will want the BED file with
+GOPHER can produce a number of different output files for different analyses. Many users will want the BED file with
 the definitions of target regions that can be used to produce a capture Hi-C probe set.
 
 
@@ -14,13 +14,13 @@ GOPHER outputs a series of BED files. Here are the first three lines of a typica
 	chr17	66507972	66508222	PRKAR1A
 
 Each line represents one region for which we would like to generate a probe. The regions are located on the edges of the
-restriction fragments chosen by the user with VPV.
+restriction fragments chosen by the user with GOPHER.
 
 One way to validate the results of this analysis are to compare the
 chosen fragments with the locations of restriction enzyme cutting
 sites in the genome. Users can generate aBED file for any enzyme and
 load both BED files as custom tracks to UCSC. Following this,the user
-can copy URLs from the VPV browser itself and visualize the viewpoints
+can copy URLs from the GOPHER browser itself and visualize the viewpoints
 and the fragments they contain together with the information from the
 BED files.
 
