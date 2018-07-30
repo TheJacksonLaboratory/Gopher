@@ -45,7 +45,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'VPV'
+project = u'GOPHER'
 copyright = u'2017, Peter Hansen, Peter Robinson'
 author = u'Peter Hansen, Peter Robinson'
 

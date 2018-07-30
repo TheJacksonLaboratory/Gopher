@@ -1,5 +1,5 @@
-Parameters and Settings for GOPHER
-==================================
+Parameters and Settings for GOPHER **(deprecated)**
+===================================================
 
 Parameters that affect the overall size of the viewpoints and the thresholds for GC and repeat content are set in the main `Setup` tab.
 
@@ -12,7 +12,7 @@ The setup dialog allows users to set or change parameters prior to the calculati
 
  .. figure:: img/VPVparams.png
    :scale: 100 %
-   :alt: VPV params
+   :alt: GOPHER params
 
       GOPHER Setup window.
 
@@ -28,7 +28,7 @@ The ``Extended`` approach identifies multiple fragments per promoter: all fragme
 
   GOPHER currently supports hg19 (i.e., GRCh37), GRCh38, mm9, mm10, and TODO. Choose the appropriate genome build from the pulldown menu.
 
-Click on the ``Download`` button and choose a directory for the genome. VPV will download the corresponding genome file from the UCSC Genome Browser unless it finds the correspding files in the directory, in which case it will merely show the path to the directory. Note that the full download may take many minutes or longer depending on your network bandwidth.
+Click on the ``Download`` button and choose a directory for the genome. GOPHER will download the corresponding genome file from the UCSC Genome Browser unless it finds the correspding files in the directory, in which case it will merely show the path to the directory. Note that the full download may take many minutes or longer depending on your network bandwidth.
 
 The UCSC Genome files are provided as compressed (gzip) tar archives. Clicking on the start button for ``Decompress genome`` will decompress the files if necessary.
 If GOPHER finds the unpacked files in the genome directory, it will show the message "extraction previously completed" and do nothing.
@@ -37,7 +37,7 @@ Finally, the genome FASTA files (one for each chromosome) need to be indexed. GO
 
 * Transcripts
 
-  VPV requires a transcript definition file. It will automatically download the correct file from UCSC if the user clicks on the ``Transcripts`` Download button.  It is recommended to store the file in the same directory as the genome file. If VPV finds the file in the direcotry (refGene.txt.gz) it will show the path to the file and do nothing.
+  GOPHER requires a transcript definition file. It will automatically download the correct file from UCSC if the user clicks on the ``Transcripts`` Download button.  It is recommended to store the file in the same directory as the genome file. If VPV finds the file in the direcotry (refGene.txt.gz) it will show the path to the file and do nothing.
 
  * Restriction enzymes
 
@@ -59,7 +59,7 @@ Finally, the genome FASTA files (one for each chromosome) need to be indexed. GO
 
  .. figure:: img/VPVgenes.png
    :scale: 60 %
-   :alt: VPV genes
+   :alt: GOPHER genes
 
 This dialog allows users to choose the genes whose promoter regions will be enriched in the capture Hi-C experiment.
 
