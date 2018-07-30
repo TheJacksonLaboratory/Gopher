@@ -64,7 +64,7 @@ public class ViewPointPresenter implements Initializable {
     /** The backend behind the UCSC browser content. */
     private WebEngine ucscWebEngine;
     /** By how much do we change the width of the UCSC confirmDialog when zooming? */
-    private static double ZOOMFACTOR =1.5;
+    private static final double ZOOMFACTOR =1.5;
     /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     @FXML
     private TableView<ColoredSegment> segmentsTableView;
@@ -137,7 +137,8 @@ public class ViewPointPresenter implements Initializable {
         e.consume();
     }
 
-    @FXML void refreshUCSCButtonAction() {
+    @FXML
+    private void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
         String url= urlmaker.getImageURL(viewpoint,getHighlightRegions());
         StackPane sproot = new StackPane();
@@ -154,29 +155,14 @@ public class ViewPointPresenter implements Initializable {
         stage.show();
 
         this.ucscWebEngine.getLoadWorker().stateProperty().addListener(
-                new ChangeListener<Worker.State>() {
-                    @Override
-                    public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
-                        if (newState == Worker.State.SUCCEEDED) {
-                            // hide progress bar then page is ready
-                            progress.setVisible(false);
-                            stage.close();
-                        }
+                (ov, oldState, newState) -> {
+                    if (newState == Worker.State.SUCCEEDED) {
+                        // hide progress bar then page is ready
+                        progress.setVisible(false);
+                        stage.close();
                     }
                 });
     }
-
-//  TODO - save action here
-//    @FXML
-//    void saveButtonAction() {
-//        // choose Segments that were selected by user.
-//        List<ColoredSegment> ss = segmentsTableView.getItems().stream()
-//                .filter(ColoredSegment::isSelected)
-//                .collect(Collectors
-//                        .toList());
-//        logger.trace(String.format("Selected segments: %s", ss.stream().map(ColoredSegment::toString).collect
-//                (Collectors.joining(","))));
-//    }
 
     public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
         this.analysisPresenter=vpAnalysisPresenter;
@@ -293,6 +279,16 @@ public class ViewPointPresenter implements Initializable {
 
         locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getChromosomalPositionString())));
+        locationTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    setStyle("-fx-text-fill: black; -fx-font-weight: normal");
+                }
+
+        }});
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
 
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
@@ -350,11 +346,14 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
                     setText(item);
-                    String A[]=item.split("/");
                     boolean red=false;
-                    for (String a : A) {
-                        double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
-                        if (rp>model.getMaxRepeatContent()) red = true;
+                    if (item.equals("n/a")) red=true;
+                    else { // in this case we expect something like 35.2%/34.8%
+                        String A[] = item.split("/");
+                        for (String a : A) {
+                            double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
+                            if (rp > model.getMaxRepeatContent()) red = true;
+                        }
                     }
                     if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
@@ -366,7 +365,7 @@ public class ViewPointPresenter implements Initializable {
         });
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
-                getSegment().getMeanGCcontentOfBaitsAsPercent()))); // TODO MAKE UPDOWN
+                getSegment().getMeanGCcontentOfBaitsAsPercent())));
         gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
@@ -374,14 +373,17 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
-                    String A[]=item.split("/");
                     boolean red=false;
-                    for (String a : A) {
-                        // maxGcContent is a proportion (not a percentage) so we need to convert back
-                        double rp = 0.01* ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() -1)): Double.parseDouble(a));
-                        // Show red if we are above or below threshold for either threshold
-                        if (rp>model.getMaxGCcontent()) red = true;
-                        if (rp<model.getMinGCcontent()) red = true;
+                    if (item.equals("n/a")) red=true;
+                    else {
+                        String A[] = item.split("/");
+                        for (String a : A) {
+                            // maxGcContent is a proportion (not a percentage) so we need to convert back
+                            double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
+                            // Show red if we are above or below threshold for either threshold
+                            if (rp > model.getMaxGCcontent()) red = true;
+                            if (rp < model.getMinGCcontent()) red = true;
+                        }
                     }
                     if (red) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
@@ -400,6 +402,7 @@ public class ViewPointPresenter implements Initializable {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
+                    setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                 }
             }
         });
@@ -490,16 +493,6 @@ public class ViewPointPresenter implements Initializable {
     }
 
     /**
-     * Provide URL pointing to the genomic region of displayed ViewPoint in the UCSC browser. The URL will be loaded by
-     * the WebEngine.
-     *
-     * @param url String with URL
-     */
-    public void setURL(String url) {
-        ucscWebEngine.load(url);
-    }
-
-    /**
      * Get the top-level Pane which contains all other graphical elements of this controller.
      *
      * @return {@link ScrollPane} object.
@@ -533,23 +526,10 @@ public class ViewPointPresenter implements Initializable {
         showUcscView();
     }
 
-
-    @FXML private void zoomIn() {
-        if (ZOOMFACTOR ==0) {
-            logger.error("Attempt to zoom in with LOGFACTOR zero");
-            return;
-        }
-        zoom(1/ ZOOMFACTOR);
-    }
-
-    @FXML private void zoomOut() {
-        if (ZOOMFACTOR ==0) {
-            logger.error("Attempt to zoom out with LOGFACTOR zero");
-            return;
-        }
-        zoom(ZOOMFACTOR);
-
-    }
+    /** Change the UCSC view by zooming in. */
+    @FXML private void zoomIn() { zoom(1 / ZOOMFACTOR); }
+    /** Change the UCSC view by zooming out. */
+    @FXML private void zoomOut() { zoom(ZOOMFACTOR); }
 
     /**
      * Creates a string to show highlights. Nonselected regions are highlighted in very light grey.
@@ -576,11 +556,11 @@ public class ViewPointPresenter implements Initializable {
      */
     private static class ColoredSegment {
         /** Color for highlighting an active segment. */
-        private String color;
+        private final String color;
 
-        private Segment segment;
+        private final Segment segment;
 
-        private CheckBox checkBox;
+        private final CheckBox checkBox;
 
         ColoredSegment(Segment segment, String color) {
             this.segment = segment;

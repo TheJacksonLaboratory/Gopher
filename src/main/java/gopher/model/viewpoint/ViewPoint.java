@@ -38,7 +38,7 @@ public class ViewPoint implements Serializable {
     /* The approach used to generate this viewpoint */
     private Approach approach;
     /** Size of the "borders" at the edges of a digest that are especially important because we sequence there. */
-    private int marginSize;
+    private final int marginSize;
     /** Maximum allowable repeat content for a digest to be included. A digest will be deselected
      * if one of the margins has a higher repeat content.*/
     private double maximumRepeatContent;
@@ -59,10 +59,10 @@ public class ViewPoint implements Serializable {
     private int startPos;
     /** end position of the viewpoint */
     private int endPos;
-    /** The minimum allowable start position if the user zooms. */
-    private int minimumAllowableStartPosition;
-    /** The maximum allowable end position if the user zooms. */
-    private int maximumAllowableEndPosition;
+//    /** The minimum allowable start position if the user zooms. */
+//    private int minimumAllowableStartPosition;
+//    /** The maximum allowable end position if the user zooms. */
+//    private int maximumAllowableEndPosition;
     /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
     private int minFragSize;
@@ -89,7 +89,7 @@ public class ViewPoint implements Serializable {
 
     private Model model;
 
-    private transient AlignabilityMap chromosome2AlignabilityMap;
+    //private transient AlignabilityMap chromosome2AlignabilityMap;
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -105,11 +105,11 @@ public class ViewPoint implements Serializable {
     }
 
     static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
-    /** A list of restriction enzymes (at least one) as chosen by the user. */
-    public static RestrictionEnzyme getChosenEnzyme(int i) {
-        if (chosenEnzymes==null || i-1>chosenEnzymes.size()) return null;
-        else return chosenEnzymes.get(i);
-    }
+//    /** A list of restriction enzymes (at least one) as chosen by the user. */
+//    public static RestrictionEnzyme getChosenEnzyme(int i) {
+//        if (chosenEnzymes==null || i-1>chosenEnzymes.size()) return null;
+//        else return chosenEnzymes.get(i);
+//    }
     /** Overall score of this Viewpoint.*/
     private double score;
     /** Maximim allowable digest size for simple approach */
@@ -153,7 +153,7 @@ public class ViewPoint implements Serializable {
     /**
      * This function should only be used for the extended approach. It changes the start and end position
      * of the ViewPoint so that more or less Segments can be selected.
-     * @param zoomfactor
+     * @param zoomfactor amount of zoom to perform
      */
     public void zoom(double zoomfactor) {
         logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
@@ -196,8 +196,8 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
-        setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
-        setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
+//        setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
+//        setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -205,6 +205,7 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
+        logger.trace("Done with vars, about to init in VP CTOR");
         init(builder.fastaReader,builder.c2alignmap);
     }
 
@@ -219,6 +220,7 @@ public class ViewPoint implements Serializable {
                 this.upstreamNucleotideLength,
                 this.downstreamNucleotideLength,
                 ViewPoint.chosenEnzymes);
+        logger.trace("Done with Segment factory");
         initRestrictionFragments(fastaReader, c2align);
     }
 
@@ -237,6 +239,10 @@ public class ViewPoint implements Serializable {
             Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
+        }
+        logger.trace("Done init Restriction Frags");
+        for (Segment er : restrictionSegmentList){
+            logger.trace("\tSegment: " + er.detailedReport());
         }
     }
 
@@ -284,8 +290,8 @@ public class ViewPoint implements Serializable {
         this.startPos = startPos>0?startPos:0;
     }
 
-    private void setMinimumAllowableStartPos(int pos) { this.minimumAllowableStartPosition = pos; }
-    private void setMaximumAllowableEndPos(int pos) { this.maximumAllowableEndPosition = pos; }
+//    private void setMinimumAllowableStartPos(int pos) { this.minimumAllowableStartPosition = pos; }
+//    private void setMaximumAllowableEndPos(int pos) { this.maximumAllowableEndPosition = pos; }
 
     public final Integer getStartPos() {
         return startPos;
@@ -333,8 +339,6 @@ public class ViewPoint implements Serializable {
         return (int) this.restrictionSegmentList.stream().filter(Segment::isSelected).count();
     }
 
-    public void setTargetName(String name) { this.targetName=name;}
-
     public String getTargetName() { return this.targetName; }
 
     public boolean isTSSfragmentChosen() {
@@ -361,12 +365,12 @@ public class ViewPoint implements Serializable {
      * updateOriginallySelected should be set to true. If we are modifying the viewpoint (e.g., zooming),
      * then updateOriginallySelected should be false. This allows us to keep track of whether
      * the current ViewPoint has been modified by the user.
-     * @param lowerLimit
-     * @param upperLimit
+     * @param lowerLimit 3' limit for selecting digests
+     * @param upperLimit 5' limit for selecting digests
      * @param updateOriginallySelected if true,alter the originallySelected field in {@link Segment}
      */
     private void setFragmentsForExtendedApproach(int lowerLimit, int upperLimit, boolean updateOriginallySelected) {
-        int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+//        int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
 
         for (Segment segment:restrictionSegmentList) {
 
@@ -393,16 +397,16 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
-            if(segment.isSelected() && segment.isUnbalanced()) {
-                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
-            }
+//            if(segment.isSelected() && segment.isUnbalanced()) {
+//                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
+//            }
 
             // if at least one segment is selected, declare viewpoint to be resolved
             if(segment.isSelected()) {
                 this.resolved = true;
             }
         }
-        c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
+//        c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
     }
 
 
@@ -507,15 +511,20 @@ public class ViewPoint implements Serializable {
             restrictionSegmentList.clear(); /* no fragments */
         } else {
             this.centerSegment.setOverlapsTSS(true);
-
+            logger.trace("Setting center segment, overlaps TSS for " + this.getReferenceID() + ": " );
             // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
             int length = centerSegment.length();
-            if (((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isBalanced())
-                   ||
-                    ((length >= this.minFragSize) && (length <= SIMPLE_APPROACH_MAXSIZE) && this.centerSegment.isUnbalanced() && allowSingleMargin)
-
-                    )
-            {
+            logger.trace("length of center segment=" + length +" balanced=" + (centerSegment.isBalanced()?"yes":"no"));
+            if ((length >= this.minFragSize &&
+                    length <= SIMPLE_APPROACH_MAXSIZE &&
+                    this.centerSegment.isBalanced())
+                    ||
+                    (length >= this.minFragSize &&
+                            length <= SIMPLE_APPROACH_MAXSIZE &&
+                            this.centerSegment.isUnbalanced() &&
+                            allowSingleMargin)
+                    ) {
+                logger.trace("In loop set TRUE for " + this.getReferenceID() );
                 centerSegment.setSelected(true,true);
                 this.setStartPos(centerSegment.getStartPos());
                 this.setEndPos(centerSegment.getEndPos());
@@ -526,11 +535,13 @@ public class ViewPoint implements Serializable {
                 int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
                 if (genomicPosFragIdx > 0) {
                     upstreamSegment = restrictionSegmentList.get(genomicPosFragIdx - 1);
+                    logger.trace("SELECTED UPSTREAM " + upstreamSegment.detailedReport() );
                 } else {
                     logger.trace("Warning: There is no segment in upstream direction of the center segment!");
                 }
                 if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
                     downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
+                    logger.trace("SELECTED DOWNSTREAM " + upstreamSegment.detailedReport() );
 
                 } else {
                     logger.trace("Warning: There is no segment in downstream direction of the center segment!");
@@ -556,6 +567,23 @@ public class ViewPoint implements Serializable {
                             this.setEndPos(centerSegment.getEndPos());
                         }
                     }
+                }
+                restrictionSegmentList.clear();
+                if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
+                if(centerSegment != null) {restrictionSegmentList.add(centerSegment);}
+                if(downstreamSegment != null) {restrictionSegmentList.add(downstreamSegment);}
+            } else {
+                // in this case, the center fragment was not selectable
+                // if the user has not checked "allow unbalanced", then it might be desirable to allow the user to
+                // select it manually. We need to show three fragments!
+                Segment upstreamSegment = null;
+                Segment downstreamSegment = null;
+                int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
+                if (genomicPosFragIdx > 0) {
+                    upstreamSegment = restrictionSegmentList.get(genomicPosFragIdx - 1);
+                }
+                if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
+                    downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
                 }
                 restrictionSegmentList.clear();
                 if(upstreamSegment != null) {restrictionSegmentList.add(upstreamSegment);}
@@ -700,57 +728,7 @@ public class ViewPoint implements Serializable {
         return score;
     }
 
-    /**
-     * This function calculates the viewpoint score and sets the field 'score' of this class.
-     * The function is also intended to update the score.
-     * <p>
-     * The function iterates over all restriction segments of the viewpoint.
-     * For selected segments a <i>position distance score</i> is calculated for each position.
-     * The scores for all positions are summed up and in the end divided by the total number of positions for which
-     * <i>position distance scores</i> were calculated.
-     * <p>
-     * The overall score for the viewpoint is again between 0 and 1.
-     *
-     */
-    public void calculateViewpointScore_v1() {
 
-
-        Double score = 0.0;
-
-        /* iterate over all selected fragments */
-
-        Integer posCnt = 0;
-        List<Segment> allFrags=restrictionSegmentList;
-        for (Segment currentSegment : allFrags) {
-            double repCont = 0;
-            double positionScoreSumFragment = 0;
-
-            if (currentSegment.isSelected()) {
-
-                repCont=currentSegment.getMeanMarginRepeatContent();
-
-                /* get position distance score for each position of the digest */
-
-                positionScoreSumFragment = 0;
-                for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
-                    Integer dist = j - genomicPos;
-                    if (dist < 0) {
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
-                    } else {
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
-                    }
-                    posCnt++;
-                }
-            }
-            score += (1 - repCont) * positionScoreSumFragment;
-        }
-        if (posCnt == 0) {
-            this.score = 0.0;
-        } else {
-            this.score = score / posCnt;
-        }
-
-    }
     /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
         return getActiveSegments().stream().mapToInt(Segment::getMarginSize).sum();

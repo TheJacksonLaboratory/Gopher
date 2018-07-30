@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 import static gopher.io.Platform.getGopherDir;
@@ -80,6 +81,7 @@ public class Gopher extends Application {
     }
 
     public static void main(String[] args) {
+        Locale.setDefault(new Locale("en", "US"));
         launch(args);
     }
 
@@ -112,7 +114,7 @@ public class Gopher extends Application {
         SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
         splashpresenter.setSwitchScreen(switchscreen);
         Scene scene = new Scene(splashview.getView());
-        this.primarystage.setTitle("Gopher");
+        this.primarystage.setTitle("GOPHER");
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);

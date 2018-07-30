@@ -17,8 +17,8 @@ the GOPHER GitHub repository: https://github.com/TheJacksonLaboratory/GOPHER/rel
 
 
 
-It is also possible to build the VPV application from source.
-On most systems you should be able to start VPV by double clicking on the
+It is also possible to build the GOPHER application from source.
+On most systems you should be able to start GOPHER by double clicking on the
 `GOPHER.jar`. Alternatively, you can start `GOPHER.jar` from the shell with the following command. ::
 
   $ java -jar GOPHER.jar
@@ -31,9 +31,8 @@ Installing and running the prebuilt GOPHER app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The source code for GOPHER is available from the GOPHER GitHub page. ::
 
-  https://github.com/TheJacksonLaboratory/Gopher
+  $ git clone https://github.com/TheJacksonLaboratory/Gopher
 
-You can clone or download the source as with any project hosted at GitHub.
 GOPHER used the maven build system. To build the App simply enter the following command. ::
 
   $ mvn package

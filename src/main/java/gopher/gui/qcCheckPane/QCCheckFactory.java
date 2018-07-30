@@ -21,7 +21,7 @@ public class QCCheckFactory {
 
     public static boolean showQCCheck(Model model) {
         Stage window;
-        String windowTitle = "Gopher Parameter Check";
+        String windowTitle = "GOPHER Parameter Check";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);

@@ -27,8 +27,8 @@ public class HelpViewFactory {
 
 
     private static String getHTML() {
-        return "<html><body><h3>VPV Help</h3>" +
-                "<p>VPV (<i>GOPHER</i>) is designed to facilitate the design of probes for capture Hi-C and related" +
+        return "<html><body><h3>GOPHER Help</h3>" +
+                "<p><i>GOPHER</i> is designed to facilitate the design of probes for capture Hi-C and related" +
                 " methods by visualizing the restriction fragments that surround the one or multiple transcription" +
                 "start sites of a gene (a viewpoint) in the context of their genomic position and repeat content.</p>" +
                 "<p>Documentation can be found at the <a href=\"https://readthedocs.org/projects/gopher/\">GOPHER Documentation Website</a>.</p>" +
@@ -42,9 +42,9 @@ public class HelpViewFactory {
 
     private static void openHelpDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("VPV Help");
-        alert.setHeaderText("Get help for Gopher");
-        alert.setContentText(String.format("A tutorial and detailed documentation for Gopher (VPV) can be found at readthedocs: %s",READTHEDOCS_SITE));
+        alert.setTitle("GOPHER Help");
+        alert.setHeaderText("Get help for GOPHER");
+        alert.setContentText(String.format("A tutorial and detailed documentation for GOPHER can be found at readthedocs: %s",READTHEDOCS_SITE));
 
         ButtonType buttonTypeOne = new ButtonType("Open ReadTheDocs");
         ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);

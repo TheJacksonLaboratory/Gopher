@@ -299,6 +299,9 @@ public class Model implements Serializable {
     public String getTranscriptsBasename() {
         return transcriptsBasename;
     }
+    public void setTranscriptsBasename(String bname) {
+        this.transcriptsBasename=bname;
+    }
 
     public int getN_validGeneSymbols() { return n_validGeneSymbols; }
     public void setN_validGeneSymbols(int n_validGeneSymbols) { this.n_validGeneSymbols = n_validGeneSymbols; }
@@ -311,7 +314,8 @@ public class Model implements Serializable {
         } catch (IOException e) {
             logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
         }
-
+        this.allowSingleMargin=false;
+        this.allowPatching=false;
     }
 
 
@@ -339,10 +343,10 @@ public class Model implements Serializable {
 
     public void debugPrintVPVGenes() {
         if (this.geneList==null || this.geneList.size()==0) {
-            System.err.println("No Gopher Genes in Model!");
+            System.err.println("No GOPHER Genes in Model!");
             return;
         }
-        System.err.println("Gopher Genes in Model:");
+        System.err.println("GOPHER Genes in Model:");
         for (GopherGene vg : geneList) {
             System.err.println(vg);
         }

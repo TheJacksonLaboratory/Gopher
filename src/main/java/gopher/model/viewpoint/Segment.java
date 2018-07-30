@@ -62,8 +62,22 @@ public class Segment implements Serializable {
 
     private transient IndexedFastaSequenceFile fastaReader;
 
-    private List<Bait> baitListUpStreamMargin = null;
-    private List<Bait> baitListDownStreamMargin = null;
+    private List<Bait> baitListUpStreamMargin;
+    private List<Bait> baitListDownStreamMargin;
+
+
+    public String detailedReport() {
+        return String.format("%s:%d-%d [len: %d] repeat-up:%.1f, down:%.1f  GC-up:%.1f, down:%.1f overlaps TSS: %s",
+                referenceSequenceID,
+                startPos,
+                endPos,
+                (endPos-startPos+1),
+                repeatContentUp,
+                repeatContentDown,
+                GCcontentUp,
+                GCcontentDown,
+                overlapsTSS?"yes":"no");
+    }
 
 
     /** Size of the margins in up and downstream direction. */
@@ -597,7 +611,7 @@ public class Segment implements Serializable {
             if(i == this.getStartPos()) { break; }
 
         }
-        this.baitListDownStreamMargin=baitListDownStreamMargin;
+        //this.baitListDownStreamMargin=baitListDownStreamMargin;
         return this.baitListDownStreamMargin;
     }
 
@@ -612,7 +626,7 @@ public class Segment implements Serializable {
      *
      * @return Number of redundant baits removed from downstream margin
      */
-    public Integer removeRedundantBaits() {
+    private Integer removeRedundantBaits() {
 
         Integer numOfRedundantBaitsRemoved = 0;
 
@@ -661,6 +675,7 @@ public class Segment implements Serializable {
 
     public String getMeanGCcontentOfBaitsAsPercent() {
         Double meanGCcontentOfBaits = getMeanGCcontentOfBaits();
+        if (meanGCcontentOfBaits.isNaN()) return "n/a";
         return String.format("%.2f%%",100*meanGCcontentOfBaits);
     }
 
@@ -687,6 +702,7 @@ public class Segment implements Serializable {
     }
     public String getMeanRepeatContentOfBaitsAsPercent() {
         Double meanRepeatContentOfBaits = getMeanRepeatContentOfBaits();
+        if (meanRepeatContentOfBaits.isNaN()) return "n/a";
         return String.format("%.2f%%",100*meanRepeatContentOfBaits);
     }
 

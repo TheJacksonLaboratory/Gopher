@@ -101,7 +101,7 @@ public class BEDFileExporter {
         PrintStream out_allTracks = new PrintStream(new FileOutputStream(getFullPath(allTracksBEDfile)));
 
         // print genomic positions
-        out_allTracks.println("track name='" + "Gopher: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
+        out_allTracks.println("track name='" + "GOPHER: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s",
@@ -112,7 +112,7 @@ public class BEDFileExporter {
         }
 
         // print viewpoints
-        out_allTracks.println("track name='" + "Gopher: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
+        out_allTracks.println("track name='" + "GOPHER: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
@@ -124,7 +124,7 @@ public class BEDFileExporter {
         }
 
         // print restriction fragments and get unique digest margins
-        out_allTracks.println("track name='" + "Gopher: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
+        out_allTracks.println("track name='" + "GOPHER: Restriction fragments" + "' description='" + "Restriction fragments" + "' color=0,0,128" + " visibility=2");
         Set<String> uniqueFragmentMargins = new HashSet<>(); // use a set to get rid of duplicate digest margins
         HashMap<String,String> uniqueFragmentMarginsMap = new HashMap<>();
         Set<String> uniqueFragments = new HashSet<>(); // use a set to get rid of duplicated fragments
@@ -167,7 +167,7 @@ public class BEDFileExporter {
         }
 
         // print out unique set of margins as targets for enrichment
-        out_allTracks.println("track name='" + "Gopher: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
+        out_allTracks.println("track name='" + "GOPHER: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
         Integer totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
             //out_allTracks.println(s);
@@ -193,7 +193,7 @@ public class BEDFileExporter {
             target_id++;
         }
 
-        out_allTracks.println("track name='" + "Gopher: Probes" + "' description='" + "Probes" + "' color=0,0,0" + "' useScore=1" + " visibility=3");
+        out_allTracks.println("track name='" + "GOPHER: Probes" + "' description='" + "Probes" + "' color=0,0,0" + "' useScore=1" + " visibility=3");
         for(String s : uniqueProbes) {
             out_allTracks.println(s);
         }

@@ -87,10 +87,6 @@ public class GopherMainPresenter implements Initializable {
     @FXML private Button downloadGenome;
     @FXML private Button decompressGenomeButton;
     @FXML private Button indexGenomeButton;
-    /** Label for the genome build we want to download. */
-    @FXML private Label genomeBuildLabel;
-    /** Label for the transcripts we want to download.*/
-    @FXML private Label transcriptsLabel;
     /**Clicking this button will download the genome file if it is not found at the indicated directory. */
     @FXML private Button downloadGenomeButton;
     /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
@@ -123,19 +119,6 @@ public class GopherMainPresenter implements Initializable {
 
     /** Show which enzymes the user has chosen. */
     @FXML private Label restrictionEnzymeLabel;
-//    /** Show how many valid genes were uploaded by user. */
-//    @FXML private Label nValidGenesLabel;
-//    /** Show the name of the downloaded genome we areusing. */
-//    @FXML private Label downloadedGenomeLabel;
-//    /** Show status of unpacking the downloaded genome. */
-//    @FXML private Label decompressGenomeLabel;
-//    /** Show status of indexing the downloaded genome. */
-//    @FXML private Label indexGenomeLabel;
-//    /** Show name of downloaded transcripts file. */
-//    @FXML private Label downloadedTranscriptsLabel;
-//    /** Show name of downloaded transcripts file. */
-//    @FXML private Label downloadAlignabilityLabel;
-//    @FXML private Label decompressAlignabilityLabel;
 
     @FXML private TabPane tabpane;
     @FXML private StackPane analysisPane;
@@ -241,7 +224,7 @@ public class GopherMainPresenter implements Initializable {
         try {
             SerializationManager.serializeModel(this.model, path);
         } catch (IOException e) {
-            PopupFactory.displayException("Error","Unable to serialize VPV viewpoint",e);
+            PopupFactory.displayException("Error","Unable to serialize Gopher viewpoint",e);
             return false;
         }
         logger.trace("Serialization successful to file "+path);
@@ -525,7 +508,6 @@ public class GopherMainPresenter implements Initializable {
      */
     private void setGenomeBuild(String build) {
         logger.info("Setting genome build to "+build);
-        this.genomeBuildLabel.setText(build);
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
         this.alignabilityDownloadPI.setProgress(0.0);
@@ -581,6 +563,7 @@ public class GopherMainPresenter implements Initializable {
         String url;
         try {
             url = rgd.getURL();
+            model.setTranscriptsBasename(transcriptName);
         } catch (DownloadFileNotFoundException dfne) {
             PopupFactory.displayError("Could not identify RefGene file for genome",dfne.getMessage());
             return;
@@ -765,9 +748,6 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-//                this.model.getChosenGeneCount(),
-//                this.model.getUniqueChosenTSScount()));
         e.consume();
     }
 
@@ -949,11 +929,6 @@ public class GopherMainPresenter implements Initializable {
 
         ViewPointCreationTask task;
 
-        // TODO use boolean var allowSingleMargin
-
-        logger.trace("Reading alignability map to memory...");
-       //
-
         if (model.useSimpleApproach()) {
             task = new SimpleViewPointCreationTask(model);
         } else {
@@ -1015,7 +990,7 @@ public class GopherMainPresenter implements Initializable {
     public void closeWindow(ActionEvent e) {
         boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
         if (answer) {
-            logger.info("Closing VPV Gui");
+            logger.info("Closing Gopher Gui");
             serialize();
             javafx.application.Platform.exit();
         }
@@ -1070,7 +1045,7 @@ public class GopherMainPresenter implements Initializable {
 
     /** Display the settings (parameters) of the current viewpoint. */
     public void showSettingsOfCurrentProject() {
-        SettingsViewFactory.showSettings(model.getProperties());
+        SettingsViewFactory.showSettings(model);
     }
 
     /**
@@ -1246,7 +1221,7 @@ public class GopherMainPresenter implements Initializable {
     @FXML
     public void importProject(ActionEvent e) {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Open VPV project file");
+        chooser.setTitle("Open Gopher project file");
         File file = chooser.showOpenDialog(null);
         if (file==null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;
