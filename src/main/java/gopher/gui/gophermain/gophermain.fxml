@@ -26,7 +26,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
     <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0" minWidth="830.0" stylesheets="@gophermain.css">
         <top>
             <HBox maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
@@ -47,9 +47,6 @@
                     <Menu mnemonicParsing="false" text="Export">
                         <MenuItem mnemonicParsing="false" onAction="#displayReport" text="Display report" />
                         <MenuItem mnemonicParsing="false" onAction="#exportReport" text="Export report" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" onAction="#downloadRegulationData" text="Download regulation data" />
-                        <MenuItem mnemonicParsing="false" onAction="#buildRegulatoryExome" text="Build regulatory exome" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..." />
                         <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file as ..." />
@@ -115,7 +112,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label fx:id="transcriptsLabel" text="Transcripts" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                            <Label text="Transcripts" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                 <GridPane.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>

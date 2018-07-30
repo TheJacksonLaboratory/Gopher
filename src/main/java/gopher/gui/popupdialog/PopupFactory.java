@@ -30,50 +30,6 @@ public class PopupFactory {
 
 
 
-    private boolean showDialogToGetIntegerFromUser(String windowTitle, String html, String labeltext, int previousValue, int defaultValue){
-        Stage window;
-        window = new Stage();
-        window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
-
-        PopupView view = new PopupView();
-        PopupPresenter presenter = (PopupPresenter) view.getPresenter();
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
-        presenter.setData(html);
-        presenter.setLabelText(labeltext);
-        if (previousValue>0) {
-            presenter.setPreviousValue(String.valueOf(previousValue));
-        } else {
-            presenter.setPromptValue(String.valueOf(defaultValue));
-        }
-
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();
-        if (presenter.wasCanceled()) {
-            wasCancelled=true;
-            return false; // do nothing, the user canceled the entry
-        }
-        String entryvalue = presenter.getValue();
-        try {
-            this.integerValue=Integer.parseInt(entryvalue);
-        } catch (NumberFormatException e) {
-            displayException("Format error","Could not parse integer value",e);
-            valid=false;
-            return false;
-        }
-        return (! presenter.wasCanceled());
-    }
-
 
     private boolean showDialogToGetStringFromUser(String windowTitle, String html, String labeltext, String previousValue, String defaultValue){
         Stage window;
@@ -121,75 +77,14 @@ public class PopupFactory {
     }
 
 
-    private static String getMarginSizeHTML() {
-        return "<h1>Margin Size</h1>\n"+
-                "<p>" +
-                "The margin size defines the width of the regions at the margins of restriction fragments " +
-                "that are exported as target regions in the end. " +
-                "The thresholds for repeats and GC content only refer to these margins." +
-                "</p>" +
-                "For the simple approach the margin size should equal the probe length." +
-                "</p>";
-    }
-
-
-    private static String getProbeLengthHTML() {
-        return  "<h1>Probe length</h1>\n"+
-                "<p>The probes used in capture Hi-C are oligonucleotides (sometimes called baits) " +
-                "that are used to capture sequences of interest, thereby enriching these sequences prior " +
-                "to next generation sequencing. In some technologies, streptavidin-labeled magnetic beads " +
-                "are used to capture target sequences in solution; in others, variable length probes are " +
-                "attached to an array. The probe length entered here should match the probe length used in " +
-                "the actual capture Hi-C experiment that will be conducted.</p>";
-    }
-
     private static String getProjectNameHTML() {
-        return  "<h1>Gopher Projects</h1>\n"+
-                "<p>Enter a name for a new Gopher project. Names should start with letters, numbers, or an underscore." +
-                " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
+        return  "<h1>GOPHER Projects</h1>\n"+
+                "<p>Enter a name for a new GOPHER project. Names should start with letters, numbers, or an underscore." +
+               " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
                 " Projects can also be exported to other locations on the file system using the File|Export... menu item." +
                 " Projects can be imported with Project|Import.</p>";
     }
 
-    public Integer setProbeLength(int previousValue) {
-        String title="Enter Probe Length";
-        String labelText="Enter probe length:";
-        String html=getProbeLengthHTML();
-        if (previousValue>0) {
-            html=html +  "<p>The previously entered value is shown.</p>";
-            html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
-        } else {
-            html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
-        }
-        boolean OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.PROBE_LENGTH);
-        if (OK) {
-            return integerValue;
-        } else {
-            valid = false;
-            return null;
-        }
-    }
-
-
-    public Integer setMarginSize(int previousValue) {
-        String title="Enter Margin Size";
-        String labelText="Enter margin size (bp):";
-        String html=getMarginSizeHTML();
-        if (previousValue>0) {
-            html=html +  "<p>The previously entered value is shown.</p>";
-            html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
-        } else {
-            html=String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),html,HTML_FOOTER);
-        }
-        boolean OK = showDialogToGetIntegerFromUser(title,html,labelText,previousValue,Default.MARGIN_SIZE);
-
-        if (OK) {
-            return integerValue;
-        } else {
-            valid = false;
-            return null;
-        }
-    }
 
     /** Open up a dialog where the user can enter a new project name. */
     public String getProjectName() {
@@ -383,41 +278,13 @@ public class PopupFactory {
     public boolean wasCancelled() { return wasCancelled; }
 
 
-    /**
-     * @return a block of CSS code intended for the blue-beige Table of data on the design.
-     */
-    private static String getCSSblock() {
-        return "<style>\n" +
-                "h1 {\n" +
-                "\tfont-size: 16;\n" +
-                "  font-weight: bold;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "h2 {\n" +
-                "\tfont-size: 16;\n" +
-                "  font-weight: italic;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "h4 {\n" +
-                "\tfont-size: 12;\n" +
-                "  font-weight: italic;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "p.ex {\n" +
-                "\tfont-size: 9;\n" +
-                "}\n" +
-                "</style>";
-    }
-
-
-
     private static String getPreHTML(String text) {
-       return String.format("<html><body><h1>Gopher Report</h1><pre>%s</pre></body></html>",text);
+       return String.format("<html><body><h1>GOPHER Report</h1><pre>%s</pre></body></html>",text);
     }
 
     public static  void showSummaryDialog(String text) {
         Stage window;
-        String windowTitle = "Gopher Report";
+        String windowTitle = "GOPHER Report";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);

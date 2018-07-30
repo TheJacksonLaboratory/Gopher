@@ -114,7 +114,7 @@ public class Gopher extends Application {
         SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
         splashpresenter.setSwitchScreen(switchscreen);
         Scene scene = new Scene(splashview.getView());
-        this.primarystage.setTitle("Gopher");
+        this.primarystage.setTitle("GOPHER");
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);

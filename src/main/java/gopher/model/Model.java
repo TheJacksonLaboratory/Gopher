@@ -343,10 +343,10 @@ public class Model implements Serializable {
 
     public void debugPrintVPVGenes() {
         if (this.geneList==null || this.geneList.size()==0) {
-            System.err.println("No Gopher Genes in Model!");
+            System.err.println("No GOPHER Genes in Model!");
             return;
         }
-        System.err.println("Gopher Genes in Model:");
+        System.err.println("GOPHER Genes in Model:");
         for (GopherGene vg : geneList) {
             System.err.println(vg);
         }

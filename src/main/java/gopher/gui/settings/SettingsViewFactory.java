@@ -21,7 +21,7 @@ public class SettingsViewFactory {
 
     public static void showSettings(Model model) {
         Stage window;
-        String windowTitle = "Gopher Settings";
+        String windowTitle = "GOPHER Settings";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
