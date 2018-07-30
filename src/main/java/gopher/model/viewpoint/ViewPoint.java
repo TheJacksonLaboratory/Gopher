@@ -728,58 +728,7 @@ public class ViewPoint implements Serializable {
         return score;
     }
 
-    /**
-     * This function calculates the viewpoint score and sets the field 'score' of this class.
-     * The function is also intended to update the score.
-     * <p>
-     * The function iterates over all restriction segments of the viewpoint.
-     * For selected segments a <i>position distance score</i> is calculated for each position.
-     * The scores for all positions are summed up and in the end divided by the total number of positions for which
-     * <i>position distance scores</i> were calculated.
-     * <p>
-     * The overall score for the viewpoint is again between 0 and 1.
-     *
-     */
-    @Deprecated
-    public void calculateViewpointScore_v1() {
 
-
-        Double score = 0.0;
-
-        /* iterate over all selected fragments */
-
-        Integer posCnt = 0;
-        List<Segment> allFrags=restrictionSegmentList;
-        for (Segment currentSegment : allFrags) {
-            double repCont = 0;
-            double positionScoreSumFragment = 0;
-
-            if (currentSegment.isSelected()) {
-
-                repCont=currentSegment.getMeanMarginRepeatContent();
-
-                /* get position distance score for each position of the digest */
-
-                positionScoreSumFragment = 0;
-                for (int j = currentSegment.getStartPos(); j < currentSegment.getEndPos(); j++) {
-                    Integer dist = j - genomicPos;
-                    if (dist < 0) {
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
-                    } else {
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
-                    }
-                    posCnt++;
-                }
-            }
-            score += (1 - repCont) * positionScoreSumFragment;
-        }
-        if (posCnt == 0) {
-            this.score = 0.0;
-        } else {
-            this.score = score / posCnt;
-        }
-
-    }
     /** @return the total length of the Margins of all active segments of this ViewPoint. */
     public int getTotalMarginSize() {
         return getActiveSegments().stream().mapToInt(Segment::getMarginSize).sum();
