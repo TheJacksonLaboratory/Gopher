@@ -4,6 +4,11 @@ Changelog
 
 
 ------
+v0.4.6
+------
+- Parallel streams for viewpoint creation
+
+------
 v0.4.5
 ------
 - Bug fixes and Q/C prior to manuscript submission

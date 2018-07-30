@@ -38,9 +38,13 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
 
   }
 
-    /** TODO document me
-     *
-     * */
+    /**
+     * Calculate the data for the current ViewPoint object
+     * @param vpvgene A representation of the input gene and target (usually the TSS)
+     * @param referenceSequenceID Chromosome/scaffold on which the gene is located
+     * @param fastaReader HTSJDK object to read FASTA file
+     * @param chr2alignMap alignability map for the current chromosome
+     */
     private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, AlignabilityMap chr2alignMap) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         List<Integer> gPosList = vpvgene.getTSSlist();
@@ -116,23 +120,21 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
                 logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
-                if (! chromosomes.containsKey(referenceSequenceID)) {
+                if (!chromosomes.containsKey(referenceSequenceID)) {
                     continue; // skip if we have no gene on this chromosome
                 }
                 ChromosomeGroup group = chromosomes.get(referenceSequenceID);
-                if (group==null) {
-                    logger.error("group is null while searching for \"" + referenceSequenceID +"\"");
+                if (group == null) {
+                    logger.error("group is null while searching for \"" + referenceSequenceID + "\"");
                     for (ChromosomeGroup g : chromosomes.values()) {
                         logger.error(g.getReferenceSequenceID());
                     }
                 } else {
-                    logger.trace("group="+group.getReferenceSequenceID());
+                    logger.trace("group=" + group.getReferenceSequenceID());
                 }
-                for (GopherGene gene : group.getGenes()) {
-                    //group.getGenes().parallelStream().forEach(vpvGene ->
-                            calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);}
+                //for (GopherGene vpvGene : gopherGene.getGenes()) {
+                group.getGenes().parallelStream().forEach(gopherGene -> calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair));
             }
-
 
         } catch (IOException e){
             e.printStackTrace();

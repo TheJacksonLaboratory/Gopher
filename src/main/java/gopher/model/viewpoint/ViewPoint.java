@@ -240,10 +240,10 @@ public class ViewPoint implements Serializable {
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
-        logger.trace("Done init Restriction Frags");
-        for (Segment er : restrictionSegmentList){
-            logger.trace("\tSegment: " + er.detailedReport());
-        }
+//        logger.trace("Done init Restriction Frags");
+//        for (Segment er : restrictionSegmentList){
+//            logger.trace("\tSegment: " + er.detailedReport());
+//        }
     }
 
     /** @return a 2-tuple with the number of baits: <up,down>. */
