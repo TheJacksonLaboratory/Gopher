@@ -46,7 +46,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
-        //Instrumentation inst=null;
+        logger.trace("Creating simple viewpoint for " + vpvgene.getGeneSymbol());
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
                     targetName(vpvgene.getGeneSymbol()).
@@ -130,7 +130,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 }
                 for (GopherGene gene : group.getGenes()) {
                     //group.getGenes().parallelStream().forEach(vpvGene ->
-                        calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);}
+                            calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);}
             }
 
 
