@@ -19,8 +19,6 @@ public class Design {
     static Logger logger = Logger.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
-
-
     /** total length in nt of all unique digest margins  */
     private int n_nucleotides_in_unique_fragment_margins;
 
@@ -88,7 +86,6 @@ public class Design {
 
 
     public Design(Model mod) {
-
         this.model = mod;
     }
 
@@ -220,7 +217,6 @@ public class Design {
         }
         // count number balanced
         Integer n_balanced_digests = 0;
-        logger.trace(uniqueDigests.size());
         for (Segment seg : uniqueDigests) {
             if(seg.isBalanced()) {
                 n_balanced_digests++;
@@ -238,7 +234,6 @@ public class Design {
         }
         // count number balanced
         Integer n_unbalanced_digests = 0;
-        logger.trace(uniqueDigests.size());
         for (Segment seg : uniqueDigests) {
             if(seg.isUnbalanced()) {
                 n_unbalanced_digests++;
