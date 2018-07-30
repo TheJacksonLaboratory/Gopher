@@ -66,6 +66,20 @@ public class Segment implements Serializable {
     private List<Bait> baitListDownStreamMargin;
 
 
+    public String detailedReport() {
+        return String.format("%s:%d-%d [len: %d] repeat-up:%.1f, down:%.1f  GC-up:%.1f, down:%.1f overlaps TSS: %s",
+                referenceSequenceID,
+                startPos,
+                endPos,
+                (endPos-startPos+1),
+                repeatContentUp,
+                repeatContentDown,
+                GCcontentUp,
+                GCcontentDown,
+                overlapsTSS?"yes":"no");
+    }
+
+
     /** Size of the margins in up and downstream direction. */
     private Integer marginSize;
     /** Is this digest overlapping the TSS, i.e., it is the center digest? */
