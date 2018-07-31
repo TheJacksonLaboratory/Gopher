@@ -272,20 +272,20 @@ public class VPAnalysisPresenter implements Initializable {
         int resolvedVP = design.getN_resolvedViewpoints();
         double avVpSize = design.getAvgVPsize();
         double avgVpScore = design.getAvgVPscore();
-        String vpointV = String.format("n=%d of which %d have \u2265 1 valid fragment.",
+        String vpointV = String.format("n=%d of which %d have \u2265 1 valid digest;",
                 nviewpoints,resolvedVP);
         if (model.getApproach().equals(Model.Approach.SIMPLE)) {
             int n_patched=design.getN_patched_viewpoints();
             vpointV=String.format("%s %d viewpoints were patched",vpointV,n_patched);
         }
         listItems.put("Viewpoints",vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp. Mean score=%.1f",
+        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f",
                 avVpSize,avgVpScore);
         listItems.put(" ",vpointV2);
 
         int nfrags = design.getN_unique_fragments();
         double avg_n_frag = design.getAvgFragmentsPerVP();
-        String fragmentV = String.format("Total unique digests=%d; mean digests/viewpoint: %.1f",
+        String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
                 nfrags,avg_n_frag);
         listItems.put("Digests",fragmentV);
 
@@ -293,7 +293,7 @@ public class VPAnalysisPresenter implements Initializable {
         int n_unbalanced = design.getTotalNumUnbalancedDigests();
 
 
-        listItems.put("",String.format( "Balanced digests: %d; unbalanced digests: %d",n_balancedDigests,n_unbalanced));
+        listItems.put("",String.format( "Balanced: %d; Unbalanced: %d",n_balancedDigests,n_unbalanced));
         int n_baits = design.getTotalNumOfUniqueBaits();
         String baitV = String.format("n=%d", n_baits);
         listItems.put("Probes",baitV);
