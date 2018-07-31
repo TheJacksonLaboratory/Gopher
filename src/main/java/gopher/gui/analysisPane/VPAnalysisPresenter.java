@@ -15,6 +15,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import org.apache.log4j.Logger;
 
 import java.net.URL;
@@ -37,7 +39,7 @@ public class VPAnalysisPresenter implements Initializable {
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
-
+    @FXML private HBox listviewHbox;
     @FXML private ListView<String> lviewKey;
     @FXML private ListView<String> lviewValue;
 
@@ -76,6 +78,7 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     private void init() {
+        listviewHbox.setHgrow(lviewValue, Priority.ALWAYS);
         initTable();
     }
 
