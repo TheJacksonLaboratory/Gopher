@@ -262,30 +262,34 @@ public class VPAnalysisPresenter implements Initializable {
 
         int ngenes = design.getN_genes();
         int resolvedGenes = design.getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 valid viewpoint",ngenes,resolvedGenes);
+        String geneV = String.format("n=%d of which %d have \u2265 1 valid viewpoint",ngenes,resolvedGenes);
         listItems.put("Genes",geneV);
 
         int nviewpoints = design.getN_viewpoints();
         int resolvedVP = design.getN_resolvedViewpoints();
         double avVpSize = design.getAvgVPsize();
         double avgVpScore = design.getAvgVPscore();
-        String vpointV = String.format("n=%d of which %d have \u2265 valid fragment. Mean size=%.1f bp. Mean score=%.1f",
-                nviewpoints,resolvedVP,avVpSize,avgVpScore);
+        String vpointV = String.format("n=%d of which %d have \u2265 1 valid fragment.",
+                nviewpoints,resolvedVP);
         listItems.put("Viewpoints",vpointV);
+        String vpointV2 = String.format("Mean size=%.1f bp. Mean score=%.1f",
+                avVpSize,avgVpScore);
+        listItems.put(" ",vpointV2);
 
         int nfrags = design.getN_unique_fragments();
-        int total_active_frags = design.getN_unique_fragments();
         double avg_n_frag = design.getAvgFragmentsPerVP();
-        String fragmentV = String.format("Total unique digests=%d; active digests: %d; mean digests/viewpoint: %.1f",
-                nfrags,total_active_frags,avg_n_frag);
+        String fragmentV = String.format("Total unique digests=%d; mean digests/viewpoint: %.1f",
+                nfrags,avg_n_frag);
         listItems.put("Digests",fragmentV);
 
         int n_balancedDigests = design.getTotalNumBalancedDigests();
         int n_unbalanced = design.getTotalNumUnbalancedDigests();
+
+
+        listItems.put("",String.format( "Balanced digests: %d; unbalanced digests: %d",n_balancedDigests,n_unbalanced));
         int n_baits = design.getTotalNumOfUniqueBaits();
-        String fragmentBalanceV = String.format("n=%d (Balanced digests: %d; unbalanced digests: %d)",
-                n_baits,n_balancedDigests,n_unbalanced);
-        listItems.put("Probes",fragmentBalanceV);
+        String baitV = String.format("n=%d", n_baits);
+        listItems.put("Probes",baitV);
         return listItems;
     }
 
