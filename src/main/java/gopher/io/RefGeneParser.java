@@ -4,6 +4,7 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import gopher.model.GopherGene;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 
@@ -152,8 +153,13 @@ public class RefGeneParser {
         return lst;
     }
 
-    /** @return A sorted list of those symbols uploaded by the user that could be found in the {@code refGene.txt.gz} file.*/
+    /**
+     * Return a sorted list of validated genes symbols. If none of the gene symbols are valid, we return an empty list.
+     * This will not allow the GUI to start to calculate viewpoints.
+     * @return A sorted list of those symbols uploaded by the user that could be found in the {@code refGene.txt.gz} file.*/
     public List<String> getValidGeneSymbols() {
+        if (validGeneSymbols==null)
+            return ImmutableList.of(); //
         List<String> lst = new ArrayList<>(validGeneSymbols);
         Collections.sort(lst);
         return lst;
