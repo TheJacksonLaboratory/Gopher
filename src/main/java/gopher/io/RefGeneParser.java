@@ -148,6 +148,8 @@ public class RefGeneParser {
 
     /** @return A sorted list of those symbols uploaded by the user that could NOT be found in the {@code refGene.txt.gz} file.*/
     public List<String> getInvalidGeneSymbols() {
+        if (invalidGeneSymbols==null)
+            return ImmutableList.of(); //
         List<String> lst = new ArrayList<>(invalidGeneSymbols);
         Collections.sort(lst);
         return lst;
