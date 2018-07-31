@@ -4,7 +4,6 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import gopher.model.GopherGene;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 
@@ -42,7 +41,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.2.4 (2017-11-26)
  */
 public class RefGeneParser {
-    private static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
+    private final static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
@@ -53,14 +52,15 @@ public class RefGeneParser {
     private final Map<String, GopherGene> gene2chromosomePosMap;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
-    private Set<String> invalidGeneSymbols=null;
+    private Set<String> invalidGeneSymbols=ImmutableSet.of();
     /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.
      * These are the genes chosen by the user. */
-    private Set<String> validGeneSymbols=null;
+    private Set<String> validGeneSymbols=ImmutableSet.of();
     /** Total number of genes in the refGene.txt.gz file (number of unique gene symbols). */
     private int n_totalGenes;
-    private int n_chosenGenes;
+    /** Total number of transcription start sites in the refGene.txt.gz file. */
     private int n_totalTSS;
+    /** Total number of TSS chosen by the user. */
     private int n_chosenTSS;
     /** index of the coding sequence start position in the UCSC file. */
     private static final int CDS_START_IDX=6;
@@ -132,6 +132,7 @@ public class RefGeneParser {
         gene2chromosomePosMap.values().forEach(vpvGene -> n_totalTSS += vpvGene.n_viewpointstarts());
     }
 
+    /** @return a list of all gene symbols of all protein-coding genes in the {@code refGene.txt.gz} file.*/
     public List<String>  getAllProteinCodingGeneSymbols() {
         ImmutableList.Builder<String> builder=new ImmutableList.Builder<>();
         ImmutableSet.Builder<String> setbuilder=new ImmutableSet.Builder<>();
@@ -180,15 +181,17 @@ public class RefGeneParser {
             PopupFactory.displayError("Unable to check gene list", "Attempt to check genelist with null pointer");
             return;
         }
-        this.invalidGeneSymbols = new HashSet<>();
-        this.validGeneSymbols = new HashSet<>();
+        ImmutableSet.Builder<String> validSetBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<String> invalidSetBuilder = new ImmutableSet.Builder<>();
         for (String sym:genelst) {
             if (this.geneSymbolMap.containsKey(sym)) { // it's only checked, if a gene is in refGene or not -> use geneSymbolMap
-                validGeneSymbols.add(sym);
+                validSetBuilder.add(sym);
             } else {
-                invalidGeneSymbols.add(sym);
+                invalidSetBuilder.add(sym);
             }
         }
+        this.invalidGeneSymbols=invalidSetBuilder.build();
+        this.validGeneSymbols=validSetBuilder.build();
     }
 
     /**
@@ -197,15 +200,15 @@ public class RefGeneParser {
      * @return List of VPVGenes representing valid uploaded gene symbols.
      */
     public List<GopherGene> getGopherGeneList() {
-        List<GopherGene> genelist=new ArrayList<>();
+        ImmutableList.Builder<GopherGene> builder = new ImmutableList.Builder<>();
         this.n_chosenTSS=0;
         for (GopherGene g: gene2chromosomePosMap.values()) {
             if (this.validGeneSymbols.contains(g.getGeneSymbol())) {
-                genelist.add(g);
+                builder.add(g);
                 this.n_chosenTSS += g.n_viewpointstarts();
             }
         }
-        return genelist; // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use gene2chromosomePosMap
+        return builder.build(); // must contain objects RNU6-2 on chr1 as well for RNU6-2 on chr10 -> use gene2chromosomePosMap
     }
 
     /** @return the total number of {@link GopherGene} objects created from parsing the {@code refGene.txt.gz} file. */
