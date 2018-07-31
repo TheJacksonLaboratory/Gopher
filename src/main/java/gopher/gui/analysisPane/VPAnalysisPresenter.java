@@ -271,6 +271,10 @@ public class VPAnalysisPresenter implements Initializable {
         double avgVpScore = design.getAvgVPscore();
         String vpointV = String.format("n=%d of which %d have \u2265 1 valid fragment.",
                 nviewpoints,resolvedVP);
+        if (model.getApproach().equals(Model.Approach.SIMPLE)) {
+            int n_patched=design.getN_patched_viewpoints();
+            vpointV=String.format("%s %d viewpoints were patched",vpointV,n_patched);
+        }
         listItems.put("Viewpoints",vpointV);
         String vpointV2 = String.format("Mean size=%.1f bp. Mean score=%.1f",
                 avVpSize,avgVpScore);

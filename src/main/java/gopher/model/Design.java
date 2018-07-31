@@ -41,8 +41,12 @@ public class Design {
     private int n_resolvedGenes;
 
     private int n_estimatedProbeCount;
+    /** NUmber of viewpoints with more than one digest (only applies to simple approach).*/
+    private int n_patched_viewpoints;
 
     private Model model;
+
+    private Model.Approach approach;
 
     public int getN_unique_fragments() {
         return n_unique_fragments;
@@ -86,7 +90,9 @@ public class Design {
 
 
     public Design(Model mod) {
+
         this.model = mod;
+        this.approach=model.getApproach();
     }
 
 
@@ -147,6 +153,7 @@ public class Design {
         Set<String> uniqueGeneSymbols = new HashSet<>();
         avgVPscore = 0.0;
         avgVPsize = 0.0;
+        n_patched_viewpoints=0;
         // If the user calls this function on a new project before
         // creating viewpoints, then viewPointList is null, and we should just return.
         if (viewPointList == null) {
@@ -164,6 +171,9 @@ public class Design {
             if (vp.hasValidProbe()) {
                 n_resolvedViewpoints++;
                 genesWithValidViewPoint.add(vp.getTargetName());
+            }
+            if (this.approach.equals(Model.Approach.SIMPLE) && vp.getActiveSegments().size()>1) {
+                n_patched_viewpoints++;
             }
         });
 
@@ -225,7 +235,7 @@ public class Design {
         return n_balanced_digests;
     }
 
-    public Integer getTotalNumUnbalancedDigests() {
+    public int getTotalNumUnbalancedDigests() {
         // get rid of redundant segments emerging from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
         List<ViewPoint> viewPointList = model.getViewPointList();
@@ -233,7 +243,7 @@ public class Design {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number balanced
-        Integer n_unbalanced_digests = 0;
+        int n_unbalanced_digests = 0;
         for (Segment seg : uniqueDigests) {
             if(seg.isUnbalanced()) {
                 n_unbalanced_digests++;
@@ -241,6 +251,8 @@ public class Design {
         }
         return n_unbalanced_digests;
     }
+
+    public int getN_patched_viewpoints(){ return n_patched_viewpoints;}
 
 
 
