@@ -9,6 +9,7 @@ import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.help.HelpViewFactory;
+import gopher.gui.logviewer.Level;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
@@ -49,6 +50,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -69,128 +71,305 @@ import java.util.stream.Collectors;
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
-    /** The Model for the entire analysis. */
+    /**
+     * The Model for the entire analysis.
+     */
     private Model model = null;
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
      * obtain a reference to the primary scene, which is needed by FileChooser, etc. It is set in the FXML
      * document to refer to the Anchor pane that is the root node of the GUI.
      */
-    @FXML private Node rootNode;
-    /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9","mm10");
-    /** List of genome builds. Used by genomeChoiceBox*/
-    @FXML private final ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
-    @FXML private ChoiceBox<String> genomeChoiceBox;
-    @FXML private ChoiceBox<String> approachChoiceBox;
-    /** Clicking this button downloads the genome build and unpacks it.*/
-    @FXML private Button downloadGenome;
-    @FXML private Button decompressGenomeButton;
-    @FXML private Button indexGenomeButton;
-    /**Clicking this button will download the genome file if it is not found at the indicated directory. */
-    @FXML private Button downloadGenomeButton;
-    /** Button to download RefSeq.tar.gz (transcript/gene definition file  */
-    @FXML private Button downloadTranscriptsButton;
-    @FXML private ProgressIndicator genomeDownloadPI;
-    /** Show progress in downloading the Genome and corresponding transcript definition file.  */
-    @FXML private ProgressIndicator genomeDecompressPI;
-    @FXML private ProgressIndicator genomeIndexPI;
-    /** Progress indicator for downloading the transcript file */
-    @FXML private ProgressIndicator transcriptDownloadPI;
-    /** Progress indicator for downloading alignability file */
-    @FXML private ProgressIndicator alignabilityDownloadPI;
+    @FXML
+    private Node rootNode;
+    /**
+     * List of genome builds. Used by genomeChoiceBox
+     */
+    @FXML
+    private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9", "mm10");
+    /**
+     * List of genome builds. Used by genomeChoiceBox
+     */
+    @FXML
+    private final ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
+    @FXML
+    private ChoiceBox<String> genomeChoiceBox;
+    @FXML
+    private ChoiceBox<String> approachChoiceBox;
+    /**
+     * Clicking this button downloads the genome build and unpacks it.
+     */
+    @FXML
+    private Button downloadGenome;
+    @FXML
+    private Button decompressGenomeButton;
+    @FXML
+    private Button indexGenomeButton;
+    /**
+     * Clicking this button will download the genome file if it is not found at the indicated directory.
+     */
+    @FXML
+    private Button downloadGenomeButton;
+    /**
+     * Button to download RefSeq.tar.gz (transcript/gene definition file
+     */
+    @FXML
+    private Button downloadTranscriptsButton;
+    @FXML
+    private ProgressIndicator genomeDownloadPI;
+    /**
+     * Show progress in downloading the Genome and corresponding transcript definition file.
+     */
+    @FXML
+    private ProgressIndicator genomeDecompressPI;
+    @FXML
+    private ProgressIndicator genomeIndexPI;
+    /**
+     * Progress indicator for downloading the transcript file
+     */
+    @FXML
+    private ProgressIndicator transcriptDownloadPI;
+    /**
+     * Progress indicator for downloading alignability file
+     */
+    @FXML
+    private ProgressIndicator alignabilityDownloadPI;
 
-    @FXML private Label sizeUpLabel;
-    @FXML private Label sizeDownLabel;
-    @FXML private TextField sizeUpTextField;
-    @FXML private TextField sizeDownTextField;
-    @FXML private TextField minFragSizeTextField;
-    @FXML private TextField maxKmerAlignabilityTextField;
-    @FXML private TextField minGCContentTextField;
-    @FXML private TextField maxGCContentTextField;
-    @FXML private TextField minBaitCountTextField;
-    @FXML private TextField maxBaitCountTextField;
-    @FXML private TextField baitLengthTextField;
-    @FXML private TextField marginSizeTextField;
+    @FXML
+    private Label sizeUpLabel;
+    @FXML
+    private Label sizeDownLabel;
+    @FXML
+    private TextField sizeUpTextField;
+    @FXML
+    private TextField sizeDownTextField;
+    @FXML
+    private TextField minFragSizeTextField;
+    @FXML
+    private TextField maxKmerAlignabilityTextField;
+    @FXML
+    private TextField minGCContentTextField;
+    @FXML
+    private TextField maxGCContentTextField;
+    @FXML
+    private TextField minBaitCountTextField;
+    @FXML
+    private TextField maxBaitCountTextField;
+    @FXML
+    private TextField baitLengthTextField;
+    @FXML
+    private TextField marginSizeTextField;
 
-    @FXML private Label patchedViewpointLabel;
-    @FXML private CheckBox unbalancedMarginCheckbox;
-    @FXML private CheckBox patchedViewpointCheckbox;
+    @FXML
+    private Label patchedViewpointLabel;
+    @FXML
+    private CheckBox unbalancedMarginCheckbox;
+    @FXML
+    private CheckBox patchedViewpointCheckbox;
 
-    /** Show which enzymes the user has chosen. */
-    @FXML private Label restrictionEnzymeLabel;
+    @FXML
+    RadioMenuItem loggingLevelOFF;
+    @FXML
+    RadioMenuItem loggingLevelTrace;
+    @FXML
+    RadioMenuItem loggingLevelInfo;
+    @FXML
+    RadioMenuItem loggingLevelDebug;
+    @FXML
+    RadioMenuItem loggingLevelWarn;
+    @FXML
+    RadioMenuItem loggingLevelError;
 
-    @FXML private TabPane tabpane;
-    @FXML private StackPane analysisPane;
+    /**
+     * Show which enzymes the user has chosen.
+     */
+    @FXML
+    private Label restrictionEnzymeLabel;
 
-    /** The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints. */
-    @FXML private Tab analysistab;
-    /** Click this to choose the restriction enzymes with which to do the capture Hi-C cutting  */
-    @FXML private Button chooseEnzymeButton;
-    /** Presenter for the second tab. */
+    @FXML
+    private TabPane tabpane;
+    @FXML
+    private StackPane analysisPane;
+
+    /**
+     * The 'second' tab of VPVGui that shows a summary of the analysis and a list of Viewpoints.
+     */
+    @FXML
+    private Tab analysistab;
+    /**
+     * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting
+     */
+    @FXML
+    private Button chooseEnzymeButton;
+    /**
+     * Presenter for the second tab.
+     */
     private VPAnalysisPresenter vpanalysispresenter;
-    /** View for the second tab. */
+    /**
+     * View for the second tab.
+     */
     private VPAnalysisView vpanalysisview;
-    /** Reference to the primary stage. We use this to set the title when we switch models (new from File menu). */
-    private Stage primaryStage=null;
+    /**
+     * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
+     */
+    private Stage primaryStage = null;
 
     transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
-    private int getSizeUp() { return sizeUp.get();}
-    private void setSizeUp(int su) { sizeUp.set(su);}
-    private IntegerProperty sizeDownProperty() { return sizeDown; }
+
+    private int getSizeUp() {
+        return sizeUp.get();
+    }
+
+    private void setSizeUp(int su) {
+        sizeUp.set(su);
+    }
+
+    private IntegerProperty sizeDownProperty() {
+        return sizeDown;
+    }
 
     transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
-    private int getSizeDown() { return sizeDown.get();}
-    private void setSizeDown(int sd) { sizeUp.set(sd);}
-    private IntegerProperty sizeUpProperty() { return sizeUp; }
+
+    private int getSizeDown() {
+        return sizeDown.get();
+    }
+
+    private void setSizeDown(int sd) {
+        sizeUp.set(sd);
+    }
+
+    private IntegerProperty sizeUpProperty() {
+        return sizeUp;
+    }
 
     transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
-    private int getMinFragSize() { return minFragSize.get(); }
-    private void setMinFragSize(int i) { this.minFragSize.set(i);}
-    private IntegerProperty minFragSizeProperty() { return minFragSize; }
+
+    private int getMinFragSize() {
+        return minFragSize.get();
+    }
+
+    private void setMinFragSize(int i) {
+        this.minFragSize.set(i);
+    }
+
+    private IntegerProperty minFragSizeProperty() {
+        return minFragSize;
+    }
 
     transient private DoubleProperty maxRepeatContent = new SimpleDoubleProperty();
-    private double getMaxRepeatContent() {return maxRepeatContent.get();}
-    private void setMaxRepeatContent(double r) { this.maxRepeatContent.set(r);}
-    private DoubleProperty maxRepeatContentProperty() { return maxRepeatContent;  }
+
+    private double getMaxRepeatContent() {
+        return maxRepeatContent.get();
+    }
+
+    private void setMaxRepeatContent(double r) {
+        this.maxRepeatContent.set(r);
+    }
+
+    private DoubleProperty maxRepeatContentProperty() {
+        return maxRepeatContent;
+    }
 
     transient private IntegerProperty maxMeanKmerAlignability = new SimpleIntegerProperty();
-    private int getMaxMeanKmerAlignability(){ return maxMeanKmerAlignability.get();}
-    private void setMaxMeanKmerAlignability(int mmka) { this.maxMeanKmerAlignability.set(mmka);}
-    private IntegerProperty maxMeanKmerAlignabilityProperty() { return maxMeanKmerAlignability; }
+
+    private int getMaxMeanKmerAlignability() {
+        return maxMeanKmerAlignability.get();
+    }
+
+    private void setMaxMeanKmerAlignability(int mmka) {
+        this.maxMeanKmerAlignability.set(mmka);
+    }
+
+    private IntegerProperty maxMeanKmerAlignabilityProperty() {
+        return maxMeanKmerAlignability;
+    }
 
     transient private IntegerProperty minBaitCount = new SimpleIntegerProperty();
-    private int getMinimumBaitCount(){ return minBaitCount.get();}
-    private void setMinimumBaitCount(int bc) { this.minBaitCount.set(bc);}
-    private IntegerProperty minimumBaitCountProperty() { return minBaitCount; }
+
+    private int getMinimumBaitCount() {
+        return minBaitCount.get();
+    }
+
+    private void setMinimumBaitCount(int bc) {
+        this.minBaitCount.set(bc);
+    }
+
+    private IntegerProperty minimumBaitCountProperty() {
+        return minBaitCount;
+    }
 
     transient private IntegerProperty baitLength = new SimpleIntegerProperty();
-    private int getBaitLength() { return baitLength.get();}
-    private void setBaitLength(int len) { this.baitLength.set(len);}
-    private IntegerProperty baitLengthProperty() { return baitLength; }
+
+    private int getBaitLength() {
+        return baitLength.get();
+    }
+
+    private void setBaitLength(int len) {
+        this.baitLength.set(len);
+    }
+
+    private IntegerProperty baitLengthProperty() {
+        return baitLength;
+    }
 
     transient private IntegerProperty marginLength = new SimpleIntegerProperty();
-    private int getMarginLength(){ return marginLength.get(); }
-    private void setMarginLength(int len) { this.marginLength.set(len);}
-    private IntegerProperty marginLengthProperty() { return  marginLength; }
+
+    private int getMarginLength() {
+        return marginLength.get();
+    }
+
+    private void setMarginLength(int len) {
+        this.marginLength.set(len);
+    }
+
+    private IntegerProperty marginLengthProperty() {
+        return marginLength;
+    }
 
     transient private IntegerProperty maxBaitCount = new SimpleIntegerProperty();
-    private int getMaximumBaitCount(){ return maxBaitCount.get();}
-    private void setMaximumBaitCount(int bc) { this.maxBaitCount.set(bc);}
-    private IntegerProperty maximumBaitCountProperty() { return maxBaitCount; }
+
+    private int getMaximumBaitCount() {
+        return maxBaitCount.get();
+    }
+
+    private void setMaximumBaitCount(int bc) {
+        this.maxBaitCount.set(bc);
+    }
+
+    private IntegerProperty maximumBaitCountProperty() {
+        return maxBaitCount;
+    }
 
     transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
-    private double getMinGCcontent() { return minGCcontent.get();}
-    private void setMinGCcontent(double mgc) { minGCcontent.set(mgc);}
-    private DoubleProperty minGCcontentProperty() { return minGCcontent; }
+
+    private double getMinGCcontent() {
+        return minGCcontent.get();
+    }
+
+    private void setMinGCcontent(double mgc) {
+        minGCcontent.set(mgc);
+    }
+
+    private DoubleProperty minGCcontentProperty() {
+        return minGCcontent;
+    }
 
     transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
-    private double getMaxGCcontent() { return maxGCcontent.get();}
-    /** Note we expect the user to enter a percentage, and we convert it here to proportion. */
-    private void setMaxGCcontent(double mgc) { maxGCcontent.set(mgc);}
-    private DoubleProperty maxGCcontentProperty() { return maxGCcontent; }
 
+    private double getMaxGCcontent() {
+        return maxGCcontent.get();
+    }
 
+    /**
+     * Note we expect the user to enter a percentage, and we convert it here to proportion.
+     */
+    private void setMaxGCcontent(double mgc) {
+        maxGCcontent.set(mgc);
+    }
+
+    private DoubleProperty maxGCcontentProperty() {
+        return maxGCcontent;
+    }
 
 
     @FXML
@@ -201,36 +380,43 @@ public class GopherMainPresenter implements Initializable {
         javafx.application.Platform.exit();
     }
 
-    /** Serialize the project data to the default location. */
+    /**
+     * Serialize the project data to the default location.
+     */
     private boolean serialize() {
-        String projectname=this.model.getProjectName();
-        if (projectname==null) {
-            PopupFactory.displayError("Error","Could not get viewpoint name (should never happen). Will save with default");
-            projectname="default";
+        String projectname = this.model.getProjectName();
+        if (projectname == null) {
+            PopupFactory.displayError("Error", "Could not get viewpoint name (should never happen). Will save with default");
+            projectname = "default";
         }
-        String serializedFilePath=Platform.getAbsoluteProjectPath(projectname);
+        String serializedFilePath = Platform.getAbsoluteProjectPath(projectname);
         return serializeToLocation(serializedFilePath);
     }
 
-    /** Serialialize the project file to the location given as path.
+    /**
+     * Serialialize the project file to the location given as path.
+     *
      * @param path absolute path to which the serilaized file should be saved.
      * @return true iff serialization is successful
      */
     private boolean serializeToLocation(String path) {
-        if (path==null) {
-            PopupFactory.displayError("Error","Could not get file name for saving project file.");
+        if (path == null) {
+            PopupFactory.displayError("Error", "Could not get file name for saving project file.");
             return false;
         }
         try {
             SerializationManager.serializeModel(this.model, path);
         } catch (IOException e) {
-            PopupFactory.displayException("Error","Unable to serialize Gopher viewpoint",e);
+            PopupFactory.displayException("Error", "Unable to serialize Gopher viewpoint", e);
             return false;
         }
-        logger.trace("Serialization successful to file "+path);
+        logger.trace("Serialization successful to file " + path);
         return true;
     }
 
+    private void setLoggingLevel(org.apache.log4j.Level level){
+        LogManager.getRootLogger().setLevel(level);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -241,6 +427,19 @@ public class GopherMainPresenter implements Initializable {
         // The following will initialize the GUI to the simple approach
         approachChoiceBox.setItems(approachList);
         approachChoiceBox.getSelectionModel().selectFirst();
+
+        ToggleGroup tGroup = new ToggleGroup();
+
+        tGroup.getToggles().addAll(loggingLevelOFF,loggingLevelTrace,loggingLevelInfo,loggingLevelDebug,loggingLevelWarn,loggingLevelError);
+        loggingLevelOFF.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.OFF));
+        loggingLevelTrace.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.TRACE));
+        loggingLevelInfo.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.INFO));
+        loggingLevelDebug.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.DEBUG));
+        loggingLevelWarn.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.WARN));
+        loggingLevelError.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.ERROR));
+        loggingLevelError.setSelected(true);
+
+
         setGUItoSimple();
 
         initializePromptTexts();
@@ -263,6 +462,7 @@ public class GopherMainPresenter implements Initializable {
                 }
             }
         });
+
 
     }
 

@@ -26,6 +26,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.RadioMenuItem?>
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
     <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0" minWidth="830.0" stylesheets="@gophermain.css">
         <top>
@@ -62,6 +63,14 @@
                             <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleMouseGenes" text="mouse" />
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
+                        <Menu mnemonicParsing="false" text="Set logging level">
+                            <RadioMenuItem fx:id="loggingLevelOFF" mnemonicParsing="false" text="OFF"/>
+                            <RadioMenuItem fx:id="loggingLevelTrace" mnemonicParsing="false" text="TRACE"/>
+                            <RadioMenuItem fx:id="loggingLevelInfo" mnemonicParsing="false" text="INFO"/>
+                            <RadioMenuItem fx:id="loggingLevelDebug" mnemonicParsing="false" text="DEBUG"/>
+                            <RadioMenuItem fx:id="loggingLevelWarn" mnemonicParsing="false" text="WARN"/>
+                            <RadioMenuItem fx:id="loggingLevelError" mnemonicParsing="false" text="ERROR"/>
+                        </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
                     </Menu>
                 </MenuBar>
