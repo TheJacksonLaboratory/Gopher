@@ -98,11 +98,13 @@ public class ViewPointPresenter implements Initializable {
 
     /** Instance of {@link ViewPoint} presented by this presenter. */
     private ViewPoint viewpoint;
-    /** If {@link #coloridx} is set to this, then we know we need to set it to a random number. Otherwise
+    /** If {@link #startIndexForColor} is set to this, then we know we need to set it to a random number. Otherwise
      * leave if unchanged so that the color remains the same.  */
     private static final int UNINITIALIZED=-1;
     /** The (random) starting index in our list of colors. */
-    private int coloridx = UNINITIALIZED;
+    private int startIndexForColor = UNINITIALIZED;
+    /** The current index for color -- this will be updated by the iteration. */
+    private int idx;
     /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
      * well as in the table.
      */
@@ -194,27 +196,7 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
-//    /** Class for sorting items like 2.3% and 34.5% */
-//    class PercentComparator implements Comparator<String> {
-//        @Override
-//        public int compare(String s1, String s2) {
-//            int i=s1.indexOf("%");
-//            if (i>0)
-//                s1=s1.substring(0,i);
-//            i=s2.indexOf("%");
-//            if (i>0)
-//                s2=s2.substring(0,i);
-//            try {
-//                Double d1 = Double.parseDouble(s1);
-//                Double d2=Double.parseDouble(s2);
-//                return d1.compareTo(d2);
-//            } catch (Exception e) {
-//                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
-//                logger.error(e,e);
-//                return 0;
-//            }
-//        }
-//    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -412,8 +394,8 @@ public class ViewPointPresenter implements Initializable {
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
 
         /* the following will start us off with a different color for each ViewPoint. */
-        if (coloridx == UNINITIALIZED) {
-            this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        if (startIndexForColor == UNINITIALIZED) {
+            this.startIndexForColor = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
         }
     }
 
@@ -470,6 +452,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void showColoredSegmentsInTable() {
         segmentsTableView.getItems().clear();
+        this.idx=this.startIndexForColor; // "reset" the start position for the loop around the colors.
         this.coloredsegments = this.viewpoint.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
                 .collect(Collectors.toList());
@@ -509,14 +492,16 @@ public class ViewPointPresenter implements Initializable {
      * @return a rotating list of colors for the digest highlights.
      */
     private String getNextColor() {
-        String color = colors[this.coloridx];
-        this.coloridx = (this.coloridx + 1) % (colors.length);
+        String color = colors[this.idx];
+        this.idx = (this.idx + 1) % (colors.length);
         return String.format("%%23%s", color);
     }
 
 
-
-
+    /**
+     * Zoom in or out with the UCSC display.
+     * @param factor If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
+     */
     private void zoom(double factor) {
         logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
