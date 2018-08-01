@@ -43,13 +43,13 @@ public class ViewPoint implements Serializable {
      * if one of the margins has a higher repeat content.*/
     private double maximumRepeatContent;
     /** "Home" of the viewpoint, usually a chromosome */
-    private String chromosomeID;
+    private final String chromosomeID;
     /** Accession number of this gene, e.g., NM_0001234 .*/
-    private String accession;
+    private final String accession;
     /** Name of the target of the viewpoint (often a gene).*/
-    private String targetName;
+    private final String targetName;
     /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
-    private int genomicPos;
+    private final int genomicPos;
     /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).
      * Note that this is defined with respect to the strand -- it is "reversed" for genes on the - strand. */
     private int upstreamNucleotideLength;
@@ -65,13 +65,13 @@ public class ViewPoint implements Serializable {
 //    private int maximumAllowableEndPosition;
     /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
-    private int minFragSize;
+    private final int minFragSize;
     /** Maximum allowable GC content */
-    private double maxGcContent;
+    private final double maxGcContent;
     /** Minimum allowable GC content */
-    private double minGcContent;
+    private final double minGcContent;
     /** Is the gene on the forward (positive) strand). */
-    private boolean isPositiveStrand;
+    private final boolean isPositiveStrand;
     /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointExtendedApproach}. */
     private boolean resolved;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
@@ -393,7 +393,7 @@ public class ViewPoint implements Serializable {
             }
 
             // if allow single margin is false, do not select segments that are rescuable
-            if(!model.getAllowSingleMargin() && segment.isUnbalanced()) {
+            if(!model.getAllowUnbalancedMargins() && segment.isUnbalanced()) {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
@@ -421,7 +421,7 @@ public class ViewPoint implements Serializable {
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
     public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, Model model ) {
-        boolean allowSingleMargin=model.getAllowSingleMargin();
+        boolean allowSingleMargin=model.getAllowUnbalancedMargins();
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
             maxSizeUp=maxSizeDown;
@@ -494,7 +494,7 @@ public class ViewPoint implements Serializable {
 
     public void generateViewpointSimple(Model model) {
 
-        boolean allowSingleMargin = model.getAllowSingleMargin();
+        boolean allowSingleMargin = model.getAllowUnbalancedMargins();
         boolean allowPatchedViewpoints = model.getAllowPatching();
         boolean resolved = true;
         approach = Approach.SIMPLE;
@@ -604,7 +604,7 @@ public class ViewPoint implements Serializable {
         if(seg.isBalanced()) {
             return true;
         }
-        return (model.getAllowSingleMargin() && seg.isUnbalanced());
+        return (model.getAllowUnbalancedMargins() && seg.isUnbalanced());
     }
 
 

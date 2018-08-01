@@ -532,7 +532,7 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
-        this.unbalancedMarginCheckbox.setSelected(model.getAllowSingleMargin());
+        this.unbalancedMarginCheckbox.setSelected(model.getAllowUnbalancedMargins());
         this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
 
     }
@@ -1413,7 +1413,7 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML
     public void about(ActionEvent e) {
-        PopupFactory.showAbout(model.getVersion(), model.getLastChangeDate());
+        PopupFactory.showAbout(Model.getVersion(), model.getLastChangeDate());
         e.consume();
     }
 

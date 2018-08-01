@@ -192,7 +192,7 @@ public class Model implements Serializable {
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
 
     private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
-    public boolean getAllowSingleMargin() { return allowSingleMargin; }
+    public boolean getAllowUnbalancedMargins() { return allowSingleMargin; }
     public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
 
     private boolean allowPatching=Default.ALLOW_PATCHING; // false

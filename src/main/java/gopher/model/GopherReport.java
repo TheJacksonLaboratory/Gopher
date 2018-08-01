@@ -112,7 +112,7 @@ public class GopherReport {
         if (model.getApproach().equals(Model.Approach.SIMPLE)) {
             builder.add(String.format("allow patched?: %s\n", model.getAllowPatching() ? "yes" : "no"));
         }
-        builder.add(String.format("allow unbalanced margins?: %s\n", model.getAllowSingleMargin() ? "yes" : "no"));
+        builder.add(String.format("allow unbalanced margins?: %s\n", model.getAllowUnbalancedMargins() ? "yes" : "no"));
         builder.add(String.format("Minimum probe count: %d\n", model.getMinBaitCount() ));
         return builder.build();
     }
