@@ -108,7 +108,7 @@ public class GopherReport {
         builder.add(String.format("minimum digest size: %d\n",model.getMinFragSize()));
         builder.add(String.format("maximum GC content: %s%%\n",model.getMaxGCContentPercent()));
         builder.add(String.format("minimum GC content: %s%%\n",model.getMinGCContentPercent()));
-        builder.add(String.format("Max. k-mer alignability: %d", model.getMaxMeanKmerAlignability()));
+        builder.add(String.format("Max. k-mer alignability: %d\n", model.getMaxMeanKmerAlignability()));
         if (model.getApproach().equals(Model.Approach.SIMPLE)) {
             builder.add(String.format("allow patched?: %s\n", model.getAllowPatching() ? "yes" : "no"));
         }
@@ -119,7 +119,6 @@ public class GopherReport {
 
 
     private List<String> getRegulatoryExomeReport() {
-        StringBuilder sb = new StringBuilder();
         Properties regprop = this.model.getRegulatoryExomeProperties();
         if (regprop==null) {
             return ImmutableList.of();
