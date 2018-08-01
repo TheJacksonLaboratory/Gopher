@@ -190,6 +190,18 @@ public class VPAnalysisPresenter implements Initializable {
         openViewPointInTab(vp);
     }
 
+
+    public void removeViewPointTab(ViewPoint vp) {
+        if (this.openTabs.containsKey(vp)) {
+            Tab tab=this.openTabs.get(vp);
+            tab.setDisable(true);
+            tab.getTabPane().getTabs().remove(tab);
+            this.openTabs.remove(vp);
+        } else {
+            logger.error("Could not find opened viewpoint in openTabs list: "+vp.getTargetName());
+        }
+    }
+
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
      *
@@ -198,9 +210,13 @@ public class VPAnalysisPresenter implements Initializable {
     private void openViewPointInTab(ViewPoint vp) {
         if (openTabs.containsKey(vp)) {
             Tab tab = openTabs.get(vp);
+            logger.trace("openTabs containsKey " + vp.getTargetName());
+
             if (tab == null || tab.isDisabled()) {
+                logger.trace("openTabs REMOVING " + vp.getTargetName());
                 openTabs.remove(vp);
             } else {
+                logger.trace("openTabs SELECTING " + vp.getTargetName());
                 this.tabpane.getSelectionModel().select(tab);
                 return;
             }
@@ -214,6 +230,15 @@ public class VPAnalysisPresenter implements Initializable {
             if (tabpane.getTabs()
                     .size() == 2) {
                 event.consume();
+            }
+        });
+
+        tab.setOnCloseRequest((e)-> {
+            for (ViewPoint vpnt : this.openTabs.keySet()) {
+                Tab t = this.openTabs.get(vpnt);
+                if (t.equals(tab)) {
+                    this.openTabs.remove(vpnt);
+                }
             }
         });
 

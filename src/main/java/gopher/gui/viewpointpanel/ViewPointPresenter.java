@@ -114,8 +114,7 @@ public class ViewPointPresenter implements Initializable {
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
         Platform.runLater(() -> {
-            tab.setDisable(true);
-            this.tab.getTabPane().getTabs().remove(this.tab);
+            this.analysisPresenter.removeViewPointTab(this.viewpoint);
             this.analysisPresenter.refreshVPTable();
         });
     }
