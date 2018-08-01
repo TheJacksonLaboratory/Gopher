@@ -191,9 +191,9 @@ public class Model implements Serializable {
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
 
-    private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
-    public boolean getAllowUnbalancedMargins() { return allowSingleMargin; }
-    public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
+    private boolean allowUnbalancedMargins =Default.ALLOW_UNBALANCED_MARGINs; // true
+    public boolean getAllowUnbalancedMargins() { return allowUnbalancedMargins; }
+    public void setAllowUnbalancedMargins(boolean b) { allowUnbalancedMargins =b; }
 
     private boolean allowPatching=Default.ALLOW_PATCHING; // false
     public boolean getAllowPatching() { return this.allowPatching; }
@@ -327,7 +327,7 @@ public class Model implements Serializable {
         } catch (IOException e) {
             logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
         }
-        this.allowSingleMargin=false;
+        this.allowUnbalancedMargins =false;
         this.allowPatching=false;
         this.targetType=TargetType.NONE;
     }

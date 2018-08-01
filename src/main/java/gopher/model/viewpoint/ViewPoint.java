@@ -41,7 +41,7 @@ public class ViewPoint implements Serializable {
     private final int marginSize;
     /** Maximum allowable repeat content for a digest to be included. A digest will be deselected
      * if one of the margins has a higher repeat content.*/
-    private double maximumRepeatContent;
+    private final double maximumRepeatContent;
     /** "Home" of the viewpoint, usually a chromosome */
     private final String chromosomeID;
     /** Accession number of this gene, e.g., NM_0001234 .*/
@@ -87,7 +87,7 @@ public class ViewPoint implements Serializable {
     /** This is a reference to the segment that overlaps the TSS */
     private Segment centerSegment=null;
 
-    private Model model;
+    private final Model model;
 
     //private transient AlignabilityMap chromosome2AlignabilityMap;
 
@@ -281,9 +281,15 @@ public class ViewPoint implements Serializable {
 
     /** @return overall score of this ViewPoint */
     public final double getScore() {
+        if (hasNoActiveSegment()) return 0.0;
         return this.score;
     }
-    public String getScoreAsPercentString() { return String.format("%.2f%%",100*score);}
+
+    /**@return the viewpoint score formated as a percent string. */
+    public String getScoreAsPercentString() {
+        if (hasNoActiveSegment()) return "0.0%";
+        return String.format("%.2f%%",100*score);
+    }
 
 
     private void setStartPos(int startPos) {
@@ -834,9 +840,9 @@ public class ViewPoint implements Serializable {
      */
     public static class Builder {
         //  parameters required in the constructor
-        private String chromosomeID;
+        private final String chromosomeID;
         private String accessionNr=null;
-        private int genomicPos;
+        private final int genomicPos;
         // other params
         private IndexedFastaSequenceFile fastaReader;
         private String targetName="";

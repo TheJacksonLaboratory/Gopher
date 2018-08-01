@@ -211,7 +211,7 @@ public class GopherMainPresenter implements Initializable {
      */
     private Stage primaryStage = null;
 
-    transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
+    final transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
 
     private int getSizeUp() {
         return sizeUp.get();
@@ -225,7 +225,7 @@ public class GopherMainPresenter implements Initializable {
         return sizeDown;
     }
 
-    transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
+    final transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
 
     private int getSizeDown() {
         return sizeDown.get();
@@ -239,7 +239,7 @@ public class GopherMainPresenter implements Initializable {
         return sizeUp;
     }
 
-    transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
+    final transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
 
     private int getMinFragSize() {
         return minFragSize.get();
@@ -253,7 +253,7 @@ public class GopherMainPresenter implements Initializable {
         return minFragSize;
     }
 
-    transient private DoubleProperty maxRepeatContent = new SimpleDoubleProperty();
+    final transient private DoubleProperty maxRepeatContent = new SimpleDoubleProperty();
 
     private double getMaxRepeatContent() {
         return maxRepeatContent.get();
@@ -1574,9 +1574,9 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML private void setUnbalancedMargin(ActionEvent e) {
         if (unbalancedMarginCheckbox.isSelected()) {
-            this.model.setAllowSingleMargin(true);
+            this.model.setAllowUnbalancedMargins(true);
         } else {
-            this.model.setAllowSingleMargin(false);
+            this.model.setAllowUnbalancedMargins(false);
         }
         e.consume();
     }

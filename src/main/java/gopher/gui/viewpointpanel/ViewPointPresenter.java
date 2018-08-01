@@ -42,6 +42,10 @@ public class ViewPointPresenter implements Initializable {
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
 
+
+    private static final String FAILED_HTML_CONTENT  = "<html><body><h3>GOPHER</h3><p><i>Could not connect to UCSC " +
+            "Browser. Please check your internet connection and proxy</i></p></body></html>";
+
     private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
             "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
@@ -165,6 +169,10 @@ public class ViewPointPresenter implements Initializable {
                         // hide progress bar then page is ready
                         progress.setVisible(false);
                         stage.close();
+                    } else if (newState.equals(Worker.State.FAILED)) {
+                        progress.setVisible(false);
+                        stage.close();
+                        ucscWebEngine.loadContent(FAILED_HTML_CONTENT);
                     }
                 });
     }
@@ -410,7 +418,6 @@ public class ViewPointPresenter implements Initializable {
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
-        //setManuallyRevised();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
