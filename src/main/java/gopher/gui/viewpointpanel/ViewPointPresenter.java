@@ -131,6 +131,10 @@ public class ViewPointPresenter implements Initializable {
         e.consume();
     }
 
+
+
+
+
     @FXML private void deleteThisViewPoint(Event e) {
         this.model.deleteViewpoint(this.viewpoint);
         tab.setDisable(true);

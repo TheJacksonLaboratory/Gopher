@@ -119,6 +119,12 @@ public class VPAnalysisPresenter implements Initializable {
                 logger.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
                 model.deleteViewpoint(vp);
+                if (this.openTabs.containsKey(vp)) { // If the tab is open, remove it from the GUI.
+                    Tab tab = openTabs.get(vp);
+                    tab.setDisable(true);
+                    tab.getTabPane().getTabs().remove(tab);
+                    openTabs.remove(vp);
+                }
                 refreshVPTable();
             });
             return new ReadOnlyObjectWrapper<>(btn);
