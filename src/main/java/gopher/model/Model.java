@@ -26,8 +26,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 6L;
-    private static final String VERSION="0.3.11";
-    private static final String LAST_CHANGE_DATE="2018-06-28";
+    private static final String VERSION="0.4.7";
+    private static final String LAST_CHANGE_DATE="2018-07-31";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -490,10 +490,6 @@ public class Model implements Serializable {
         return LAST_CHANGE_DATE;
     }
 
-    public String getVersion() {
-        return VERSION;
-    }
-
     /** Remove a ViewPoint from the list {@link #viewpointList}. */
     public void deleteViewpoint(ViewPoint vp) {
         Iterator<ViewPoint> it = viewpointList.listIterator();
@@ -516,7 +512,16 @@ public class Model implements Serializable {
        return this.viewpointList.stream().filter(ViewPoint::hasValidProbe).collect(Collectors.toList());
     }
 
-
-
+    /** @return the version number. */
+    public static String getVersion() {
+        String version;
+        try {
+            Package p = Model.class.getPackage();
+            version = p.getImplementationVersion();
+        } catch (Exception e) {
+            version=VERSION;
+        }
+        return version;
+    }
 
 }

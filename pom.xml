@@ -248,6 +248,8 @@
                     <archive>
                         <manifest>
                             <mainClass>gopher.Gopher</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>
