@@ -56,6 +56,14 @@ public class Model implements Serializable {
         }
     }
 
+
+    public enum TargetType {
+        NONE,TARGET_GENES,ALL_GENES,BED_TARGETS
+    }
+
+    private TargetType targetType;
+
+
     private Approach approach=Approach.UNINITIALIZED;
 
 
@@ -103,16 +111,21 @@ public class Model implements Serializable {
     public String getGenomeBuild() { return genome.getGenomeBuild(); }
     /** @param newDatabase The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
     public void setGenomeBuild(String newDatabase) {
-        if (newDatabase.equals("hg19")) {
-            this.genome = new HumanHg19();
-        } else if (newDatabase.equals("hg38")) {
-            this.genome = new HumanHg38();
-        } else if (newDatabase.equals("mm9")) {
-            this.genome = new MouseMm9();
-        } else if (newDatabase.equals("mm10")) {
-            this.genome = new MouseMm10();
-        } else {
-            PopupFactory.displayError("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
+        switch (newDatabase) {
+            case "hg19":
+                this.genome = new HumanHg19();
+                break;
+            case "hg38":
+                this.genome = new HumanHg38();
+                break;
+            case "mm9":
+                this.genome = new MouseMm9();
+                break;
+            case "mm10":
+                this.genome = new MouseMm10();
+                break;
+            default:
+                PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
         }
     }
 
@@ -316,7 +329,11 @@ public class Model implements Serializable {
         }
         this.allowSingleMargin=false;
         this.allowPatching=false;
+        this.targetType=TargetType.NONE;
     }
+
+    public void setTargetType(TargetType ttype) { this.targetType=ttype; }
+    public TargetType getTargetType(){ return this.targetType==null?TargetType.NONE : targetType; }
 
 
     /** @return List of enzymes for the user to choose from. */

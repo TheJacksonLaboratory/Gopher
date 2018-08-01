@@ -9,7 +9,6 @@ import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.help.HelpViewFactory;
-import gopher.gui.logviewer.Level;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
@@ -67,13 +66,11 @@ import java.util.stream.Collectors;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.2.9 (2018-07-17)
+ * @version 0.4.7 (2018-07-31)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
-    /**
-     * The Model for the entire analysis.
-     */
+    /** The Model for the entire analysis.*/
     private Model model = null;
     /**
      * This is the root node of the GUI and refers to the BorderPane. It can be used to
@@ -82,14 +79,10 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML
     private Node rootNode;
-    /**
-     * List of genome builds. Used by genomeChoiceBox
-     */
+    /** List of genome builds. Used by genomeChoiceBox */
     @FXML
     private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9", "mm10");
-    /**
-     * List of genome builds. Used by genomeChoiceBox
-     */
+    /** List of Design approaches.  */
     @FXML
     private final ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
     @FXML
@@ -99,8 +92,8 @@ public class GopherMainPresenter implements Initializable {
     /**
      * Clicking this button downloads the genome build and unpacks it.
      */
-    @FXML
-    private Button downloadGenome;
+//    @FXML
+//    private Button downloadGenome;
     @FXML
     private Button decompressGenomeButton;
     @FXML
@@ -179,6 +172,10 @@ public class GopherMainPresenter implements Initializable {
     RadioMenuItem loggingLevelWarn;
     @FXML
     RadioMenuItem loggingLevelError;
+
+    @FXML private Label targetGeneLabel;
+    @FXML private Label allGenesLabel;
+    @FXML private Label bedTargetsLabel;
 
     /**
      * Show which enzymes the user has chosen.
@@ -609,7 +606,10 @@ public class GopherMainPresenter implements Initializable {
         } else {
             this.marginSizeTextField.setText(String.valueOf(model.getMarginSize()));
         }
-
+        if (! model.getTargetType().equals(Model.TargetType.NONE))  {
+            int n_targets = model.getN_validGeneSymbols();
+            setTargetFeedback(model.getTargetType(),n_targets);
+        }
 
         if (model.useSimpleApproach()) {
             this.approachChoiceBox.setValue("Simple");
@@ -948,6 +948,8 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
+        model.setTargetType(Model.TargetType.TARGET_GENES);
+        setTargetFeedback(Model.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
         e.consume();
     }
 
@@ -981,6 +983,8 @@ public class GopherMainPresenter implements Initializable {
             model.setTotalRefGeneCount(n_genes);
             this.model.setGopherGenes(parser.getGopherGeneList());
             this.model.setUniqueChosenTSScount(genelist.size());
+            this.model.setTargetType(Model.TargetType.BED_TARGETS);
+            setTargetFeedback(Model.TargetType.BED_TARGETS,validGeneSymbols.size());
         } catch (GopherException ge) {
             PopupFactory.displayException("Error","Could not input BED file",ge);
         }
@@ -1020,6 +1024,27 @@ public class GopherMainPresenter implements Initializable {
         model.setTotalRefGeneCount(n_genes);
         this.model.setGopherGenes(parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
+        model.setTargetType(Model.TargetType.ALL_GENES);
+        setTargetFeedback(Model.TargetType.ALL_GENES,validGeneSymbols.size());
+    }
+
+
+    private void setTargetFeedback(Model.TargetType ttype, int count) {
+        this.targetGeneLabel.setText("");
+        this.bedTargetsLabel.setText("");
+        this.allGenesLabel.setText("");
+        switch (ttype) {
+            case NONE:
+                return;
+            case TARGET_GENES:
+                this.targetGeneLabel.setText(String.format("%d genes",count));
+                return;
+            case ALL_GENES:
+                this.allGenesLabel.setText(String.format("%d genes",count));
+                return;
+            case BED_TARGETS:
+                this.bedTargetsLabel.setText(String.format("%d targets",count));
+        }
     }
 
 

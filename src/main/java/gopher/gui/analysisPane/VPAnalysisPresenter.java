@@ -69,9 +69,6 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, Button> resetTableColumn;
 
-
-    // private BooleanProperty editingStarted;
-
     @FXML
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
@@ -92,7 +89,7 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     private void init() {
-        listviewHbox.setHgrow(lviewValue, Priority.ALWAYS);
+        HBox.setHgrow(lviewValue, Priority.ALWAYS);
         initTable();
     }
 
