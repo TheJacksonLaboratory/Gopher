@@ -1552,7 +1552,7 @@ public class GopherMainPresenter implements Initializable {
 
     @FXML public void displayReport(ActionEvent e) {
         GopherReport report = new GopherReport(this.model);
-        PopupFactory.showSummaryDialog(report.getReport());
+        PopupFactory.showReportListDialog(report.getReportList());
         e.consume();
     }
 
