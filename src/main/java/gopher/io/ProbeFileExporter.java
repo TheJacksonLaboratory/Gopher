@@ -59,6 +59,11 @@ public class ProbeFileExporter {
         PrintStream out_probe_file_agilent = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
         out_probe_file_agilent.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
 
+        // TODO: The following code is not nice but it works. It would be better to derive first the list of unique
+        // TODO: segments and then export probes from this list.
+        // TODO: BUT NOTE, THE PROBES IN THE EXPORTED PROBE FILE FOR AGILENT NEED TO BE SORTED BY
+        // TODO: REFERENCE ID AND STARTING COORDINATE!
+
         // use a hashMap of Integer sets to get rid of duplicated probes
         Set<String> uniqueProbes = new HashSet<>();
         HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<String, ArrayList<Integer>>();

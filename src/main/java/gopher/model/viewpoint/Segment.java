@@ -472,7 +472,6 @@ public class Segment implements Serializable {
     /** NEW VERSION */
     public void setUsableBaits(Model model, AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
         Integer bmin =model.getMinBaitCount();
-        Integer bmax = model.getMaxBaitCount();
         Integer baitSize = model.getProbeLength();
         Double minGCcontent = model.getMinGCcontent();
         Double maxGCcontent = model.getMaxGCcontent();
@@ -556,7 +555,7 @@ public class Segment implements Serializable {
         Integer sta = this.getStartPos();
         Integer end = this.getStartPos() + marginSize - 1;
 
-        //ArrayList<Bait> baitListUpStreamMargin = new ArrayList<>();
+        ArrayList<Bait> baitListUpStreamMargin = new ArrayList<>();
         for(int i = sta; i <= end - baitSize + 1; i++ ) { // from left to right because this is the upstream margin
 
             // init bait
@@ -573,6 +572,7 @@ public class Segment implements Serializable {
             // abort if end of bait reaches end of segment
             if(i + baitSize - 1 == this.getEndPos()) { break; }
         }
+        this.baitListUpStreamMargin=baitListUpStreamMargin;
         return this.baitListUpStreamMargin;
     }
 
@@ -593,7 +593,7 @@ public class Segment implements Serializable {
         Integer sta = this.getEndPos() - marginSize + 1;
         Integer end = this.getEndPos();
 
-        //ArrayList<Bait> baitListDownStreamMargin = new ArrayList<>();
+        ArrayList<Bait> baitListDownStreamMargin = new ArrayList<>();
         for (int i = end - baitSize + 1; sta < i; i--) { // from right to left because this is the upstream margin
 
             // init bait
@@ -611,7 +611,7 @@ public class Segment implements Serializable {
             if(i == this.getStartPos()) { break; }
 
         }
-        //this.baitListDownStreamMargin=baitListDownStreamMargin;
+        this.baitListDownStreamMargin=baitListDownStreamMargin;
         return this.baitListDownStreamMargin;
     }
 
