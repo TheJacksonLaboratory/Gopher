@@ -516,7 +516,7 @@ public class ViewPointPresenter implements Initializable {
         logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        updateScore();
+        //updateScore();
         showColoredSegmentsInTable();
         showUcscView();
     }
