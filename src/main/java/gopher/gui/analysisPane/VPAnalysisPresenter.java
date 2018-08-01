@@ -39,21 +39,35 @@ public class VPAnalysisPresenter implements Initializable {
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
-    @FXML private HBox listviewHbox;
-    @FXML private ListView<String> lviewKey;
-    @FXML private ListView<String> lviewValue;
+    @FXML
+    private HBox listviewHbox;
+    @FXML
+    private ListView<String> lviewKey;
+    @FXML
+    private ListView<String> lviewValue;
 
-    @FXML private TableView<ViewPoint> viewPointTableView;
-    @FXML private TableColumn<ViewPoint, Button> actionTableColumn;
-    @FXML private TableColumn<ViewPoint, String> targetTableColumn;
-    @FXML private TableColumn<ViewPoint, String> genomicLocationColumn;
-    @FXML private TableColumn<ViewPoint, String> nSelectedTableColumn;
-    @FXML private TableColumn<ViewPoint, String> viewpointScoreColumn;
-    @FXML private TableColumn<ViewPoint, String> viewpointTotalLengthOfActiveSegments;
-    @FXML private TableColumn<ViewPoint, String> viewpointTotalLength;
-    @FXML private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
-    @FXML private TableColumn<ViewPoint, Button> deleteTableColumn;
-    @FXML private TableColumn<ViewPoint, Button> resetTableColumn;
+    @FXML
+    private TableView<ViewPoint> viewPointTableView;
+    @FXML
+    private TableColumn<ViewPoint, Button> actionTableColumn;
+    @FXML
+    private TableColumn<ViewPoint, String> targetTableColumn;
+    @FXML
+    private TableColumn<ViewPoint, String> genomicLocationColumn;
+    @FXML
+    private TableColumn<ViewPoint, String> nSelectedTableColumn;
+    @FXML
+    private TableColumn<ViewPoint, String> viewpointScoreColumn;
+    @FXML
+    private TableColumn<ViewPoint, String> viewpointTotalLengthOfActiveSegments;
+    @FXML
+    private TableColumn<ViewPoint, String> viewpointTotalLength;
+    @FXML
+    private TableColumn<ViewPoint, String> fragmentOverlappingTSSColumn;
+    @FXML
+    private TableColumn<ViewPoint, Button> deleteTableColumn;
+    @FXML
+    private TableColumn<ViewPoint, Button> resetTableColumn;
 
 
     // private BooleanProperty editingStarted;
@@ -114,7 +128,7 @@ public class VPAnalysisPresenter implements Initializable {
         });
 
         resetTableColumn.setSortable(false);
-        resetTableColumn.setCellValueFactory( cdf -> {
+        resetTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
             Button btn = new Button("Reset");
             btn.setOnAction(e -> {
@@ -164,7 +178,6 @@ public class VPAnalysisPresenter implements Initializable {
     }
 
 
-
     private void updateViewPointInTab(ViewPoint vp) {
         if (openTabs.containsKey(vp)) {
             Tab tab = openTabs.get(vp);
@@ -185,12 +198,11 @@ public class VPAnalysisPresenter implements Initializable {
             if (tab == null || tab.isDisabled()) {
                 openTabs.remove(vp);
             } else {
-                this.tabpane.getTabs().add(tab);
                 this.tabpane.getSelectionModel().select(tab);
                 return;
             }
         }
-
+        logger.trace("openTabs containsKey NO " + vp.getTargetName());
 
         final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
         tab.setId(vp.getTargetName());
@@ -213,7 +225,7 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
         openTabs.put(vp, tab);
-        List<Segment> seglist=vp.getAllSegments();
+        List<Segment> seglist = vp.getAllSegments();
         for (Segment s : seglist) {
             System.err.println(s);
         }
@@ -246,8 +258,8 @@ public class VPAnalysisPresenter implements Initializable {
 
 
     private void updateListView() {
-        Map<String,String> summaryMap = createListViewContent();
-       ObservableList<String> keys = FXCollections.observableArrayList(summaryMap.keySet());
+        Map<String, String> summaryMap = createListViewContent();
+        ObservableList<String> keys = FXCollections.observableArrayList(summaryMap.keySet());
         ObservableList<String> values = FXCollections.observableArrayList(summaryMap.values());
         lviewKey.setItems(keys);
         lviewValue.setItems(values);
@@ -256,60 +268,61 @@ public class VPAnalysisPresenter implements Initializable {
 
     /**
      * Creates a map with the information that we will display in the two ListView objects of this Tab.
+     *
      * @return Map with info about the panel design
      */
-    private Map<String,String>  createListViewContent() {
+    private Map<String, String> createListViewContent() {
         Design design = new Design(this.model);
         design.calculateDesignParameters();
-        Map<String,String> listItems=new LinkedHashMap<>();
+        Map<String, String> listItems = new LinkedHashMap<>();
 
         int ngenes = design.getN_genes();
         int resolvedGenes = design.getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 valid viewpoint",ngenes,resolvedGenes);
-        listItems.put("Genes",geneV);
+        String geneV = String.format("n=%d of which %d have \u2265 1 valid viewpoint", ngenes, resolvedGenes);
+        listItems.put("Genes", geneV);
 
         int nviewpoints = design.getN_viewpoints();
         int resolvedVP = design.getN_resolvedViewpoints();
         double avVpSize = design.getAvgVPsize();
         double avgVpScore = design.getAvgVPscore();
         String vpointV = String.format("n=%d of which %d have \u2265 1 valid digest;",
-                nviewpoints,resolvedVP);
+                nviewpoints, resolvedVP);
         if (model.getApproach().equals(Model.Approach.SIMPLE)) {
-            int n_patched=design.getN_patched_viewpoints();
-            vpointV=String.format("%s %d viewpoints were patched",vpointV,n_patched);
+            int n_patched = design.getN_patched_viewpoints();
+            vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
         }
-        listItems.put("Viewpoints",vpointV);
+        listItems.put("Viewpoints", vpointV);
         String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f",
-                avVpSize,avgVpScore);
-        listItems.put(" ",vpointV2);
+                avVpSize, avgVpScore);
+        listItems.put(" ", vpointV2);
 
         int nfrags = design.getN_unique_fragments();
         double avg_n_frag = design.getAvgFragmentsPerVP();
         String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
-                nfrags,avg_n_frag);
-        listItems.put("Digests",fragmentV);
+                nfrags, avg_n_frag);
+        listItems.put("Digests", fragmentV);
 
         int n_balancedDigests = design.getTotalNumBalancedDigests();
         int n_unbalanced = design.getTotalNumUnbalancedDigests();
 
 
-        listItems.put("",String.format( "Balanced: %d; Unbalanced: %d",n_balancedDigests,n_unbalanced));
+        listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
         int n_baits = design.getTotalNumOfUniqueBaits();
         String baitV = String.format("n=%d", n_baits);
-        listItems.put("Probes",baitV);
+        listItems.put("Probes", baitV);
         return listItems;
     }
 
 
-
-
-    /** This method is called to refresh the values of the ViewPoint in the table of the analysis tab. */
+    /**
+     * This method is called to refresh the values of the ViewPoint in the table of the analysis tab.
+     */
     public void refreshVPTable() {
         if (model == null) {
             logger.fatal("Model null--should never happen");
             return;
         }
-          javafx.application.Platform.runLater(() -> {
+        javafx.application.Platform.runLater(() -> {
             updateListView();
             if (model == null) {
                 logger.error("model was null while trying to refresh VP table, should never happen");
@@ -323,7 +336,9 @@ public class VPAnalysisPresenter implements Initializable {
         });
     }
 
-    /** Class for sorting items like 100 and 1000 */
+    /**
+     * Class for sorting items like 100 and 1000
+     */
     class IntegerComparator implements Comparator<String> {
 
         @Override
@@ -340,7 +355,9 @@ public class VPAnalysisPresenter implements Initializable {
         }
     }
 
-    /** Class for sorting items like 2.3% and 34.5% */
+    /**
+     * Class for sorting items like 2.3% and 34.5%
+     */
     class PercentComparator implements Comparator<String> {
 
         @Override
