@@ -81,8 +81,7 @@ public class Faidx extends Task<Void> {
             return null;
         }
         File fasta = new File(path);
-        int blocks = n_canonical_chromosomes + 1;
-        double blocksize = 1D/blocks;
+        double file_size = fasta.length();
         double currentProgress=0.0D;
         updateProgress(currentProgress);
 
@@ -121,8 +120,7 @@ public class Faidx extends Task<Void> {
                             if (faidxEntry != null) {
                                 records.add(faidxEntry);
                             }
-                            currentProgress+=blocksize;
-                            updateProgress(currentProgress);
+                            updateProgress(Math.min(0.99, currOffset/file_size));
                             faidxEntry = new FastaIndexEntry();
                             faidxEntry.makeSeqNameFromRawLine(line);
                             logger.trace("Indexing " + faidxEntry.getSeqName());
