@@ -13,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -21,6 +22,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
@@ -213,6 +215,17 @@ public class ViewPointPresenter implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
+
+    // Todo -- not catching lack of internet connect error.
+        ucscWebEngine.setOnError(new EventHandler<WebErrorEvent>() {
+            @Override
+            public void handle(WebErrorEvent event) {
+                System.out.println("BAD ERRL " + event.toString());
+            }
+        });
+
+
+
         /* The following line is needed to avoid an SSL handshake alert
          * when opening the UCSC Browser. */
         System.setProperty("jsse.enableSNIExtension", "false");
