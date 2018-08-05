@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
@@ -26,7 +27,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.gophermain.GopherMainPresenter">
     <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="677.0" minWidth="830.0" stylesheets="@gophermain.css">
         <top>
             <HBox maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
@@ -62,6 +63,14 @@
                             <MenuItem mnemonicParsing="false" onAction="#openGeneWindowWithExampleMouseGenes" text="mouse" />
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#showLog" text="Show log" />
+                        <Menu mnemonicParsing="false" text="Set logging level">
+                            <RadioMenuItem fx:id="loggingLevelOFF" mnemonicParsing="false" text="OFF" />
+                            <RadioMenuItem fx:id="loggingLevelTrace" mnemonicParsing="false" text="TRACE" />
+                            <RadioMenuItem fx:id="loggingLevelInfo" mnemonicParsing="false" text="INFO" />
+                            <RadioMenuItem fx:id="loggingLevelDebug" mnemonicParsing="false" text="DEBUG" />
+                            <RadioMenuItem fx:id="loggingLevelWarn" mnemonicParsing="false" text="WARN" />
+                            <RadioMenuItem fx:id="loggingLevelError" mnemonicParsing="false" text="ERROR" />
+                        </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
                     </Menu>
                 </MenuBar>
@@ -190,28 +199,46 @@
                                     </HBox.margin>
                                 </Label>
                             </HBox>
-                            <HBox prefHeight="46.0" prefWidth="830.0">
-                                <Region prefHeight="46.0" prefWidth="55.0" />
-                                <Button mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="250.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter gene list">
+                            <HBox prefHeight="44.0" prefWidth="830.0">
+                                <Region prefHeight="46.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                <VBox alignment="CENTER" minWidth="200.0" prefHeight="200.0" prefWidth="100.0">
                                     <HBox.margin>
-                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                        <Insets top="10.0" />
                                     </HBox.margin>
-                                </Button>
+                                    <Button mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0" prefWidth="250.0" styleClass="Button" stylesheets="@gophermain.css" text="Target gene list" />
+                                    <Label fx:id="targetGeneLabel" styleClass="bluelabel" stylesheets="@gophermain.css">
+                                        <VBox.margin>
+                                            <Insets bottom="10.0" left="10.0" top="10.0" />
+                                        </VBox.margin>
+                                    </Label>
+                                </VBox>
                                 <Region prefHeight="200.0" prefWidth="200.0" />
-                                <Button mnemonicParsing="false" onAction="#allProteinCodingGenes" prefHeight="30.0" prefWidth="300.0" styleClass="Button" stylesheets="@gophermain.css" text="All protein-coding genes">
+                                <VBox alignment="CENTER" minWidth="200.0" prefHeight="200.0" prefWidth="100.0">
                                     <HBox.margin>
-                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                        <Insets top="10.0" />
                                     </HBox.margin>
-                                </Button>
+                                    <Button mnemonicParsing="false" onAction="#allProteinCodingGenes" prefHeight="30.0" prefWidth="300.0" styleClass="Button" stylesheets="@gophermain.css" text="All protein-coding genes" />
+                                    <Label fx:id="allGenesLabel" styleClass="bluelabel" stylesheets="@gophermain.css">
+                                        <VBox.margin>
+                                            <Insets bottom="10.0" left="10.0" top="10.0" />
+                                        </VBox.margin>
+                                    </Label>
+                                </VBox>
                                 <Region prefHeight="200.0" prefWidth="200.0" />
-                                <Button mnemonicParsing="false" onAction="#enterBedFile" prefHeight="30.0" prefWidth="250.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter BED file">
+                                <VBox alignment="CENTER" minWidth="200.0" prefHeight="200.0" prefWidth="100.0">
                                     <HBox.margin>
-                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                        <Insets top="10.0" />
                                     </HBox.margin>
-                                </Button>
+                                    <Button mnemonicParsing="false" onAction="#enterBedFile" prefHeight="30.0" prefWidth="200.0" styleClass="Button" stylesheets="@gophermain.css" text="Enter BED file" />
+                                    <Label fx:id="bedTargetsLabel" styleClass="bluelabel" stylesheets="@gophermain.css">
+                                        <padding>
+                                            <Insets bottom="10.0" left="10.0" top="10.0" />
+                                        </padding>
+                                    </Label>
+                                </VBox>
                                 <Region prefHeight="200.0" prefWidth="200.0" />
                             </HBox>
-                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="424.0">
+                            <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="830.0">
                                 <Separator maxWidth="200.0" prefWidth="190.0" styleClass="sep" stylesheets="@gophermain.css">
                                     <HBox.margin>
                                         <Insets bottom="10.0" left="10.0" top="20.0" />

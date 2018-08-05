@@ -24,7 +24,7 @@ public class Default {
     /** Size of the margin of a fragment that will be enriched by targeting probes.*/
     public final static int MARGIN_SIZE = 250;
 
-    public final static boolean ALLOW_SINGLE_MARGIN=true;
+    public final static boolean ALLOW_UNBALANCED_MARGINs =true;
     /** Whether patching should be allowed for simple approach. */
     public final static boolean ALLOW_PATCHING=false;
 

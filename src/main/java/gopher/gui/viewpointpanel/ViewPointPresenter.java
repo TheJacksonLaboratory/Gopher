@@ -13,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -21,6 +22,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
@@ -41,6 +43,10 @@ public class ViewPointPresenter implements Initializable {
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
+
+
+    private static final String FAILED_HTML_CONTENT  = "<html><body><h3>GOPHER</h3><p><i>Could not connect to UCSC " +
+            "Browser. Please check your internet connection and proxy</i></p></body></html>";
 
     private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
@@ -98,11 +104,13 @@ public class ViewPointPresenter implements Initializable {
 
     /** Instance of {@link ViewPoint} presented by this presenter. */
     private ViewPoint viewpoint;
-    /** If {@link #coloridx} is set to this, then we know we need to set it to a random number. Otherwise
+    /** If {@link #startIndexForColor} is set to this, then we know we need to set it to a random number. Otherwise
      * leave if unchanged so that the color remains the same.  */
     private static final int UNINITIALIZED=-1;
     /** The (random) starting index in our list of colors. */
-    private int coloridx = UNINITIALIZED;
+    private int startIndexForColor = UNINITIALIZED;
+    /** The current index for color -- this will be updated by the iteration. */
+    private int idx;
     /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
      * well as in the table.
      */
@@ -112,8 +120,7 @@ public class ViewPointPresenter implements Initializable {
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
         Platform.runLater(() -> {
-            tab.setDisable(true);
-            this.tab.getTabPane().getTabs().remove(this.tab);
+            this.analysisPresenter.removeViewPointTab(this.viewpoint);
             this.analysisPresenter.refreshVPTable();
         });
     }
@@ -128,6 +135,10 @@ public class ViewPointPresenter implements Initializable {
         clipboard.setContent(content);
         e.consume();
     }
+
+
+
+
 
     @FXML private void deleteThisViewPoint(Event e) {
         this.model.deleteViewpoint(this.viewpoint);
@@ -160,6 +171,10 @@ public class ViewPointPresenter implements Initializable {
                         // hide progress bar then page is ready
                         progress.setVisible(false);
                         stage.close();
+                    } else if (newState.equals(Worker.State.FAILED)) {
+                        progress.setVisible(false);
+                        stage.close();
+                        ucscWebEngine.loadContent(FAILED_HTML_CONTENT);
                     }
                 });
     }
@@ -194,32 +209,23 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
-//    /** Class for sorting items like 2.3% and 34.5% */
-//    class PercentComparator implements Comparator<String> {
-//        @Override
-//        public int compare(String s1, String s2) {
-//            int i=s1.indexOf("%");
-//            if (i>0)
-//                s1=s1.substring(0,i);
-//            i=s2.indexOf("%");
-//            if (i>0)
-//                s2=s2.substring(0,i);
-//            try {
-//                Double d1 = Double.parseDouble(s1);
-//                Double d2=Double.parseDouble(s2);
-//                return d1.compareTo(d2);
-//            } catch (Exception e) {
-//                logger.error(String.format("Error encounted while sorting percentage values %s and %s",s1,s2));
-//                logger.error(e,e);
-//                return 0;
-//            }
-//        }
-//    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
+
+    // Todo -- not catching lack of internet connect error.
+        ucscWebEngine.setOnError(new EventHandler<WebErrorEvent>() {
+            @Override
+            public void handle(WebErrorEvent event) {
+                System.out.println("BAD ERRL " + event.toString());
+            }
+        });
+
+
+
         /* The following line is needed to avoid an SSL handshake alert
          * when opening the UCSC Browser. */
         System.setProperty("jsse.enableSNIExtension", "false");
@@ -412,8 +418,8 @@ public class ViewPointPresenter implements Initializable {
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
 
         /* the following will start us off with a different color for each ViewPoint. */
-        if (coloridx == UNINITIALIZED) {
-            this.coloridx = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
+        if (startIndexForColor == UNINITIALIZED) {
+            this.startIndexForColor = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
         }
     }
 
@@ -425,7 +431,6 @@ public class ViewPointPresenter implements Initializable {
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
-        //setManuallyRevised();
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
@@ -470,6 +475,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void showColoredSegmentsInTable() {
         segmentsTableView.getItems().clear();
+        this.idx=this.startIndexForColor; // "reset" the start position for the loop around the colors.
         this.coloredsegments = this.viewpoint.getAllSegments().stream()
                 .map(s -> new ColoredSegment(s, getNextColor()))
                 .collect(Collectors.toList());
@@ -509,19 +515,21 @@ public class ViewPointPresenter implements Initializable {
      * @return a rotating list of colors for the digest highlights.
      */
     private String getNextColor() {
-        String color = colors[this.coloridx];
-        this.coloridx = (this.coloridx + 1) % (colors.length);
+        String color = colors[this.idx];
+        this.idx = (this.idx + 1) % (colors.length);
         return String.format("%%23%s", color);
     }
 
 
-
-
+    /**
+     * Zoom in or out with the UCSC display.
+     * @param factor If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
+     */
     private void zoom(double factor) {
         logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        updateScore();
+        //updateScore();
         showColoredSegmentsInTable();
         showUcscView();
     }

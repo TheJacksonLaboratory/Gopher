@@ -122,7 +122,6 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                 return null;
             AlignabilityMap apair = apiterator.next();
             String referenceSequenceID = apair.getChromName();
-            logger.trace("NEW--Creating viewpoints for RefID Extended=" + referenceSequenceID);
             if (! chromosomes.containsKey(referenceSequenceID)) {
                 continue; // skip if we have no gene on this chromosome
             }
@@ -132,15 +131,11 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                 for (ChromosomeGroup g : chromosomes.values()) {
                     logger.error(g.getReferenceSequenceID());
                 }
-            } else {
-                logger.trace("group="+group.getReferenceSequenceID());
             }
-            for (GopherGene gene : group.getGenes()) {
-               // group.getGenes().parallelStream().forEach(gene -> {
-                    logger.trace("About to calculate gene "+gene.getGeneSymbol());
-                calculateViewPoints(gene, referenceSequenceID, fastaReader,apair);
-                break;
-            }
+            //for (GopherGene gene : group.getGenes()) {
+            group.getGenes().parallelStream().forEach(gene -> {
+                calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);
+            });
         }
 
 

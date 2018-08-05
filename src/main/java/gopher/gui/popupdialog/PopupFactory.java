@@ -1,9 +1,11 @@
 package gopher.gui.popupdialog;
 
-import gopher.model.Default;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -13,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Optional;
 
 public class PopupFactory {
@@ -307,6 +310,28 @@ public class PopupFactory {
 
 
         window.setScene(new Scene(view.getView()));
+        window.showAndWait();
+    }
+
+
+    public static  void showReportListDialog(List<String> reportlist) {
+        Stage window;
+        String windowTitle = "GOPHER Report";
+        window = new Stage();
+        window.setOnCloseRequest( event -> window.close() );
+        window.setTitle(windowTitle);
+
+        ListView<String> list = new ListView<>();
+
+        ObservableList<String> items =FXCollections.observableArrayList (reportlist);
+        list.setItems(items);
+        list.setPrefWidth(450);
+        list.setPrefHeight(350);
+        list.setOrientation(Orientation.VERTICAL);
+
+        StackPane root = new StackPane();
+        root.getChildren().add(list);
+        window.setScene(new Scene(root, 450, 350));
         window.showAndWait();
     }
 

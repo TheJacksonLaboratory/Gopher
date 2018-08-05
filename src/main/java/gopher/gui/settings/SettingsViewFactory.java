@@ -1,14 +1,11 @@
 package gopher.gui.settings;
 
 import gopher.model.Model;
-import gopher.model.RestrictionEnzyme;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 
 /**
@@ -65,7 +62,7 @@ public class SettingsViewFactory {
         orderedmap.put("Minimum fragment size", String.format("%s bp",model.getMinFragSize()));
         orderedmap.put("Minimum probe/fragment count", String.valueOf(model.getMinBaitCount()));
         orderedmap.put("Max. k-mer alignability", String.valueOf(model.getMaxMeanKmerAlignability()));
-        orderedmap.put("Allow unbalanced margins?", model.getAllowSingleMargin()? "yes":"no");
+        orderedmap.put("Allow unbalanced margins?", model.getAllowUnbalancedMargins()? "yes":"no");
         orderedmap.put("Restriction enzymes", model.getAllSelectedEnzymeString());
         return orderedmap;
     }

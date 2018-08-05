@@ -12,6 +12,7 @@ Welcome to GOPHER's documentation!
    04_gui_viewpoint
    05_output
    06_concepts
+   07_probe_upload
 
 ~~~~~~
 GOPHER

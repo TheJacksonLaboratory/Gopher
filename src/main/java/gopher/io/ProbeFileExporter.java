@@ -7,12 +7,11 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class exports probe files that can be used for ordering of probes.
@@ -25,6 +24,7 @@ public class ProbeFileExporter {
     private static final Logger logger = Logger.getLogger(gopher.io.BEDFileExporter.class.getName());
 
         private final String ProbeFileAgilentFormat;
+    private final String ProbeFileAgilentFormatZip;
         private final String ProbeFileBedFormat;
         private final String directoryPath; // Path to directory where the BED files will be stored. Has no path is guaranteed to have no trailing slash.
 
@@ -35,7 +35,8 @@ public class ProbeFileExporter {
      */
     public ProbeFileExporter(String dirpath, String outPrefix){
         // initialize the file names
-        this.ProbeFileAgilentFormat = String.format("%s_agilentProbeFile.bed",outPrefix);
+        this.ProbeFileAgilentFormat = String.format("%s_agilentProbeFile.txt",outPrefix);
+        this.ProbeFileAgilentFormatZip = String.format("%s_agilentProbeFile.txt.zip",outPrefix);
         this.ProbeFileBedFormat = String.format("%s_BedProbeFile.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
@@ -48,7 +49,7 @@ public class ProbeFileExporter {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
     }
 
-    public void printProbeFileInAgilentFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws FileNotFoundException {
+    public void printProbeFileInAgilentFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws IOException {
 
         Integer probe_length = 120;
 
@@ -56,8 +57,24 @@ public class ProbeFileExporter {
 
         PrintStream out_probe_file_bed = new PrintStream(new FileOutputStream(getFullPath(ProbeFileBedFormat)));
 
-        PrintStream out_probe_file_agilent = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
-        out_probe_file_agilent.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
+        //PrintStream out_probe_file_agilent = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
+
+
+        FileOutputStream fos = new FileOutputStream(getFullPath(ProbeFileAgilentFormatZip));
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        ZipOutputStream zipOutAgillent = new ZipOutputStream(bos);
+        zipOutAgillent.putNextEntry(new ZipEntry(ProbeFileAgilentFormat));
+
+        zipOutAgillent.write(String.format("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates\n").getBytes());
+
+
+
+        //out_probe_file_agilent.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
+
+        // TODO: The following code is not nice but it works. It would be better to derive first the list of unique
+        // TODO: segments and then export probes from this list.
+        // TODO: BUT NOTE, THE PROBES IN THE EXPORTED PROBE FILE FOR AGILENT NEED TO BE SORTED BY
+        // TODO: REFERENCE ID AND STARTING COORDINATE!
 
         // use a hashMap of Integer sets to get rid of duplicated probes
         Set<String> uniqueProbes = new HashSet<>();
@@ -119,11 +136,13 @@ public class ProbeFileExporter {
                 probeID += (sortedPositions.get(i)-1);
                 // get sequence
                 ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+probe_length-1);
-                out_probe_file_agilent.println(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1));
+                String printToZip=String.format(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1) + "\n");
+                zipOutAgillent.write(printToZip.getBytes());
                 out_probe_file_bed.println(refID + "\t" + (sortedPositions.get(i)-1) + "\t" + (sortedPositions.get(i)+probe_length-2) + "\t" + probeID); // start and end 0-based
+
             }
         }
-        out_probe_file_agilent.close();
-        out_probe_file_bed.close();
+        zipOutAgillent.closeEntry();
+        zipOutAgillent.close();
     }
 }

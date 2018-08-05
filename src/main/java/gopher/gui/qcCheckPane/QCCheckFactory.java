@@ -126,7 +126,7 @@ public class QCCheckFactory {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Unbalanced margins</td>");
-        if (model.getAllowSingleMargin()) {
+        if (model.getAllowUnbalancedMargins()) {
             sb.append("<td>yes</td>");
         } else {
             sb.append("<td>no</td>");

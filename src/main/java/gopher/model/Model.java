@@ -26,8 +26,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 6L;
-    private static final String VERSION="0.3.11";
-    private static final String LAST_CHANGE_DATE="2018-06-28";
+    private static final String VERSION="0.4.7";
+    private static final String LAST_CHANGE_DATE="2018-07-31";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -55,6 +55,14 @@ public class Model implements Serializable {
             }
         }
     }
+
+
+    public enum TargetType {
+        NONE,TARGET_GENES,ALL_GENES,BED_TARGETS
+    }
+
+    private TargetType targetType;
+
 
     private Approach approach=Approach.UNINITIALIZED;
 
@@ -103,16 +111,21 @@ public class Model implements Serializable {
     public String getGenomeBuild() { return genome.getGenomeBuild(); }
     /** @param newDatabase The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
     public void setGenomeBuild(String newDatabase) {
-        if (newDatabase.equals("hg19")) {
-            this.genome = new HumanHg19();
-        } else if (newDatabase.equals("hg38")) {
-            this.genome = new HumanHg38();
-        } else if (newDatabase.equals("mm9")) {
-            this.genome = new MouseMm9();
-        } else if (newDatabase.equals("mm10")) {
-            this.genome = new MouseMm10();
-        } else {
-            PopupFactory.displayError("setGenomeBuild error",String.format("genome build %s not implemented",newDatabase));
+        switch (newDatabase) {
+            case "hg19":
+                this.genome = new HumanHg19();
+                break;
+            case "hg38":
+                this.genome = new HumanHg38();
+                break;
+            case "mm9":
+                this.genome = new MouseMm9();
+                break;
+            case "mm10":
+                this.genome = new MouseMm10();
+                break;
+            default:
+                PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
         }
     }
 
@@ -178,9 +191,9 @@ public class Model implements Serializable {
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
 
-    private boolean allowSingleMargin=Default.ALLOW_SINGLE_MARGIN; // true
-    public boolean getAllowSingleMargin() { return allowSingleMargin; }
-    public void setAllowSingleMargin(boolean b) { allowSingleMargin=b; }
+    private boolean allowUnbalancedMargins =Default.ALLOW_UNBALANCED_MARGINs; // true
+    public boolean getAllowUnbalancedMargins() { return allowUnbalancedMargins; }
+    public void setAllowUnbalancedMargins(boolean b) { allowUnbalancedMargins =b; }
 
     private boolean allowPatching=Default.ALLOW_PATCHING; // false
     public boolean getAllowPatching() { return this.allowPatching; }
@@ -314,9 +327,13 @@ public class Model implements Serializable {
         } catch (IOException e) {
             logger.warn("Unable to load restriction enzymes from bundled '/enzymelist.tab' file");
         }
-        this.allowSingleMargin=false;
+        this.allowUnbalancedMargins =false;
         this.allowPatching=false;
+        this.targetType=TargetType.NONE;
     }
+
+    public void setTargetType(TargetType ttype) { this.targetType=ttype; }
+    public TargetType getTargetType(){ return this.targetType==null?TargetType.NONE : targetType; }
 
 
     /** @return List of enzymes for the user to choose from. */
@@ -473,10 +490,6 @@ public class Model implements Serializable {
         return LAST_CHANGE_DATE;
     }
 
-    public String getVersion() {
-        return VERSION;
-    }
-
     /** Remove a ViewPoint from the list {@link #viewpointList}. */
     public void deleteViewpoint(ViewPoint vp) {
         Iterator<ViewPoint> it = viewpointList.listIterator();
@@ -499,7 +512,16 @@ public class Model implements Serializable {
        return this.viewpointList.stream().filter(ViewPoint::hasValidProbe).collect(Collectors.toList());
     }
 
-
-
+    /** @return the version number. */
+    public static String getVersion() {
+        String version;
+        try {
+            Package p = Model.class.getPackage();
+            version = p.getImplementationVersion();
+        } catch (Exception e) {
+            version=VERSION;
+        }
+        return version;
+    }
 
 }

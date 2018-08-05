@@ -2,6 +2,15 @@
 Changelog
 =========
 
+------
+v0.4.7
+------
+- bug fixes
+
+------
+v0.4.6
+------
+- Parallel streams for viewpoint creation
 
 ------
 v0.4.5
