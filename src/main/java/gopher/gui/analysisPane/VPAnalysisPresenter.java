@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.apache.log4j.Logger;
@@ -361,6 +362,7 @@ public class VPAnalysisPresenter implements Initializable {
             viewPointTableView.getItems().clear(); /* clear previous rows, if any */
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
         });
     }
 
