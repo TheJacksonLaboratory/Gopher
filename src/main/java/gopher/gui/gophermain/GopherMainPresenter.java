@@ -267,7 +267,7 @@ public class GopherMainPresenter implements Initializable {
         return maxRepeatContent;
     }
 
-    transient private IntegerProperty maxMeanKmerAlignability = new SimpleIntegerProperty();
+    final transient private IntegerProperty maxMeanKmerAlignability = new SimpleIntegerProperty();
 
     private int getMaxMeanKmerAlignability() {
         return maxMeanKmerAlignability.get();
@@ -534,6 +534,11 @@ public class GopherMainPresenter implements Initializable {
         }
         this.unbalancedMarginCheckbox.setSelected(model.getAllowUnbalancedMargins());
         this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
+
+        this.targetGeneLabel.setText("");
+        this.allGenesLabel.setText("");
+        this.bedTargetsLabel.setText("");
+        this.model.setTargetType(Model.TargetType.NONE);
 
     }
 
