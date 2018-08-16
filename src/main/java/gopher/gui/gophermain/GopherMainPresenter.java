@@ -1354,7 +1354,10 @@ public class GopherMainPresenter implements Initializable {
         Utils.setSystemProxyAndPort(proxy,port);
     }
 
-
+    /**
+     * This function is called if the user choose the get human example genes from the Help menu, which is intended
+     * to give new users an easy way to get a list of genes to try out the software.
+     */
     @FXML private void openGeneWindowWithExampleHumanGenes() {
         InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/humangenesymbols.txt");
 
