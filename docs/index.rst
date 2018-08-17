@@ -13,6 +13,7 @@ Welcome to GOPHER's documentation!
    05_output
    06_concepts
    07_probe_upload
+   08_troubleshooting
 
 ~~~~~~
 GOPHER

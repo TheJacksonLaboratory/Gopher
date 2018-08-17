@@ -139,6 +139,25 @@ public class ViewPoint implements Serializable {
         return this.restrictionSegmentList.stream().filter(Segment::isSelected).collect(Collectors.toList());
     }
 
+    /**
+     *
+     */
+    public void refreshStartAndEndPos() {
+        List<Segment> segments = this.restrictionSegmentList.stream().filter(Segment::isSelected).collect(Collectors.toList());
+        int min = segments.get(0).getStartPos();
+        int max = segments.get(0).getEndPos();
+        for(int i=1; i< segments.size(); i++) {
+            if(segments.get(i).getStartPos() < min) {
+                min=segments.get(i).getStartPos();
+            }
+            if(max < segments.get(i).getEndPos()) {
+                max=segments.get(i).getEndPos();
+            }
+            this.setStartPos(min);
+            this.setEndPos(max);
+        }
+    }
+
     /** @return List of all segments (selected or not). */
    public List<Segment> getAllSegments() {
         return restrictionSegmentList;

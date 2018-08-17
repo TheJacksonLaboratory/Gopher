@@ -281,7 +281,7 @@ public class GopherMainPresenter implements Initializable {
         return maxMeanKmerAlignability;
     }
 
-    transient private IntegerProperty minBaitCount = new SimpleIntegerProperty();
+    final transient private IntegerProperty minBaitCount = new SimpleIntegerProperty();
 
     private int getMinimumBaitCount() {
         return minBaitCount.get();
@@ -446,17 +446,14 @@ public class GopherMainPresenter implements Initializable {
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
 
-        this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-                String selectedItem=approachChoiceBox.getItems().get((Integer) number2);
-                if (selectedItem.equals("Simple")) {
-                    setGUItoSimple();
-                } else if (selectedItem.equals("Extended")) {
-                    setGUItoExtended();
-                } else {
-                    logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
-                }
+        this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
+            String selectedItem=approachChoiceBox.getItems().get((Integer) number2);
+            if (selectedItem.equals("Simple")) {
+                setGUItoSimple();
+            } else if (selectedItem.equals("Extended")) {
+                setGUItoExtended();
+            } else {
+                logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
             }
         });
 
@@ -471,6 +468,8 @@ public class GopherMainPresenter implements Initializable {
         this.sizeUpLabel.setDisable(true);
         this.patchedViewpointCheckbox.setDisable(false);
         this.patchedViewpointLabel.setDisable(false);
+        this.sizeUpTextField.setVisible(false);
+        this.sizeDownTextField.setVisible(false);
     }
     /** makes the upstream and downstream size fields visible because they are needed for the extended approach.*/
     private void setGUItoExtended() {
@@ -480,6 +479,10 @@ public class GopherMainPresenter implements Initializable {
         this.sizeUpLabel.setDisable(false);
         this.patchedViewpointCheckbox.setDisable(true);
         this.patchedViewpointLabel.setDisable(true);
+        this.patchedViewpointCheckbox.setSelected(false);
+        this.sizeUpTextField.setVisible(true);
+        this.sizeDownTextField.setVisible(true);
+
     }
 
 
@@ -505,26 +508,20 @@ public class GopherMainPresenter implements Initializable {
         }
         String refGenePath=this.model.getRefGenePath();
         if (refGenePath!=null) {
-           // this.downloadedTranscriptsLabel.setText(refGenePath);
             this.transcriptDownloadPI.setProgress(1.0);
         } else {
-           // this.downloadedTranscriptsLabel.setText("...");
             this.transcriptDownloadPI.setProgress(0.0);
         }
 
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
-           // this.downloadAlignabilityLabel.setText("Download complete");
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
-           // this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
 
         if (model.isGenomeIndexed()) {
-           // this.indexGenomeLabel.setText("Genome files successfully indexed");
             this.genomeIndexPI.setProgress(1.00);
         } else {
-           // this.indexGenomeLabel.setText("...");
             this.genomeIndexPI.setProgress(0.00);
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
@@ -533,7 +530,7 @@ public class GopherMainPresenter implements Initializable {
             this.restrictionEnzymeLabel.setText(null);
         }
         this.unbalancedMarginCheckbox.setSelected(model.getAllowUnbalancedMargins());
-        this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
+        this.patchedViewpointCheckbox.setSelected(model.getAllowPatching());
 
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
@@ -904,16 +901,18 @@ public class GopherMainPresenter implements Initializable {
         String basenameGz = genomeBuild.concat(".50mer.alignabilityMap.bedgraph.gz");
         String url;
         String url2;
-        if(genomeBuild.equals("hg19")) {
-            url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
-            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
-
-        } else if (genomeBuild.equals("mm9")) {
-            url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
-            url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
-        } else {
-            //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
-            return;
+        switch (genomeBuild) {
+            case "hg19":
+                url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
+                break;
+            case "mm9":
+                url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                break;
+            default:
+                //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
+                return;
         }
         // also download chromosme file
         Downloader downloadTask0 = new Downloader(file, url2, "chromInfo.txt.gz", alignabilityDownloadPI);
@@ -1354,7 +1353,10 @@ public class GopherMainPresenter implements Initializable {
         Utils.setSystemProxyAndPort(proxy,port);
     }
 
-
+    /**
+     * This function is called if the user choose the get human example genes from the Help menu, which is intended
+     * to give new users an easy way to get a list of genes to try out the software.
+     */
     @FXML private void openGeneWindowWithExampleHumanGenes() {
         InputStream is = GopherMainPresenter.class.getResourceAsStream("/data/humangenesymbols.txt");
 
@@ -1364,9 +1366,8 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-//                this.model.getChosenGeneCount(),
-//                this.model.getUniqueChosenTSScount()));
+        model.setTargetType(Model.TargetType.TARGET_GENES);
+        setTargetFeedback(Model.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
     }
 
 
@@ -1379,9 +1380,8 @@ public class GopherMainPresenter implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-//        this.nValidGenesLabel.setText(String.format("%d valid genes with %d viewpoint starts",
-//                this.model.getChosenGeneCount(),
-//                this.model.getUniqueChosenTSScount()));
+        model.setTargetType(Model.TargetType.TARGET_GENES);
+        setTargetFeedback(Model.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
     }
 
 
