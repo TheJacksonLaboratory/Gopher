@@ -259,6 +259,7 @@ public class ViewPointPresenter implements Initializable {
                                     Boolean old_val, Boolean new_val) {
                     // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
+                    viewpoint.refreshStartAndEndPos();
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
