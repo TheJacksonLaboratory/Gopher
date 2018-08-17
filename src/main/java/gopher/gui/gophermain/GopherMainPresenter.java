@@ -508,26 +508,20 @@ public class GopherMainPresenter implements Initializable {
         }
         String refGenePath=this.model.getRefGenePath();
         if (refGenePath!=null) {
-           // this.downloadedTranscriptsLabel.setText(refGenePath);
             this.transcriptDownloadPI.setProgress(1.0);
         } else {
-           // this.downloadedTranscriptsLabel.setText("...");
             this.transcriptDownloadPI.setProgress(0.0);
         }
 
         if (model.alignabilityMapPathIncludingFileNameGzExists()) {
-           // this.downloadAlignabilityLabel.setText("Download complete");
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
-           // this.downloadAlignabilityLabel.setText("...");
             this.alignabilityDownloadPI.setProgress(0.0);
         }
 
         if (model.isGenomeIndexed()) {
-           // this.indexGenomeLabel.setText("Genome files successfully indexed");
             this.genomeIndexPI.setProgress(1.00);
         } else {
-           // this.indexGenomeLabel.setText("...");
             this.genomeIndexPI.setProgress(0.00);
         }
         if (model.getChosenEnzymelist()!=null && model.getChosenEnzymelist().size()>0) {
@@ -536,7 +530,7 @@ public class GopherMainPresenter implements Initializable {
             this.restrictionEnzymeLabel.setText(null);
         }
         this.unbalancedMarginCheckbox.setSelected(model.getAllowUnbalancedMargins());
-        this.unbalancedMarginCheckbox.setSelected(model.getAllowPatching());
+        this.patchedViewpointCheckbox.setSelected(model.getAllowPatching());
 
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
