@@ -1,5 +1,6 @@
 package gopher.model;
 
+import gopher.model.viewpoint.Bait;
 import org.apache.log4j.Logger;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
@@ -217,6 +218,32 @@ public class Design {
         }
         return n_baits;
     }
+
+    public Integer getCaptureSize() {
+        // get rid of redundant segments emerging from overlapping viewpoints
+        Set<Segment> uniqueDigests = new HashSet<>();
+        Set<String> cSizeSet = new HashSet<>();
+        List<ViewPoint> viewPointList = model.getViewPointList();
+        for(ViewPoint vp : viewPointList) {
+            uniqueDigests.addAll(vp.getActiveSegments());
+        }
+        // count number of baits
+        Integer cSize = 0;
+        for(Segment seg : uniqueDigests) {
+            for(Bait b : seg.getBaitsForUpstreamMargin()) {
+                for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
+                    cSizeSet.add(b.getRefId().concat((Integer.toString(i))));
+                }
+            }
+            for(Bait b : seg.getBaitsForDownstreamMargin()) {
+                for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
+                    cSizeSet.add(b.getRefId().concat((Integer.toString(i))));
+                }
+            }
+        }
+        return cSizeSet.size();
+    }
+
 
     public Integer getTotalNumBalancedDigests() {
         // get rid of redundant segments emerging from overlapping viewpoints
