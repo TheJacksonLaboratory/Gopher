@@ -280,7 +280,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </GridPane.margin>
                             </Label>
-                            <Label text="Minimum fragment size" GridPane.rowIndex="3">
+                            <Label text="Minimum digest size" GridPane.rowIndex="3">
                                 <tooltip>
                                     <Tooltip text="Minimum size in nucleotides for a fragment to be selected" />
                                 </tooltip>
