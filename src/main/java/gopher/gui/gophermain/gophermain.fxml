@@ -361,7 +361,7 @@
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                 </GridPane.margin>
                             </Button>
-                     <Label text="Minimum bait count" GridPane.rowIndex="5">
+                     <Label text="Minimum probe count" GridPane.rowIndex="5">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>
@@ -371,7 +371,7 @@
                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                         </GridPane.margin>
                      </TextField>
-                     <Label text="Bait size" GridPane.rowIndex="6">
+                     <Label text="Probe size" GridPane.rowIndex="6">
                         <GridPane.margin>
                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </GridPane.margin>

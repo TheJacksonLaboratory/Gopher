@@ -69,7 +69,7 @@
                     <TableColumn fx:id="alignabilityContentColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" styleClass="mycolumn" text="Alignability" />
                     <TableColumn fx:id="repeatContentUpColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" styleClass="mycolumn" text="Repeat content" />
                     <TableColumn fx:id="gcContentUpDownColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="175.0" prefWidth="-1.0" styleClass="mycolumn" text="GC content" />
-                    <TableColumn fx:id="numberOfBaitsColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" styleClass="mycolumn" text="Baits" />
+                    <TableColumn fx:id="numberOfBaitsColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" styleClass="mycolumn" text="Probes" />
                     <TableColumn fx:id="colorTableColumn" editable="false" maxWidth="1.0" minWidth="1.0" prefWidth="1.0" resizable="false" sortable="false" text="Column X" />
                 </columns>
             <columnResizePolicy>
