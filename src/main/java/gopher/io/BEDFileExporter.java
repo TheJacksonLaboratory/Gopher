@@ -32,7 +32,7 @@ public class BEDFileExporter {
     private final String allTracksBEDfile;
     private final String targetRegionBEDfile;
     private final String vpvSummaryTSVfile;
-    private final String vpvSummaryRfile;
+    //private final String vpvSummaryRfile;
     private final String vpvUniqueTargetFragmentsFile;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private final String directoryPath;
@@ -45,10 +45,10 @@ public class BEDFileExporter {
     public BEDFileExporter(String dirpath, String outPrefix){
         // initialize the file  names
         this.allTracksBEDfile =String.format("%s_allTracks.bed",outPrefix);
-        this.targetRegionBEDfile =String.format("%s_targetRegions.txt",outPrefix);
-        this.vpvSummaryTSVfile=String.format("%s_vpvSummary.tsv",outPrefix);
-        this.vpvSummaryRfile=String.format("%s_vpvSummary.r",outPrefix);
-        this.vpvUniqueTargetFragmentsFile=String.format("%s_unique_target_fragments.bed",outPrefix);
+        this.targetRegionBEDfile =String.format("%s_uniqueTargetDigestMargins.txt",outPrefix);
+        this.vpvSummaryTSVfile=String.format("%s_viewPoints.tsv",outPrefix);
+        //this.vpvSummaryRfile=String.format("%s_vpvSummary.r",outPrefix);
+        this.vpvUniqueTargetFragmentsFile=String.format("%s_uniqueTargetDigests.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
             dirpath=dirpath.substring(0,dirpath.length()-1);
@@ -87,12 +87,12 @@ public class BEDFileExporter {
         }
         out_ucscURL.close();
 
-        PrintStream vpvSummaryR = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryRfile)));
+        //PrintStream vpvSummaryR = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryRfile)));
 
-        String[] helpSplit=vpvSummaryRfile.split("_gopherSummary.r");
-        String prefix=helpSplit[0];
-        String script=getRscript(prefix);
-        vpvSummaryR.println(script);
+        //String[] helpSplit=vpvSummaryRfile.split("_gopherSummary.r");
+        //String prefix=helpSplit[0];
+        //String script=getRscript(prefix);
+        //vpvSummaryR.println(script);
 
         // print file for all tracks that can be uploaded to the UCSC genome browser
         // print file for target regions that can be used as input for the SureDesign wizard

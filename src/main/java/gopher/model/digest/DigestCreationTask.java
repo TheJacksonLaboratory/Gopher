@@ -11,6 +11,7 @@ import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.concurrent.Task;
+import javafx.stage.DirectoryChooser;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -117,7 +118,13 @@ public class DigestCreationTask extends Task<Void> {
         int msize = model.getMarginSize();
         this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath=model.getGenomeFastaFile();
+        outfile += model.getProjectName();
+        outfile += "_";
+        outfile += model.getGenomeBuild();
+        outfile += "_DigestedGenome.txt";
         outfilename=outfile;
+        logger.trace(outfilename);
+
         logger.trace(String.format("Digest Factory initialize with FASTA file=%s",this.genomeFastaFilePath));
         marginSize=msize;
         this.model=model;
