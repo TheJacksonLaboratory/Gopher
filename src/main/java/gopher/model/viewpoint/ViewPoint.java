@@ -215,8 +215,6 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(genomicPos - upstreamNucleotideLength);
         setEndPos(genomicPos + downstreamNucleotideLength);
-//        setMinimumAllowableStartPos(genomicPos - SegmentFactory.MAXIMUM_ZOOM_FACTOR * upstreamNucleotideLength);
-//        setMaximumAllowableEndPos(genomicPos + SegmentFactory.MAXIMUM_ZOOM_FACTOR * downstreamNucleotideLength);
         this.minGcContent=builder.minGcContent;
         this.maxGcContent=builder.maxGcContent;
         this.minFragSize=builder.minFragSize;
@@ -224,7 +222,6 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
-        logger.trace("Done with vars, about to init in VP CTOR");
         init(builder.fastaReader,builder.c2alignmap);
     }
 
@@ -639,18 +636,18 @@ public class ViewPoint implements Serializable {
         double repeat=0;
         double gc=0;
 
-        if(dir.equals("Up")) {
-            repeat = segment.getRepeatContentMarginUp();
-            gc = segment.getGcContentMarginUp();
+        switch (dir) {
+            case "Up":
+                repeat = segment.getRepeatContentMarginUp();
+                gc = segment.getGcContentMarginUp();
+                break;
+            case "Down":
+                repeat = segment.getRepeatContentMarginDown();
+                gc = segment.getGcContentMarginDown();
+                break;
+            default:
+                logger.error("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'");
         }
-        else if(dir.equals("Down")) {
-            repeat = segment.getRepeatContentMarginDown();
-            gc = segment.getGcContentMarginDown();
-        } else {
-            logger.error("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'");
-
-        }
-
         return (this.minGcContent <= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
     }
 
@@ -687,7 +684,7 @@ public class ViewPoint implements Serializable {
      * The overall score for the viewpoint is between 0 and 1.
      *
      */
-    public void calculateViewpointScoreExtended() {
+    public void calculateViewpointScoreExtendedOLD() {
         Double score = 0.0;
 
         /* iterate over all selected fragments */
@@ -743,6 +740,63 @@ public class ViewPoint implements Serializable {
         }
 
     }
+
+
+    private double getSegmentProbabilityDownstream(int from, int to,NormalDistribution nD) {
+        if (from>=to)return 0d;
+        // only look at the part of the segment that is downstream, i.e., >0
+        double fromPos=from>0?(double)from:0d;
+        double toPos=to>0?(double)to:0d;
+        double cp1= nD.cumulativeProbability(toPos);
+        double cp2 =nD.cumulativeProbability(fromPos);
+        return cp1-cp2;
+    }
+
+    private double getSegmentProbabilityUpstream(int from, int to,NormalDistribution nD) {
+        if (from>=to)return 0d;
+        // only look at the part of the segment that is upstream, i.e., <0
+        double fromPos=from<0?(double)from:0d;
+        double toPos=to<0?(double)to:0d;
+        double cp1= nD.cumulativeProbability(toPos);
+        double cp2 =nD.cumulativeProbability(fromPos);
+        return cp1-cp2;
+    }
+
+    /**
+     * A simplified version of the extended viewpoint score.
+     */
+    public void calculateViewpointScoreExtended() {
+        Double score = 0.0;
+        // three standard deviations cover 99.7% of the data
+        double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
+        double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
+        NormalDistribution nDistUpstream = new NormalDistribution(mean,sd);
+        sd = (double)downstreamNucleotideLength/6;
+        NormalDistribution nDistDownstream= new NormalDistribution(mean,sd);
+
+        /* iterate over all selected fragments */
+        List<Segment> selectedSegments = restrictionSegmentList.
+                stream().
+                filter(Segment::isSelected).
+                collect(Collectors.toList());
+
+        double totalProbability=0.0;
+
+        for (Segment seg : selectedSegments) {
+            // get distance relative to TSS (or genomic pos in general)
+            // The following is a two element list with from and to
+            List<Integer> distance = seg.posToDistance(this.genomicPos);
+           // System.err.println("From "+distance.get(0)+ " To="+distance.get(1));
+            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),nDistUpstream);
+            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),nDistDownstream);
+            totalProbability += (upProb + downProb);
+            //System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
+
+        }
+       this.score= totalProbability;
+
+    }
+
 
     public Double calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
 
