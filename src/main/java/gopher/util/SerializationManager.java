@@ -18,12 +18,12 @@ public class SerializationManager {
         FileOutputStream fos = new FileOutputStream(fileName);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(model);
-
         fos.close();
+        model.setClean(true);
     }
 
     public static Model deserializeModel(String fileName) throws IOException,ClassNotFoundException {
-        Object obj=null;
+        Object obj;
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);
         obj = ois.readObject();
