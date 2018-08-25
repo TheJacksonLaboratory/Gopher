@@ -23,7 +23,7 @@ Alternatively, you can start ``GOPHER.jar`` from the shell with the following co
 
   $ java -jar GOPHER.jar
 
-**Note:** if you receive an ``OutOfMemoryError`` allow more memory to be allocated for Java heap using ``-Xmx`` option (e.g. ``java -Xmx6g -jar GOPHER.jar``)
+**Note:** if you receive an ``OutOfMemoryError`` allow more memory to be allocated for Java heap using ``-Xmx`` option (e.g. ``java -Xmx6g -jar GOPHER.jar``).
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building GOPHER from source
