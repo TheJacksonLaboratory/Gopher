@@ -29,13 +29,15 @@ class URLMaker {
     private static final int OFFSET = 200;
 
 
-
-
-    URLMaker(Model model){
+    URLMaker(Model model, int width) {
         this.genomebuild=model.getGenomeBuild();
-        xdim=Math.min(UCSC_DEFAULT_WIDTH,model.getXdim());
+        xdim=width;
         this.enzymeString = model.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
+    }
+
+    URLMaker(Model model){
+        this(model, UCSC_DEFAULT_WIDTH);
     }
 
 
