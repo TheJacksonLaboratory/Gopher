@@ -1055,13 +1055,17 @@ public class GopherMainPresenter implements Initializable {
     @FXML private void saveDigestFileAs(ActionEvent e) {
         logger.trace("Saving the digest file");
         // get path from chooser
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Choose file path to save digest file");
-        File file = chooser.showSaveDialog(null);
-        if (file==null) {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for exporting digest file.");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File dir = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (dir==null || dir.getAbsolutePath().equals("")) {
+            PopupFactory.displayError("Error","Could not get path to export digest file.");
             return;
         }
-        String path = file.getAbsolutePath();
+
+        String path = dir.getAbsolutePath();
+        path += File.separator;
         DigestCreationTask task = new DigestCreationTask(path,model);
 
         TaskProgressBarView pbview = new TaskProgressBarView();
