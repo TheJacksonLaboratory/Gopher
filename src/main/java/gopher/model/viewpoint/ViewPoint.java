@@ -263,7 +263,7 @@ public class ViewPoint implements Serializable {
     }
 
     /** @return a 2-tuple with the number of baits: <up,down>. */
-    public List<Integer> getNumberOfBaitsUpDown() {
+    private List<Integer> getNumberOfBaitsUpDown() {
         ImmutableList.Builder<Integer> builder = new ImmutableList.Builder<>();
         Integer up=0;
         Integer down=0;
@@ -373,8 +373,8 @@ public class ViewPoint implements Serializable {
     }
 
     public String getStrandAsString() {
-        if (this.isPositiveStrand) return "+ strand";
-        else return "- strand";
+        if (this.isPositiveStrand) return "Strand: +";
+        else return "Strand: -";
     }
 
 

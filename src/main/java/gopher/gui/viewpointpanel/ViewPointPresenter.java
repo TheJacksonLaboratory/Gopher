@@ -450,16 +450,8 @@ public class ViewPointPresenter implements Initializable {
             int upstreamSpan= viewpoint.getUpstreamSpan();
             int downstreamSpan= viewpoint.getDownstreamSpan();
             int total = viewpoint.getTotalPromoterCount();
-            String promoterCount;
-            if (total==1) {
-                promoterCount=String.format("Only promoter of %s gene", viewpoint.getTargetName());
-            } else {
-                 promoterCount = String.format("Promoter %d of %d of %s gene",
-                        viewpoint.getPromoterNumber(),
-                        total, viewpoint.getTargetName());
-            }
-            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s (%s)",
-                    upstreamSpan,downstreamSpan,promoterCount, viewpoint.getStrandAsString()));
+            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s",
+                    upstreamSpan,downstreamSpan, viewpoint.getStrandAsString()));
         }
     }
 
