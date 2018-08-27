@@ -13,19 +13,3 @@ $ java -jar GopherGui-0.4.0-jar-with-dependencies.jar
 ```
 
 The manual for GOPHER can be found here: http://Gopher.readthedocs.io/en/latest/
-
-
-### To build the read-the-docs
-there seems to be a discrepancy between various systems
-One of the following may work
-```
-$ make html
-$ sphinx-autobuild . _build/html
-$ sphinx-build . _build/html
-```
-On the mac
-```
-$ python3 -m pip install sphinx
-$ python3 -m pip install sphinx_rtd_theme
-$ sphinx-build . _build/html
-```
