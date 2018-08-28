@@ -89,8 +89,6 @@ public class ViewPoint implements Serializable {
 
     private final Model model;
 
-    //private transient AlignabilityMap chromosome2AlignabilityMap;
-
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
     public int getPromoterNumber(){return promoterNumber;}
