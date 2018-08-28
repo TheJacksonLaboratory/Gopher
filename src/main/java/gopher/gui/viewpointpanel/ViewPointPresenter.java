@@ -53,6 +53,9 @@ public class ViewPointPresenter implements Initializable {
             "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
             "FFE4E1","F0FFF0","F0FFFF"};
 
+    @FXML
+    private SplitPane viewPointSplitPane;
+
     /** The top-level Pane which contains all other graphical elements of this controller.*/
     @FXML
     private ScrollPane contentScrollPane;
@@ -216,7 +219,10 @@ public class ViewPointPresenter implements Initializable {
         ucscWebEngine = ucscContentWebView.getEngine();
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
 
-    // Todo -- not catching lack of internet connect error.
+        // allow content of viewpoint tab to be resized to follow width of UCSC image
+        viewPointSplitPane.prefWidthProperty().bind(ucscContentWebView.widthProperty());
+
+        // Todo -- not catching lack of internet connect error.
         ucscWebEngine.setOnError(new EventHandler<WebErrorEvent>() {
             @Override
             public void handle(WebErrorEvent event) {
@@ -444,16 +450,8 @@ public class ViewPointPresenter implements Initializable {
             int upstreamSpan= viewpoint.getUpstreamSpan();
             int downstreamSpan= viewpoint.getDownstreamSpan();
             int total = viewpoint.getTotalPromoterCount();
-            String promoterCount;
-            if (total==1) {
-                promoterCount=String.format("Only promoter of %s gene", viewpoint.getTargetName());
-            } else {
-                 promoterCount = String.format("Promoter %d of %d of %s gene",
-                        viewpoint.getPromoterNumber(),
-                        total, viewpoint.getTargetName());
-            }
-            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s (%s)",
-                    upstreamSpan,downstreamSpan,promoterCount, viewpoint.getStrandAsString()));
+            this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s",
+                    upstreamSpan,downstreamSpan, viewpoint.getStrandAsString()));
         }
     }
 

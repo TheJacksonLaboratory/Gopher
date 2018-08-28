@@ -33,20 +33,17 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.LogManager;
@@ -89,11 +86,6 @@ public class GopherMainPresenter implements Initializable {
     private ChoiceBox<String> genomeChoiceBox;
     @FXML
     private ChoiceBox<String> approachChoiceBox;
-    /**
-     * Clicking this button downloads the genome build and unpacks it.
-     */
-//    @FXML
-//    private Button downloadGenome;
     @FXML
     private Button decompressGenomeButton;
     @FXML
@@ -295,7 +287,7 @@ public class GopherMainPresenter implements Initializable {
         return minBaitCount;
     }
 
-    transient private IntegerProperty baitLength = new SimpleIntegerProperty();
+    final transient private IntegerProperty baitLength = new SimpleIntegerProperty();
 
     private int getBaitLength() {
         return baitLength.get();
@@ -309,7 +301,7 @@ public class GopherMainPresenter implements Initializable {
         return baitLength;
     }
 
-    transient private IntegerProperty marginLength = new SimpleIntegerProperty();
+    final transient private IntegerProperty marginLength = new SimpleIntegerProperty();
 
     private int getMarginLength() {
         return marginLength.get();
@@ -323,7 +315,7 @@ public class GopherMainPresenter implements Initializable {
         return marginLength;
     }
 
-    transient private IntegerProperty maxBaitCount = new SimpleIntegerProperty();
+    final transient private IntegerProperty maxBaitCount = new SimpleIntegerProperty();
 
     private int getMaximumBaitCount() {
         return maxBaitCount.get();
@@ -337,7 +329,7 @@ public class GopherMainPresenter implements Initializable {
         return maxBaitCount;
     }
 
-    transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
+    final transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
 
     private double getMinGCcontent() {
         return minGCcontent.get();
@@ -351,7 +343,7 @@ public class GopherMainPresenter implements Initializable {
         return minGCcontent;
     }
 
-    transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
+    final transient private DoubleProperty maxGCcontent = new SimpleDoubleProperty();
 
     private double getMaxGCcontent() {
         return maxGCcontent.get();
@@ -369,16 +361,10 @@ public class GopherMainPresenter implements Initializable {
     }
 
 
-    @FXML
-    void exitButtonClicked(ActionEvent e) {
-        e.consume();
-        logger.info("Closing Gopher Gui");
-        serialize();
-        javafx.application.Platform.exit();
-    }
-
     /**
-     * Serialize the project data to the default location.
+     * Serialize the project data to the default location. Note that the class
+     * {@link SerializationManager} will set the model's "clean" variable to true after
+     * saving.
      */
     private boolean serialize() {
         String projectname = this.model.getProjectName();
@@ -456,9 +442,9 @@ public class GopherMainPresenter implements Initializable {
                 logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
             }
         });
-
-
     }
+
+
 
     /** makes the upstream and downstream size fields invisible because they are irrelevant to the simple approach.*/
     private void setGUItoSimple() {
@@ -488,9 +474,6 @@ public class GopherMainPresenter implements Initializable {
 
 
     private void setInitializedValuesInGUI() {
-        String genomebuild=model.getGenomeBuild();
-//        if (genomebuild!=null)
-//            this.genomeBuildLabel.setText(genomebuild);
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory!= null) {
            // this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
@@ -618,6 +601,9 @@ public class GopherMainPresenter implements Initializable {
         } else if (model.useExtendedApproach()){
             this.approachChoiceBox.setValue("Extended");
         }
+        // after we have set up the model the first time, mark it as clean. Any changes after this will lead
+        // to a confirmation window being opened if the user has changed anything.
+        model.setClean(true);
     }
 
 
@@ -903,11 +889,20 @@ public class GopherMainPresenter implements Initializable {
         String url2;
         switch (genomeBuild) {
             case "hg19":
-                url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1"; // this is 50-mer
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/wgEncodeCrgMapabilityAlign50mer.hg19.bedGraph.gz";
+                //url = "https://www.dropbox.com/s/lxrkpjfwy6xenq5/wgEncodeCrgMapabilityAlign50mer.bedpraph.gz?dl=1";
                 url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/chromInfo.txt.gz";
                 break;
             case "mm9":
-                url = "https://www.dropbox.com/s/nqq1c8vzuh5o4ky/wgEncodeCrgMapabilityAlign100mer.bedgraph.gz?dl=1"; // this is still 100-mer
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/wgEncodeCrgMapabilityAlign50mer.mm9.bedGraph.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                break;
+            case "hg38":
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/hg38_50.m2.bedGraph.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                break;
+            case "mm10":
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/mm10_50.m2.bedGraph.gz";
                 url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
                 break;
             default:
@@ -1055,13 +1050,17 @@ public class GopherMainPresenter implements Initializable {
     @FXML private void saveDigestFileAs(ActionEvent e) {
         logger.trace("Saving the digest file");
         // get path from chooser
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Choose file path to save digest file");
-        File file = chooser.showSaveDialog(null);
-        if (file==null) {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Choose directory for exporting digest file.");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File dir = dirChooser.showDialog(this.rootNode.getScene().getWindow());
+        if (dir==null || dir.getAbsolutePath().equals("")) {
+            PopupFactory.displayError("Error","Could not get path to export digest file.");
             return;
         }
-        String path = file.getAbsolutePath();
+
+        String path = dir.getAbsolutePath();
+        path += File.separator;
         DigestCreationTask task = new DigestCreationTask(path,model);
 
         TaskProgressBarView pbview = new TaskProgressBarView();
@@ -1207,22 +1206,6 @@ public class GopherMainPresenter implements Initializable {
         new Thread(task).start();
         window.setScene(new Scene(pbview.getView()));
         window.showAndWait();
-    }
-
-
-
-    /**
-     * This method is run after user clicks on 'Close' item of File|Menu. User is prompted to confirm the closing and
-     * window is closed if 'yes' is selected.
-     * @param e Event triggered by close command.
-     */
-    public void closeWindow(ActionEvent e) {
-        boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
-        if (answer) {
-            logger.info("Closing Gopher Gui");
-            serialize();
-            javafx.application.Platform.exit();
-        }
     }
 
     public void refreshViewPoints() {
@@ -1551,8 +1534,43 @@ public class GopherMainPresenter implements Initializable {
         logger.trace("buildRegulatoryExome");
     }
 
+    /**
+     * This method is run after user clicks on 'Close' item of File|Menu. User is prompted to confirm the closing and
+     * window is closed if 'yes' is selected.
+     * @param e Event triggered by close command.
+     */
+    public void closeWindow(ActionEvent e) {
+        if (model.isClean()) {
+            boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
+            if (answer) {
+                logger.info("Closing Gopher Gui");
+                serialize();
+                javafx.application.Platform.exit();
+            }
+        } else {
+            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
+            if (answer) {
+                logger.info("Closing Gopher Gui");
+                serialize();
+                javafx.application.Platform.exit();
+            }
+        }
+    }
+
+    /** A Handler for the event that the user clicks the close box at the left upper corner of the app.
+     * We just call {@link #closeWindow(ActionEvent)}, which is the function that is called
+     * if the user chooses Quit from the file menu or uses the corresponding keyboard shortcut.
+     * Note that we need to transform a WindowEvent to an ActionEvent.
+     */
+    private final EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
+        closeWindow(new ActionEvent(event.getSource(),event.getTarget()));
+        event.consume();
+    };
+
     public void setPrimaryStageReference(Stage stage) {
+
         this.primaryStage=stage;
+        this.primaryStage.setOnCloseRequest(confirmCloseEventHandler);
     }
 
     @FXML public void displayReport(ActionEvent e) {
@@ -1595,9 +1613,7 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
     }
 
-    @FXML private void setPatchedViewpoint() {
-        logger.error("TODO -- SET PATCHED VIEWPOINT IN MODEL?????");
-    }
+
 }
 
 

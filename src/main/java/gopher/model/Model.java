@@ -26,8 +26,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 6L;
-    private static final String VERSION="0.4.7";
-    private static final String LAST_CHANGE_DATE="2018-07-31";
+    private static final String VERSION="0.4.8";
+    private static final String LAST_CHANGE_DATE="2018-08-31";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -36,19 +36,18 @@ public class Model implements Serializable {
     private List<ViewPoint> viewpointList=null;
     /** List of all target genes chosen by the user. Note: One gene can have one or more ViewPoints (one for each transcription start site) .*/
     private List<GopherGene> geneList=null;
+    /** This variable is set to false if something was changed in the GUI that the user might want to save.
+     * We initialize it to true so that we have a fresh slate at the start of each session. */
+    private transient boolean clean=true;
 
     public enum Approach {
-        SIMPLE, EXTENDED, SIMPLE_WITH_MANUAL_REVISIONS, EXTENDED_WITH_MANUAL_REVISIONS,UNINITIALIZED;
+        SIMPLE, EXTENDED, UNINITIALIZED;
         public String toString() {
             switch (this) {
                 case SIMPLE:
                     return "simple";
-                case SIMPLE_WITH_MANUAL_REVISIONS:
-                    return "simple with manual revisions";
                 case EXTENDED:
                     return "extended";
-                case EXTENDED_WITH_MANUAL_REVISIONS:
-                    return "extended with manual revisions";
                 case UNINITIALIZED:
                 default:
                     return "uninitialized";
@@ -91,6 +90,7 @@ public class Model implements Serializable {
 
     public void setRegulatoryExomeProperties(Properties regulatoryExomeProperties) {
         this.regulatoryExomeProperties = regulatoryExomeProperties;
+        clean=false;
     }
 
     /** A list of the analysis results for the regulatory exome. */
@@ -100,6 +100,7 @@ public class Model implements Serializable {
     public String getRegulatoryBuildPath() { return regulatoryBuildPath; }
     public void setRegulatoryBuildPath(String regulatoryBuildPath) {
         this.regulatoryBuildPath = regulatoryBuildPath;
+        clean=false;
     }
     public boolean regulatoryBuildPathInitialized(){ return regulatoryBuildPath!=null;}
 
@@ -127,6 +128,7 @@ public class Model implements Serializable {
             default:
                 PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
         }
+        clean=false;
     }
 
     public Genome getGenome() { return this.genome; }
@@ -137,14 +139,22 @@ public class Model implements Serializable {
         else {
             logger.error(String.format("Malformed approach string %s",s));
         }
+        clean=false;
     }
 
+    /** Set the variable clean (which we use to keep track of changes to the model that the user might want to save)*/
+    public void setClean(boolean b){
+        this.clean=b;
+    }
+    /** Is the model clean, i.e., it does not have unsaved changes? */
+    public boolean isClean(){ return clean; }
+
     public boolean useSimpleApproach() {
-        return approach==Approach.SIMPLE || approach==Approach.SIMPLE_WITH_MANUAL_REVISIONS;
+        return approach==Approach.SIMPLE;
     }
 
     public boolean useExtendedApproach() {
-        return approach==Approach.EXTENDED || approach==Approach.EXTENDED_WITH_MANUAL_REVISIONS;
+        return approach==Approach.EXTENDED;
     }
 
     public Approach getApproach() {
@@ -156,62 +166,63 @@ public class Model implements Serializable {
      */
     private int sizeUp;
     public final int getSizeUp() { return sizeUp;}
-    public final void setSizeUp(int su) {  sizeUp=su;}
+    public final void setSizeUp(int su) {  sizeUp=su; clean=false;}
 
     private int sizeDown;
     public final int getSizeDown() { return sizeDown;}
-    public final void setSizeDown(int sd) { sizeDown=sd;}
+    public final void setSizeDown(int sd) { sizeDown=sd; clean=false;}
 
     /** Minimum allowable size of a restriction digest within a ViewPoint chosen for capture Hi C enrichment. */
     private int minFragSize;
     public int getMinFragSize() { return minFragSize; }
-    public void setMinFragSize(int i) { this.minFragSize=i;}
+    public void setMinFragSize(int i) { this.minFragSize=i; clean=false;}
 
     /** Maximum allowable repeat content in the margin of a selected digest. */
     // TODO -- this is being replaced by the alignability score
     private double maxRepeatContent;
     public  double getMaxRepeatContent() {return maxRepeatContent;}
-    public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r;}
+    public  void setMaxRepeatContent(double r) { this.maxRepeatContent=r; clean=false;}
     public double getMaxRepeatContentPercent(){return 100*maxRepeatContent; }
 
     /** Maximum allowable mean kmer alignability score of a margin. */
     private int maxMeanKmerAlignability;
     public int getMaxMeanKmerAlignability() {return this.maxMeanKmerAlignability;}
-    public void setMaxMeanKmerAlignability(int mmka) { this.maxMeanKmerAlignability=mmka;}
+    public void setMaxMeanKmerAlignability(int mmka) { this.maxMeanKmerAlignability=mmka; clean=false;}
 
     /** Minimum allowable GC content in a selected digest. */
     private double minGCcontent;
     public  double getMinGCcontent() { return minGCcontent;}
-    public  void setMinGCcontent(double mgc) { minGCcontent=mgc;}
+    public  void setMinGCcontent(double mgc) { minGCcontent=mgc; clean=false;}
     public double getMinGCContentPercent() { return 100*minGCcontent; }
     /** Maximum allowable GC content in a selected digest. */
     private double maxGCcontent;
     public  double getMaxGCcontent() { return maxGCcontent;}
-    public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc;}
+    public  void setMaxGCcontent(double mgc) { maxGCcontent=mgc; clean=false;}
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
 
     private boolean allowUnbalancedMargins =Default.ALLOW_UNBALANCED_MARGINs; // true
     public boolean getAllowUnbalancedMargins() { return allowUnbalancedMargins; }
-    public void setAllowUnbalancedMargins(boolean b) { allowUnbalancedMargins =b; }
+    public void setAllowUnbalancedMargins(boolean b) { allowUnbalancedMargins =b; clean=false;}
 
     private boolean allowPatching=Default.ALLOW_PATCHING; // false
     public boolean getAllowPatching() { return this.allowPatching; }
-    public void setAllowPatching(boolean b) { this.allowPatching=b; }
+    public void setAllowPatching(boolean b) { this.allowPatching=b; clean=false;}
 
     /** Minimum number of baits (probes) per valid margin */
     private int minBaitCount;
     public int getMinBaitCount(){return minBaitCount;}
-    public void setMinBaitCount(int bc) { this.minBaitCount=bc;}
+    public void setMinBaitCount(int bc) { this.minBaitCount=bc; clean=false;}
     /** Maximum number of baits (probes) per valid margin */
     private int maxBaitCount;
     public int getMaxBaitCount(){return maxBaitCount;}
-    public void setMaxBaitCount(int bc) { this.maxBaitCount=bc;}
+    public void setMaxBaitCount(int bc) { this.maxBaitCount=bc; clean=false;}
 
     /** Estimated average length of restriction fragments */
     private Double estAvgRestFragLen = null;
     public void setEstAvgRestFragLen(Double estAvgRestFragLen) {
         this.estAvgRestFragLen = estAvgRestFragLen;
+        clean=false;
     }
     public Double getEstAvgRestFragLen() {
         return this.estAvgRestFragLen;
@@ -230,7 +241,7 @@ public class Model implements Serializable {
 
     public int getUniqueTSScount() { return uniqueTSScount; }
 
-    public void setUniqueTSScount(int n) { this.uniqueTSScount = n; }
+    public void setUniqueTSScount(int n) { this.uniqueTSScount = n; clean=false; }
 
     /** Total number of Transcription start sites associated with the genes chosen by the user. Viewpoints will be chosen
      * from these start sites.
@@ -244,6 +255,7 @@ public class Model implements Serializable {
     public void setUniqueChosenTSScount(int uniqueChosenTSScount) {
         logger.trace(String.format("Setting chosen TSS count to %d",uniqueChosenTSScount));
         this.uniqueChosenTSScount = uniqueChosenTSScount;
+        clean=false;
     }
 
     private int uniqueChosenTSScount;
@@ -255,6 +267,7 @@ public class Model implements Serializable {
     public void setChosenGeneCount(int chosenGeneCount) {
         logger.trace(String.format("Setting chosen gene count to %d",chosenGeneCount));
         this.chosenGeneCount = chosenGeneCount;
+        clean=false;
     }
 
     /** Number of genes initialially chosen by user. Can be different from final number of genes if no valid viewpoints
@@ -269,6 +282,7 @@ public class Model implements Serializable {
 
     public void setTotalRefGeneCount(int totalRefGeneCount) {
         this.totalRefGeneCount = totalRefGeneCount;
+        clean=false;
     }
 
     /** Total number of RefGenes in the UCSC file. */
@@ -283,17 +297,17 @@ public class Model implements Serializable {
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
     private int probeLength=Default.PROBE_LENGTH;
     public int getProbeLength() { return probeLength; }
-    public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; }
+    public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; clean=false;}
 
 
     private Integer marginSize =Default.MARGIN_SIZE;
     public int getMarginSize(){return marginSize;}
-    public void setMarginSize(Integer s) {this.marginSize=s; }
+    public void setMarginSize(Integer s) {this.marginSize=s; clean=false;}
 
     //private Map<String, String> indexedFaFiles=null;
     /** Path to the genome fai file, e.g., hg19.fa.fai. */
     private String indexedGenomeFastaIndexFile=null;
-    public void setIndexedGenomeFastaIndexFile(String path) { indexedGenomeFastaIndexFile=path;}
+    public void setIndexedGenomeFastaIndexFile(String path) { indexedGenomeFastaIndexFile=path; clean=false;}
     public String getIndexedGenomeFastaIndexFile() { return indexedGenomeFastaIndexFile; }
 
     public List<GopherGene> getGopherGeneList() { return this.geneList; }
@@ -301,11 +315,11 @@ public class Model implements Serializable {
     public boolean isGenomeUnpacked() { return this.genome.isUnpackingComplete(); }
     public boolean isGenomeIndexed() { return this.genome.isIndexingComplete(); }
 
-    public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true);}
-    public void setGenomeIndexed() { this.genome.setGenomeIndexed(true);}
+    public void setGenomeUnpacked() { this.genome.setGenomeUnpacked(true); clean=false;}
+    public void setGenomeIndexed() { this.genome.setGenomeIndexed(true); clean=false;}
 
     public String getGenomeBasename() { return this.genome.getGenomeBasename(); }
-    public void setTargetGenesPath(String path){this.targetGenesPath=path; }
+    public void setTargetGenesPath(String path){this.targetGenesPath=path; clean=false;}
     public String getTargetGenesPath() { return this.targetGenesPath; }
 
     private String transcriptsBasename = null;
@@ -313,11 +327,11 @@ public class Model implements Serializable {
         return transcriptsBasename;
     }
     public void setTranscriptsBasename(String bname) {
-        this.transcriptsBasename=bname;
+        this.transcriptsBasename=bname;clean=false;
     }
 
     public int getN_validGeneSymbols() { return n_validGeneSymbols; }
-    public void setN_validGeneSymbols(int n_validGeneSymbols) { this.n_validGeneSymbols = n_validGeneSymbols; }
+    public void setN_validGeneSymbols(int n_validGeneSymbols) { this.n_validGeneSymbols = n_validGeneSymbols; clean=false;}
 
     public Model() {
         this.genome=new HumanHg19(); /* the default genome */
@@ -332,7 +346,7 @@ public class Model implements Serializable {
         this.targetType=TargetType.NONE;
     }
 
-    public void setTargetType(TargetType ttype) { this.targetType=ttype; }
+    public void setTargetType(TargetType ttype) { this.targetType=ttype; clean=false;}
     public TargetType getTargetType(){ return this.targetType==null?TargetType.NONE : targetType; }
 
 
@@ -341,8 +355,8 @@ public class Model implements Serializable {
         return enzymelist;
     }
 
-    public void setGenomeDirectoryPath(String p) { this.genome.setPathToGenomeDirectory(p); }
-    public void setGenomeDirectoryPath(File f) { this.genome.setPathToGenomeDirectory(f.getAbsolutePath());}
+    public void setGenomeDirectoryPath(String p) { this.genome.setPathToGenomeDirectory(p); clean=false;}
+    public void setGenomeDirectoryPath(File f) { setGenomeDirectoryPath(f.getAbsolutePath()); }
     public String getGenomeDirectoryPath() {
         return this.genome.getPathToGenomeDirectory();
     }
@@ -355,7 +369,7 @@ public class Model implements Serializable {
 
 
     public void setGopherGenes(List<GopherGene> vpvgenelist) {
-        this.geneList = vpvgenelist;
+        this.geneList = vpvgenelist;clean=false;
     }
 
     public void debugPrintVPVGenes() {
@@ -382,6 +396,7 @@ public class Model implements Serializable {
     public void setViewPoints(List<ViewPoint> viewpointlist) {
         logger.trace("setViewPoints: viewpointlist with size="+viewpointlist.size());
         this.viewpointList=viewpointlist;
+        clean=false;
     }
     /** @return the plain cutting site (no caret symbol) of the first enyzme chosen. */
     public String getFirstRestrictionEnzymeString() {
@@ -395,15 +410,15 @@ public class Model implements Serializable {
     }
 
     public void setChosenRestrictionEnzymes(List<RestrictionEnzyme> chosenEnzymes) {
-        this.chosenEnzymelist = chosenEnzymes;
+        this.chosenEnzymelist = chosenEnzymes; clean=false;
     }
 
     public List<RestrictionEnzyme> getChosenEnzymelist(){return this.chosenEnzymelist; }
 
-    public void setHttpProxyPort(String port) {this.httpPort=port; }
+    public void setHttpProxyPort(String port) {this.httpPort=port; clean=false;}
     public String getHttpProxyPort() { return this.httpPort; }
     public String getHttpProxy() { return this.httpProxy; }
-    public void setHttpProxy(String proxy) {this.httpProxy=proxy; }
+    public void setHttpProxy(String proxy) {this.httpProxy=proxy; clean=false; }
     public boolean needsProxy() { return (httpProxy!=null && httpPort!=null); }
     /** @return number of successfully parsed genes. */
     public int n_valid_genes() {
@@ -425,10 +440,10 @@ public class Model implements Serializable {
     }
 
 
-    public void setRefGenePath(String p) { refGenePath=p; }
+    public void setRefGenePath(String p) { refGenePath=p;clean=false; }
     public String getRefGenePath() { return this.refGenePath; }
 
-    public void setAlignabilityMapPathIncludingFileNameGz(String p) { alignabilityMapPathIncludingFileNameGz = p; }
+    public void setAlignabilityMapPathIncludingFileNameGz(String p) { alignabilityMapPathIncludingFileNameGz = p;clean=false; }
     public String getAlignabilityMapPathIncludingFileNameGz() { return this.alignabilityMapPathIncludingFileNameGz; }
     public boolean alignabilityMapPathIncludingFileNameGzExists() {
         return ( alignabilityMapPathIncludingFileNameGz != null &&
@@ -436,7 +451,7 @@ public class Model implements Serializable {
         );
     }
 
-    public void setChromInfoPathIncludingFileNameGz(String p) { chromInfoPathIncludingFileNameGz = p; }
+    public void setChromInfoPathIncludingFileNameGz(String p) { chromInfoPathIncludingFileNameGz = p; clean=false;}
     public String getChromInfoPathIncludingFileNameGz() { return this.chromInfoPathIncludingFileNameGz; }
     public boolean chromInfoPathIncludingFileNameGzExists() {
         return ( chromInfoPathIncludingFileNameGz != null &&
@@ -444,7 +459,7 @@ public class Model implements Serializable {
     }
 
 
-    public void setProjectName(String name) { this.projectName=name;}
+    public void setProjectName(String name) { this.projectName=name; clean=false;}
     public String getProjectName() { return this.projectName; }
 
 

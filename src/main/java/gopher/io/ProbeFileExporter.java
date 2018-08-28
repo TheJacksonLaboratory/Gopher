@@ -37,7 +37,7 @@ public class ProbeFileExporter {
         // initialize the file names
         this.ProbeFileAgilentFormat = String.format("%s_agilentProbeFile.txt",outPrefix);
         this.ProbeFileAgilentFormatZip = String.format("%s_agilentProbeFile.txt.zip",outPrefix);
-        this.ProbeFileBedFormat = String.format("%s_BedProbeFile.bed",outPrefix);
+        this.ProbeFileBedFormat = String.format("%s_ProbeFile.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
             dirpath=dirpath.substring(0,dirpath.length()-1);

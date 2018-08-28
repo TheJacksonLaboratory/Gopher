@@ -20,7 +20,7 @@ public class Default {
     /** Minimum size of a fragment to be considered for enrichment. */
     public final static int MINIMUM_FRAGMENT_SIZE = 120;
     /** Maximum allowable mean kmer alignability. */
-    public final static int MAXIMUM_KMER_ALIGNABILITY = 10;
+    public final static int MAXIMUM_KMER_ALIGNABILITY = 2;
     /** Size of the margin of a fragment that will be enriched by targeting probes.*/
     public final static int MARGIN_SIZE = 250;
 

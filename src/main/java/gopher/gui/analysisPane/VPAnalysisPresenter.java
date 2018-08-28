@@ -336,8 +336,10 @@ public class VPAnalysisPresenter implements Initializable {
 
 
         listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
+
         int n_baits = design.getTotalNumOfUniqueBaits();
-        String baitV = String.format("n=%d", n_baits);
+        Double captureSize = design.getCaptureSize()/1000000.0;
+        String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
         listItems.put("Probes", baitV);
         return listItems;
     }
