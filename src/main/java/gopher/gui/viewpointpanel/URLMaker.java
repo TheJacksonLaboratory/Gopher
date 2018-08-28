@@ -83,21 +83,21 @@ class URLMaker {
     }
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg19() {
-        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&wgEncodeCrgMapabilityAlign50mer=full";
+        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&ncbiRefSeqView=pack&g=wgEncodeCrgMapabilityAlign50mer&i=wgEncodeCrgMapabilityAlign50mer";
     }
 
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg38() {
-        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&refGene=full&OmimAvSnp=hide";
+        return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&ncbiRefSeqView=pack&OmimAvSnp=hide";
     }
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm9() {
-        return "gc5Base=dense&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full&wgEncodeCrgMapabilityAlign50mer=full";
+        return "gc5Base=dense&knownGene=hide&ncbiRefSeqView=pack&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full&wgEncodeCrgMapabilityAlign50mer=full";
     }
 
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm10() {
-        return "gc5Base=dense&knownGene=hide&refGene=full&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
+        return "gc5Base=dense&knownGene=hide&ncbiRefSeqView=pack&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
     }
 
 
