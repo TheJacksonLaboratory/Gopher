@@ -106,7 +106,7 @@
                                      </VBox.margin>
                               <Separator prefWidth="200.0" styleClass="sep" stylesheets="@gophermain.css">
                                  <GridPane.margin>
-                                    <Insets left="10.0" />
+                                    <Insets />
                                  </GridPane.margin>
                               </Separator>
                                      <Label text="Genome build" GridPane.rowIndex="1">

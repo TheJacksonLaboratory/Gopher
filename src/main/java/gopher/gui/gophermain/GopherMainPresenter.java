@@ -1197,10 +1197,17 @@ public class GopherMainPresenter implements Initializable {
             window.close();
         });
         task.setOnFailed(eh -> {
-            Exception exc = (Exception)eh.getSource().getException();
-            PopupFactory.displayException("Error",
-                    "Exception encountered while attempting to create viewpoints",
-                    exc);
+            if (eh.getSource() instanceof OutOfMemoryError) {
+                PopupFactory.displayMessage("Error",
+                        "Out of memory error--see online documentation for how to increase memory"
+                        );
+                return;
+            } else {
+                Exception exc = (Exception) eh.getSource().getException();
+                PopupFactory.displayException("Error",
+                        "Exception encountered while attempting to create viewpoints",
+                        exc);
+            }
         });
         task.setOnCancelled( e -> window.close() );
         new Thread(task).start();
