@@ -1197,10 +1197,11 @@ public class GopherMainPresenter implements Initializable {
             window.close();
         });
         task.setOnFailed(eh -> {
-            if (eh.getSource() instanceof OutOfMemoryError) {
-                PopupFactory.displayMessage("Error",
+            if (eh.getSource().getException() instanceof OutOfMemoryError) {
+                window.close();
+                PopupFactory.displayMessage("Out of memory error",
                         "Out of memory error--see online documentation for how to increase memory"
-                        );
+                );
                 return;
             } else {
                 Exception exc = (Exception) eh.getSource().getException();
