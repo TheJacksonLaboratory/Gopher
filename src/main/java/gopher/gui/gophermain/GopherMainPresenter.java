@@ -899,11 +899,11 @@ public class GopherMainPresenter implements Initializable {
                 break;
             case "hg38":
                 url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/hg38_50.m2.bedGraph.gz";
-                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/chromInfo.txt.gz";
                 break;
             case "mm10":
                 url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/mm10_50.m2.bedGraph.gz";
-                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm10/database/chromInfo.txt.gz";
                 break;
             default:
                 //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
