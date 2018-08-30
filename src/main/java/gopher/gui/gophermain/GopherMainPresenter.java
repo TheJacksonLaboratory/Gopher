@@ -601,6 +601,7 @@ public class GopherMainPresenter implements Initializable {
         } else if (model.useExtendedApproach()){
             this.approachChoiceBox.setValue("Extended");
         }
+        this.genomeChoiceBox.setValue(model.getGenomeBuild());
         // after we have set up the model the first time, mark it as clean. Any changes after this will lead
         // to a confirmation window being opened if the user has changed anything.
         model.setClean(true);
