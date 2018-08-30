@@ -42,6 +42,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.*;
 import javafx.util.StringConverter;
@@ -49,6 +50,7 @@ import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1200,9 +1202,9 @@ public class GopherMainPresenter implements Initializable {
         task.setOnFailed(eh -> {
             if (eh.getSource().getException() instanceof OutOfMemoryError) {
                 window.close();
-                PopupFactory.displayMessage("Out of memory error",
-                        "Out of memory error--see online documentation for how to increase memory"
-                );
+                JOptionPane.showMessageDialog(null,
+                        "Out of memory error--see online documentation for how to increase memory",
+                        "Out of memory error", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
                 Exception exc = (Exception) eh.getSource().getException();
