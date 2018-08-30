@@ -1,5 +1,7 @@
 package gopher;
 
+import gopher.gui.popupdialog.PopupFactory;
+import gopher.io.Platform;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -50,6 +52,12 @@ public class Gopher extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try { // ensure that directory for Gopher global settings exists, or die
+            Platform.createGopherDir();
+        } catch (IOException e) {
+            PopupFactory.displayException("Error", e.getMessage() + "\nGopher will now exit", e);
+            javafx.application.Platform.exit();
+        }
         updateLog4jConfiguration();
         //logger.info("Starting Gopher Gui");
         this.primarystage = primaryStage;
