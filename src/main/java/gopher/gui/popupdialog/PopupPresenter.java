@@ -1,5 +1,6 @@
 package gopher.gui.popupdialog;
 
+import gopher.io.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +15,7 @@ import org.apache.log4j.Logger;
 import gopher.framework.Signal;
 
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -24,6 +26,8 @@ public class PopupPresenter  implements Initializable  {
     AnchorPane apane;
     @FXML
     private WebView wview;
+
+    private WebEngine webEngine;
 
     @FXML private Button cancelButon;
     @FXML private Button okButton;
@@ -37,6 +41,8 @@ public class PopupPresenter  implements Initializable  {
     private Consumer<Signal> signal;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        webEngine = wview.getEngine();
+        webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
     public void setSignal(Consumer<Signal> signal) {
@@ -44,8 +50,7 @@ public class PopupPresenter  implements Initializable  {
     }
 
     public void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
+        webEngine.loadContent(html);
     }
 
     @FXML public void cancelButtonClicked(ActionEvent e) {

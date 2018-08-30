@@ -27,6 +27,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
@@ -157,7 +158,6 @@ public class ViewPointPresenter implements Initializable {
         String url= urlmaker.getImageURL(viewpoint,getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
-        this.ucscWebEngine = ucscContentWebView.getEngine();
         this.ucscWebEngine.load(url);
 
         progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
@@ -217,6 +217,7 @@ public class ViewPointPresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ucscWebEngine = ucscContentWebView.getEngine();
+        ucscWebEngine.setUserDataDirectory(new File(gopher.io.Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
 
         // allow content of viewpoint tab to be resized to follow width of UCSC image

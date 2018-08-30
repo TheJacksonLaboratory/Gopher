@@ -11,6 +11,7 @@ import javafx.scene.web.WebView;
 import gopher.framework.Signal;
 
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -23,18 +24,21 @@ public class HelpPresenter implements Initializable {
     @FXML
     WebView wview;
 
+    private WebEngine webEngine;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // no op
+        webEngine = wview.getEngine();
+        webEngine.setUserDataDirectory(new File(gopher.io.Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
     public void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
-        engine.locationProperty().addListener(new ChangeListener<String>() {
+
+        webEngine.loadContent(html);
+        webEngine.locationProperty().addListener(new ChangeListener<String>() {
             @Override public void changed(ObservableValue<? extends String> ov, final String oldLoc, final String loc) {
                 if (!loc.contains("google.com")) {
-                    Platform.runLater(() -> engine.load(oldLoc)); // new Runnable
+                    Platform.runLater(() -> webEngine.load(oldLoc)); // new Runnable
                 }
             }
         });
