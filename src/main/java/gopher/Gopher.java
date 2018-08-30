@@ -89,6 +89,15 @@ public class Gopher extends Application {
     }
 
     public static void main(String[] args) {
+        String jre_version = System.getProperty("java.specification.version");
+        if (!jre_version.equals("1.8")) {
+            JOptionPane.showMessageDialog(null,
+                    "Your current Java version "
+                            + jre_version
+                            + " is not supported and GOPHER may not work correctly.\n"
+                            + "Please install Java version 1.8 (Java 8) from: https://www.java.com/download/",
+                    "Java version warning", JOptionPane.WARNING_MESSAGE);
+        }
         Locale.setDefault(new Locale("en", "US"));
         launch(args);
     }
