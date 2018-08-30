@@ -2,20 +2,37 @@ package gopher.io;
 
 
 import java.io.File;
-
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import java.io.IOException;
 
 /**
- * This is used to figure out where VPVGui will store the viewpoint files. For instance, with linux
+ * This is used to figure out where Gopher will store the viewpoint files. For instance, with linux
  * this would be /home/username/.gopher/...
  */
 public class Platform {
 
     /**
-     * Get path to directory where HRMD-gui stores global settings.
-     * The path depends on underlying operating system. Linux, Windows and OSX
-     * currently supported.
+     * This method creates directory where Gopher stores global settings, if the directory does not exist.
+     *
+     * @throws IOException if it is not possible to create the Gopher directory
+     */
+    public static void createGopherDir() throws IOException {
+        File target = getGopherDir();
+
+        if (target == null)
+            throw new IOException("Operating system not recognized. Supported systems: WINDOWS, OSX, LINUX");
+
+        if (!target.isDirectory()) { // either does not exist or is not a directory
+            boolean success = target.mkdirs();
+            if (!success)
+                throw new IOException("Unable to create directory for storing Gopher settings at '" + target.getAbsolutePath() + "'");
+        }
+    }
+
+
+    /**
+     * Get path to directory where Gopher stores global settings.
+     * The path depends on underlying operating system. Linux, Windows and OSX currently supported.
+     *
      * @return File to directory
      */
     public static File getGopherDir() {
@@ -31,11 +48,6 @@ public class Platform {
             case OSX: return osxPath;
             case UNKNOWN: return null;
             default:
-                Alert a = new Alert(AlertType.ERROR);
-                a.setTitle("Find GUI config dir");
-                a.setHeaderText(null);
-                a.setContentText(String.format("Unrecognized platform. %s", platform.toString()));
-                a.showAndWait();
                 return null;
         }
     }
