@@ -1,14 +1,17 @@
 package gopher.gui.help;
 
+import gopher.io.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.util.Optional;
 
 /**
@@ -70,7 +73,9 @@ public class HelpViewFactory {
             Stage window;
             window = new Stage();
             WebView web = new WebView();
-            web.getEngine().load(READTHEDOCS_SITE);
+            WebEngine webEngine = web.getEngine();
+            webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), HelpViewFactory.class.getCanonicalName()));
+            webEngine.load(READTHEDOCS_SITE);
             Scene scene = new Scene(web);
             window.setScene(scene);
             window.show();
