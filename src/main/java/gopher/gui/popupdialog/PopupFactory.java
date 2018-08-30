@@ -24,15 +24,7 @@ public class PopupFactory {
 
     private boolean wasCancelled=false;
 
-    private Integer integerValue=null;
-
     private String stringValue=null;
-
-    private static final String HTML_HEADER = "<html><head>%s</head><body>";
-    private static final String HTML_FOOTER = "</body></html>";
-
-
-
 
     private boolean showDialogToGetStringFromUser(String windowTitle, String html, String labeltext, String previousValue, String defaultValue){
         Stage window;
@@ -285,35 +277,6 @@ public class PopupFactory {
        return String.format("<html><body><h1>GOPHER Report</h1><pre>%s</pre></body></html>",text);
     }
 
-    public static  void showSummaryDialog(String text) {
-        Stage window;
-        String windowTitle = "GOPHER Report";
-        window = new Stage();
-        window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
-
-        PopupView view = new PopupView();
-        PopupPresenter presenter = (PopupPresenter) view.getPresenter();
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
-        presenter.setData(getPreHTML(text));
-        presenter.hideButtons();
-
-
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();
-    }
-
-
     public static  void showReportListDialog(List<String> reportlist) {
         Stage window;
         String windowTitle = "GOPHER Report";
@@ -349,35 +312,6 @@ public class PopupFactory {
         al.setHeaderText(null);
         al.setContentText(text);
         al.showAndWait();
-    }
-
-
-
-    public static void showException(String windowTitle, String header, Exception exception) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(windowTitle);
-        alert.setHeaderText(header);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        exception.printStackTrace(pw);
-        String exceptionText = sw.toString();
-
-        Label label = new Label("The exception stacktrace was:");
-
-        TextArea textArea = new TextArea(exceptionText);
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-        // Set expandable Exception into the dialog pane.
-        alert.getDialogPane().setExpandableContent(textArea);
-        alert.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.showAndWait();
     }
 
 

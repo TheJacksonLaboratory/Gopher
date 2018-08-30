@@ -1,5 +1,7 @@
 package gopher;
 
+import gopher.gui.popupdialog.PopupFactory;
+import gopher.io.Platform;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -50,6 +52,12 @@ public class Gopher extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try { // ensure that directory for Gopher global settings exists, or die
+            Platform.createGopherDir();
+        } catch (IOException e) {
+            PopupFactory.displayException("Error", e.getMessage() + "\nGopher will now exit", e);
+            javafx.application.Platform.exit();
+        }
         updateLog4jConfiguration();
         //logger.info("Starting Gopher Gui");
         this.primarystage = primaryStage;
@@ -81,6 +89,15 @@ public class Gopher extends Application {
     }
 
     public static void main(String[] args) {
+        String jre_version = System.getProperty("java.specification.version");
+        if (!jre_version.equals("1.8")) {
+            JOptionPane.showMessageDialog(null,
+                    "Your current Java version "
+                            + jre_version
+                            + " is not supported and GOPHER may not work correctly.\n"
+                            + "Please install Java version 1.8 (Java 8) from: https://www.java.com/download/",
+                    "Java version warning", JOptionPane.WARNING_MESSAGE);
+        }
         Locale.setDefault(new Locale("en", "US"));
         launch(args);
     }

@@ -1,5 +1,6 @@
 package gopher.gui.qcCheckPane;
 
+import gopher.io.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,6 +11,7 @@ import javafx.scene.web.WebView;
 import org.apache.log4j.Logger;
 import gopher.framework.Signal;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -19,6 +21,8 @@ public class QCCheckPresenter implements Initializable {
     static Logger logger = Logger.getLogger(QCCheckPresenter.class.getName());
     @FXML
     private WebView wview;
+
+    private WebEngine webEngine;
 
     @FXML private Button cancelButon;
     @FXML private Button continueButton;
@@ -30,6 +34,8 @@ public class QCCheckPresenter implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        webEngine = wview.getEngine();
+        webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
     public QCCheckPresenter() {
@@ -40,8 +46,7 @@ public class QCCheckPresenter implements Initializable {
     }
 
     public void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
+        webEngine.loadContent(html);
     }
 
     @FXML public void cancelButtonClicked(ActionEvent e) {

@@ -4,6 +4,7 @@ package gopher.gui.entrezgenetable;
 import com.google.common.collect.ImmutableList;
 import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
+import gopher.io.Platform;
 import gopher.io.RefGeneParser;
 import gopher.model.GopherGene;
 import gopher.model.Model;
@@ -45,6 +46,8 @@ public class EntrezGenePresenter implements Initializable {
     private static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
     /** This webview explains how to enter genes */
     @FXML private WebView wview;
+
+    private WebEngine webEngine;
     /** A reference to the Model. We will use it to add genes information to the model.*/
     private Model model=null;
     /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
@@ -62,6 +65,8 @@ public class EntrezGenePresenter implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         isvalidated=false;
+        webEngine = wview.getEngine();
+        webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
    public void setSignal(Consumer<Signal> signal) {
@@ -127,8 +132,7 @@ public class EntrezGenePresenter implements Initializable {
 
    /** Sets the text that will be shown in the HTML View. */
     void setData(String html) {
-        WebEngine engine = wview.getEngine();
-        engine.loadContent(html);
+        webEngine.loadContent(html);
     }
 
     @FXML

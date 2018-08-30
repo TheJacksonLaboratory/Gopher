@@ -601,6 +601,7 @@ public class GopherMainPresenter implements Initializable {
         } else if (model.useExtendedApproach()){
             this.approachChoiceBox.setValue("Extended");
         }
+        this.genomeChoiceBox.setValue(model.getGenomeBuild());
         // after we have set up the model the first time, mark it as clean. Any changes after this will lead
         // to a confirmation window being opened if the user has changed anything.
         model.setClean(true);
@@ -899,11 +900,11 @@ public class GopherMainPresenter implements Initializable {
                 break;
             case "hg38":
                 url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/hg38_50.m2.bedGraph.gz";
-                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/chromInfo.txt.gz";
                 break;
             case "mm10":
                 url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/mm10_50.m2.bedGraph.gz";
-                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm9/database/chromInfo.txt.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm10/database/chromInfo.txt.gz";
                 break;
             default:
                 //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
@@ -1197,10 +1198,18 @@ public class GopherMainPresenter implements Initializable {
             window.close();
         });
         task.setOnFailed(eh -> {
-            Exception exc = (Exception)eh.getSource().getException();
-            PopupFactory.displayException("Error",
-                    "Exception encountered while attempting to create viewpoints",
-                    exc);
+            if (eh.getSource().getException() instanceof OutOfMemoryError) {
+                window.close();
+                PopupFactory.displayMessage("Out of memory error",
+                        "Out of memory error--see online documentation for how to increase memory"
+                );
+                return;
+            } else {
+                Exception exc = (Exception) eh.getSource().getException();
+                PopupFactory.displayException("Error",
+                        "Exception encountered while attempting to create viewpoints",
+                        exc);
+            }
         });
         task.setOnCancelled( e -> window.close() );
         new Thread(task).start();

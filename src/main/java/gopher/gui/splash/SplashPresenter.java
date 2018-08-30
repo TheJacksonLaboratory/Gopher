@@ -76,18 +76,22 @@ public class SplashPresenter implements Initializable {
     }
 
 
-    /** @return list of project serialized files in the user's gopher directory. */
+    /**
+     * @return list of project serialized files in the user's gopher directory.
+     */
     private ObservableList<String> getExistingProjectNames() {
-        File dir= getGopherDir();
-       File[] files = dir.listFiles(pathname -> pathname.getAbsolutePath().endsWith(".ser"));//FileFilter
+        File dir = getGopherDir();
         ObservableList<String> lst = FXCollections.observableArrayList();
-       for (File f : files) {
-           /* We want to show just the base name without "ser". Also, transform underscores to spaces */
-           String basename=f.getName();
-           basename = basename.replaceAll(".ser","");
-           basename = basename.replaceAll(" ","_");
-           lst.add(basename);
-       }
+        if (dir==null) return lst;
+        File[] files = dir.listFiles(pathname -> pathname.getAbsolutePath().endsWith(".ser"));
+        if (files==null) return lst;
+        for (File f : files) {
+            /* We want to show just the base name without "ser". Also, transform underscores to spaces */
+            String basename = f.getName();
+            basename = basename.replaceAll(".ser", "");
+            basename = basename.replaceAll(" ", "_");
+            lst.add(basename);
+        }
         return lst;
     }
 
@@ -101,7 +105,7 @@ public class SplashPresenter implements Initializable {
 
 
     public void openExistingProject(ActionEvent e){
-        String selected = (String)this.projectBox.getSelectionModel().getSelectedItem();
+        String selected = this.projectBox.getSelectionModel().getSelectedItem();
         switchscreen.openExistingModel(selected);
         e.consume();
     }
