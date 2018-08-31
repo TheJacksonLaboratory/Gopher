@@ -126,7 +126,7 @@ public class GenomeGunZipper extends Task<Void>  {
             OK=true;
         } catch (IOException e) {
             logger.error("Unable to decompress "+INPUT_GZIP_FILE);
-            logger.error(e,e);
+            // logger.error(e,e);
             updateProgress(0.0);
             this.status="extraction could not be completed.";
             throw e;
