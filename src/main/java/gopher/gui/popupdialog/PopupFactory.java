@@ -76,8 +76,8 @@ public class PopupFactory {
         return  "<h1>GOPHER Projects</h1>\n"+
                 "<p>Enter a name for a new GOPHER project. Names should start with letters, numbers, or an underscore." +
                " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
-                " Projects can also be exported to other locations on the file system using the File|Export... menu item." +
-                " Projects can be imported with Project|Import.</p>";
+                " Projects can also be exported to other locations on the file system using the File|Export project... menu item." +
+                " Projects can be imported with File|Import project...</p>";
     }
 
 
