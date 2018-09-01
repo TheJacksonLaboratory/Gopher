@@ -321,8 +321,8 @@ public class VPAnalysisPresenter implements Initializable {
             vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
         }
         listItems.put("Viewpoints", vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f",
-                avVpSize, avgVpScore);
+        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
+                avVpSize, 100*avgVpScore);
         listItems.put(" ", vpointV2);
 
         int nfrags = design.getN_unique_fragments();

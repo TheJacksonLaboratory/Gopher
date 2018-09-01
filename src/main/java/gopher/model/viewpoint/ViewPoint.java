@@ -302,7 +302,7 @@ public class ViewPoint implements Serializable {
     /**@return the viewpoint score formated as a percent string. */
     public String getScoreAsPercentString() {
         if (hasNoActiveSegment()) return "0.0%";
-        return String.format("%.2f%%",100*score);
+        return String.format("%.1f%%",100*score);
     }
 
 
@@ -990,7 +990,7 @@ public class ViewPoint implements Serializable {
      * This function can be used in order to determine if the set of selected segments has changed after creation
      * of the viewpoint.
      */
-    public boolean wasModified() {
+    private boolean wasModified() {
         // iterate over all segments (selected and deselected)
         for(Segment s : this.restrictionSegmentList) {
             if(s.wasOriginallySelected() != s.isSelected()) {
