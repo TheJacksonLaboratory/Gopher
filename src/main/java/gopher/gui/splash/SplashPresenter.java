@@ -89,7 +89,7 @@ public class SplashPresenter implements Initializable {
             /* We want to show just the base name without "ser". Also, transform underscores to spaces */
             String basename = f.getName();
             basename = basename.replaceAll(".ser", "");
-            basename = basename.replaceAll(" ", "_");
+            //basename = basename.replaceAll(" ", "_");
             lst.add(basename);
         }
         return lst;

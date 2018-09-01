@@ -1558,6 +1558,7 @@ public class GopherMainPresenter implements Initializable {
                 logger.info("Closing Gopher Gui");
                 serialize();
                 javafx.application.Platform.exit();
+                System.exit(0);
             }
         } else {
             boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
@@ -1565,6 +1566,7 @@ public class GopherMainPresenter implements Initializable {
                 logger.info("Closing Gopher Gui");
                 serialize();
                 javafx.application.Platform.exit();
+                System.exit(0);
             }
         }
     }
@@ -1575,8 +1577,8 @@ public class GopherMainPresenter implements Initializable {
      * Note that we need to transform a WindowEvent to an ActionEvent.
      */
     private final EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
-        closeWindow(new ActionEvent(event.getSource(),event.getTarget()));
         event.consume();
+        closeWindow(new ActionEvent(event.getSource(),event.getTarget()));
     };
 
     public void setPrimaryStageReference(Stage stage) {
