@@ -100,7 +100,7 @@ public class GopherReport {
         builder.add(String.format("genome_unpacked: %s\n",model.isGenomeUnpacked()));
         builder.add(String.format("genome_indexed: %s\n",model.isGenomeIndexed()));
         builder.add(String.format("refgene_path: %s\n",model.getRefGenePath()));
-        builder.add(String.format("transcripts-name: %s", model.getTranscriptsBasename()));
+        builder.add(String.format("transcripts-name: %s\n", model.getTranscriptsBasename()));
         builder.add(String.format("target_genes_path: %s\n",model.getTargetGenesPath()));
         builder.add(String.format("Alignability map: %s\n",model.getAlignabilityMapPathIncludingFileNameGz()));
         builder.add(String.format("upstream size: %d\n",model.getSizeUp()));
