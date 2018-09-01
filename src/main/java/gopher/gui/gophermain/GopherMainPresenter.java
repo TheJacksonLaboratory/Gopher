@@ -1435,6 +1435,7 @@ public class GopherMainPresenter implements Initializable {
         chooser.setTitle("Choose file path to save project file");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showSaveDialog(null);
+        if (file==null) return;
         String path = file.getAbsolutePath();
         serializeToLocation(path);
         logger.trace(String.format("Serialized file to %s",path));
