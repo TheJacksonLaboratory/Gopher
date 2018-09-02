@@ -822,6 +822,11 @@ public class GopherMainPresenter implements Initializable {
         }
         GenomeGunZipper genomeGunZipper = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
+        if (! genomeGunZipper.gZippedFileExists()) {
+            PopupFactory.displayError("Could not find genome file",
+                    "Download genome file before extraction step!");
+            return;
+        }
         genomeGunZipper.setOnSucceeded( event -> {
            // decompressGenomeLabel.setText(genomeGunZipper.getStatus());
             if (genomeGunZipper.OK()) {
@@ -846,6 +851,12 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
         logger.trace("Indexing genome files...");
         Faidx manager = new Faidx(this.model,this.genomeIndexPI);
+        if (! manager.genomeFileExists()) {
+            PopupFactory.displayError("Could not find genome file",
+                    "Download and extract genome file before indexing step!");
+            return;
+        }
+
         manager.setOnSucceeded(event ->{
             int n_chroms = manager.getContigLengths().size();
             String message = String.format("%d chromosomes in %s successfully indexed.",

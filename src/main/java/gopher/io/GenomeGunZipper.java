@@ -45,7 +45,6 @@ public class GenomeGunZipper extends Task<Void>  {
         this.genome=genom;
         this.genomeFileNameTarGZ=this.genome.getGenomeBasename();
         logger.trace(String.format("genomeFileNameTarGZ=%s",genomeFileNameTarGZ));
-        //this.genomeFileNameTar=this.genomeFileNameTarGZ.replaceAll(".gz","");
     }
 
 
@@ -58,6 +57,16 @@ public class GenomeGunZipper extends Task<Void>  {
     private boolean alreadyExtracted() {
         File f = new File(this.genome.getPathToGenomeDirectory() + File.separator + genome.getGenomeFastaName());
         logger.trace("checking for existence of file " + f.getAbsolutePath());
+        return f.exists();
+    }
+
+    /** Check if we can find the original downloaded file (e.g., hg38.chromFa.tar.gz). If not, probably the user
+     * needs to download it or the user is in the wrong directory.
+     * @return true if we can find the gzipped file, e.g., hg38.chromFa.tar.gz
+     */
+    public boolean gZippedFileExists() {
+        String path = this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ;
+        File f = new File(path);
         return f.exists();
     }
 
