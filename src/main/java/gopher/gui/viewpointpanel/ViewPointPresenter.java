@@ -267,6 +267,9 @@ public class ViewPointPresenter implements Initializable {
                     // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     viewpoint.refreshStartAndEndPos();
+                    if (!old_val.equals(new_val)) { // if the user has changed something, record that we have unsaved data
+                        model.setClean(false);
+                    }
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -345,9 +348,6 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-
-
-
 
         repeatContentUpColumn.setCellValueFactory(cdf -> {
                 String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();

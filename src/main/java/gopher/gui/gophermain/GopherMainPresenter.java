@@ -19,6 +19,7 @@ import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.settings.SettingsViewFactory;
 import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
 import gopher.gui.taskprogressbar.TaskProgressBarView;
+import gopher.gui.util.WindowCloser;
 import gopher.io.*;
 import gopher.model.*;
 import gopher.model.digest.DigestCreationTask;
@@ -435,13 +436,16 @@ public class GopherMainPresenter implements Initializable {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
-            String selectedItem=approachChoiceBox.getItems().get((Integer) number2);
-            if (selectedItem.equals("Simple")) {
-                setGUItoSimple();
-            } else if (selectedItem.equals("Extended")) {
-                setGUItoExtended();
-            } else {
-                logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
+            String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
+            switch (selectedItem) {
+                case "Simple":
+                    setGUItoSimple();
+                    break;
+                case "Extended":
+                    setGUItoExtended();
+                    break;
+                default:
+                    logger.error(String.format("Did not recognize approach in menu %s", selectedItem));
             }
         });
     }
@@ -1205,7 +1209,6 @@ public class GopherMainPresenter implements Initializable {
                 JOptionPane.showMessageDialog(null,
                         "Out of memory error--see online documentation for how to increase memory",
                         "Out of memory error", JOptionPane.ERROR_MESSAGE);
-                return;
             } else {
                 Exception exc = (Exception) eh.getSource().getException();
                 PopupFactory.displayException("Error",
@@ -1556,13 +1559,17 @@ public class GopherMainPresenter implements Initializable {
             boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
             if (answer) {
                 logger.info("Closing Gopher Gui");
-                serialize();
                 javafx.application.Platform.exit();
                 System.exit(0);
             }
         } else {
-            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
-            if (answer) {
+//            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
+            WindowCloser closer = new WindowCloser();
+            closer.display();
+            if (closer.save()) {
+                serialize();
+            }
+            if (closer.quit()) {
                 logger.info("Closing Gopher Gui");
                 serialize();
                 javafx.application.Platform.exit();

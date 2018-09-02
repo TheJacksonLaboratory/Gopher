@@ -993,7 +993,7 @@ public class ViewPoint implements Serializable {
      * This function can be used in order to determine if the set of selected segments has changed after creation
      * of the viewpoint.
      */
-    private boolean wasModified() {
+    public boolean wasModified() {
         // iterate over all segments (selected and deselected)
         for(Segment s : this.restrictionSegmentList) {
             if(s.wasOriginallySelected() != s.isSelected()) {

@@ -147,7 +147,9 @@ public class Model implements Serializable {
         this.clean=b;
     }
     /** Is the model clean, i.e., it does not have unsaved changes? */
-    public boolean isClean(){ return clean; }
+    public boolean isClean(){
+        return clean;
+    }
 
     public boolean useSimpleApproach() {
         return approach==Approach.SIMPLE;
@@ -512,6 +514,7 @@ public class Model implements Serializable {
             ViewPoint vpit = it.next();
             if (vpit.equals(vp)) {
                 it.remove();
+                clean=false;
                 break;
             }
         }
