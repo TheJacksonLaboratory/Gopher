@@ -142,6 +142,9 @@ public class ViewPoint implements Serializable {
      */
     public void refreshStartAndEndPos() {
         List<Segment> segments = this.restrictionSegmentList.stream().filter(Segment::isSelected).collect(Collectors.toList());
+        // if the user deselects all segments, then none of the segments is empty. In this case, we just
+        // leave the start and end position as they were
+        if (segments.isEmpty()) return;
         int min = segments.get(0).getStartPos();
         int max = segments.get(0).getEndPos();
         for(int i=1; i< segments.size(); i++) {
