@@ -134,6 +134,9 @@ public class VPAnalysisPresenter implements Initializable {
         resetTableColumn.setSortable(false);
         resetTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
+            if (vp.wasModified()) {
+                this.model.setClean(false);
+            }
             Button btn = new Button("Reset");
             btn.setOnAction(e -> {
                 vp.resetSegmentsToOriginalState();

@@ -1597,7 +1597,6 @@ public class GopherMainPresenter implements Initializable {
             }
             if (closer.quit()) {
                 logger.info("Closing Gopher Gui");
-                serialize();
                 javafx.application.Platform.exit();
                 System.exit(0);
             }
