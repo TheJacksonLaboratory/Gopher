@@ -81,7 +81,11 @@ public class PopupFactory {
     }
 
 
-    /** Open up a dialog where the user can enter a new project name. */
+    /** Open up a dialog where the user can enter a new project name.
+     *  The function checks that the filename does not contain weird and potentially
+     *  invalid characters.
+     * @return String representing the chosen project name or null if the chosen name was invalid.
+     * */
     public String getProjectName() {
         String title="Enter New Project Name";
         String labelText="Enter project name:";
@@ -89,12 +93,15 @@ public class PopupFactory {
         String html=getProjectNameHTML();
         boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
         if (OK) {
+            if (stringValue.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
+                PopupFactory.displayError("File name error", "File name contains invalid characters");
+                return null;
+            }
             return stringValue;
         } else {
             valid = false;
             return null;
         }
-
     }
 
     /**
