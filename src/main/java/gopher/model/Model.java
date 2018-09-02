@@ -1,6 +1,7 @@
 package gopher.model;
 
 
+import com.google.common.collect.ImmutableList;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.genome.*;
@@ -386,6 +387,7 @@ public class Model implements Serializable {
     }
     /** @return list of all {@link ViewPoint} objects to be displayed. */
     public List<ViewPoint> getViewPointList() {
+        if (viewpointList==null) return ImmutableList.of();
         return this.viewpointList;
     }
 

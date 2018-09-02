@@ -1493,8 +1493,8 @@ public class GopherMainPresenter implements Initializable {
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
-
-            setModelInMainAndInAnalysisPresenter(this.model);
+        setModelInMainAndInAnalysisPresenter(this.model);
+        vpanalysispresenter.refreshVPTable();
             logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
         } catch (IOException ex) {
             PopupFactory.displayException("Error","I/O Error opening project file", ex);
