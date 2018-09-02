@@ -59,10 +59,6 @@ public class ViewPoint implements Serializable {
     private int startPos;
     /** end position of the viewpoint */
     private int endPos;
-//    /** The minimum allowable start position if the user zooms. */
-//    private int minimumAllowableStartPosition;
-//    /** The maximum allowable end position if the user zooms. */
-//    private int maximumAllowableEndPosition;
     /** Minimum allowable size of a restriction digest-this will usually be determined by the size of the probes
      * that are used for enrichment (e.g., 130 bp. */
     private final int minFragSize;
@@ -103,11 +99,6 @@ public class ViewPoint implements Serializable {
     }
 
     static void setChosenEnzymes(List<RestrictionEnzyme> lst) { chosenEnzymes=lst;}
-//    /** A list of restriction enzymes (at least one) as chosen by the user. */
-//    public static RestrictionEnzyme getChosenEnzyme(int i) {
-//        if (chosenEnzymes==null || i-1>chosenEnzymes.size()) return null;
-//        else return chosenEnzymes.get(i);
-//    }
     /** Overall score of this Viewpoint.*/
     private double score;
     /** Maximim allowable digest size for simple approach */
@@ -154,9 +145,9 @@ public class ViewPoint implements Serializable {
             if(max < segments.get(i).getEndPos()) {
                 max=segments.get(i).getEndPos();
             }
-            this.setStartPos(min);
-            this.setEndPos(max);
         }
+        this.setStartPos(min);
+        this.setEndPos(max);
     }
 
     /** @return List of all segments (selected or not). */
@@ -191,10 +182,6 @@ public class ViewPoint implements Serializable {
         }
 
     }
-
-
-
-
 
 
     /**
@@ -337,8 +324,8 @@ public class ViewPoint implements Serializable {
         this.endPos = endPos;
     }
 
-    public final String getDerivationApproach() {
-        return approach.toString();
+    public final Approach getDerivationApproach() {
+        return approach;
     }
 
     private void setDerivationApproach(Approach derivationApproach) {
@@ -420,16 +407,11 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
-//            if(segment.isSelected() && segment.isUnbalanced()) {
-//                //logger.trace(segment.getReferenceSequenceID() + ":" + segment.getStartPos() + "-" + segment.getEndPos());
-//            }
-
             // if at least one segment is selected, declare viewpoint to be resolved
             if(segment.isSelected()) {
                 this.resolved = true;
             }
         }
-//        c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
     }
 
 
@@ -652,95 +634,6 @@ public class ViewPoint implements Serializable {
         return (this.minGcContent <= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
     }
 
-    /**
-     * Helper function for the calculation of the viewpoint score.
-     * It calculates a score for a given distance based on the cumulative normal distribution function.
-     * <p>
-     * The distance of 0 receives a score of almost one.
-     * Greater distances receive a lower score.
-     * The distance maxDistToGenomicPos receives a score of almost 0.
-     *
-     * @param dist distance (to {@link #genomicPos}) for which the distance score will be calculated.
-     * @param maxDistToGenomicPos is used to init the normal distribution used to model the distance score.
-     * @return position distance score between 0 and 1 (see maunscript).
-     */
-    private double getViewpointPositionDistanceScore(Integer dist, Integer maxDistToGenomicPos) {
-        double sd = maxDistToGenomicPos/6; // the factor 1/6 was chosen by eye
-        double mean = -3*sd; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
-        NormalDistribution nD = new NormalDistribution(mean,sd);
-        return nD.cumulativeProbability(-dist);
-    }
-
-
-    /**
-     * This function calculates the viewpoint score and sets the field 'score' of this class.
-     * The function is also intended to update the score.
-     * <p>
-     * The function iterates over all restriction segments of the viewpoint.
-     * For selected segments a <i>position distance score</i> is calculated for each position.
-     * The scores for all positions are summed up and in the end divided by the sum of all
-     * <i>position distance scores</i> for all positions within the interval
-     * [genomicPos - upstreamNucleotideLength; genomicPos + downstreamNucleotideLength ].
-     * <p>
-     * The overall score for the viewpoint is between 0 and 1.
-     *
-     */
-    public void calculateViewpointScoreExtendedOLD() {
-        Double score = 0.0;
-
-        /* iterate over all selected fragments */
-
-        Integer posCnt = 0;
-        List<Segment> allFrags=restrictionSegmentList;
-        for (Segment currentSegment : allFrags) {
-            double repCont = 0;
-            double positionScoreSumFragment = 0;
-
-            if (currentSegment.isSelected()) {
-
-                repCont=currentSegment.getMeanMarginRepeatContent();
-
-                /* get position distance score for each position of the digest */
-
-                positionScoreSumFragment = 0;
-                for (int j = currentSegment.getStartPos(); j <= currentSegment.getEndPos(); j++) {
-                    Integer dist = j - genomicPos;
-                    if (dist < 0) {
-                        if (dist*-1 > upstreamNucleotideLength) { continue; } // regions outside the specified range are not taken into account
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
-                    } else {
-                        if (dist*-1 > downstreamNucleotideLength) { continue; } // regions outside the specified range are not taken into account
-                        positionScoreSumFragment += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
-                    }
-                    posCnt++;
-                }
-            }
-            score += (1 - repCont) * positionScoreSumFragment;
-        }
-
-        /* calculate reference: all position within specified range covered, no repeats */
-
-        double positionScoreSumRef = 0;
-        for(int i = genomicPos-upstreamNucleotideLength; i<=genomicPos+downstreamNucleotideLength; i++) {
-
-            Integer dist = i - genomicPos;
-            if (dist < 0) {
-                positionScoreSumRef += getViewpointPositionDistanceScore(-1 * dist, upstreamNucleotideLength);
-            } else {
-                positionScoreSumRef += getViewpointPositionDistanceScore(dist, downstreamNucleotideLength);
-            }
-        }
-
-        /* set final score */
-
-        //System.out.println( upstreamNucleotideLength+downstreamNucleotideLength + "\t" + score + "\t" + positionScoreSumRef + "\t" + score/positionScoreSumRef);
-        if (posCnt == 0) {
-            this.score = 0.0;
-        } else {
-            this.score = score / positionScoreSumRef;
-        }
-
-    }
 
 
     private double getSegmentProbabilityDownstream(int from, int to,NormalDistribution nD) {
