@@ -524,8 +524,6 @@ public class GopherMainPresenter implements Initializable {
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
-        this.model.setTargetType(Model.TargetType.NONE);
-
     }
 
     /**
@@ -607,6 +605,23 @@ public class GopherMainPresenter implements Initializable {
         } else if (model.useExtendedApproach()){
             this.approachChoiceBox.setValue("Extended");
         }
+
+        Model.TargetType ttype = model.getTargetType();
+        switch (ttype) {
+            case TARGET_GENES:
+                int count = model.getN_validGeneSymbols();
+                this.targetGeneLabel.setText(String.format("%d genes",count));
+                break;
+            case ALL_GENES:
+                int allgenes = model.getN_validGeneSymbols();
+                this.allGenesLabel.setText(String.format("%d genes",allgenes));
+                break;
+            case BED_TARGETS:
+                int n_bedtargets = model.getN_validGeneSymbols();
+                this.bedTargetsLabel.setText(String.format("%d targets",n_bedtargets));
+                break;
+        }
+
         this.genomeChoiceBox.setValue(model.getGenomeBuild());
         // after we have set up the model the first time, mark it as clean. Any changes after this will lead
         // to a confirmation window being opened if the user has changed anything.

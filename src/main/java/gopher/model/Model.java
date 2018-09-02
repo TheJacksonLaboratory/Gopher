@@ -55,11 +55,11 @@ public class Model implements Serializable {
         }
     }
 
-
+    /** TARGET_GENES: a gene panel; ALL_GENES: promoterome; BED_TARGETS: custom. NONE: uninitialized. */
     public enum TargetType {
         NONE,TARGET_GENES,ALL_GENES,BED_TARGETS
     }
-
+    /** This variable records the kind of gene/target set we are analyzing. */
     private TargetType targetType;
 
 
@@ -349,7 +349,7 @@ public class Model implements Serializable {
     }
 
     public void setTargetType(TargetType ttype) { this.targetType=ttype; clean=false;}
-    public TargetType getTargetType(){ return this.targetType==null?TargetType.NONE : targetType; }
+    public TargetType getTargetType(){ return this.targetType; }
 
 
     /** @return List of enzymes for the user to choose from. */
