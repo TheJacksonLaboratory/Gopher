@@ -47,7 +47,6 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.*;
 import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -66,7 +65,7 @@ import java.util.stream.Collectors;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.4.7 (2018-07-31)
+ * @version 0.5.2 (2018-09-01)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
@@ -98,9 +97,7 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML
     private Button downloadGenomeButton;
-    /**
-     * Button to download RefSeq.tar.gz (transcript/gene definition file
-     */
+    /** Button to download RefSeq.tar.gz (transcript/gene definition file*/
     @FXML
     private Button downloadTranscriptsButton;
     @FXML
@@ -141,8 +138,6 @@ public class GopherMainPresenter implements Initializable {
     private TextField maxGCContentTextField;
     @FXML
     private TextField minBaitCountTextField;
-    @FXML
-    private TextField maxBaitCountTextField;
     @FXML
     private TextField baitLengthTextField;
     @FXML
@@ -326,10 +321,6 @@ public class GopherMainPresenter implements Initializable {
 
     private void setMaximumBaitCount(int bc) {
         this.maxBaitCount.set(bc);
-    }
-
-    private IntegerProperty maximumBaitCountProperty() {
-        return maxBaitCount;
     }
 
     final transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
@@ -659,18 +650,59 @@ public class GopherMainPresenter implements Initializable {
         this.baitLengthTextField.setText(null);
     }
 
+    /**
+     * This object is used to convert doubles in the bindings. It stops exceptions
+     * from being thrown if the user enters non-numbers.
+     */
+    private final StringConverter<Number> doubleConverter = new StringConverter<Number>() {
+        @Override
+        public String toString(Number object) {
+            return object == null ? "" : object.toString();
+        }
+        @Override
+        public Number fromString(String string) {
+            if (string == null) {
+                return 0.0;
+            } else {
+                try {
+                    return Double.parseDouble(string);
+                } catch (NumberFormatException ex) {
+                    return 0.0;
+                }
+            }
+        }
+    };
+
+    private final StringConverter<Number> integerConverter = new StringConverter<Number>() {
+        @Override
+        public String toString(Number object) {
+            return object == null ? "" : object.toString();
+        }
+        @Override
+        public Number fromString(String string) {
+            if (string == null) {
+                return 0;
+            } else {
+                try {
+                    return Integer.parseInt(string);
+                } catch (NumberFormatException ex) {
+                    return 0;
+                }
+            }
+        }
+    };
+
     /** Keep the fields in the GUI in synch with the corresponding variables in this class. */
     private void setBindings() {
-        StringConverter<Number> converter = new NumberStringConverter();
-        Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
-        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),converter);
-        Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
-        Bindings.bindBidirectional(this.maxKmerAlignabilityTextField.textProperty(),maxMeanKmerAlignabilityProperty(),converter);
-        Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
-        Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
-        Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
-        Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),converter);
-        Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),converter);
+        Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),integerConverter);
+        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),integerConverter);
+        Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),integerConverter);
+        Bindings.bindBidirectional(this.maxKmerAlignabilityTextField.textProperty(),maxMeanKmerAlignabilityProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),integerConverter);
+        Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),integerConverter);
+        Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),integerConverter);
         sizeDownTextField.clear();
         sizeUpTextField.clear();
         minFragSizeTextField.clear();
@@ -703,8 +735,6 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMaxMeanKmerAlignability(kmerAlign);
         int minbait = getMinimumBaitCount()>0 ? getMinimumBaitCount() : Default.MIN_BAIT_NUMBER;
         this.model.setMinBaitCount(minbait);
-        int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
-        this.model.setMaxBaitCount(maxbait);
         int baitlen = getBaitLength()>0?getBaitLength() : Default.PROBE_LENGTH;
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
