@@ -236,6 +236,7 @@ public class ViewPoint implements Serializable {
              genomicPos occurs on first or last fragment of the list in order to make sure that adjacent fragments
              can later be added.
              */
+            int chromosomeLength = fastaReader.getSequence(this.getReferenceID()).length();
             int iteration = 0;
             do {
                 this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
@@ -248,7 +249,14 @@ public class ViewPoint implements Serializable {
                         ViewPoint.chosenEnzymes);
                 iteration++;
                 logger.trace("Done with Segment factory: " + iteration);
+                logger.trace("upstreamNucleotideLength: " + this.upstreamNucleotideLength);
+                logger.trace("downstreamNucleotideLength: " + this.downstreamNucleotideLength);
+
+                //check if
+
                 initRestrictionFragments(fastaReader, c2align);
+                if(genomicPos-this.upstreamNucleotideLength < 1) {break;}
+                if(chromosomeLength < genomicPos+this.downstreamNucleotideLength) {break;}
             }
             while (tssOnFirstOrLastRestrictionFragment());
         } else {
@@ -282,6 +290,13 @@ public class ViewPoint implements Serializable {
      */
     private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
+        // if genomicPos occurs on the first digest of the chromosome, add pseudo digest with length 0.
+        if(genomicPos < segmentFactory.getAllCuts().get(0)) {
+            Segment restFrag = new Segment.Builder(chromosomeID,
+                    0,
+                    0).
+                    fastaReader(fastaReader).marginSize(marginSize).build();
+        }
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment.Builder(chromosomeID,
                     segmentFactory.getUpstreamCut(j),

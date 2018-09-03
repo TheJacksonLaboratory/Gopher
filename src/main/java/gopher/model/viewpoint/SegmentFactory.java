@@ -93,6 +93,11 @@ public class SegmentFactory implements Serializable {
                         maxDistToGenomicPosDown,genomicPos,(maxDistToGenomicPosDown+genomicPos), referenceSequenceID , chromosomeLength));
                 maxDistToGenomicPosDown = chromosomeLength - genomicPos;
             }
+            if (genomicPos - maxDistToGenomicPosUp < 1) {
+                logger.warn(String.format("genomicPos [%d] - maxDistToGenomicPosUp [%d] < 1 (on chromosome %s) -> will adjust",
+                        genomicPos, maxDistToGenomicPosUp, referenceSequenceID));
+                maxDistToGenomicPosUp = genomicPos;
+            }
             // note fastaReader refers to one-based numbering scheme.
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
             Pattern pattern = Pattern.compile(cutpat,Pattern.CASE_INSENSITIVE);
