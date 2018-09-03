@@ -264,7 +264,7 @@ public class ViewPointPresenter implements Initializable {
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
-                    // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
+                    // the following updates the selection in the GUI but does not change the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     viewpoint.refreshStartAndEndPos();
                     Platform.runLater(new Runnable() {

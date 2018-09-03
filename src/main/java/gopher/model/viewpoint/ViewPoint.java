@@ -228,15 +228,52 @@ public class ViewPoint implements Serializable {
         this.restrictionSegmentList=new ArrayList<>();
         setResolved(false);
         /* Create segmentFactory */
-        segmentFactory = new SegmentFactory(this.chromosomeID,
-                this.genomicPos,
-                fastaReader,
-                this.upstreamNucleotideLength,
-                this.downstreamNucleotideLength,
-                ViewPoint.chosenEnzymes);
-        logger.trace("Done with Segment factory");
-        initRestrictionFragments(fastaReader, c2align);
+        if(model.getApproach().equals(Model.Approach.SIMPLE)) {
+            this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue()*2;
+            this.downstreamNucleotideLength=model.getEstAvgRestFragLen().intValue()*2;
+            /*
+             For the simple approach, iteratively increase range for initial restriction fragments as long as
+             genomicPos occurs on first or last fragment of the list in order to make sure that adjacent fragments
+             can later be added.
+             */
+            int iteration = 0;
+            do {
+                this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
+                this.downstreamNucleotideLength = this.downstreamNucleotideLength + 1000;
+                segmentFactory = new SegmentFactory(this.chromosomeID,
+                        this.genomicPos,
+                        fastaReader,
+                        this.upstreamNucleotideLength,
+                        this.downstreamNucleotideLength,
+                        ViewPoint.chosenEnzymes);
+                iteration++;
+                logger.trace("Done with Segment factory: " + iteration);
+                initRestrictionFragments(fastaReader, c2align);
+            }
+            while (tssOnFirstOrLastRestrictionFragment());
+        } else {
+            segmentFactory = new SegmentFactory(this.chromosomeID,
+                    this.genomicPos,
+                    fastaReader,
+                    this.upstreamNucleotideLength,
+                    this.downstreamNucleotideLength,
+                    ViewPoint.chosenEnzymes);
+            logger.trace("Done with Segment factory");
+            initRestrictionFragments(fastaReader, c2align);
+        }
     }
+
+    private boolean tssOnFirstOrLastRestrictionFragment() {
+        if (this.genomicPos < this.restrictionSegmentList.get(0).getEndPos()) {
+            return true;
+        }
+        else if (this.restrictionSegmentList.get(restrictionSegmentList.size() - 1).getStartPos() < this.genomicPos) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 
     /**
