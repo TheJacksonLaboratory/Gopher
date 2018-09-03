@@ -241,6 +241,7 @@ public class ViewPoint implements Serializable {
             do {
                 this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
                 this.downstreamNucleotideLength = this.downstreamNucleotideLength + 1000;
+
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
                         fastaReader,
@@ -248,17 +249,20 @@ public class ViewPoint implements Serializable {
                         this.downstreamNucleotideLength,
                         ViewPoint.chosenEnzymes);
                 iteration++;
+
                 logger.trace("Done with Segment factory: " + iteration);
                 logger.trace("upstreamNucleotideLength: " + this.upstreamNucleotideLength);
                 logger.trace("downstreamNucleotideLength: " + this.downstreamNucleotideLength);
+                logger.trace("segmentFactory.getAllCuts().size(): " + segmentFactory.getAllCuts().size());
 
-                //check if
+                if(1<segmentFactory.getAllCuts().size()) {
+                    initRestrictionFragments(fastaReader, c2align);
+                }
 
-                initRestrictionFragments(fastaReader, c2align);
-                if(genomicPos-this.upstreamNucleotideLength < 1) {break;}
-                if(chromosomeLength < genomicPos+this.downstreamNucleotideLength) {break;}
+                if(genomicPos-this.upstreamNucleotideLength < 1) {break;} // upstream end of chromosome is reached
+                if(chromosomeLength < genomicPos + this.downstreamNucleotideLength) {break;} // downstream end of chromosome is reached
             }
-            while (tssOnFirstOrLastRestrictionFragment());
+            while (segmentFactory.getAllCuts().size()<2 || tssOnFirstOrLastRestrictionFragment()); // TSS-containing digest does not have two adjacent digetss
         } else {
             segmentFactory = new SegmentFactory(this.chromosomeID,
                     this.genomicPos,
@@ -464,7 +468,7 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
-            // if allow single margin is false, do not select segments that are rescuable
+            // if allow single margin is false, do not select unbalanced digests
             if(!model.getAllowUnbalancedMargins() && segment.isUnbalanced()) {
                 segment.setSelected(false,updateOriginallySelected);
             }
