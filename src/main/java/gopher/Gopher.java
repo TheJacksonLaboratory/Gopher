@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import gopher.framework.Injector;
 import gopher.gui.splash.SplashPresenter;
