@@ -368,6 +368,7 @@ public class VPAnalysisPresenter implements Initializable {
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
+            viewPointTableView.sort();
         });
     }
 
