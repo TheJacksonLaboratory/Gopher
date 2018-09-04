@@ -33,6 +33,9 @@ public class SegmentFactory implements Serializable {
     private Integer maxDistToGenomicPosUp;
     /** The distance from {@link #genomicPos} in 5' direction.*/
     private Integer maxDistToGenomicPosDown;
+
+    private Integer chromosomeLength;
+
     /** Map of the positions where the enzymes cut. Key: a site, such as GATC, value: list of cutting site positions
      * relative to {@link #genomicPos}. */
     private final HashMap<String, ArrayList<Integer>> cuttingPositionMap;
@@ -82,7 +85,7 @@ public class SegmentFactory implements Serializable {
         cuttingPositionMap = new HashMap<>();
         Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
 
-        int chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+        this.chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
 
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
             String cutpat = enzyme.getPlainSite();
@@ -92,11 +95,13 @@ public class SegmentFactory implements Serializable {
                 logger.warn(String.format("maxDistToGenomicPosDown [%d] + genomicPos [%d] = %d > length of chromosome [%s;%d] -> will adjust",
                         maxDistToGenomicPosDown,genomicPos,(maxDistToGenomicPosDown+genomicPos), referenceSequenceID , chromosomeLength));
                 maxDistToGenomicPosDown = chromosomeLength - genomicPos;
+                allPositionSet.add(chromosomeLength);
             }
             if (genomicPos - maxDistToGenomicPosUp < 1) {
                 logger.warn(String.format("genomicPos [%d] - maxDistToGenomicPosUp [%d] < 1 (on chromosome %s) -> will adjust",
                         genomicPos, maxDistToGenomicPosUp, referenceSequenceID));
                 maxDistToGenomicPosUp = genomicPos;
+                allPositionSet.add(1);
             }
             // note fastaReader refers to one-based numbering scheme.
             String genomicPosRegionString = fastaReader.getSubsequenceAt(referenceSequenceID, genomicPos - maxDistToGenomicPosUp, genomicPos + maxDistToGenomicPosDown).getBaseString().toUpperCase();
@@ -115,6 +120,51 @@ public class SegmentFactory implements Serializable {
         ArrayList<Integer> cuttingPositionListUnion = new ArrayList<>(allPositionSet);
         Collections.sort(cuttingPositionListUnion);
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
+    }
+
+    /*
+    Counts the number of cutting sites in upstream direction of genomicPos.
+    */
+    public int getNumOfCutsUpstreamGenomicPos() {
+        int numOfCuts=0;
+        for(int i=0;i<getAllCuts().size();i++) {
+            if(getAllCuts().get(i) < genomicPos) {
+                numOfCuts++;
+            }
+            else {
+                break;
+            }
+        }
+        return numOfCuts;
+    }
+
+    /*
+    Counts the number of cutting sites in downstream direction of genomicPos.
+    */
+    public int getNumOfCutsDownstreamGenomicPos() {
+        int numOfCuts=0;
+        for(int i=0;i<getAllCuts().size();i++) {
+            if(getAllCuts().get(i) >= genomicPos) {
+                numOfCuts++;
+            }
+        }
+        return numOfCuts;
+    }
+
+    public boolean maxDistUpOutOfChromosome() {
+        if(genomicPos-maxDistToGenomicPosUp < 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean maxDistDownOutOfChromosome() {
+        if(this.chromosomeLength < maxDistToGenomicPosDown + genomicPos) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

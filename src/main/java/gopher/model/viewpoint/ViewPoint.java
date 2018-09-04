@@ -229,19 +229,15 @@ public class ViewPoint implements Serializable {
         setResolved(false);
         /* Create segmentFactory */
         if(model.getApproach().equals(Model.Approach.SIMPLE)) {
-            this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue()*2;
-            this.downstreamNucleotideLength=model.getEstAvgRestFragLen().intValue()*2;
+            this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
+            this.downstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
             /*
              For the simple approach, iteratively increase range for initial restriction fragments as long as
              genomicPos occurs on first or last fragment of the list in order to make sure that adjacent fragments
              can later be added.
              */
-            int chromosomeLength = fastaReader.getSequence(this.getReferenceID()).length();
             int iteration = 0;
             do {
-                this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
-                this.downstreamNucleotideLength = this.downstreamNucleotideLength + 1000;
-
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
                         fastaReader,
@@ -254,15 +250,35 @@ public class ViewPoint implements Serializable {
                 logger.trace("upstreamNucleotideLength: " + this.upstreamNucleotideLength);
                 logger.trace("downstreamNucleotideLength: " + this.downstreamNucleotideLength);
                 logger.trace("segmentFactory.getAllCuts().size(): " + segmentFactory.getAllCuts().size());
+                logger.trace("segmentFactory.getNumOfCutsUpstreamGenomicPos(): " + segmentFactory.getNumOfCutsUpstreamGenomicPos());
+                logger.trace("segmentFactory.getNumOfCutsDownstreamGenomicPos(): " + segmentFactory.getNumOfCutsDownstreamGenomicPos());
+                logger.trace("segmentFactory.maxDistUpOutOfChromosome(): " + segmentFactory.maxDistUpOutOfChromosome());
+                logger.trace("segmentFactory.maxDistDownOutOfChromosome(): " + segmentFactory.maxDistDownOutOfChromosome());
+                logger.trace("segmentFactory.getAllCuts(): " + segmentFactory.getAllCuts());
+                logger.trace("genomicPos: " + genomicPos);
 
-                if(1<segmentFactory.getAllCuts().size()) {
+                if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2) {
+                    this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
+                    this.restrictionSegmentList.clear();
+                }
+                if(segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) {
+                    this.downstreamNucleotideLength = this.downstreamNucleotideLength + 1000;
+                    this.restrictionSegmentList.clear();
+                }
+
+
+                if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
                     initRestrictionFragments(fastaReader, c2align);
                 }
 
-                if(genomicPos-this.upstreamNucleotideLength < 1) {break;} // upstream end of chromosome is reached
-                if(chromosomeLength < genomicPos + this.downstreamNucleotideLength) {break;} // downstream end of chromosome is reached
+                //if(genomicPos-this.upstreamNucleotideLength < 1) {break;} // upstream end of chromosome is reached
+                //if(chromosomeLength < genomicPos + this.downstreamNucleotideLength) {break;} // downstream end of chromosome is reached
             }
-            while (segmentFactory.getAllCuts().size()<2 || tssOnFirstOrLastRestrictionFragment()); // TSS-containing digest does not have two adjacent digetss
+            while ((segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
+                    segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) &&
+                    !segmentFactory.maxDistUpOutOfChromosome() &&
+                    !segmentFactory.maxDistDownOutOfChromosome());
+            //while (segmentFactory.getAllCuts().size()<2 || tssOnFirstOrLastRestrictionFragment()); // TSS-containing digest does not have two adjacent digetss
         } else {
             segmentFactory = new SegmentFactory(this.chromosomeID,
                     this.genomicPos,
