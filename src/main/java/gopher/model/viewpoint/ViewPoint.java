@@ -266,7 +266,6 @@ public class ViewPoint implements Serializable {
                     this.restrictionSegmentList.clear();
                 }
 
-
                 if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
                     initRestrictionFragments(fastaReader, c2align);
                 }
