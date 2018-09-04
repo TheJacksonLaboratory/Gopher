@@ -47,7 +47,7 @@
 
 .bluelabel {
     -fx-font-size: 11pt;
-    -fx-font-family: "monospace";
+    -fx-font-family: "Helvetica";
     -fx-font-style: italic;
      -fx-text-fill: blue;
     -fx-opacity: 0.75;
@@ -55,7 +55,7 @@
 
 .biglabel {
 -fx-font-size: 14pt;
-    -fx-font-family: "monospace";
+    -fx-font-family: "Helvetica";
     -fx-font-style: italic;
      -fx-text-fill: black;
     -fx-opacity: 0.95;
