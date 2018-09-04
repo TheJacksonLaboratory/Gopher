@@ -68,8 +68,6 @@ public class ViewPoint implements Serializable {
     private final double minGcContent;
     /** Is the gene on the forward (positive) strand). */
     private final boolean isPositiveStrand;
-    /** A viewpoint is marked as resolved, if it has the required number of segments after application of the function {@link #generateViewpointExtendedApproach}. */
-    private boolean resolved;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
     private SegmentFactory segmentFactory;
     /** List of active and inactive restriction {@link gopher.model.viewpoint.Segment} objects that are contained within the viewpoint. */
@@ -209,13 +207,13 @@ public class ViewPoint implements Serializable {
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
         this.model=builder.model;
-        init(builder.fastaReader,builder.c2alignmap);
+        init(builder.fastaReader,builder.c2alignmap, builder.chromosomelen);
     }
 
 
-    private void init(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
+    private void init(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align, int chromosomeLength) {
         this.restrictionSegmentList=new ArrayList<>();
-        setResolved(false);
+        boolean changed=false;
         /* Create segmentFactory */
         if(model.getApproach().equals(Model.Approach.SIMPLE)) {
             this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
@@ -226,30 +224,41 @@ public class ViewPoint implements Serializable {
              can later be added.
              */
             int iteration = 0;
+            int increment = 1000;
             do {
-                logger.trace("segmentFactory iteration" + iteration);
+                logger.trace("segmentFactory iteration=" + iteration);
+                changed=false;
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
                         fastaReader,
+                        chromosomeLength,
                         this.upstreamNucleotideLength,
                         this.downstreamNucleotideLength,
                         ViewPoint.chosenEnzymes);
                 iteration++;
 
-                if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2) {
-                    this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
+                logger.trace("Number of frags="+restrictionSegmentList.size());
+
+                if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2
+                        && hasMoreSequenceUpstream() ) {
+                    this.upstreamNucleotideLength = this.upstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
+                    changed=true;
                 }
-                if(segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) {
-                    this.downstreamNucleotideLength = this.downstreamNucleotideLength + 1000;
+                if(segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2
+                        && hasMoreSequenceDownstream(chromosomeLength)) {
+                    this.downstreamNucleotideLength = this.downstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
+                    changed=true;
                 }
 
                 if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
+                    logger.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
+                increment *= 2;
             }
-            while ((segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
+            while (changed && (segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
                     segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) &&
                     !segmentFactory.maxDistUpOutOfChromosome() &&
                     !segmentFactory.maxDistDownOutOfChromosome());
@@ -257,12 +266,22 @@ public class ViewPoint implements Serializable {
             segmentFactory = new SegmentFactory(this.chromosomeID,
                     this.genomicPos,
                     fastaReader,
+                    chromosomeLength,
                     this.upstreamNucleotideLength,
                     this.downstreamNucleotideLength,
                     ViewPoint.chosenEnzymes);
             logger.trace("Done with Segment factory");
             initRestrictionFragments(fastaReader, c2align);
         }
+    }
+
+    /** @return true if we are at or over the 3' end of the chromosome. */
+    private boolean hasMoreSequenceDownstream(int chromlen) {
+        return (this.genomicPos + this.downstreamNucleotideLength < chromlen);
+    }
+
+    private boolean hasMoreSequenceUpstream() {
+        return (this.genomicPos - this.upstreamNucleotideLength > 0);
     }
 
 
@@ -376,17 +395,9 @@ public class ViewPoint implements Serializable {
         this.approach = derivationApproach;
     }
 
-
-    public final boolean getResolved() {
-        return resolved;
-    }
     /** @return true if this viewpoint has at least one active (selected) probe and it is resolved. */
     public final boolean hasValidProbe() {
-        return getNumOfSelectedFrags()>0 && resolved;
-    }
-
-    private void setResolved(boolean resolved) {
-        this.resolved = resolved;
+        return getNumOfSelectedFrags()>0;
     }
     /** @return Number of Segments in this ViewPoint that are active (selected). */
     public final int getNumOfSelectedFrags() {
@@ -451,10 +462,6 @@ public class ViewPoint implements Serializable {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
-            // if at least one segment is selected, declare viewpoint to be resolved
-            if(segment.isSelected()) {
-                this.resolved = true;
-            }
         }
     }
 
@@ -477,7 +484,7 @@ public class ViewPoint implements Serializable {
             maxSizeDown=tmp;
         }
 
-        boolean resolved = true;
+
         approach=Approach.EXTENDED;
         this.centerSegment=null; // the digest that contains the TSS. Always show it!
         restrictionSegmentList.forEach(segment -> segment.setSelected(true,true));
@@ -537,7 +544,6 @@ public class ViewPoint implements Serializable {
 
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScoreExtended();
-        setResolved(resolved);
     }
 
 
@@ -545,7 +551,6 @@ public class ViewPoint implements Serializable {
 
         boolean allowSingleMargin = model.getAllowUnbalancedMargins();
         boolean allowPatchedViewpoints = model.getAllowPatching();
-        boolean resolved = true;
         approach = Approach.SIMPLE;
 
         // find the digest that contains genomicPos
@@ -556,8 +561,7 @@ public class ViewPoint implements Serializable {
 
         if (this.centerSegment == null) {
             logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d)", getTargetName(), chromosomeID, genomicPos));
-            resolved = false;
-            restrictionSegmentList.clear(); /* no fragments */
+            //restrictionSegmentList.clear(); /* no fragments */
         } else {
             this.centerSegment.setOverlapsTSS(true);
             logger.trace("Setting center segment, overlaps TSS for " + this.getReferenceID() + ": " );
@@ -593,7 +597,6 @@ public class ViewPoint implements Serializable {
                 } else {
                     logger.trace("Warning: There is no segment in downstream direction of the center segment!");
                 }
-                resolved = true;
                 Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
                 if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
@@ -639,8 +642,6 @@ public class ViewPoint implements Serializable {
             }
         }
         setDerivationApproach(Approach.SIMPLE);
-        setResolved(resolved);
-
     }
 
     private boolean isSegmentValid(Segment seg) {
@@ -870,14 +871,18 @@ public class ViewPoint implements Serializable {
         private Model model;
         private AlignabilityMap c2alignmap;
 
+        private final int chromosomelen;
+
         /**
          *
          * @param refID reference sequence ID (eg, chr5)
          * @param pos central position of the viewpoint on the reference sequence
          */
-        Builder(String refID, int pos) {
+        Builder(String refID, int pos, int chromlen) {
             this.chromosomeID = refID;
             this.genomicPos    = pos;
+            this.chromosomelen=chromlen;
+
         }
         Builder targetName(String val)
         { targetName = val;  return this; }

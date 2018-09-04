@@ -41,7 +41,11 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         super(model);
     }
 
-    private void calculateViewPoints(GopherGene gopherGene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader,AlignabilityMap c2aMap) {
+    private void calculateViewPoints(GopherGene gopherGene,
+                                     String referenceSequenceID,
+                                     IndexedFastaSequenceFile fastaReader,
+                                     AlignabilityMap c2aMap,
+                                     int chromLen) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
         updateMessage("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
         logger.trace("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
@@ -56,7 +60,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             if (isCancelled()) // true if user has cancelled the task
                 return;
             logger.trace("Working on viewpoint for gPos=" + gPos);
-            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos,chromLen).
                     targetName(gopherGene.getGeneSymbol()).
                     upstreamLength(model.getSizeUp()).
                     downstreamLength(model.getSizeDown()).
@@ -132,9 +136,10 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     logger.error(g.getReferenceSequenceID());
                 }
             }
+            int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
             //for (GopherGene gene : group.getGenes()) {
             group.getGenes().parallelStream().forEach(gene -> {
-                calculateViewPoints(gene, referenceSequenceID, fastaReader, apair);
+                calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen);
             });
         }
 

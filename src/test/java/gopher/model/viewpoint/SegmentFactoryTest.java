@@ -65,9 +65,11 @@ public class SegmentFactoryTest {
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
+        int len = testFastaReader.getSequence(refSeqID1).length();
         segmentFactory = new SegmentFactory(refSeqID1,
                 genomicPos_1,
                 testFastaReader,
+                len,
                 maxDistToGenomicPosUp,
                 maxDistToGenomicPosDown,
                 chosenEnzymeList);
@@ -131,9 +133,11 @@ public class SegmentFactoryTest {
         try {
             testFastaReader = new IndexedFastaSequenceFile(fasta);
             String seq=testFastaReader.getSequence(refID).getBaseString();
+            int len = seq.length();
             cpm = new SegmentFactory(refID,
                     genomicPos,
                     testFastaReader,
+                    len,
                     maxDistUp,
                     maxDistDown,
                     chosenEnzymeList);

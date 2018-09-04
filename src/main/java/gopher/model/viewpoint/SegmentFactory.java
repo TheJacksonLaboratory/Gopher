@@ -67,6 +67,7 @@ public class SegmentFactory implements Serializable {
     public SegmentFactory(String referenceSequenceID,
                           Integer genomicPos,
                           IndexedFastaSequenceFile fastaReader,
+                          int chromLen,
                           Integer maxDistToGenomicPosUp,
                           Integer maxDistToGenomicPosDown,
                           List<RestrictionEnzyme> chosenEnzymeList) {
@@ -75,7 +76,9 @@ public class SegmentFactory implements Serializable {
             maxDistToGenomicPosUp=genomicPos;
         }
         maxDistToGenomicPosDown=maxDistToGenomicPosDown*MAXIMUM_ZOOM_FACTOR;
-        Integer referenceSequenceLen = fastaReader.getSequence(referenceSequenceID).length();
+        Integer referenceSequenceLen = chromLen;
+        //this.chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+        this.chromosomeLength=referenceSequenceLen;
         if(referenceSequenceLen < genomicPos + maxDistToGenomicPosDown) {
             maxDistToGenomicPosDown = referenceSequenceLen - genomicPos;
         }
@@ -85,7 +88,7 @@ public class SegmentFactory implements Serializable {
         cuttingPositionMap = new HashMap<>();
         Set<Integer> allPositionSet = new HashSet<>(); // remove duplicates
 
-        this.chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
+
 
         for (RestrictionEnzyme enzyme : chosenEnzymeList) {
             String cutpat = enzyme.getPlainSite();
@@ -122,13 +125,11 @@ public class SegmentFactory implements Serializable {
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
     }
 
-    /*
-    Counts the number of cutting sites in upstream direction of genomicPos.
-    */
+    /** @return  the number of cutting sites upstream of genomicPos. */
     public int getNumOfCutsUpstreamGenomicPos() {
         int numOfCuts=0;
-        for(int i=0;i<getAllCuts().size();i++) {
-            if(getAllCuts().get(i) < genomicPos) {
+        for(Integer cut : getAllCuts()) {
+            if(cut < genomicPos) {
                 numOfCuts++;
             }
             else {
@@ -138,13 +139,11 @@ public class SegmentFactory implements Serializable {
         return numOfCuts;
     }
 
-    /*
-    Counts the number of cutting sites in downstream direction of genomicPos.
-    */
+    /** @return the number of cutting sites downstream of genomicPos.*/
     public int getNumOfCutsDownstreamGenomicPos() {
         int numOfCuts=0;
-        for(int i=0;i<getAllCuts().size();i++) {
-            if(getAllCuts().get(i) >= genomicPos) {
+        for(Integer cut : getAllCuts()) {
+            if(cut >= genomicPos) {
                 numOfCuts++;
             }
         }
@@ -208,13 +207,11 @@ public class SegmentFactory implements Serializable {
 
 
     Integer getUpstreamCut(int j) {
-        // replaces return relToAbsPos(getAllCuts().get(j));
         return getAllCuts().get(j);
     }
 
 
     Integer getDownstreamCut(int j) {
-        // replaces return relToAbsPos(getAllCuts().get(j+1));
         return getAllCuts().get(j+1);
     }
 

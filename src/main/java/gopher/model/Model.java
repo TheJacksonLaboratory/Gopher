@@ -391,9 +391,9 @@ public class Model implements Serializable {
         return this.viewpointList;
     }
 
-    /** @return true if we have at least one GopherGene (which contain ViewPoints). */
+    /** @return true if viewpoints have been set (not null). Note that we allow empty lists (which can occur with weird targets) */
     public boolean viewpointsInitialized() {
-        return (this.viewpointList!=null && this.viewpointList.size()>0);
+        return (this.viewpointList!=null);
     }
 
 
