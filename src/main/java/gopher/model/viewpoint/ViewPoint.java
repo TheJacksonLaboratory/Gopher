@@ -110,8 +110,7 @@ public class ViewPoint implements Serializable {
 //    }
     /** Overall score of this Viewpoint.*/
     private double score;
-    /** Maximim allowable digest size for simple approach */
-    private static final int SIMPLE_APPROACH_MAXSIZE=20_000;
+
 
     public String getAccession() {
         return accession;
@@ -238,6 +237,7 @@ public class ViewPoint implements Serializable {
              */
             int iteration = 0;
             do {
+                logger.trace("segmentFactory iteration" + iteration);
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
                         fastaReader,
@@ -245,17 +245,6 @@ public class ViewPoint implements Serializable {
                         this.downstreamNucleotideLength,
                         ViewPoint.chosenEnzymes);
                 iteration++;
-
-                logger.trace("Done with Segment factory: " + iteration);
-                logger.trace("upstreamNucleotideLength: " + this.upstreamNucleotideLength);
-                logger.trace("downstreamNucleotideLength: " + this.downstreamNucleotideLength);
-                logger.trace("segmentFactory.getAllCuts().size(): " + segmentFactory.getAllCuts().size());
-                logger.trace("segmentFactory.getNumOfCutsUpstreamGenomicPos(): " + segmentFactory.getNumOfCutsUpstreamGenomicPos());
-                logger.trace("segmentFactory.getNumOfCutsDownstreamGenomicPos(): " + segmentFactory.getNumOfCutsDownstreamGenomicPos());
-                logger.trace("segmentFactory.maxDistUpOutOfChromosome(): " + segmentFactory.maxDistUpOutOfChromosome());
-                logger.trace("segmentFactory.maxDistDownOutOfChromosome(): " + segmentFactory.maxDistDownOutOfChromosome());
-                logger.trace("segmentFactory.getAllCuts(): " + segmentFactory.getAllCuts());
-                logger.trace("genomicPos: " + genomicPos);
 
                 if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2) {
                     this.upstreamNucleotideLength = this.upstreamNucleotideLength + 1000;
@@ -269,15 +258,11 @@ public class ViewPoint implements Serializable {
                 if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
                     initRestrictionFragments(fastaReader, c2align);
                 }
-
-                //if(genomicPos-this.upstreamNucleotideLength < 1) {break;} // upstream end of chromosome is reached
-                //if(chromosomeLength < genomicPos + this.downstreamNucleotideLength) {break;} // downstream end of chromosome is reached
             }
             while ((segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
                     segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) &&
                     !segmentFactory.maxDistUpOutOfChromosome() &&
                     !segmentFactory.maxDistDownOutOfChromosome());
-            //while (segmentFactory.getAllCuts().size()<2 || tssOnFirstOrLastRestrictionFragment()); // TSS-containing digest does not have two adjacent digetss
         } else {
             segmentFactory = new SegmentFactory(this.chromosomeID,
                     this.genomicPos,
@@ -289,18 +274,6 @@ public class ViewPoint implements Serializable {
             initRestrictionFragments(fastaReader, c2align);
         }
     }
-
-    private boolean tssOnFirstOrLastRestrictionFragment() {
-        if (this.genomicPos < this.restrictionSegmentList.get(0).getEndPos()) {
-            return true;
-        }
-        else if (this.restrictionSegmentList.get(restrictionSegmentList.size() - 1).getStartPos() < this.genomicPos) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 
 
     /**
@@ -597,7 +570,7 @@ public class ViewPoint implements Serializable {
                 orElse(null);
 
         if (this.centerSegment == null) {
-            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d-%d)", getTargetName(), chromosomeID, startPos , endPos ));
+            logger.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d)", getTargetName(), chromosomeID, genomicPos));
             resolved = false;
             restrictionSegmentList.clear(); /* no fragments */
         } else {
@@ -607,11 +580,9 @@ public class ViewPoint implements Serializable {
             int length = centerSegment.length();
             logger.trace("length of center segment=" + length +" balanced=" + (centerSegment.isBalanced()?"yes":"no"));
             if ((length >= this.minFragSize &&
-                    length <= SIMPLE_APPROACH_MAXSIZE &&
                     this.centerSegment.isBalanced())
                     ||
                     (length >= this.minFragSize &&
-                            length <= SIMPLE_APPROACH_MAXSIZE &&
                             this.centerSegment.isUnbalanced() &&
                             allowSingleMargin)
                     ) {
@@ -689,7 +660,7 @@ public class ViewPoint implements Serializable {
 
     private boolean isSegmentValid(Segment seg) {
 
-        if(seg.length() < minFragSize || seg.length()>= SIMPLE_APPROACH_MAXSIZE) {
+        if(seg.length() < minFragSize) {
             return false;
         }
         if(seg.isBalanced()) {

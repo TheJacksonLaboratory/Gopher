@@ -143,7 +143,7 @@ public class SegmentFactoryTest {
         }
         // The following are the first bases of the GATC fragments in the sequence with ^GATC, i.e.,
         //offset zero.
-        gatcsites=new ArrayList<>(Arrays.asList(2,24,48));
+        gatcsites=new ArrayList<>(Arrays.asList(1,2,24,48));
 
         int offset=0; // for ^GATC
         for (Integer pos:gatcsites) {
