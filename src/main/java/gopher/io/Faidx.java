@@ -197,5 +197,11 @@ public class Faidx extends Task<Void> {
         return genomeDirectoryPath + File.separator + genomeFastaIndexBaseName;
     }
 
+    public boolean genomeFileExists() {
+        String path= genomeDirectoryPath + File.separator + genomeFastaBaseName;
+        File f = new File(path);
+        return f.exists();
+    }
+
 }
 

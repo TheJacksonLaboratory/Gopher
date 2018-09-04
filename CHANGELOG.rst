@@ -3,6 +3,11 @@ Changelog
 =========
 
 ------
+v0.5.2
+------
+- numerous bug fixes
+
+------
 v0.4.7
 ------
 - bug fixes

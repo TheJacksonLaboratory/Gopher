@@ -134,6 +134,9 @@ public class VPAnalysisPresenter implements Initializable {
         resetTableColumn.setSortable(false);
         resetTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
+            if (vp.wasModified()) {
+                this.model.setClean(false);
+            }
             Button btn = new Button("Reset");
             btn.setOnAction(e -> {
                 vp.resetSegmentsToOriginalState();
@@ -321,8 +324,8 @@ public class VPAnalysisPresenter implements Initializable {
             vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
         }
         listItems.put("Viewpoints", vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f",
-                avVpSize, avgVpScore);
+        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
+                avVpSize, 100*avgVpScore);
         listItems.put(" ", vpointV2);
 
         int nfrags = design.getN_unique_fragments();
@@ -365,6 +368,7 @@ public class VPAnalysisPresenter implements Initializable {
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
+            viewPointTableView.sort();
         });
     }
 

@@ -14,7 +14,7 @@ public class SerializationManager {
     /** This serializes the Model object. It replaces any spaces in the filename with underscores. */
     public static void serializeModel(Model model, String fileName)
             throws IOException {
-        fileName = fileName.replaceAll(" ","_");
+        //fileName = fileName.replaceAll(" ","_");
         FileOutputStream fos = new FileOutputStream(fileName);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(model);

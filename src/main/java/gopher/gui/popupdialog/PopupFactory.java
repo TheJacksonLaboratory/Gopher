@@ -76,12 +76,16 @@ public class PopupFactory {
         return  "<h1>GOPHER Projects</h1>\n"+
                 "<p>Enter a name for a new GOPHER project. Names should start with letters, numbers, or an underscore." +
                " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
-                " Projects can also be exported to other locations on the file system using the File|Export... menu item." +
-                " Projects can be imported with Project|Import.</p>";
+                " Projects can also be exported to other locations on the file system using the File|Export project... menu item." +
+                " Projects can be imported with File|Import project...</p>";
     }
 
 
-    /** Open up a dialog where the user can enter a new project name. */
+    /** Open up a dialog where the user can enter a new project name.
+     *  The function checks that the filename does not contain weird and potentially
+     *  invalid characters.
+     * @return String representing the chosen project name or null if the chosen name was invalid.
+     * */
     public String getProjectName() {
         String title="Enter New Project Name";
         String labelText="Enter project name:";
@@ -89,12 +93,15 @@ public class PopupFactory {
         String html=getProjectNameHTML();
         boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
         if (OK) {
+            if (stringValue.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
+                PopupFactory.displayError("File name error", "File name contains invalid characters");
+                return null;
+            }
             return stringValue;
         } else {
             valid = false;
             return null;
         }
-
     }
 
     /**

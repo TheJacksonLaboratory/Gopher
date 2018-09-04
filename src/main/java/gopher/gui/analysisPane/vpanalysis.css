@@ -13,3 +13,7 @@
      -fx-text-fill: black;
      -fx-font-weight: bold;
  }
+
+ .mycolumn {
+  -fx-alignment: CENTER-RIGHT;
+ }

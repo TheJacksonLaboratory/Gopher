@@ -1,6 +1,7 @@
 package gopher.model;
 
 
+import com.google.common.collect.ImmutableList;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.genome.*;
@@ -55,11 +56,11 @@ public class Model implements Serializable {
         }
     }
 
-
+    /** TARGET_GENES: a gene panel; ALL_GENES: promoterome; BED_TARGETS: custom. NONE: uninitialized. */
     public enum TargetType {
         NONE,TARGET_GENES,ALL_GENES,BED_TARGETS
     }
-
+    /** This variable records the kind of gene/target set we are analyzing. */
     private TargetType targetType;
 
 
@@ -147,7 +148,9 @@ public class Model implements Serializable {
         this.clean=b;
     }
     /** Is the model clean, i.e., it does not have unsaved changes? */
-    public boolean isClean(){ return clean; }
+    public boolean isClean(){
+        return clean;
+    }
 
     public boolean useSimpleApproach() {
         return approach==Approach.SIMPLE;
@@ -347,7 +350,7 @@ public class Model implements Serializable {
     }
 
     public void setTargetType(TargetType ttype) { this.targetType=ttype; clean=false;}
-    public TargetType getTargetType(){ return this.targetType==null?TargetType.NONE : targetType; }
+    public TargetType getTargetType(){ return this.targetType; }
 
 
     /** @return List of enzymes for the user to choose from. */
@@ -384,6 +387,7 @@ public class Model implements Serializable {
     }
     /** @return list of all {@link ViewPoint} objects to be displayed. */
     public List<ViewPoint> getViewPointList() {
+        if (viewpointList==null) return ImmutableList.of();
         return this.viewpointList;
     }
 
@@ -512,6 +516,7 @@ public class Model implements Serializable {
             ViewPoint vpit = it.next();
             if (vpit.equals(vp)) {
                 it.remove();
+                clean=false;
                 break;
             }
         }

@@ -11,10 +11,7 @@ import java.io.IOException;
  * this would be /home/username/.gopher/...
  */
 public class Platform {
-
     public static final String WEB_ENGINE_DIRNAME = "web_engine_user_data";
-
-    private static final Logger LOGGER = Logger.getLogger(Platform.class);
 
 
     /**
@@ -29,22 +26,16 @@ public class Platform {
             throw new IOException("Operating system not recognized. Supported systems: WINDOWS, OSX, LINUX");
 
         if (target.isFile()) { // a file exists at the place where we want to create a directory
-            LOGGER.debug(String.format("Deleting the file '%s', we want to create a directory here", target.getAbsolutePath()));
             boolean success = target.delete();
             if (!success) {
                 throw new IOException("Unable to create directory for storing Gopher settings at '" + target.getAbsolutePath() + "'");
-            } else {
-                LOGGER.debug("Success!");
             }
         }
 
         if (!target.isDirectory()) {
-            LOGGER.debug(String.format("Creating directory to store global settings at '%s'", target.getAbsolutePath()));
             boolean success = target.mkdirs();
             if (!success)
                 throw new IOException("Unable to create directory for storing Gopher settings at '" + target.getAbsolutePath() + "'");
-            else
-                LOGGER.debug("Success!");
         }
 
         // create directory for WebEngine user data
@@ -55,7 +46,6 @@ public class Platform {
         }
         if (!userDataDir.isDirectory()) { // either does not exist or is not a directory
             boolean success = userDataDir.mkdirs();
-            LOGGER.debug("Created userData dir");
         }
     }
 
