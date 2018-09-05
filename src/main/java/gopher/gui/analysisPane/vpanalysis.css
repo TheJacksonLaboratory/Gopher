@@ -17,3 +17,8 @@
  .mycolumn {
   -fx-alignment: CENTER-RIGHT;
  }
+
+ .mycolumntarget {
+  -fx-alignment: CENTER-LEFT;
+ }
+
