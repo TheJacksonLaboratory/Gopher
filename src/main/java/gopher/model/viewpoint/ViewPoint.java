@@ -310,6 +310,26 @@ public class ViewPoint implements Serializable {
                     !segmentFactory.maxDistUpOutOfChromosome() &&
                     !segmentFactory.maxDistDownOutOfChromosome());
         }
+        /* We want to have all digests that overlap the range specified by the user plus the two adjacent digests
+        in upstream and downstream direction, but the iterative approach can result in more than one adjacent digest
+        in up- or downstream direction. Such digests need to be removed from the list.
+         */
+        for(int i=0; i < restrictionSegmentList.size();i++) {
+            if(genomicPos+downstreamNucleotideLength < restrictionSegmentList.get(i).getStartPos()) {
+                for(int j=i+1;j < restrictionSegmentList.size(); j++) {
+                    restrictionSegmentList.remove(j);
+                }
+                break;
+            }
+        }
+        for(int i=restrictionSegmentList.size()-1; 0 < i ;i--) {
+            if(restrictionSegmentList.get(i).getEndPos() < genomicPos-upstreamNucleotideLength) {
+                for(int j=i-1; 0 <= j ; j--) {
+                    restrictionSegmentList.remove(j);
+                }
+                break;
+            }
+        }
     }
 
     /** @return true if we are at or over the 3' end of the chromosome. */
