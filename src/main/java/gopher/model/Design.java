@@ -166,10 +166,10 @@ public class Design {
             avgVPscore += vp.getScore();
             avgVPsize += vp.getTotalLengthOfViewpoint();
             //avgVPsize += vp.getEndPos()-vp.getStartPos()+1;
-            if (vp.hasValidProbe()){
+            if (vp.hasValidDigest()){
                 uniqueGeneSymbols.add(vp.getTargetName());
             }
-            if (vp.hasValidProbe()) {
+            if (vp.hasValidDigest()) {
                 n_resolvedViewpoints++;
                 genesWithValidViewPoint.add(vp.getTargetName());
             }

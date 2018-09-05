@@ -226,7 +226,7 @@ public class ViewPoint implements Serializable {
             int iteration = 0;
             int increment = 1000;
             do {
-                logger.trace("segmentFactory iteration=" + iteration);
+                logger.trace("segmentFactory iteration = " + iteration);
                 changed=false;
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
@@ -239,39 +239,76 @@ public class ViewPoint implements Serializable {
 
                 logger.trace("Number of frags="+restrictionSegmentList.size());
 
-                if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2
+                if(segmentFactory.getNumOfCutsUpstreamPos(genomicPos) < 2
                         && hasMoreSequenceUpstream() ) {
                     this.upstreamNucleotideLength = this.upstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
                     changed=true;
                 }
-                if(segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2
+                if(segmentFactory.getNumOfCutsDownstreamPos(genomicPos) < 2
                         && hasMoreSequenceDownstream(chromosomeLength)) {
                     this.downstreamNucleotideLength = this.downstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
                     changed=true;
                 }
 
-                if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
                     logger.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
                 increment *= 2;
             }
-            while (changed && (segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
-                    segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) &&
+            while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos) < 2 ||
+                    segmentFactory.getNumOfCutsDownstreamPos(genomicPos) < 2) &&
                     !segmentFactory.maxDistUpOutOfChromosome() &&
                     !segmentFactory.maxDistDownOutOfChromosome());
         } else {
-            segmentFactory = new SegmentFactory(this.chromosomeID,
-                    this.genomicPos,
-                    fastaReader,
-                    chromosomeLength,
-                    this.upstreamNucleotideLength,
-                    this.downstreamNucleotideLength,
-                    ViewPoint.chosenEnzymes);
-            logger.trace("Done with Segment factory");
-            initRestrictionFragments(fastaReader, c2align);
+            /*
+            For the extended approach, start with the range specified by the user.
+            Increase this range as long as the TSS-digest is not included and there are
+            less than two cutting sites in up- and downstream direction of the specified range.
+             */
+            Integer upstreamLength = this.upstreamNucleotideLength;
+            Integer downstreamLength = this.downstreamNucleotideLength;
+            int iteration = 0;
+            int increment = 1000;
+            do {
+                logger.trace("segmentFactory iteration = " + iteration);
+                changed=false;
+                segmentFactory = new SegmentFactory(this.chromosomeID,
+                        this.genomicPos,
+                        fastaReader,
+                        chromosomeLength,
+                        upstreamLength,
+                        downstreamLength,
+                        ViewPoint.chosenEnzymes);
+                logger.trace("Done with Segment factory");
+                iteration++;
+
+                logger.trace("Number of frags = " + restrictionSegmentList.size());
+
+                if(segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2
+                        && hasMoreSequenceUpstream() ) {
+                    upstreamLength = upstreamLength + increment;
+                    this.restrictionSegmentList.clear();
+                    changed=true;
+                }
+                if(segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2
+                        && hasMoreSequenceDownstream(chromosomeLength)) {
+                    downstreamLength = downstreamLength + increment;
+                    this.restrictionSegmentList.clear();
+                    changed=true;
+                }
+
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
+                    logger.trace("0<x and 0<y");
+                    initRestrictionFragments(fastaReader, c2align);
+                }
+            }
+            while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2 ||
+                    segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2) &&
+                    !segmentFactory.maxDistUpOutOfChromosome() &&
+                    !segmentFactory.maxDistDownOutOfChromosome());
         }
     }
 
@@ -396,7 +433,7 @@ public class ViewPoint implements Serializable {
     }
 
     /** @return true if this viewpoint has at least one active (selected) probe and it is resolved. */
-    public final boolean hasValidProbe() {
+    public final boolean hasValidDigest() {
         return getNumOfSelectedFrags()>0;
     }
     /** @return Number of Segments in this ViewPoint that are active (selected). */
@@ -496,7 +533,7 @@ public class ViewPoint implements Serializable {
         }
         if (this.centerSegment==null) {
             logger.error("center segment NUll for " + getTargetName() + "\n\t" +
-            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList =" +
+            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList = " +
             restrictionSegmentList.size());
         }
 
