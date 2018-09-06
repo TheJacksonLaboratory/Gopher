@@ -26,7 +26,7 @@
                                 <TableView fx:id="viewPointTableView" stylesheets="@vpanalysis.css" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="actionTableColumn" editable="false" maxWidth="105.0" minWidth="105.0" prefWidth="105.0" resizable="false" text="Viewpoint" />
-                            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="100.0" minWidth="80.0" prefWidth="-1.0" text="Target" />
+                            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="100.0" minWidth="80.0" prefWidth="-1.0" styleClass="mycolumntarget" text="Target" />
                             <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="150.0" styleClass="mycolumn" text="Genomic location" />
                             <TableColumn fx:id="nSelectedTableColumn" maxWidth="1.7976931348623157E308" minWidth="110.0" prefWidth="-1.0" styleClass="mycolumn" text="# Selected" />
                             <TableColumn fx:id="viewpointScoreColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" styleClass="mycolumn" text="Score" />
