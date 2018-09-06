@@ -258,9 +258,9 @@ public class VPAnalysisPresenter implements Initializable {
         this.tabpane.getSelectionModel().select(tab);
         openTabs.put(vp, tab);
         List<Segment> seglist = vp.getAllSegments();
-        for (Segment s : seglist) {
-            System.err.println(s);
-        }
+//        for (Segment s : seglist) {
+//            System.err.println(s);
+//        }
     }
 
 
@@ -310,14 +310,14 @@ public class VPAnalysisPresenter implements Initializable {
 
         int ngenes = design.getN_genes();
         int resolvedGenes = design.getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 valid viewpoint", ngenes, resolvedGenes);
+        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
         listItems.put("Genes", geneV);
 
         int nviewpoints = design.getN_viewpoints();
         int resolvedVP = design.getN_resolvedViewpoints();
         double avVpSize = design.getAvgVPsize();
         double avgVpScore = design.getAvgVPscore();
-        String vpointV = String.format("n=%d of which %d have \u2265 1 valid digest;",
+        String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
                 nviewpoints, resolvedVP);
         if (model.getApproach().equals(Model.Approach.SIMPLE)) {
             int n_patched = design.getN_patched_viewpoints();

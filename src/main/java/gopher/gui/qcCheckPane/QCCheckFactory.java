@@ -78,7 +78,7 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getSizeDown()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Minimum fragment size</td>");
+        sb.append("<tr><td>Minimum digest size</td>");
         if (model.getMinFragSize()<120) {
             sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
         } else {
@@ -115,7 +115,7 @@ public class QCCheckFactory {
             sb.append(String.format("<td>%d</td>",model.getProbeLength()));
         }
         sb.append("</tr>");
-        sb.append("<tr><td>Minimum bait count</td>");
+        sb.append("<tr><td>Minimum probe (bait) count</td>");
         sb.append(String.format("<td>%d</td>",model.getMinBaitCount()));
         sb.append("</tr>");
         sb.append("<tr><td>Patched viewpoints (simple only)</td>");

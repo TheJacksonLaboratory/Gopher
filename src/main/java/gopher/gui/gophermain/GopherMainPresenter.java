@@ -727,9 +727,9 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinFragSize(getMinFragSize()>0?getMinFragSize():Default.MINIMUM_FRAGMENT_SIZE);
         double repeatProportion=getMaxRepeatContent()/100;
         this.model.setMaxRepeatContent(repeatProportion>0?repeatProportion:Default.MAXIMUM_KMER_ALIGNABILITY);
-        double minGCproportion = getMinGCcontent()/100;
+        double minGCproportion = percentageToProportion(this.minGCContentTextField.getText());
         this.model.setMinGCcontent(minGCproportion>0?minGCproportion:Default.MIN_GC_CONTENT);
-        double maxGCproportion = getMaxGCcontent()/100;
+        double maxGCproportion = percentageToProportion(this.maxGCContentTextField.getText());
         this.model.setMaxGCcontent(maxGCproportion>0?maxGCproportion:Default.MAX_GC_CONTENT);
         int kmerAlign = getMaxMeanKmerAlignability()>0?getMaxMeanKmerAlignability() : Default.MAXIMUM_KMER_ALIGNABILITY;
         this.model.setMaxMeanKmerAlignability(kmerAlign);
@@ -739,6 +739,20 @@ public class GopherMainPresenter implements Initializable {
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.model.setMarginSize(marginsize);
+    }
+
+    /**
+     *
+     * @param perc a string such as 35%
+     * @return The corresponding proportion (e.g., 0.35)
+     */
+    private double percentageToProportion(String perc) {
+        String s = perc.replaceAll("%","");
+        try {
+            return Double.parseDouble(s)/100.0;
+        } catch (NumberFormatException e){
+        }
+        return 0.0;
     }
 
 
