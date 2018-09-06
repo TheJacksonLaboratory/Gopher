@@ -74,12 +74,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             updateProgress(i++, total); /* this will update the progress bar */
             updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene.toString()));
             vp.generateViewpointSimple(model);
-            if (1==1) {
-                viewpointlist.add(vp);
-                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
-            } else {
-                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
-            }
+            viewpointlist.add(vp);
         }
     }
 
