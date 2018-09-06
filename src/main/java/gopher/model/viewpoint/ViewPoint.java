@@ -316,25 +316,42 @@ public class ViewPoint implements Serializable {
         /* The iterative approach can result in more than one adjacent digest in up- or downstream direction.
            Such digests need to be removed from the list.
          */
+ /*       ArrayList newRestrictionSegmentList = new ArrayList<>();
         for(int i=0; i < restrictionSegmentList.size(); i++) {
-            if(genomicPos + this.downstreamNucleotideLength < restrictionSegmentList.get(i).getStartPos()) {
-                // first in downstream direction that does not overlap the specified range
-                for(int j=i+1; j < restrictionSegmentList.size(); j++) {
-                    // keep this digest and remove all following digests
-                    logger.trace("Removing digest starting at pos: " + restrictionSegmentList.get(j).getStartPos() + " i: " + i + " j: " + j);
-                    restrictionSegmentList.remove(j);
+
+            if((restrictionSegmentList.get(i).getStartPos() < genomicPos-this.upstreamNucleotideLength) &&
+                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos())) {
+                // first digest in upstream direction that overlaps the specified range
+                if(0<i-1) {
+                    // try to add adjacent upstream digest
+                    newRestrictionSegmentList.add(restrictionSegmentList.get(i-1));
                 }
-                break;
+                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
+            }
+            if(
+                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getStartPos()) &&
+                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos()) &&
+                (restrictionSegmentList.get(i).getStartPos() < genomicPos+this.downstreamNucleotideLength) &&
+                (restrictionSegmentList.get(i).getEndPos() < genomicPos+this.downstreamNucleotideLength))
+            {
+                // digest completely overlaps specified range
+                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
+            }
+            if((restrictionSegmentList.get(i).getStartPos() < genomicPos+this.downstreamNucleotideLength) &&
+                    (genomicPos+this.downstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos())) {
+                // last digest in downstream direction that overlaps the specified range
+                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
+                if(i+1 < restrictionSegmentList.size()) {
+                    // try to add adjacent downstream digest
+                    newRestrictionSegmentList.add(restrictionSegmentList.get(i+1));
+                }
             }
         }
-        for(int i=restrictionSegmentList.size()-1; 0 <= i ; i--) {
-            if(restrictionSegmentList.get(i).getEndPos() < genomicPos-this.upstreamNucleotideLength) {
-                for(int j=i-1; 0 <= j ; j--) {
-                    restrictionSegmentList.remove(j);
-                }
-                break;
-            }
-        }
+        restrictionSegmentList.clear();
+        restrictionSegmentList.addAll(newRestrictionSegmentList);
+
+
+        */
     }
 
     /** @return true if we are at or over the 3' end of the chromosome. */
@@ -580,7 +597,7 @@ public class ViewPoint implements Serializable {
         }
         setStartPos(start);
         setEndPos(end);
-/*
+
         // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
         // retain one unselected digest on each end
         // this will keep the table from having lots of unselected fragments
@@ -604,7 +621,7 @@ public class ViewPoint implements Serializable {
             int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
             restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
         }
-*/
+
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScoreExtended();
     }
