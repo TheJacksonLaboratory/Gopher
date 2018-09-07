@@ -19,6 +19,7 @@ import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.settings.SettingsViewFactory;
 import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
 import gopher.gui.taskprogressbar.TaskProgressBarView;
+import gopher.gui.util.WindowCloser;
 import gopher.io.*;
 import gopher.model.*;
 import gopher.model.digest.DigestCreationTask;
@@ -42,13 +43,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.*;
 import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +65,7 @@ import java.util.stream.Collectors;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.4.7 (2018-07-31)
+ * @version 0.5.5 (2018-09-10)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
@@ -95,9 +97,7 @@ public class GopherMainPresenter implements Initializable {
      */
     @FXML
     private Button downloadGenomeButton;
-    /**
-     * Button to download RefSeq.tar.gz (transcript/gene definition file
-     */
+    /** Button to download RefSeq.tar.gz (transcript/gene definition file*/
     @FXML
     private Button downloadTranscriptsButton;
     @FXML
@@ -138,8 +138,6 @@ public class GopherMainPresenter implements Initializable {
     private TextField maxGCContentTextField;
     @FXML
     private TextField minBaitCountTextField;
-    @FXML
-    private TextField maxBaitCountTextField;
     @FXML
     private TextField baitLengthTextField;
     @FXML
@@ -325,10 +323,6 @@ public class GopherMainPresenter implements Initializable {
         this.maxBaitCount.set(bc);
     }
 
-    private IntegerProperty maximumBaitCountProperty() {
-        return maxBaitCount;
-    }
-
     final transient private DoubleProperty minGCcontent = new SimpleDoubleProperty();
 
     private double getMinGCcontent() {
@@ -433,13 +427,16 @@ public class GopherMainPresenter implements Initializable {
         this.analysisPane.getChildren().add(vpanalysisview.getView());
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
-            String selectedItem=approachChoiceBox.getItems().get((Integer) number2);
-            if (selectedItem.equals("Simple")) {
-                setGUItoSimple();
-            } else if (selectedItem.equals("Extended")) {
-                setGUItoExtended();
-            } else {
-                logger.error(String.format("Did not recognize approach in menu %s",selectedItem ));
+            String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
+            switch (selectedItem) {
+                case "Simple":
+                    setGUItoSimple();
+                    break;
+                case "Extended":
+                    setGUItoExtended();
+                    break;
+                default:
+                    logger.error(String.format("Did not recognize approach in menu %s", selectedItem));
             }
         });
     }
@@ -518,8 +515,6 @@ public class GopherMainPresenter implements Initializable {
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
-        this.model.setTargetType(Model.TargetType.NONE);
-
     }
 
     /**
@@ -601,6 +596,23 @@ public class GopherMainPresenter implements Initializable {
         } else if (model.useExtendedApproach()){
             this.approachChoiceBox.setValue("Extended");
         }
+
+        Model.TargetType ttype = model.getTargetType();
+        switch (ttype) {
+            case TARGET_GENES:
+                int count = model.getN_validGeneSymbols();
+                this.targetGeneLabel.setText(String.format("%d genes",count));
+                break;
+            case ALL_GENES:
+                int allgenes = model.getN_validGeneSymbols();
+                this.allGenesLabel.setText(String.format("%d genes",allgenes));
+                break;
+            case BED_TARGETS:
+                int n_bedtargets = model.getN_validGeneSymbols();
+                this.bedTargetsLabel.setText(String.format("%d targets",n_bedtargets));
+                break;
+        }
+
         this.genomeChoiceBox.setValue(model.getGenomeBuild());
         // after we have set up the model the first time, mark it as clean. Any changes after this will lead
         // to a confirmation window being opened if the user has changed anything.
@@ -638,18 +650,59 @@ public class GopherMainPresenter implements Initializable {
         this.baitLengthTextField.setText(null);
     }
 
+    /**
+     * This object is used to convert doubles in the bindings. It stops exceptions
+     * from being thrown if the user enters non-numbers.
+     */
+    private final StringConverter<Number> doubleConverter = new StringConverter<Number>() {
+        @Override
+        public String toString(Number object) {
+            return object == null ? "" : object.toString();
+        }
+        @Override
+        public Number fromString(String string) {
+            if (string == null) {
+                return 0.0;
+            } else {
+                try {
+                    return Double.parseDouble(string);
+                } catch (NumberFormatException ex) {
+                    return 0.0;
+                }
+            }
+        }
+    };
+
+    private final StringConverter<Number> integerConverter = new StringConverter<Number>() {
+        @Override
+        public String toString(Number object) {
+            return object == null ? "" : object.toString();
+        }
+        @Override
+        public Number fromString(String string) {
+            if (string == null) {
+                return 0;
+            } else {
+                try {
+                    return Integer.parseInt(string);
+                } catch (NumberFormatException ex) {
+                    return 0;
+                }
+            }
+        }
+    };
+
     /** Keep the fields in the GUI in synch with the corresponding variables in this class. */
     private void setBindings() {
-        StringConverter<Number> converter = new NumberStringConverter();
-        Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),converter);
-        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),converter);
-        Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),converter);
-        Bindings.bindBidirectional(this.maxKmerAlignabilityTextField.textProperty(),maxMeanKmerAlignabilityProperty(),converter);
-        Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),converter);
-        Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),converter);
-        Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),converter);
-        Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),converter);
-        Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),converter);
+        Bindings.bindBidirectional(this.sizeDownTextField.textProperty(),sizeDownProperty(),integerConverter);
+        Bindings.bindBidirectional(this.sizeUpTextField.textProperty(), sizeUpProperty(),integerConverter);
+        Bindings.bindBidirectional(this.minFragSizeTextField.textProperty(),minFragSizeProperty(),integerConverter);
+        Bindings.bindBidirectional(this.maxKmerAlignabilityTextField.textProperty(),maxMeanKmerAlignabilityProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.minGCContentTextField.textProperty(),minGCcontentProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.maxGCContentTextField.textProperty(),maxGCcontentProperty(),doubleConverter);
+        Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(),minimumBaitCountProperty(),integerConverter);
+        Bindings.bindBidirectional(this.baitLengthTextField.textProperty(),baitLengthProperty(),integerConverter);
+        Bindings.bindBidirectional(this.marginSizeTextField.textProperty(),marginLengthProperty(),integerConverter);
         sizeDownTextField.clear();
         sizeUpTextField.clear();
         minFragSizeTextField.clear();
@@ -674,20 +727,33 @@ public class GopherMainPresenter implements Initializable {
         this.model.setMinFragSize(getMinFragSize()>0?getMinFragSize():Default.MINIMUM_FRAGMENT_SIZE);
         double repeatProportion=getMaxRepeatContent()/100;
         this.model.setMaxRepeatContent(repeatProportion>0?repeatProportion:Default.MAXIMUM_KMER_ALIGNABILITY);
-        double minGCproportion = getMinGCcontent()/100;
+        double minGCproportion = percentageToProportion(this.minGCContentTextField.getText());
         this.model.setMinGCcontent(minGCproportion>0?minGCproportion:Default.MIN_GC_CONTENT);
-        double maxGCproportion = getMaxGCcontent()/100;
+        double maxGCproportion = percentageToProportion(this.maxGCContentTextField.getText());
         this.model.setMaxGCcontent(maxGCproportion>0?maxGCproportion:Default.MAX_GC_CONTENT);
         int kmerAlign = getMaxMeanKmerAlignability()>0?getMaxMeanKmerAlignability() : Default.MAXIMUM_KMER_ALIGNABILITY;
         this.model.setMaxMeanKmerAlignability(kmerAlign);
         int minbait = getMinimumBaitCount()>0 ? getMinimumBaitCount() : Default.MIN_BAIT_NUMBER;
         this.model.setMinBaitCount(minbait);
-        int maxbait = getMaximumBaitCount()>0?getMaximumBaitCount() : Default.MAX_BAIT_NUMBER;
-        this.model.setMaxBaitCount(maxbait);
         int baitlen = getBaitLength()>0?getBaitLength() : Default.PROBE_LENGTH;
         this.model.setProbeLength(baitlen);
         int marginsize = getMarginLength()>0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.model.setMarginSize(marginsize);
+    }
+
+    /**
+     *
+     * @param perc a string such as 35%
+     * @return The corresponding proportion (e.g., 0.35)
+     */
+    private double percentageToProportion(String perc) {
+        String s = perc.replaceAll("%","");
+        try {
+            return Double.parseDouble(s)/100.0;
+        } catch (NumberFormatException e){
+            // do nothing
+        }
+        return 0.0;
     }
 
 
@@ -801,6 +867,11 @@ public class GopherMainPresenter implements Initializable {
         }
         GenomeGunZipper genomeGunZipper = new GenomeGunZipper(this.model.getGenome(),
                 this.genomeDecompressPI);
+        if (! genomeGunZipper.gZippedFileExists()) {
+            PopupFactory.displayError("Could not find genome file",
+                    "Download genome file before extraction step!");
+            return;
+        }
         genomeGunZipper.setOnSucceeded( event -> {
            // decompressGenomeLabel.setText(genomeGunZipper.getStatus());
             if (genomeGunZipper.OK()) {
@@ -825,6 +896,12 @@ public class GopherMainPresenter implements Initializable {
         e.consume();
         logger.trace("Indexing genome files...");
         Faidx manager = new Faidx(this.model,this.genomeIndexPI);
+        if (! manager.genomeFileExists()) {
+            PopupFactory.displayError("Could not find genome file",
+                    "Download and extract genome file before indexing step!");
+            return;
+        }
+
         manager.setOnSucceeded(event ->{
             int n_chroms = manager.getContigLengths().size();
             String message = String.format("%d chromosomes in %s successfully indexed.",
@@ -1200,10 +1277,9 @@ public class GopherMainPresenter implements Initializable {
         task.setOnFailed(eh -> {
             if (eh.getSource().getException() instanceof OutOfMemoryError) {
                 window.close();
-                PopupFactory.displayMessage("Out of memory error",
-                        "Out of memory error--see online documentation for how to increase memory"
-                );
-                return;
+                JOptionPane.showMessageDialog(null,
+                        "Out of memory error--see online documentation for how to increase memory",
+                        "Out of memory error", JOptionPane.ERROR_MESSAGE);
             } else {
                 Exception exc = (Exception) eh.getSource().getException();
                 PopupFactory.displayException("Error",
@@ -1433,6 +1509,7 @@ public class GopherMainPresenter implements Initializable {
         chooser.setTitle("Choose file path to save project file");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File file = chooser.showSaveDialog(null);
+        if (file==null) return;
         String path = file.getAbsolutePath();
         serializeToLocation(path);
         logger.trace(String.format("Serialized file to %s",path));
@@ -1461,8 +1538,8 @@ public class GopherMainPresenter implements Initializable {
         this.vpanalysispresenter.setTabPaneRef(this.tabpane);
         this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
-
-            setModelInMainAndInAnalysisPresenter(this.model);
+        setModelInMainAndInAnalysisPresenter(this.model);
+        vpanalysispresenter.refreshVPTable();
             logger.trace(String.format("Opened model %s from file %s",model.getProjectName(), file.getAbsolutePath()));
         } catch (IOException ex) {
             PopupFactory.displayException("Error","I/O Error opening project file", ex);
@@ -1553,15 +1630,20 @@ public class GopherMainPresenter implements Initializable {
             boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
             if (answer) {
                 logger.info("Closing Gopher Gui");
-                serialize();
                 javafx.application.Platform.exit();
+                System.exit(0);
             }
         } else {
-            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
-            if (answer) {
-                logger.info("Closing Gopher Gui");
+//            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
+            WindowCloser closer = new WindowCloser();
+            closer.display();
+            if (closer.save()) {
                 serialize();
+            }
+            if (closer.quit()) {
+                logger.info("Closing Gopher Gui");
                 javafx.application.Platform.exit();
+                System.exit(0);
             }
         }
     }
@@ -1572,8 +1654,8 @@ public class GopherMainPresenter implements Initializable {
      * Note that we need to transform a WindowEvent to an ActionEvent.
      */
     private final EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
-        closeWindow(new ActionEvent(event.getSource(),event.getTarget()));
         event.consume();
+        closeWindow(new ActionEvent(event.getSource(),event.getTarget()));
     };
 
     public void setPrimaryStageReference(Stage stage) {

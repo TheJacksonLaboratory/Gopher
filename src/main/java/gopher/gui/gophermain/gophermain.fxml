@@ -77,7 +77,7 @@
      </top>
      <center>
          <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0">
-             <Tab id="setuptab" closable="false" text="Set up">
+             <Tab id="setuptab" closable="false" text="Setup">
             <ScrollPane fitToHeight="true" fitToWidth="true">
                <content>
                   <StackPane alignment="TOP_CENTER">

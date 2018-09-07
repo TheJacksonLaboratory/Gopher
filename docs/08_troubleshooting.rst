@@ -56,3 +56,14 @@ This command will start GOPHER with at least 2 gigabytes of RAM (-Xms2g) and all
 RAM (-Xmx6g).
 
 
+~~~~~~~
+Logging
+~~~~~~~
+By default, GOPHER will only write messages to its log file if an error occurs. If you
+run into difficulties using GOPHER, you can set the logging level
+to TRACE (in the Help menu). This will cause GOPHER to write detailed messages to its log file
+that you can see with the Show log entry in the Help menu. You can contact us and if you like can send
+us the log file (which will be stored in your GOPHER user directory (.gopher in linux and Mac, and gopher in
+Windows).
+
+

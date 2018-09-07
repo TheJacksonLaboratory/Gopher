@@ -26,7 +26,7 @@ import java.util.List;
  * The downloadable files are sorted like this.
  */
 public class AlignabilityMap {
-    /** Array of coordinates with boundaries of the region that has a certain score. TODO what? */
+    /** Array of coordinates with boundaries of the region that has a certain score. */
     private final int coordArray[];
      /** Array of alignability score entries */
     private final int scoreArray[];

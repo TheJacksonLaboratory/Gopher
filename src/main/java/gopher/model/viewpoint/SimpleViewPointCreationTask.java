@@ -20,11 +20,6 @@ import java.util.List;
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
-    /** Total number of viewpoints */
-    private int total;
-    /** Index of current viewpoint */
-    private int i;
-
 
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
@@ -45,14 +40,17 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * @param fastaReader HTSJDK object to read FASTA file
      * @param chr2alignMap alignability map for the current chromosome
      */
-    private void calculateViewPoints(GopherGene vpvgene, String referenceSequenceID, IndexedFastaSequenceFile fastaReader, AlignabilityMap chr2alignMap) {
-        int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
+    private void calculateViewPoints(GopherGene vpvgene,
+                                     String referenceSequenceID,
+                                     IndexedFastaSequenceFile fastaReader,
+                                     AlignabilityMap chr2alignMap,
+                                     int chromLen) {
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
         logger.trace("Creating simple viewpoint for " + vpvgene.getGeneSymbol());
         for (Integer gPos : gPosList) {
-            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos).
+            ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos,chromLen).
                     targetName(vpvgene.getGeneSymbol()).
                     upstreamLength(model.getSizeUp()).
                     downstreamLength(model.getSizeDown()).
@@ -71,12 +69,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             updateProgress(i++, total); /* this will update the progress bar */
             updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene.toString()));
             vp.generateViewpointSimple(model);
-            if (vp.getResolved()) {
-                viewpointlist.add(vp);
-                logger.trace(String.format("Adding viewpoint %s to list (size: %d)", vp.getTargetName(), viewpointlist.size()));
-            } else {
-                logger.trace(String.format("Skipping viewpoint %s (size: %d) because it was not resolved", vp.getTargetName(), viewpointlist.size()));
-            }
+            viewpointlist.add(vp);
         }
     }
 
@@ -132,8 +125,9 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 } else {
                     logger.trace("group=" + group.getReferenceSequenceID());
                 }
+                int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
                 //for (GopherGene vpvGene : gopherGene.getGenes()) {
-                group.getGenes().parallelStream().forEach(gopherGene -> calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair));
+                group.getGenes().parallelStream().forEach(gopherGene -> calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair,chromosomeLen));
             }
 
         } catch (IOException e){

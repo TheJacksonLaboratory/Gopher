@@ -45,10 +45,13 @@ public class SplashPresenter implements Initializable {
 
     private Consumer<Signal> signal;
 
+
+    private ObservableList<String> existingProjectNames;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ObservableList<String> filelist = getExistingProjectNames();
-        projectBox.setItems(filelist);
+        existingProjectNames = getExistingProjectNames();
+        projectBox.setItems(existingProjectNames);
         projectBox.getSelectionModel().selectFirst();
         Image newFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/newFileIcon.png"));
         Image openFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/openFileIcon.png"));
@@ -67,9 +70,15 @@ public class SplashPresenter implements Initializable {
         if (factory.wasCancelled())
             return; // do nothing, the user cancelled!
         if (projectname == null || projectname.length() <1) {
-            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
+            PopupFactory.displayError("Could not get valid project name",
+                    "Enter a valid name with letters, numbers, or underscore or space!");
             return;
         } else {
+            if (existingProjectNames.contains(projectname)) {
+                PopupFactory.displayError("Error creating new project",
+                        String.format("Project name %s already exists",projectname));
+                return;
+            }
             this.switchscreen.createNewProject(projectname);
         }
         e.consume();
@@ -89,7 +98,7 @@ public class SplashPresenter implements Initializable {
             /* We want to show just the base name without "ser". Also, transform underscores to spaces */
             String basename = f.getName();
             basename = basename.replaceAll(".ser", "");
-            basename = basename.replaceAll(" ", "_");
+            //basename = basename.replaceAll(" ", "_");
             lst.add(basename);
         }
         return lst;

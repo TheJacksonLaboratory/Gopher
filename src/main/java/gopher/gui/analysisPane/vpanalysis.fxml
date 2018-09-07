@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.analysisPane.VPAnalysisPresenter">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.analysisPane.VPAnalysisPresenter">
    <content>
       <StackPane alignment="TOP_CENTER">
          <children>
@@ -26,14 +26,14 @@
                                 <TableView fx:id="viewPointTableView" stylesheets="@vpanalysis.css" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="actionTableColumn" editable="false" maxWidth="105.0" minWidth="105.0" prefWidth="105.0" resizable="false" text="Viewpoint" />
-                            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="100.0" minWidth="80.0" prefWidth="-1.0" text="Target" />
-                            <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="150.0" text="Genomic location" />
-                            <TableColumn fx:id="nSelectedTableColumn" maxWidth="1.7976931348623157E308" minWidth="110.0" prefWidth="-1.0" text="# Selected" />
-                            <TableColumn fx:id="viewpointScoreColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Score" />
-                            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Active length" />
-                            <TableColumn fx:id="viewpointTotalLength" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Total length" />
-                            <TableColumn fx:id="fragmentOverlappingTSSColumn" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" text="Fragment at TSS" />
-                        <TableColumn fx:id="manuallyRevisedColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" text="Manually revised" />
+                            <TableColumn fx:id="targetTableColumn" editable="false" maxWidth="100.0" minWidth="80.0" prefWidth="-1.0" styleClass="mycolumntarget" text="Target" />
+                            <TableColumn fx:id="genomicLocationColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="150.0" styleClass="mycolumn" text="Genomic location" />
+                            <TableColumn fx:id="nSelectedTableColumn" maxWidth="1.7976931348623157E308" minWidth="110.0" prefWidth="-1.0" styleClass="mycolumn" text="# Selected" />
+                            <TableColumn fx:id="viewpointScoreColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" styleClass="mycolumn" text="Score" />
+                            <TableColumn fx:id="viewpointTotalLengthOfActiveSegments" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" styleClass="mycolumn" text="Active length" />
+                            <TableColumn fx:id="viewpointTotalLength" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" styleClass="mycolumn" text="Total length" />
+                            <TableColumn fx:id="fragmentOverlappingTSSColumn" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" styleClass="mycolumn" text="Fragment at TSS" />
+                        <TableColumn fx:id="manuallyRevisedColumn" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="-1.0" styleClass="mycolumn" text="Manually revised" />
                             <TableColumn fx:id="deleteTableColumn" maxWidth="80.0" minWidth="80.0" resizable="false" text="Delete" />
                         <TableColumn fx:id="resetTableColumn" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Reset" />
                         </columns>

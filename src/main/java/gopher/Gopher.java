@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import gopher.framework.Injector;
 import gopher.gui.splash.SplashPresenter;
@@ -117,8 +116,9 @@ public class Gopher extends Application {
             System.out.println("Error: Cannot load configuration file.");
         }
         // logger.info("Resetting log file location to "+logpath);
-        LogManager.resetConfiguration();
-        props.setProperty("log4j.appender.logfile.file", logpath);
+        //LogManager.resetConfiguration();
+        props.setProperty("log4j.appender.logfile.File", logpath);
+        System.setProperty("logfile.name",logpath);
         PropertyConfigurator.configure(props);
     }
 

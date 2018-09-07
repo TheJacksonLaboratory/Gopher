@@ -264,9 +264,12 @@ public class ViewPointPresenter implements Initializable {
             checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 public void changed(ObservableValue<? extends Boolean> ov,
                                     Boolean old_val, Boolean new_val) {
-                    // the following updates the selection in the GUI but does not chage the originallySelected state of the segment
+                    // the following updates the selection in the GUI but does not change the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     viewpoint.refreshStartAndEndPos();
+                    if (!old_val.equals(new_val)) { // if the user has changed something, record that we have unsaved data
+                        model.setClean(false);
+                    }
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -345,9 +348,6 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
-
-
-
 
         repeatContentUpColumn.setCellValueFactory(cdf -> {
                 String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();
@@ -434,12 +434,12 @@ public class ViewPointPresenter implements Initializable {
 
 
     private void updateScore() {
-        if(this.viewpoint.getDerivationApproach().equals("SIMPLE")) {
+        if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
             this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
-        this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.2f%% [%s], Length: %s",
+        this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.1f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
                 100* viewpoint.getScore(),
