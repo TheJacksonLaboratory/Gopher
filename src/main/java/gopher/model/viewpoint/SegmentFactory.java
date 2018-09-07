@@ -125,11 +125,12 @@ public class SegmentFactory implements Serializable {
         cuttingPositionMap.put("ALL", cuttingPositionListUnion); // push array list to map
     }
 
-    /** @return  the number of cutting sites upstream of genomicPos. */
-    public int getNumOfCutsUpstreamGenomicPos() {
+
+    /** @return  the number of cutting sites upstream of the given position. */
+    public int getNumOfCutsUpstreamPos(int pos) {
         int numOfCuts=0;
         for(Integer cut : getAllCuts()) {
-            if(cut < genomicPos) {
+            if(cut < pos) {
                 numOfCuts++;
             }
             else {
@@ -139,11 +140,12 @@ public class SegmentFactory implements Serializable {
         return numOfCuts;
     }
 
-    /** @return the number of cutting sites downstream of genomicPos.*/
-    public int getNumOfCutsDownstreamGenomicPos() {
+
+    /** @return the number of cutting sites downstream of the given position. */
+    public int getNumOfCutsDownstreamPos(int pos) {
         int numOfCuts=0;
         for(Integer cut : getAllCuts()) {
-            if(cut >= genomicPos) {
+            if(cut >= pos) {
                 numOfCuts++;
             }
         }

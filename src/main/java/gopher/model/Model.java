@@ -529,7 +529,7 @@ public class Model implements Serializable {
      * */
     public List<ViewPoint> getActiveViewPointList() {
         if (viewpointList==null ) return new ArrayList<>();
-       return this.viewpointList.stream().filter(ViewPoint::hasValidProbe).collect(Collectors.toList());
+       return this.viewpointList.stream().filter(ViewPoint::hasValidDigest).collect(Collectors.toList());
     }
 
     /** @return the version number. */

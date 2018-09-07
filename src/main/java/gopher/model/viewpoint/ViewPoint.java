@@ -226,7 +226,7 @@ public class ViewPoint implements Serializable {
             int iteration = 0;
             int increment = 1000;
             do {
-                logger.trace("segmentFactory iteration=" + iteration);
+                logger.trace("segmentFactory iteration = " + iteration);
                 changed=false;
                 segmentFactory = new SegmentFactory(this.chromosomeID,
                         this.genomicPos,
@@ -239,39 +239,103 @@ public class ViewPoint implements Serializable {
 
                 logger.trace("Number of frags="+restrictionSegmentList.size());
 
-                if(segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2
+                if(segmentFactory.getNumOfCutsUpstreamPos(genomicPos) < 2
                         && hasMoreSequenceUpstream() ) {
                     this.upstreamNucleotideLength = this.upstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
                     changed=true;
                 }
-                if(segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2
+                if(segmentFactory.getNumOfCutsDownstreamPos(genomicPos) < 2
                         && hasMoreSequenceDownstream(chromosomeLength)) {
                     this.downstreamNucleotideLength = this.downstreamNucleotideLength + increment;
                     this.restrictionSegmentList.clear();
                     changed=true;
                 }
 
-                if((0 < segmentFactory.getNumOfCutsUpstreamGenomicPos()) && (0 < segmentFactory.getNumOfCutsDownstreamGenomicPos())) {
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
                     logger.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
                 increment *= 2;
             }
-            while (changed && (segmentFactory.getNumOfCutsUpstreamGenomicPos() < 2 ||
-                    segmentFactory.getNumOfCutsDownstreamGenomicPos() < 2) &&
+            while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos) < 2 ||
+                    segmentFactory.getNumOfCutsDownstreamPos(genomicPos) < 2) &&
                     !segmentFactory.maxDistUpOutOfChromosome() &&
                     !segmentFactory.maxDistDownOutOfChromosome());
         } else {
-            segmentFactory = new SegmentFactory(this.chromosomeID,
-                    this.genomicPos,
-                    fastaReader,
-                    chromosomeLength,
-                    this.upstreamNucleotideLength,
-                    this.downstreamNucleotideLength,
-                    ViewPoint.chosenEnzymes);
-            logger.trace("Done with Segment factory");
-            initRestrictionFragments(fastaReader, c2align);
+            /*
+            For the extended approach, we want to have all digests that overlap the range specified by the user
+            [TSS-5000;TSS+1500] plus the two adjacen digests in up- and downstream direction.
+            We start with the range specified by the user and then iteratively increase this range as long as the
+            TSS-digest is not included and there are less than two cutting sites in up- and downstream direction
+            of the specified range.
+             */
+            Integer upstreamLength = this.upstreamNucleotideLength;
+            Integer downstreamLength = this.downstreamNucleotideLength;
+            int iteration = 0;
+            int increment = model.getEstAvgRestFragLen().intValue()*2;
+            do {
+                logger.trace("segmentFactory iteration = " + iteration + " (" + this.targetName + ")");
+                changed=false;
+                segmentFactory = new SegmentFactory(this.chromosomeID,
+                        this.genomicPos,
+                        fastaReader,
+                        chromosomeLength,
+                        upstreamLength,
+                        downstreamLength,
+                        ViewPoint.chosenEnzymes);
+                logger.trace("Done with Segment factory");
+                iteration++;
+
+                logger.trace("Number of frags = " + restrictionSegmentList.size());
+
+                if(segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2
+                        && !(genomicPos-upstreamLength < 0) ) {
+                    upstreamLength = upstreamLength + increment;
+                    this.restrictionSegmentList.clear();
+                    changed=true;
+                }
+                if(segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2
+                        && !(chromosomeLength < genomicPos + downstreamLength)) {
+                    downstreamLength = downstreamLength + increment;
+                    this.restrictionSegmentList.clear();
+                    changed=true;
+                }
+
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
+                    logger.trace("0<x and 0<y");
+                    initRestrictionFragments(fastaReader, c2align);
+                }
+            }
+            while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2 ||
+                    segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2) &&
+                    !(genomicPos-upstreamLength < 0) &&//!segmentFactory.maxDistUpOutOfChromosome() &&
+                    !(chromosomeLength < genomicPos + downstreamLength));//!segmentFactory.maxDistDownOutOfChromosome());
+        }
+        /* The iterative approach can result in more than one adjacent digest in up- or downstream direction.
+           Such digests need to be removed from the list.
+         */
+        int LEN = restrictionSegmentList.size();
+        logger.trace("restrictionSegmentList.size(): " + restrictionSegmentList.size());
+        int firstSelectedIndex = IntStream.range(0,LEN)
+                .filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//isSelected())
+                .findFirst().orElse(0);
+
+        // The map reverses the order.
+        int lastSelectedIndex = IntStream.range(0,LEN-1).
+                map(i -> LEN - i - 1).
+                filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//.isSelected())
+                .findFirst().orElse(0);
+
+
+        if (firstSelectedIndex+lastSelectedIndex==0) {
+            logger.error("Skipping trimming Segment List because no segments are selected for " + getTargetName());
+            logger.error("firstSelectedIndex:" + firstSelectedIndex);
+            logger.error("lastSelectedIndex:" + lastSelectedIndex);
+        } else {
+            int i = Math.max(0, firstSelectedIndex - 1);
+            int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
+            restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
         }
     }
 
@@ -307,10 +371,12 @@ public class ViewPoint implements Serializable {
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
-//        logger.trace("Done init Restriction Frags");
-//        for (Segment er : restrictionSegmentList){
-//            logger.trace("\tSegment: " + er.detailedReport());
-//        }
+/*
+        logger.trace("Done init Restriction Frags");
+        for (Segment er : restrictionSegmentList){
+            logger.trace("\tSegment: " + er.detailedReport());
+        }
+*/
     }
 
     /** @return a 2-tuple with the number of baits: <up,down>. */
@@ -396,7 +462,7 @@ public class ViewPoint implements Serializable {
     }
 
     /** @return true if this viewpoint has at least one active (selected) probe and it is resolved. */
-    public final boolean hasValidProbe() {
+    public final boolean hasValidDigest() {
         return getNumOfSelectedFrags()>0;
     }
     /** @return Number of Segments in this ViewPoint that are active (selected). */
@@ -496,7 +562,7 @@ public class ViewPoint implements Serializable {
         }
         if (this.centerSegment==null) {
             logger.error("center segment NUll for " + getTargetName() + "\n\t" +
-            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList =" +
+            "maxSizeUp=" + maxSizeUp+ ", maxSizeDown=" + maxSizeDown + " size of restrictionFragmentList = " +
             restrictionSegmentList.size());
         }
 
@@ -518,29 +584,7 @@ public class ViewPoint implements Serializable {
         setStartPos(start);
         setEndPos(end);
 
-        // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
-        // retain one unselected digest on each end
-        // this will keep the table from having lots of unselected fragments
 
-        int LEN = restrictionSegmentList.size();
-        int firstSelectedIndex = IntStream.range(0,LEN)
-               .filter(i->restrictionSegmentList.get(i).isSelected())
-                .findFirst().orElse(0);
-
-        // The map reverses the order.
-        int lastSelectedIndex = IntStream.range(0,LEN-1).
-                map(i -> LEN - i - 1).
-                filter(i->restrictionSegmentList.get(i).isSelected())
-               .findFirst().orElse(0);
-
-
-        if (firstSelectedIndex+lastSelectedIndex==0) {
-            logger.error("Skipping trimming Segment List because no segments are selected for "+getTargetName());
-        } else {
-            int i = Math.max(0, firstSelectedIndex - 1);
-            int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
-            restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
-        }
 
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScoreExtended();
