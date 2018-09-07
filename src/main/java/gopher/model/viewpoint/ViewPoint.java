@@ -122,7 +122,7 @@ public class ViewPoint implements Serializable {
             return new ArrayList<>();/* return empty list.*/
         }
         //return a List of all selected segments
-        return this.restrictionSegmentList.stream().filter(Segment::isSelected).collect(Collectors.toList());
+        return this.restrictionSegmentList.stream().filter(s -> (s!=null && s.isSelected())).collect(Collectors.toList());
     }
 
     /**
@@ -213,7 +213,7 @@ public class ViewPoint implements Serializable {
 
     private void init(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align, int chromosomeLength) {
         this.restrictionSegmentList=new ArrayList<>();
-        boolean changed=false;
+        boolean changed;
         /* Create segmentFactory */
         if(model.getApproach().equals(Model.Approach.SIMPLE)) {
             this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
@@ -270,8 +270,8 @@ public class ViewPoint implements Serializable {
             TSS-digest is not included and there are less than two cutting sites in up- and downstream direction
             of the specified range.
              */
-            Integer upstreamLength = this.upstreamNucleotideLength;
-            Integer downstreamLength = this.downstreamNucleotideLength;
+            int upstreamLength = this.upstreamNucleotideLength;
+            int downstreamLength = this.downstreamNucleotideLength;
             int iteration = 0;
             int increment = model.getEstAvgRestFragLen().intValue()*2;
             do {
@@ -367,7 +367,7 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-            Double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
+            double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
@@ -542,7 +542,7 @@ public class ViewPoint implements Serializable {
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    public void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, Model model ) {
+    void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, Model model ) {
         boolean allowSingleMargin=model.getAllowUnbalancedMargins();
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
@@ -591,7 +591,7 @@ public class ViewPoint implements Serializable {
     }
 
 
-    public void generateViewpointSimple(Model model) {
+    void generateViewpointSimple(Model model) {
 
         boolean allowSingleMargin = model.getAllowUnbalancedMargins();
         boolean allowPatchedViewpoints = model.getAllowPatching();
