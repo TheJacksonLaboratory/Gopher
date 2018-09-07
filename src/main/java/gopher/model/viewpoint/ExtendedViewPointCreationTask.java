@@ -52,7 +52,6 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
         for (Integer gPos : gPosList) {
             if (isCancelled()) // true if user has cancelled the task
                 return;
-            logger.trace("Working on viewpoint for gPos=" + gPos);
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos,chromLen).
                     targetName(gopherGene.getGeneSymbol()).
                     upstreamLength(model.getSizeUp()).

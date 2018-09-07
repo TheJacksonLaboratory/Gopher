@@ -13,12 +13,13 @@ also start Gopher from the command line as follows.
 $ java -jar GOPHER-0.5.5.jar
 ```
 
-We recommend starting GOPHER with 2Gb (min)/4Gb (max) memory.
+We recommend starting GOPHER with 2Gb (min)/6Gb (max) memory.
 
 ```aidl
-$ java -Xms2g -Xmx4g -jar GOPHER-0.5.5.jar
+$ java -Xms2g -Xmx6g -jar GOPHER-0.5.5.jar
 ```
 
-
+GOPHER will run without problems on 2GB for small panels (-Xmx2g), but 6GB is preferable for probe design
+for all protein-coding genes or other very larger panels.
 
 The manual for GOPHER can be found here: http://Gopher.readthedocs.io/en/latest/

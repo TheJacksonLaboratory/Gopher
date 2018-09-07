@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.5.2 (2018-09-01)
+ * @version 0.5.5 (2018-09-10)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
@@ -751,6 +751,7 @@ public class GopherMainPresenter implements Initializable {
         try {
             return Double.parseDouble(s)/100.0;
         } catch (NumberFormatException e){
+            // do nothing
         }
         return 0.0;
     }
