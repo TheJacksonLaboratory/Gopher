@@ -273,7 +273,7 @@ public class ViewPoint implements Serializable {
             Integer upstreamLength = this.upstreamNucleotideLength;
             Integer downstreamLength = this.downstreamNucleotideLength;
             int iteration = 0;
-            int increment = model.getEstAvgRestFragLen().intValue();
+            int increment = model.getEstAvgRestFragLen().intValue()*2;
             do {
                 logger.trace("segmentFactory iteration = " + iteration + " (" + this.targetName + ")");
                 changed=false;
@@ -306,7 +306,6 @@ public class ViewPoint implements Serializable {
                     logger.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
-                logger.trace("segmentFactory.getAllCuts(): " + segmentFactory.getAllCuts());
             }
             while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2 ||
                     segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2) &&
@@ -316,42 +315,28 @@ public class ViewPoint implements Serializable {
         /* The iterative approach can result in more than one adjacent digest in up- or downstream direction.
            Such digests need to be removed from the list.
          */
- /*       ArrayList newRestrictionSegmentList = new ArrayList<>();
-        for(int i=0; i < restrictionSegmentList.size(); i++) {
+        int LEN = restrictionSegmentList.size();
+        logger.trace("restrictionSegmentList.size(): " + restrictionSegmentList.size());
+        int firstSelectedIndex = IntStream.range(0,LEN)
+                .filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//isSelected())
+                .findFirst().orElse(0);
 
-            if((restrictionSegmentList.get(i).getStartPos() < genomicPos-this.upstreamNucleotideLength) &&
-                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos())) {
-                // first digest in upstream direction that overlaps the specified range
-                if(0<i-1) {
-                    // try to add adjacent upstream digest
-                    newRestrictionSegmentList.add(restrictionSegmentList.get(i-1));
-                }
-                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
-            }
-            if(
-                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getStartPos()) &&
-                (genomicPos-this.upstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos()) &&
-                (restrictionSegmentList.get(i).getStartPos() < genomicPos+this.downstreamNucleotideLength) &&
-                (restrictionSegmentList.get(i).getEndPos() < genomicPos+this.downstreamNucleotideLength))
-            {
-                // digest completely overlaps specified range
-                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
-            }
-            if((restrictionSegmentList.get(i).getStartPos() < genomicPos+this.downstreamNucleotideLength) &&
-                    (genomicPos+this.downstreamNucleotideLength < restrictionSegmentList.get(i).getEndPos())) {
-                // last digest in downstream direction that overlaps the specified range
-                newRestrictionSegmentList.add(restrictionSegmentList.get(i));
-                if(i+1 < restrictionSegmentList.size()) {
-                    // try to add adjacent downstream digest
-                    newRestrictionSegmentList.add(restrictionSegmentList.get(i+1));
-                }
-            }
+        // The map reverses the order.
+        int lastSelectedIndex = IntStream.range(0,LEN-1).
+                map(i -> LEN - i - 1).
+                filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//.isSelected())
+                .findFirst().orElse(0);
+
+
+        if (firstSelectedIndex+lastSelectedIndex==0) {
+            logger.error("Skipping trimming Segment List because no segments are selected for " + getTargetName());
+            logger.error("firstSelectedIndex:" + firstSelectedIndex);
+            logger.error("lastSelectedIndex:" + lastSelectedIndex);
+        } else {
+            int i = Math.max(0, firstSelectedIndex - 1);
+            int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
+            restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
         }
-        restrictionSegmentList.clear();
-        restrictionSegmentList.addAll(newRestrictionSegmentList);
-
-
-        */
     }
 
     /** @return true if we are at or over the 3' end of the chromosome. */
@@ -386,11 +371,12 @@ public class ViewPoint implements Serializable {
             restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
-
+/*
         logger.trace("Done init Restriction Frags");
         for (Segment er : restrictionSegmentList){
             logger.trace("\tSegment: " + er.detailedReport());
         }
+*/
     }
 
     /** @return a 2-tuple with the number of baits: <up,down>. */
@@ -598,29 +584,7 @@ public class ViewPoint implements Serializable {
         setStartPos(start);
         setEndPos(end);
 
-        // discard fragments except for the selected fragments and their immediate neighbors, i.e.,
-        // retain one unselected digest on each end
-        // this will keep the table from having lots of unselected fragments
 
-        int LEN = restrictionSegmentList.size();
-        int firstSelectedIndex = IntStream.range(0,LEN)
-               .filter(i->restrictionSegmentList.get(i).isSelected())
-                .findFirst().orElse(0);
-
-        // The map reverses the order.
-        int lastSelectedIndex = IntStream.range(0,LEN-1).
-                map(i -> LEN - i - 1).
-                filter(i->restrictionSegmentList.get(i).isSelected())
-               .findFirst().orElse(0);
-
-
-        if (firstSelectedIndex+lastSelectedIndex==0) {
-            logger.error("Skipping trimming Segment List because no segments are selected for "+getTargetName());
-        } else {
-            int i = Math.max(0, firstSelectedIndex - 1);
-            int j = Math.min(LEN, lastSelectedIndex + 2);// +2 because we want one more and range is (inclusive,exclusive)
-            restrictionSegmentList  = IntStream.range(i, j).boxed().map(k -> restrictionSegmentList.get(k)).collect(Collectors.toList());
-        }
 
         setDerivationApproach(Approach.EXTENDED);
         calculateViewpointScoreExtended();

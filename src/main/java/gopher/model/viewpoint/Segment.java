@@ -650,6 +650,10 @@ public class Segment implements Serializable {
         return String.format("%.2f%%",100*meanRepeatContentOfBaits);
     }
 
+    public boolean overlapsRange(Integer start, Integer end) {
+        return ((start <= this.startPos && this.startPos <= end) || (start <= this.endPos && this.endPos <= end) || (this.startPos < start && end < this.endPos));
+    }
+
 
     @Override
     public String toString() {

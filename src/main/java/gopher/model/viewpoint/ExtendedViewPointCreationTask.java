@@ -47,8 +47,8 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                                      AlignabilityMap c2aMap,
                                      int chromLen) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        updateMessage("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
-        logger.trace("calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
+        updateMessage("Calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
+        logger.trace("Calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
         List<Integer> gPosList = gopherGene.getTSSlist();
         if (! gopherGene.isForward()) {
             Collections.reverse(gPosList);
@@ -78,7 +78,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateMessage(String.format("Creating view point for %s", gopherGene.toString()));
+            updateMessage(String.format("Creating viewpoint for %s", gopherGene.toString()));
             vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model);
             viewpointlist.add(vp);
         }
