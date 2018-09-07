@@ -3,6 +3,13 @@ Changelog
 =========
 
 ------
+v0.5.5
+------
+- improved handling of edge cases such as targets at the very beginning or end of a chromosome
+- improved speed of viewpoint creating by refactoring
+
+
+------
 v0.5.2
 ------
 - numerous bug fixes

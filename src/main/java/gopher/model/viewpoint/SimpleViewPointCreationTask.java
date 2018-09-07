@@ -20,11 +20,6 @@ import java.util.List;
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
-    /** Total number of viewpoints */
-    private int total;
-    /** Index of current viewpoint */
-    private int i;
-
 
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model

@@ -24,11 +24,6 @@ import java.util.List;
  */
 public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
     private static final Logger logger = Logger.getLogger(ExtendedViewPointCreationTask.class.getName());
-    /** Total number of created viewpoints (this variable is used for the progress indicator) . */
-    private int total;
-    /** Current number of created viewpoints (this variable is used for the progress indicator) . */
-    private int i;
-
 
     /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
@@ -47,8 +42,6 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                                      AlignabilityMap c2aMap,
                                      int chromLen) {
         int chromosomeLength = fastaReader.getSequence(referenceSequenceID).length();
-        updateMessage("Calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
-        logger.trace("Calculating viewpoints for " + gopherGene.getGeneSymbol() + ", chromosome length="+chromosomeLength);
         List<Integer> gPosList = gopherGene.getTSSlist();
         if (! gopherGene.isForward()) {
             Collections.reverse(gPosList);
@@ -78,7 +71,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateMessage(String.format("Creating viewpoint for %s", gopherGene.toString()));
+            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vp.toString()));
             vp.generateViewpointExtendedApproach(model.getSizeUp(), model.getSizeDown(),model);
             viewpointlist.add(vp);
         }

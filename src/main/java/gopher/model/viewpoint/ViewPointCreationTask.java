@@ -32,6 +32,10 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     private int n_total_promoters;
     /** Referece to the model with all project data. */
     protected Model model;
+    /** Total number of viewpoints (used for the progress dialog) */
+    protected int total;
+    /** Index of current viewpoint (used for the progress dialog) */
+    protected int i;
 
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
