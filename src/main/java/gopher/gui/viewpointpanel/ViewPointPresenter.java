@@ -253,7 +253,7 @@ public class ViewPointPresenter implements Initializable {
         isSelectedTableColumn.setCellValueFactory(cdf -> {
             // if we get here, the user has selected or deselected the checkbox
             //this.viewpoint.setManuallyRevised();
-            this.analysisPresenter.refreshVPTable();
+            //this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
             if (segment.isUnselectable()) {
@@ -267,8 +267,11 @@ public class ViewPointPresenter implements Initializable {
                     // the following updates the selection in the GUI but does not change the originallySelected state of the segment
                     cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
                     viewpoint.refreshStartAndEndPos();
-                    if (!old_val.equals(new_val)) { // if the user has changed something, record that we have unsaved data
+                    if (!old_val.equals(new_val)) {
+                        // if the user has changed something, record that we have unsaved data
+                        // and also refresh the table to show the new score etc.
                         model.setClean(false);
+                        analysisPresenter.refreshVPTable();
                     }
                     Platform.runLater(new Runnable() {
                         @Override
