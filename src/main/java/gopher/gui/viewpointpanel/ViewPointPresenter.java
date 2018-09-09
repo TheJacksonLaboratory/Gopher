@@ -256,44 +256,49 @@ public class ViewPointPresenter implements Initializable {
             //this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
+            ChangeListener changeListener = cdf.getValue().getChangeListener();
             if (segment.isUnselectable()) {
                 checkBox.setDisable(true);
             } else if (segment.isSelected()) {// inspect state of the segment and initialize CheckBox state accordingly
                 checkBox.setSelected(true);
             }
-            checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                public void changed(ObservableValue<? extends Boolean> ov,
-                                    Boolean old_val, Boolean new_val) {
-                    // the following updates the selection in the GUI but does not change the originallySelected state of the segment
-                    cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
-                    viewpoint.refreshStartAndEndPos();
-                    if (!old_val.equals(new_val)) {
-                        // if the user has changed something, record that we have unsaved data
-                        // and also refresh the table to show the new score etc.
-                        model.setClean(false);
-                        analysisPresenter.refreshVPTable();
-                    }
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateScore();
-                            refreshUCSCButtonAction();
-                            colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
-                                @Override
-                                protected void updateItem(String item, boolean empty) {
-                                    super.updateItem(item, empty);
-                                    if (item != null && !empty) {
-                                        getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
-                                    } else {
-                                        getTableRow().setStyle("-fx-background-color: transparent;");
-                                    }
-                                }
-                            });
+            if (changeListener == null) {
+                changeListener = new ChangeListener<Boolean>() {
+                    public void changed(ObservableValue<? extends Boolean> ov,
+                                        Boolean old_val, Boolean new_val) {
+                        // the following updates the selection in the GUI but does not change the originallySelected state of the segment
+                        cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
+                        viewpoint.refreshStartAndEndPos();
+                        if (!old_val.equals(new_val)) {
+                            // if the user has changed something, record that we have unsaved data
+                            // and also refresh the table to show the new score etc.
+                            model.setClean(false);
+                            analysisPresenter.refreshVPTable();
                         }
-                    });
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateScore();
+                                refreshUCSCButtonAction();
+                                colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+                                    @Override
+                                    protected void updateItem(String item, boolean empty) {
+                                        super.updateItem(item, empty);
+                                        if (item != null && !empty) {
+                                            getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
+                                        } else {
+                                            getTableRow().setStyle("-fx-background-color: transparent;");
+                                        }
+                                    }
+                                });
+                            }
+                        });
 
-                }
-            });
+                    }
+                };
+                cdf.getValue().setChangeListener(changeListener);
+                checkBox.selectedProperty().addListener(changeListener);
+            }
             return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
         });
 
@@ -573,10 +578,13 @@ public class ViewPointPresenter implements Initializable {
 
         private final CheckBox checkBox;
 
+        private ChangeListener<Boolean> changeListener;
+
         ColoredSegment(Segment segment, String color) {
             this.segment = segment;
             this.color = color;
             this.checkBox = new CheckBox();
+            this.changeListener = null;
         }
 
         CheckBox getCheckBox() {
@@ -607,6 +615,10 @@ public class ViewPointPresenter implements Initializable {
                     segment +
                     "}";
         }
+
+        public ChangeListener<Boolean> getChangeListener() { return changeListener; }
+
+        public void setChangeListener(ChangeListener<Boolean> changeListener) { this.changeListener = changeListener; }
     }
 
 
