@@ -639,6 +639,7 @@ public class GopherMainPresenter implements Initializable {
      * will not see the values chosen for the previous model, but will instead see the grey prompt text default values.
      */
     private void removePreviousValuesFromTextFields() {
+        genomeChoiceBox.getSelectionModel().selectFirst();
         this.sizeUpTextField.setText(null);
         this.sizeDownTextField.setText(null);
         this.minGCContentTextField.setText(null);
