@@ -213,9 +213,9 @@
                 <configuration>
                     <!--<forkCount>4</forkCount>-->
                     <forkMode>always</forkMode>
-                    <systemPropertyVariables>
-                        <log4j.configuration>src/test/resources/log/log4j.silent.properties</log4j.configuration>
-                    </systemPropertyVariables>
+                    <!--<systemPropertyVariables>-->
+                        <!--<log4j.configuration>src/test/resources/log/log4j.silent.properties</log4j.configuration>-->
+                    <!--</systemPropertyVariables>-->
                     <excludes>
                         <exclude>**/TestViewPointCreation.java</exclude>
                         <exclude>**/ViewPointPresenterTest.java</exclude>
