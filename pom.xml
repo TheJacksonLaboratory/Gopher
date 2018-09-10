@@ -38,12 +38,12 @@
             <version>1.2.17</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>1.7.25</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-nop</artifactId>-->
+            <!--<version>1.7.25</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
@@ -213,9 +213,9 @@
                 <configuration>
                     <!--<forkCount>4</forkCount>-->
                     <forkMode>always</forkMode>
-                    <!--<systemPropertyVariables>-->
-                        <!--<log4j.configuration>src/test/resources/log/log4j.silent.properties</log4j.configuration>-->
-                    <!--</systemPropertyVariables>-->
+                    <systemPropertyVariables>
+                        <log4j.configuration>src/test/resources/log/log4j.silent.properties</log4j.configuration>
+                    </systemPropertyVariables>
                     <excludes>
                         <exclude>**/TestViewPointCreation.java</exclude>
                         <exclude>**/ViewPointPresenterTest.java</exclude>
