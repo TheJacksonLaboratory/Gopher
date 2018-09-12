@@ -3,6 +3,11 @@ Changelog
 =========
 
 ------
+v0.5.7
+------
+- bug fixes and improved responsiveness of GUI for promoterome
+
+------
 v0.5.6
 ------
 - refactored TableView in Analysis tab for more efficiency
