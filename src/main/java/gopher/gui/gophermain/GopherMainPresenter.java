@@ -748,6 +748,7 @@ public class GopherMainPresenter implements Initializable {
      * @return The corresponding proportion (e.g., 0.35)
      */
     private double percentageToProportion(String perc) {
+        if (perc==null) return 0.0;
         String s = perc.replaceAll("%","");
         try {
             return Double.parseDouble(s)/100.0;
