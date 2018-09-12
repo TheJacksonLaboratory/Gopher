@@ -640,6 +640,7 @@ public class GopherMainPresenter implements Initializable {
      */
     private void removePreviousValuesFromTextFields() {
         genomeChoiceBox.getSelectionModel().selectFirst();
+        approachChoiceBox.getSelectionModel().selectFirst();
         this.sizeUpTextField.setText(null);
         this.sizeDownTextField.setText(null);
         this.minGCContentTextField.setText(null);
