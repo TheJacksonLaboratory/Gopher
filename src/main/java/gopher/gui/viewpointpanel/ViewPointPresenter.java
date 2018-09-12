@@ -315,6 +315,7 @@ public class ViewPointPresenter implements Initializable {
 
         }});
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
+        locationTableColumn.setSortable(false);
 
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
         segmentLengthColumn.setCellFactory( column -> new TableCell<ColoredSegment, String>() {
@@ -332,6 +333,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        segmentLengthColumn.setSortable(false);
+
         alignabilityContentColumn.setCellValueFactory(cdf -> {
             double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
@@ -356,6 +359,7 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        alignabilityContentColumn.setSortable(false);
 
         repeatContentUpColumn.setCellValueFactory(cdf -> {
                 String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();
@@ -385,6 +389,7 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        repeatContentUpColumn.setSortable(false);
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getMeanGCcontentOfBaitsAsPercent())));
@@ -415,6 +420,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        gcContentUpDownColumn.setSortable(false);
+
         numberOfBaitsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getNumberOfBaitsUpDownAsString())));
         numberOfBaitsColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
@@ -428,6 +435,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        numberOfBaitsColumn.setSortable(false);
+
         vpScoreProperty=new SimpleStringProperty();
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);

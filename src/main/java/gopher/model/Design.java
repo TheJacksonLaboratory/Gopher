@@ -220,28 +220,30 @@ public class Design {
     }
 
     public Integer getCaptureSize() {
-        // get rid of redundant segments emerging from overlapping viewpoints
+        // get rid of redundant segments arising from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
-        Set<String> cSizeSet = new HashSet<>();
         List<ViewPoint> viewPointList = model.getViewPointList();
         for(ViewPoint vp : viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
-        // count number of baits
+        // count number of covered positions
         Integer cSize = 0;
         for(Segment seg : uniqueDigests) {
+            HashSet cSizeSet = new HashSet<>();
             for(Bait b : seg.getBaitsForUpstreamMargin()) {
                 for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
-                    cSizeSet.add(b.getRefId().concat((Integer.toString(i))));
+                    cSizeSet.add(i);
                 }
             }
             for(Bait b : seg.getBaitsForDownstreamMargin()) {
                 for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
-                    cSizeSet.add(b.getRefId().concat((Integer.toString(i))));
+                    cSizeSet.add(i);
                 }
             }
+            cSize = cSize + cSizeSet.size();
+            cSizeSet.clear();
         }
-        return cSizeSet.size();
+        return cSize;
     }
 
 
