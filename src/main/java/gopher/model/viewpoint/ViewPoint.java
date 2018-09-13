@@ -641,14 +641,14 @@ public class ViewPoint implements Serializable {
                 } else {
                     logger.trace("Warning: There is no segment in downstream direction of the center segment!");
                 }
-                Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                Double score = calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
                 if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
                         // try to add adjacent segment in downstream direction
                         if(isSegmentValid(downstreamSegment)) {
                             downstreamSegment.setSelected(true,true);
-                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
+                            calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
                             this.setStartPos(centerSegment.getStartPos());
                             this.setEndPos(downstreamSegment.getEndPos());
                         }
@@ -656,7 +656,7 @@ public class ViewPoint implements Serializable {
                         // try add adjacent segment in upstream direction
                         if(isSegmentValid(upstreamSegment)) {
                             upstreamSegment.setSelected(true,true);
-                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                            calculateViewpointScoreSimple(upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
                             this.setStartPos(upstreamSegment.getStartPos());
                             this.setEndPos(centerSegment.getEndPos());
                         }
@@ -747,14 +747,6 @@ public class ViewPoint implements Serializable {
      * A simplified version of the extended viewpoint score.
      */
     public void calculateViewpointScoreExtended() {
-        Double score = 0.0;
-        // three standard deviations cover 99.7% of the data
-        double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
-        double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
-        NormalDistribution nDistUpstream = new NormalDistribution(mean,sd);
-        sd = (double)downstreamNucleotideLength/6;
-        NormalDistribution nDistDownstream= new NormalDistribution(mean,sd);
-
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
                 stream().
@@ -768,8 +760,8 @@ public class ViewPoint implements Serializable {
             // The following is a two element list with from and to
             List<Integer> distance = seg.posToDistance(this.genomicPos);
            // System.err.println("From "+distance.get(0)+ " To="+distance.get(1));
-            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),nDistUpstream);
-            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),nDistDownstream);
+            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),model.getNormalDistributionExtendedUp());
+            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),model.getNormalDistributionExtendedDown());
             totalProbability += (upProb + downProb);
             //System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
 
@@ -779,12 +771,8 @@ public class ViewPoint implements Serializable {
     }
 
 
-    public Double calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
-
-        double mean = 0; // corresponds to TSS position
-        double sd = avgRestFragSize/6; // chosen by eye
-        NormalDistribution nD = new NormalDistribution(mean,sd);
-        this.score = nD.cumulativeProbability(vpEndPos - centerPos) - nD.cumulativeProbability(vpStaPos - centerPos);
+    public Double calculateViewpointScoreSimple(Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
+        this.score = model.getNormalDistributionSimple().cumulativeProbability(vpEndPos - centerPos) - model.getNormalDistributionSimple().cumulativeProbability(vpStaPos - centerPos);
         return score;
     }
 

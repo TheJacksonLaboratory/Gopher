@@ -6,6 +6,7 @@ import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.model.genome.*;
 import gopher.model.viewpoint.ViewPoint;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -55,6 +56,10 @@ public class Model implements Serializable {
             }
         }
     }
+
+    NormalDistribution simpleNd;
+    NormalDistribution extendedNdUp;
+    NormalDistribution extendedNdDown;
 
     /** TARGET_GENES: a gene panel; ALL_GENES: promoterome; BED_TARGETS: custom. NONE: uninitialized. */
     public enum TargetType {
@@ -163,6 +168,31 @@ public class Model implements Serializable {
     public Approach getApproach() {
         return approach;
     }
+
+    public void setNormalDistributionSimple(double meanDigestSize) {
+        double mean = 0; // corresponds to TSS position
+        double sd = meanDigestSize/6; // chosen by eye
+        this.simpleNd = new NormalDistribution(mean,sd);
+    }
+    public NormalDistribution getNormalDistributionSimple() {
+        return simpleNd;
+    }
+
+    public void setNormalDistributionsExtended() {
+        double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
+        // three standard deviations cover 99.7% of the data
+        double sd = (double)this.sizeUp/6; // the factor 1/6 was chosen by eye
+        this.extendedNdUp = new NormalDistribution(mean,sd);
+        sd = (double)this.sizeDown/6;
+        this.extendedNdDown = new NormalDistribution(mean,sd);
+    }
+    public NormalDistribution getNormalDistributionExtendedUp() {
+        return extendedNdUp;
+    }
+    public NormalDistribution getNormalDistributionExtendedDown() {
+        return extendedNdDown;
+    }
+
 
     /** This integer property is declared transient because properties cannot be serialized. We keep it in synch with
      * a corresponding normal integer variable that can be

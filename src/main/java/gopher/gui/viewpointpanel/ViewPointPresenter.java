@@ -452,7 +452,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
-            this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
+            this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }

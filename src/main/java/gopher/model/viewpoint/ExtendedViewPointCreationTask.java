@@ -105,6 +105,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
 
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
         model.setEstAvgRestFragLen(meanLen);
+        model.setNormalDistributionsExtended();
         String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
         String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
         int kmerSize=Default.KMER_SIZE;
