@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.5.5 (2018-09-10)
+ * @version 0.5.7 (2018-09-10)
  */
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
@@ -416,9 +416,7 @@ public class GopherMainPresenter implements Initializable {
         loggingLevelError.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.ERROR));
         loggingLevelError.setSelected(true);
 
-
         setGUItoSimple();
-
         initializePromptTexts();
 
         this.vpanalysisview = new VPAnalysisView();
@@ -468,7 +466,13 @@ public class GopherMainPresenter implements Initializable {
 
     }
 
-
+    /**
+     * This method gets called by SwitchScreens when the user wants to start a new project.
+     */
+    public void initializeNewModelInGui() {
+        setInitializedValuesInGUI();
+        removePreviousValuesFromTextFields();
+    }
 
     private void setInitializedValuesInGUI() {
         String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
@@ -515,6 +519,45 @@ public class GopherMainPresenter implements Initializable {
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
+    }
+
+
+    /**
+     * This is called when the user starts a new viewpoint. It erases everything from
+     * the GUI as well
+     * @param e Event triggered by new viewpoint command.
+     */
+    @FXML public void startNewProject(ActionEvent e) {
+        PopupFactory factory = new PopupFactory();
+        String projectname = factory.getProjectName();
+        if (factory.wasCancelled())
+            return; // do nothing, the user cancelled!
+        if (projectname == null || projectname.length() <1) {
+            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
+            return;
+        }
+
+        ObservableList<Tab> panes = this.tabpane.getTabs();
+        /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
+        List<Tab> tabsToBeRemoved=new ArrayList<>();
+        /* close all tabs except setup and analysis. */
+        for (Tab tab : panes) {
+            String id=tab.getId();
+            if (id != null && (id.equals("analysistab") || id.equals("setuptab") )) { continue; }
+            tabsToBeRemoved.add(tab);
+        }
+        this.tabpane.getTabs().removeAll(tabsToBeRemoved);
+        this.model=new Model();
+        this.model.setProjectName(projectname);
+        if (this.primaryStage!=null)
+            this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
+        this.vpanalysisview = new VPAnalysisView();
+        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+        this.vpanalysispresenter.setModel(this.model);
+        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+        this.analysisPane.getChildren().add(vpanalysisview.getView());
+        initializeNewModelInGui();
+        e.consume();
     }
 
     /**
@@ -1304,44 +1347,6 @@ public class GopherMainPresenter implements Initializable {
         this.vpanalysispresenter.refreshVPTable();
     }
 
-    /**
-     * This is called when the user starts a new viewpoint. It erases everything from
-     * the GUI as well
-     * @param e Event triggered by new viewpoint command.
-     */
-    @FXML public void startNewProject(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        String projectname = factory.getProjectName();
-        if (factory.wasCancelled())
-            return; // do nothing, the user cancelled!
-        if (projectname == null || projectname.length() <1) {
-            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
-            return;
-        }
-
-        ObservableList<Tab> panes = this.tabpane.getTabs();
-        /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
-        List<Tab> tabsToBeRemoved=new ArrayList<>();
-        /* close all tabs except setup and analysis. */
-        for (Tab tab : panes) {
-            String id=tab.getId();
-            if (id != null && (id.equals("analysistab") || id.equals("setuptab") )) { continue; }
-            tabsToBeRemoved.add(tab);
-        }
-        this.tabpane.getTabs().removeAll(tabsToBeRemoved);
-        this.model=new Model();
-        this.model.setProjectName(projectname);
-        if (this.primaryStage!=null)
-            this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
-        this.vpanalysisview = new VPAnalysisView();
-        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-        this.vpanalysispresenter.setModel(this.model);
-        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        this.analysisPane.getChildren().add(vpanalysisview.getView());
-        setInitializedValuesInGUI();
-        removePreviousValuesFromTextFields();
-        e.consume();
-    }
 
     /** Display the settings (parameters) of the current viewpoint. */
     public void showSettingsOfCurrentProject() {

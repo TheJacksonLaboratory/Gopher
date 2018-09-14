@@ -49,6 +49,7 @@ public class SwitchScreens {
         model.setYdim(screenHeight);
         logger.trace(String.format("Setting dimensions to x=%d y=%d",screenWidth,screenHeight ));
         presenter.setModelInMainAndInAnalysisPresenter(model);
+        presenter.initializeNewModelInGui();
         setupStage(appView,name);
 
     }
