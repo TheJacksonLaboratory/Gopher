@@ -599,7 +599,7 @@ public class ViewPoint implements Serializable {
 
         // find the digest that contains genomicPos
         this.centerSegment = restrictionSegmentList.stream().
-                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
+                filter(segment -> segment.getStartPos() <= genomicPos && segment.getEndPos() >= genomicPos).
                 findFirst().
                 orElse(null);
 
