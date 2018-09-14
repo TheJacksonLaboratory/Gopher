@@ -92,7 +92,7 @@ public class PopupFactory {
         String defaultProjectName="new project";
         String html=getProjectNameHTML();
         boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
-        if (OK) {
+        if (OK && stringValue!=null) {
             if (stringValue.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
                 PopupFactory.displayError("File name error", "File name contains invalid characters");
                 return null;
