@@ -747,6 +747,28 @@ public class ViewPoint implements Serializable {
      * A simplified version of the extended viewpoint score.
      */
     public void calculateViewpointScoreExtended() {
+
+        Double score = 0.0;
+        // three standard deviations cover 99.7% of the data
+        double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
+        double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
+        logger.error(sd);
+        NormalDistribution nDistUpstream = new NormalDistribution(mean,sd);
+        sd = (double)downstreamNucleotideLength/6;
+        NormalDistribution nDistDownstream = new NormalDistribution(mean,sd);
+
+
+        //nDistUpstream = model.getNormalDistributionExtendedUp();
+        //nDistDownstream = model.getNormalDistributionExtendedDown();
+
+        logger.error("nDistUpstream.getMean(): " + nDistUpstream.getMean());
+        logger.error("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
+
+        logger.error("nDistDownstream.getMean(): " + nDistDownstream.getMean());
+        logger.error("nDistDownstream.getStandardDeviation(): " + nDistDownstream.getStandardDeviation());
+
+
+
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
                 stream().
@@ -760,10 +782,14 @@ public class ViewPoint implements Serializable {
             // The following is a two element list with from and to
             List<Integer> distance = seg.posToDistance(this.genomicPos);
            // System.err.println("From "+distance.get(0)+ " To="+distance.get(1));
-            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),model.getNormalDistributionExtendedUp());
-            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),model.getNormalDistributionExtendedDown());
+            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),nDistUpstream);
+            //logger.error("nDistUpstream: " + nDistUpstream.getMean());
+            //logger.error("nDistUpstream: " + nDistUpstream.getStandardDeviation());
+            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),nDistDownstream);
+            //logger.error("nDistDownstream: " + nDistDownstream.getMean());
+            //logger.error("nDistDownstream: " + nDistDownstream.getStandardDeviation());
             totalProbability += (upProb + downProb);
-            //System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
+            System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
 
         }
        this.score= totalProbability;
