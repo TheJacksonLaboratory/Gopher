@@ -41,9 +41,9 @@ class URLMaker {
     }
 
 
-    String getImageURL(ViewPoint vp, String highlight) {
+    String getImageURL(ViewPoint vp, double zoomfactor,String highlight) {
         final String trackType="hgRenderTracks";
-        String url = getDefaultURL(vp,trackType,highlight);
+        String url = getDefaultURL(vp,zoomfactor,trackType,highlight);
         switch (genomebuild) {
             case "hg19":
 
@@ -66,9 +66,9 @@ class URLMaker {
     }
 
 
-    String getURL(ViewPoint vp,String highlights) {
+    String getURL(ViewPoint vp,double zoomfactor,String highlights) {
         final String trackType="hgTracks";
-        String url = getDefaultURL(vp,trackType,highlights);
+        String url = getDefaultURL(vp,zoomfactor,trackType,highlights);
         if (this.genomebuild.equals("hg19")){
             url=String.format("%s&%s",url,getURLFragmentHg19());
         }  else if (this.genomebuild.equals("hg38")) {
@@ -107,10 +107,11 @@ class URLMaker {
      * @param trackType either "hgTracks" (interactive browser) or "hgRenderTracks" (static image)
      * @return A URL for the UCSC Genome browser
      */
-    private String getDefaultURL(ViewPoint vp, String trackType,String highlights) {
+    private String getDefaultURL(ViewPoint vp, double zoomfactor,String trackType,String highlights) {
         int posFrom, posTo;
-        posFrom = vp.getMinimumDisplayPosition() - OFFSET;
-        posTo = vp.getMaximumDisplayPosition() + OFFSET;
+        posFrom = vp.getMinimumDisplayPosition(zoomfactor) - OFFSET;
+        posTo = vp.getMaximumDisplayPosition(zoomfactor) + OFFSET;
+        logger.trace("posFrom="+posFrom+", posTo="+posTo);
         String chrom = vp.getReferenceID();
         if (!chrom.startsWith("chr"))
             chrom = "chr" + chrom; /* TODO MAKE THIS ROBUST! */

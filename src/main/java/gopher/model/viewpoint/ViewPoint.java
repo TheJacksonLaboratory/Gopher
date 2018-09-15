@@ -839,11 +839,27 @@ public class ViewPoint implements Serializable {
      * @return leftmost confirmDialog position
      */
     public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
+
+    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
+     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
+     * @param zoomfactor Amount of zooming to do
+     * @return leftmost confirmDialog position
+     */
+    public int getMinimumDisplayPosition(double zoomfactor) {
+        return Math.min(getMinimumSelectedPosition(),this.genomicPos-(int)(upstreamNucleotideLength*zoomfactor));
+    }
+
+
     /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected digest overlaps that boundary, the end pos of that digest.
      * @return rightmost confirmDialog position
      */
+    @Deprecated
     public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
+
+    public int getMaximumDisplayPosition(double zoomfactor) {
+        return Math.max(getMaximumSelectedPosition(),this.genomicPos+(int)(downstreamNucleotideLength*zoomfactor));
+    }
 
 
     public int getUpstreamSpan() {
