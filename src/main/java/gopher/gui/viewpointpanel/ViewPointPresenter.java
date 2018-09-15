@@ -452,7 +452,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
-            this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
+            this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
@@ -546,7 +546,7 @@ public class ViewPointPresenter implements Initializable {
         logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         this.viewpoint.zoom(factor);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        //updateScore();
+        updateScore();
         showColoredSegmentsInTable();
         showUcscView();
     }
