@@ -163,22 +163,22 @@ public class ViewPoint implements Serializable {
      * of the ViewPoint so that more or less Segments can be selected.
      * @param zoomfactor amount of zoom to perform
      */
-    public void zoom(double zoomfactor) {
-        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
-        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
-        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
-        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
-        // TODO do we need to worry about going over end of chromosome?
-        // or start before zero?
-        setStartPos(genomicPos - upstreamNucleotideLength);
-        setEndPos(genomicPos + downstreamNucleotideLength);
-        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
-        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
-        if (this.approach.equals(Approach.EXTENDED)) {
-            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
-        }
-
-    }
+//    public void zoom(double zoomfactor) {
+//        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
+//        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
+//        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
+//        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
+//        // TODO do we need to worry about going over end of chromosome?
+//        // or start before zero?
+//        setStartPos(genomicPos - upstreamNucleotideLength);
+//        setEndPos(genomicPos + downstreamNucleotideLength);
+//        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
+//        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
+//        if (this.approach.equals(Approach.EXTENDED)) {
+//            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
+//        }
+//
+//    }
 
 
     /**
