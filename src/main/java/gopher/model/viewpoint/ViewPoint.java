@@ -158,12 +158,7 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-    /**
-     * This function should only be used for the extended approach. It changes the start and end position
-     * of the ViewPoint so that more or less Segments can be selected.
-     * @param zoomfactor amount of zoom to perform
-     */
-//    public void zoom(double zoomfactor) {
+    //    public void zoom(double zoomfactor) {
 //        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
 //        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
 //        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
@@ -753,13 +748,17 @@ public class ViewPoint implements Serializable {
         double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
         double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
         logger.error(sd);
-        NormalDistribution nDistUpstream = new NormalDistribution(mean,sd);
-        sd = (double)downstreamNucleotideLength/6;
-        NormalDistribution nDistDownstream = new NormalDistribution(mean,sd);
+        NormalDistribution nDistUpstream;
+        NormalDistribution nDistDownstream;
 
-
-        //nDistUpstream = model.getNormalDistributionExtendedUp();
-        //nDistDownstream = model.getNormalDistributionExtendedDown();
+        if (this.isPositiveStrand) {
+            // switch upstream and downstream if the gene/viewpoint is on the minus strand
+            nDistUpstream=  model.getNormalDistributionExtendedUp();
+            nDistDownstream=model.getNormalDistributionExtendedDown();
+        } else {
+            nDistDownstream = model.getNormalDistributionExtendedUp();
+            nDistUpstream = model.getNormalDistributionExtendedDown();
+        }
 
         logger.error("nDistUpstream.getMean(): " + nDistUpstream.getMean());
         logger.error("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
@@ -834,11 +833,11 @@ public class ViewPoint implements Serializable {
         return getActiveSegments().stream().mapToInt(Segment::getEndPos).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
-    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
-     * @return leftmost confirmDialog position
-     */
-    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
+//    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
+//     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
+//     * @return leftmost confirmDialog position
+//     */
+//    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
 
     /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected digest overlaps that boundary, the start pos of that digest.
@@ -846,19 +845,19 @@ public class ViewPoint implements Serializable {
      * @return leftmost confirmDialog position
      */
     public int getMinimumDisplayPosition(double zoomfactor) {
-        return Math.min(getMinimumSelectedPosition(),this.genomicPos-(int)(upstreamNucleotideLength*zoomfactor));
+        return this.genomicPos-(int)(upstreamNucleotideLength*zoomfactor);
     }
 
 
-    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
-     * @return rightmost confirmDialog position
-     */
-    @Deprecated
-    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
+//    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
+//     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
+//     * @return rightmost confirmDialog position
+//     */
+//    @Deprecated
+//    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
 
     public int getMaximumDisplayPosition(double zoomfactor) {
-        return Math.max(getMaximumSelectedPosition(),this.genomicPos+(int)(downstreamNucleotideLength*zoomfactor));
+        return this.genomicPos+(int)(downstreamNucleotideLength*zoomfactor);
     }
 
 
