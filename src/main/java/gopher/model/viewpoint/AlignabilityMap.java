@@ -56,7 +56,7 @@ public class AlignabilityMap {
         return coordArray.length;
     }
 
-    /** @return */
+    /** @return list of alignability scores for the interval between fromPos and toPos*/
     ArrayList<Integer> getScoreFromTo(int fromPos, int toPos) {
         ArrayList<Integer> scoreArrayForRegion = new ArrayList<>();
         // get start index from binary search

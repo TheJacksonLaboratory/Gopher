@@ -1,8 +1,6 @@
 package gopher.io;
 
 
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -108,7 +106,7 @@ public class Platform {
      */
     public static String getAbsoluteProjectPath(String basename) {
         File dir = getGopherDir();
-        return new String(dir + File.separator + basename + ".ser");
+        return dir + File.separator + basename + ".ser";
     }
 
 

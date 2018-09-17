@@ -11,7 +11,6 @@ import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.concurrent.Task;
-import javafx.stage.DirectoryChooser;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 

@@ -88,8 +88,7 @@ public class Bait implements Serializable {
 
     /**
      * Calculate GC content of the bait.
-     * @param fastaReader
-     * @return
+     * @param fastaReader FASTA Reader from HTSJDK
      */
     private void setGCContent(IndexedFastaSequenceFile fastaReader) {
         String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();

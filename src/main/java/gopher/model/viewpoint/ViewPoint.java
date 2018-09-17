@@ -739,34 +739,21 @@ public class ViewPoint implements Serializable {
     }
 
     /**
-     * A simplified version of the extended viewpoint score.
+     *  The extended viewpoint score essentially checks how much area of two half-normal distributinos
+     *  (for up and down stream) are filled in by the active segments.
      */
     public void calculateViewpointScoreExtended() {
-
-        Double score = 0.0;
         // three standard deviations cover 99.7% of the data
         double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
         double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
         logger.error(sd);
-        NormalDistribution nDistUpstream;
-        NormalDistribution nDistDownstream;
+        NormalDistribution nDistUpstream=model.getNormalDistributionExtendedUp();
+        NormalDistribution nDistDownstream=model.getNormalDistributionExtendedDown();
 
-        if (this.isPositiveStrand) {
-            // switch upstream and downstream if the gene/viewpoint is on the minus strand
-            nDistUpstream=  model.getNormalDistributionExtendedUp();
-            nDistDownstream=model.getNormalDistributionExtendedDown();
-        } else {
-            nDistDownstream = model.getNormalDistributionExtendedUp();
-            nDistUpstream = model.getNormalDistributionExtendedDown();
-        }
-
-        logger.error("nDistUpstream.getMean(): " + nDistUpstream.getMean());
-        logger.error("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
-
-        logger.error("nDistDownstream.getMean(): " + nDistDownstream.getMean());
-        logger.error("nDistDownstream.getStandardDeviation(): " + nDistDownstream.getStandardDeviation());
-
-
+        logger.trace("nDistUpstream.getMean(): " + nDistUpstream.getMean());
+        logger.trace("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
+        logger.trace("nDistDownstream.getMean(): " + nDistDownstream.getMean());
+        logger.trace("nDistDownstream.getStandardDeviation(): " + nDistDownstream.getStandardDeviation());
 
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
@@ -778,18 +765,21 @@ public class ViewPoint implements Serializable {
 
         for (Segment seg : selectedSegments) {
             // get distance relative to TSS (or genomic pos in general)
-            // The following is a two element list with from and to
+            // The following is a two element list with from and to for each segment
             List<Integer> distance = seg.posToDistance(this.genomicPos);
-           // System.err.println("From "+distance.get(0)+ " To="+distance.get(1));
-            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),nDistUpstream);
-            //logger.error("nDistUpstream: " + nDistUpstream.getMean());
-            //logger.error("nDistUpstream: " + nDistUpstream.getStandardDeviation());
-            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),nDistDownstream);
-            //logger.error("nDistDownstream: " + nDistDownstream.getMean());
-            //logger.error("nDistDownstream: " + nDistDownstream.getStandardDeviation());
+            int FROM=distance.get(0);
+            int TO=distance.get(1);
+            // if this gene is on the negative strand, we need to switch the two distrubtions.
+            double upProb,downProb;
+            if (this.isPositiveStrand) {
+                // switch upstream and downstream if the gene/viewpoint is on the minus strand
+                upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistUpstream);
+                downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistDownstream);
+            } else {
+                 upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistDownstream);
+                 downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistUpstream);
+            }
             totalProbability += (upProb + downProb);
-            System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
-
         }
        this.score= totalProbability;
 

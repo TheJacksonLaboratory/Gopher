@@ -46,9 +46,7 @@ public class EnzymeBoxPresenter implements Initializable {
         this.enzymemap = new HashMap<>();
         this.restrictionLabel.setText("Choose one or more restriction enzymes");
         this.chosen = new ArrayList<>();
-        Platform.runLater(() -> {
-            this.okButton.requestFocus();
-        });
+        Platform.runLater(() -> this.okButton.requestFocus());
     }
 
     /**

@@ -229,7 +229,7 @@ public class Design {
         // count number of covered positions
         Integer cSize = 0;
         for(Segment seg : uniqueDigests) {
-            HashSet cSizeSet = new HashSet<>();
+            HashSet<Integer> cSizeSet = new HashSet<>();
             for(Bait b : seg.getBaitsForUpstreamMargin()) {
                 for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
                     cSizeSet.add(i);
