@@ -78,7 +78,7 @@ public class ProbeFileExporter {
 
         // use a hashMap of Integer sets to get rid of duplicated probes
         Set<String> uniqueProbes = new HashSet<>();
-        HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<String, ArrayList<Integer>>();
+        HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<>();
 
         for (ViewPoint vp : viewpointlist) {
             if (vp.getNumOfSelectedFrags() == 0) { continue; }
@@ -111,7 +111,7 @@ public class ProbeFileExporter {
             }
         }
 
-        List sortedKeyList = new ArrayList(uniqueBaits.keySet());
+        List<String> sortedKeyList = new ArrayList(uniqueBaits.keySet());
         Collections.sort(sortedKeyList);
         Date curDate = new Date();
         SimpleDateFormat format = new SimpleDateFormat("ddMMyy");

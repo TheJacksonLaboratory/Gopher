@@ -120,6 +120,9 @@ public class ViewPointPresenter implements Initializable {
      */
     private List<ColoredSegment> coloredsegments;
 
+    /** The amount to zoom a window by. Note that we will limit this to 20%-500% of the original window. */
+    private double zoomfactor=1.0d;
+
 
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
@@ -134,7 +137,7 @@ public class ViewPointPresenter implements Initializable {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getURL(viewpoint,getHighlightRegions());
+        String url= urlmaker.getURL(viewpoint,this.zoomfactor,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
         e.consume();
@@ -155,7 +158,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     private void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getImageURL(viewpoint,getHighlightRegions());
+        String url= urlmaker.getImageURL(viewpoint,this.zoomfactor,getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
         this.ucscWebEngine.load(url);
@@ -504,11 +507,19 @@ public class ViewPointPresenter implements Initializable {
      */
     private void showUcscView() {
         URLMaker maker = new URLMaker(this.model);
-        String url= maker.getImageURL(this.viewpoint,getHighlightRegions());
+        logger.trace("Getting URL with zoomfactor="+zoomfactor);
+        String url= maker.getImageURL(this.viewpoint,this.zoomfactor,getHighlightRegions());
         ucscWebEngine.load(url);
     }
 
-
+    /** Adjust the zoom factor and ensure that it stays within 20%-500% of the original range.
+     * @param adjustment Amount to change the zoom factor (1.5 or 0.5).
+     * */
+    private void setZoomFactor(double adjustment) {
+        this.zoomfactor *= adjustment;
+        this.zoomfactor = Math.max(0.2,zoomfactor);
+        this.zoomfactor = Math.min(5.0,zoomfactor);
+    }
 
 
     public void setTab(Tab tab) {
@@ -540,13 +551,12 @@ public class ViewPointPresenter implements Initializable {
 
     /**
      * Zoom in or out with the UCSC display.
-     * @param factor If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
+     * @param adjustment If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
      */
-    private void zoom(double factor) {
-        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        this.viewpoint.zoom(factor);
+    private void zoom(double adjustment) {
+        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",adjustment,viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        setZoomFactor(adjustment);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        updateScore();
         showColoredSegmentsInTable();
         showUcscView();
     }

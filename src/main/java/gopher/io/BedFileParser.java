@@ -49,7 +49,7 @@ public class BedFileParser {
             BufferedReader br = new BufferedReader(fr);
             String line;
             while ((line = br.readLine()) != null) {
-                if (line==null || line.isEmpty()) {
+                if (line.isEmpty()) {
                     continue; // skip empty lines that might be at the end of the file
                 }
                 String A[] = line.split("\t");

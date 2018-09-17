@@ -153,19 +153,11 @@ public class SegmentFactory implements Serializable {
     }
 
     public boolean maxDistUpOutOfChromosome() {
-        if(genomicPos-maxDistToGenomicPosUp < 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return (genomicPos-maxDistToGenomicPosUp < 1);
     }
 
     public boolean maxDistDownOutOfChromosome() {
-        if(this.chromosomeLength < maxDistToGenomicPosDown + genomicPos) {
-            return true;
-        } else {
-            return false;
-        }
+        return (this.chromosomeLength < maxDistToGenomicPosDown + genomicPos);
     }
 
 

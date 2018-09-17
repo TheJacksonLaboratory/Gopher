@@ -131,9 +131,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             }
             int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
             //for (GopherGene gene : group.getGenes()) {
-            group.getGenes().parallelStream().forEach(gene -> {
-                calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen);
-            });
+            group.getGenes().parallelStream().forEach(gene -> calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen));
         }
 
 
