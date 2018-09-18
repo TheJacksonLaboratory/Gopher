@@ -6,6 +6,7 @@ Changelog
 v0.5.7
 ------
 - bug fixes and improved responsiveness of GUI for promoterome
+- improved efficiency of extended score function
 
 ------
 v0.5.6
