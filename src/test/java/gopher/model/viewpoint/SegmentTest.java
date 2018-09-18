@@ -3,10 +3,7 @@ package gopher.model.viewpoint;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import gopher.model.Default;
 
 import java.io.File;
@@ -28,17 +25,14 @@ public class SegmentTest {
 
 
 
-    @BeforeClass
-    public static void setup() throws Exception {
+    @Before
+    public void setup() throws Exception {
         //String testFastaFile="src/test/resources/testgenome/test_genome.fa";
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
 
         String testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         File fasta = new File(testFastaFile);
         FastaReader = new IndexedFastaSequenceFile(fasta);
-
-
-
 
         segmentA = buildSegmentA(FastaReader);
         segmentB = buildSegmentB(FastaReader);
@@ -99,7 +93,6 @@ public class SegmentTest {
      * Thus, there is a 100% upstream and a zero percent downstream repeat content
      */
     @Test
-    @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
     public void testGetSegmentMargins() {
         int marg=5; /* margin size for testing */
         Segment  segment = new Segment.Builder(referenceSequenceID,69,92).fastaReader(FastaReader).marginSize(marg).build();
@@ -116,7 +109,6 @@ public class SegmentTest {
      * Thus, there is a 80% upstream and a zero percent downstream repeat content
      */
     @Test
-    @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
     public void testGetSegmentMargins2() {
         int marg=5; /* margin size for testing */
         Segment  segment = new Segment.Builder(referenceSequenceID,75,92).fastaReader(FastaReader).marginSize(marg).build();
@@ -134,7 +126,6 @@ public class SegmentTest {
      * Thus, there is a 80% upstream and a 60% percent downstream repeat content
      */
     @Test
-    @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
     public void testGetSegmentMargins3() {
         int marg=5; /* margin size for testing */
         Segment  segment = new Segment.Builder(referenceSequenceID,75,95).fastaReader(FastaReader).marginSize(marg).build();
@@ -270,7 +261,6 @@ public class SegmentTest {
      * caacc.ggTGA.CATGA.NCATT.T  7 of 21 bases are lower case (repeat)
      */
     @Test
-    @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
     public void testRepetitiveContentAlteredSegmentB() {
         // change end position
         //Segment seg = new Segment(referenceSequenceID,72,92,false, FastaReader);
