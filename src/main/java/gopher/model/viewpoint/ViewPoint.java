@@ -717,8 +717,17 @@ public class ViewPoint implements Serializable {
     }
 
 
-
-    private double getSegmentProbabilityDownstream(int from, int to,NormalDistribution nD) {
+    /**
+     * This function calculates the probability of a segment according to the Normal distribution
+     * that is passed to it. It only takes positions that are 3' (to the right of ) the
+     * transcription start site ({@link #genomicPos}). These positions are encoded using
+     * positive integers (See {@link Segment}, function posToDistance).
+     * @param from The most 5' (upstream) position of the segment in genomic coordinates
+     * @param to The most 3' (downstream) position of the segment in genomic coordinates
+     * @param nD THe Normal distribution for calculating the probability
+     * @return THe calculated probability for this segment
+     */
+    private double getSegmentProbability3primeOfTTT(int from, int to, NormalDistribution nD) {
         if (from>=to)return 0d;
         // only look at the part of the segment that is downstream, i.e., >0
         double fromPos=from>0?(double)from:0d;
@@ -728,7 +737,17 @@ public class ViewPoint implements Serializable {
         return cp1-cp2;
     }
 
-    private double getSegmentProbabilityUpstream(int from, int to,NormalDistribution nD) {
+    /**
+     * This function calculates the probability of a segment according to the Normal distribution
+     * that is passed to it. It only takes positions that are 5' (to the left of ) the
+     * transcription start site ({@link #genomicPos}). These positions are encoded using
+     * negative integers (See {@link Segment}, function posToDistance).
+     * @param from The most 5' (upstream) position of the segment in genomic coordinates
+     * @param to The most 3' (downstream) position of the segment in genomic coordinates
+     * @param nD THe Normal distribution for calculating the probability
+     * @return THe calculated probability for this segment
+     */
+    private double getSegmentProbability5primeOfTSS(int from, int to, NormalDistribution nD) {
         if (from>=to)return 0d;
         // only look at the part of the segment that is upstream, i.e., <0
         double fromPos=from<0?(double)from:0d;
@@ -743,17 +762,8 @@ public class ViewPoint implements Serializable {
      *  (for up and down stream) are filled in by the active segments.
      */
     public void calculateViewpointScoreExtended() {
-        // three standard deviations cover 99.7% of the data
-        double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
-        double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
-        logger.error(sd);
         NormalDistribution nDistUpstream=model.getNormalDistributionExtendedUp();
         NormalDistribution nDistDownstream=model.getNormalDistributionExtendedDown();
-
-        logger.trace("nDistUpstream.getMean(): " + nDistUpstream.getMean());
-        logger.trace("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
-        logger.trace("nDistDownstream.getMean(): " + nDistDownstream.getMean());
-        logger.trace("nDistDownstream.getStandardDeviation(): " + nDistDownstream.getStandardDeviation());
 
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
@@ -773,11 +783,11 @@ public class ViewPoint implements Serializable {
             double upProb,downProb;
             if (this.isPositiveStrand) {
                 // switch upstream and downstream if the gene/viewpoint is on the minus strand
-                upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistUpstream);
-                downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistDownstream);
+                upProb = getSegmentProbability5primeOfTSS(FROM, TO, nDistUpstream);
+                downProb = getSegmentProbability3primeOfTTT(FROM, TO, nDistDownstream);
             } else {
-                 upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistDownstream);
-                 downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistUpstream);
+                 upProb = getSegmentProbability5primeOfTSS(FROM, TO, nDistDownstream);
+                 downProb = getSegmentProbability3primeOfTTT(FROM, TO, nDistUpstream);
             }
             totalProbability += (upProb + downProb);
         }
