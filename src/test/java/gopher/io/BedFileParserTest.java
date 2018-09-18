@@ -5,6 +5,9 @@ import gopher.model.GopherGene;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -17,11 +20,15 @@ public class BedFileParserTest {
 
     private static  List<GopherGene> gopherGeneList;
 
+
     @BeforeClass
     public static void setup() throws GopherException {
         ClassLoader classLoader = RefGeneParserTest.class.getClassLoader();
         String refgene = classLoader.getResource("gwas-test.bed").getFile();
-        parser=new BedFileParser(refgene);
+        Path path = Paths.get("src","test","resources","gwas-test.bed");
+        File f = path.toFile();
+
+        parser=new BedFileParser(f.getAbsolutePath());
         gopherGeneList=parser.getGopherGeneList();
     }
 

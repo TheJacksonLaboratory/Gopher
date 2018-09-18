@@ -18,6 +18,8 @@ public class QCCheckFactory {
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
+    /** This will be set to false if files are missing and we should not go on with the analysis. */
+    private static boolean qc_ok=true;
 
     public static boolean showQCCheck(Model model) {
         Stage window;
@@ -40,6 +42,9 @@ public class QCCheckFactory {
 
         });
         String html= getHTML(model);
+        if (!qc_ok) {
+            html=getErrorHTML(model);
+        }
         presenter.setData(html);
 
         if (model.getViewPointList() != null && model.getViewPointList().size()>0) {
@@ -48,7 +53,7 @@ public class QCCheckFactory {
 
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
-        return (! presenter.wasCanceled());
+        return (! presenter.wasCanceled() && qc_ok);
     }
 
     private static String getHTML(Model model) {
@@ -159,6 +164,7 @@ public class QCCheckFactory {
      * @return HTML string with summary of Q/C
      */
     private static String validateData(Model model) {
+        qc_ok=true;  // reset
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead>");
@@ -168,6 +174,7 @@ public class QCCheckFactory {
         sb.append("<tr><td>Genome</td>");
         if (model.getGenomeDirectoryPath()==null) {
             sb.append("<td class=\"red\">Path to genome directory not initialized.</td>");
+            qc_ok=false;
         } else {
             String g = String.format("%s (at %s).",model.getGenomeBuild(),model.getGenomeDirectoryPath());
             sb.append(String.format("<td>%s</td>",g));
@@ -183,24 +190,28 @@ public class QCCheckFactory {
             } else {
                 msg="Genome has not been unpacked";
             }
+            qc_ok=false;
             sb.append(String.format("<td class=\"red\">%s</td>",msg));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Alignability map</td>");
         String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
-        int i=alignabilityMap.lastIndexOf(File.separator);
-        if (i>0) {
-            alignabilityMap=alignabilityMap.substring(i+1);
-        }
+
         if (alignabilityMap!=null) {
+            int i=alignabilityMap.lastIndexOf(File.separator);
+            if (i>0) {
+                alignabilityMap=alignabilityMap.substring(i+1);
+            }
             sb.append("<td>"+alignabilityMap+"</td>");
         } else {
             sb.append("<td class=\"red\">Alignability map not found</td>");
+            qc_ok=false;
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");
         if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
             sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
+            qc_ok=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
         }
@@ -208,6 +219,7 @@ public class QCCheckFactory {
         sb.append("<tr><td>Project file</td>");
         if (model.getProjectName()==null) {
             sb.append("<td class=\"red\">Project file name not initialized.</td>");
+            qc_ok=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getProjectName()));
         }
@@ -218,6 +230,7 @@ public class QCCheckFactory {
         sb.append("<tr><td>Target file</td>");
         if (model.getRefGenePath()==null) {
             sb.append("<td class=\"red\">Targets not initialized.</td>");
+            qc_ok=false;
         } else {
             sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
         }
@@ -225,6 +238,7 @@ public class QCCheckFactory {
         sb.append("<tr><td>Gene list</td>");
         if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
+            qc_ok=false;
         } else {
             sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
         }
@@ -232,12 +246,57 @@ public class QCCheckFactory {
         sb.append("<tr><td>Unique TSS</td>");
         if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
             sb.append("<td class=\"red\">TSS list not initialized.</td>");
+            qc_ok=false;
         } else {
             sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
         }
         sb.append("</tr>");
         return sb.toString();
     }
+
+    private static String getErrorHTML(Model model) {
+        StringBuilder sb=new StringBuilder();
+        sb.append("<table class=\"vpvTable\">");
+        sb.append("<thead>");
+        sb.append("<tr><th colspan=\"2\">Errors</th></tr>");
+        sb.append("</thead>");
+        sb.append("<tbody>");
+        if (model.getGenomeDirectoryPath()==null) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Path to genome directory not initialized.</td></tr>");
+        }
+         if (! model.isGenomeUnpacked()) {
+             sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not unpacked</td></tr>");
+        }
+        if (! model.isGenomeIndexed()) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not correctly indexed</td></tr>");
+        }
+        String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
+
+        if (alignabilityMap==null) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Alignability map not found</td></tr>");
+        }
+        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Restriction enzyme not initialized.</td></tr>");
+        }
+        if (model.getProjectName()==null) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Project file name not initialized.</td></tr>");
+        }
+        if (model.getRefGenePath()==null) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Targets not initialized.</td></tr>");
+        }
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Gene list not initialized.</td></tr>");
+        }
+        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">TSS list not initialized.</td></tr>");
+        }
+        sb.append("</table>");
+        sb.append("<p>Please initialize GOPHER with the required items before creating viewpoints.</p>");
+        return String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),sb.toString(),HTML_FOOTER);
+    }
+
+
+
 
 
     /**

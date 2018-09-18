@@ -161,7 +161,7 @@ public class VPAnalysisPresenter implements Initializable {
 
         //  fifth column--number of selected fragments
         nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
-
+        nSelectedTableColumn.setComparator(new IntegerComparator());
 
         // sixth column--score of fragments.
         viewpointScoreColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScoreAsPercentString())));

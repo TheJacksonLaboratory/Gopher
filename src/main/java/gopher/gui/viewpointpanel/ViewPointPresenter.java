@@ -120,6 +120,9 @@ public class ViewPointPresenter implements Initializable {
      */
     private List<ColoredSegment> coloredsegments;
 
+    /** The amount to zoom a window by. Note that we will limit this to 20%-500% of the original window. */
+    private double zoomfactor=1.0d;
+
 
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
@@ -134,7 +137,7 @@ public class ViewPointPresenter implements Initializable {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getURL(viewpoint,getHighlightRegions());
+        String url= urlmaker.getURL(viewpoint,this.zoomfactor,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
         e.consume();
@@ -155,7 +158,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML
     private void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.model);
-        String url= urlmaker.getImageURL(viewpoint,getHighlightRegions());
+        String url= urlmaker.getImageURL(viewpoint,this.zoomfactor,getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
         this.ucscWebEngine.load(url);
@@ -256,44 +259,49 @@ public class ViewPointPresenter implements Initializable {
             //this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
+            ChangeListener changeListener = cdf.getValue().getChangeListener();
             if (segment.isUnselectable()) {
                 checkBox.setDisable(true);
             } else if (segment.isSelected()) {// inspect state of the segment and initialize CheckBox state accordingly
                 checkBox.setSelected(true);
             }
-            checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                public void changed(ObservableValue<? extends Boolean> ov,
-                                    Boolean old_val, Boolean new_val) {
-                    // the following updates the selection in the GUI but does not change the originallySelected state of the segment
-                    cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
-                    viewpoint.refreshStartAndEndPos();
-                    if (!old_val.equals(new_val)) {
-                        // if the user has changed something, record that we have unsaved data
-                        // and also refresh the table to show the new score etc.
-                        model.setClean(false);
-                        analysisPresenter.refreshVPTable();
-                    }
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateScore();
-                            refreshUCSCButtonAction();
-                            colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
-                                @Override
-                                protected void updateItem(String item, boolean empty) {
-                                    super.updateItem(item, empty);
-                                    if (item != null && !empty) {
-                                        getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
-                                    } else {
-                                        getTableRow().setStyle("-fx-background-color: transparent;");
-                                    }
-                                }
-                            });
+            if (changeListener == null) {
+                changeListener = new ChangeListener<Boolean>() {
+                    public void changed(ObservableValue<? extends Boolean> ov,
+                                        Boolean old_val, Boolean new_val) {
+                        // the following updates the selection in the GUI but does not change the originallySelected state of the segment
+                        cdf.getValue().getSegment().setSelected(new_val, false); // changes the selected value of the Segment
+                        viewpoint.refreshStartAndEndPos();
+                        if (!old_val.equals(new_val)) {
+                            // if the user has changed something, record that we have unsaved data
+                            // and also refresh the table to show the new score etc.
+                            model.setClean(false);
+                            analysisPresenter.refreshVPTable();
                         }
-                    });
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateScore();
+                                refreshUCSCButtonAction();
+                                colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+                                    @Override
+                                    protected void updateItem(String item, boolean empty) {
+                                        super.updateItem(item, empty);
+                                        if (item != null && !empty) {
+                                            getTableRow().setStyle(String.format("-fx-background-color: #%s;", item.substring(3)));
+                                        } else {
+                                            getTableRow().setStyle("-fx-background-color: transparent;");
+                                        }
+                                    }
+                                });
+                            }
+                        });
 
-                }
-            });
+                    }
+                };
+                cdf.getValue().setChangeListener(changeListener);
+                checkBox.selectedProperty().addListener(changeListener);
+            }
             return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
         });
 
@@ -310,6 +318,7 @@ public class ViewPointPresenter implements Initializable {
 
         }});
         locationTableColumn.setComparator(new FormattedChromosomeComparator());
+        locationTableColumn.setSortable(false);
 
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
         segmentLengthColumn.setCellFactory( column -> new TableCell<ColoredSegment, String>() {
@@ -327,6 +336,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        segmentLengthColumn.setSortable(false);
+
         alignabilityContentColumn.setCellValueFactory(cdf -> {
             double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
@@ -351,6 +362,7 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        alignabilityContentColumn.setSortable(false);
 
         repeatContentUpColumn.setCellValueFactory(cdf -> {
                 String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();
@@ -380,6 +392,7 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        repeatContentUpColumn.setSortable(false);
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getMeanGCcontentOfBaitsAsPercent())));
@@ -410,6 +423,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        gcContentUpDownColumn.setSortable(false);
+
         numberOfBaitsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getNumberOfBaitsUpDownAsString())));
         numberOfBaitsColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
@@ -423,6 +438,8 @@ public class ViewPointPresenter implements Initializable {
                 }
             }
         });
+        numberOfBaitsColumn.setSortable(false);
+
         vpScoreProperty=new SimpleStringProperty();
         vpExplanationProperty=new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
@@ -438,7 +455,7 @@ public class ViewPointPresenter implements Initializable {
 
     private void updateScore() {
         if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
-            this.viewpoint.calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
+            this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
@@ -490,11 +507,19 @@ public class ViewPointPresenter implements Initializable {
      */
     private void showUcscView() {
         URLMaker maker = new URLMaker(this.model);
-        String url= maker.getImageURL(this.viewpoint,getHighlightRegions());
+        logger.trace("Getting URL with zoomfactor="+zoomfactor);
+        String url= maker.getImageURL(this.viewpoint,this.zoomfactor,getHighlightRegions());
         ucscWebEngine.load(url);
     }
 
-
+    /** Adjust the zoom factor and ensure that it stays within 20%-500% of the original range.
+     * @param adjustment Amount to change the zoom factor (1.5 or 0.5).
+     * */
+    private void setZoomFactor(double adjustment) {
+        this.zoomfactor *= adjustment;
+        this.zoomfactor = Math.max(0.2,zoomfactor);
+        this.zoomfactor = Math.min(5.0,zoomfactor);
+    }
 
 
     public void setTab(Tab tab) {
@@ -526,13 +551,12 @@ public class ViewPointPresenter implements Initializable {
 
     /**
      * Zoom in or out with the UCSC display.
-     * @param factor If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
+     * @param adjustment If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
      */
-    private void zoom(double factor) {
-        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",factor,viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        this.viewpoint.zoom(factor);
+    private void zoom(double adjustment) {
+        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",adjustment,viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        setZoomFactor(adjustment);
         logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
-        //updateScore();
         showColoredSegmentsInTable();
         showUcscView();
     }
@@ -573,10 +597,13 @@ public class ViewPointPresenter implements Initializable {
 
         private final CheckBox checkBox;
 
+        private ChangeListener<Boolean> changeListener;
+
         ColoredSegment(Segment segment, String color) {
             this.segment = segment;
             this.color = color;
             this.checkBox = new CheckBox();
+            this.changeListener = null;
         }
 
         CheckBox getCheckBox() {
@@ -607,6 +634,10 @@ public class ViewPointPresenter implements Initializable {
                     segment +
                     "}";
         }
+
+        public ChangeListener<Boolean> getChangeListener() { return changeListener; }
+
+        public void setChangeListener(ChangeListener<Boolean> changeListener) { this.changeListener = changeListener; }
     }
 
 

@@ -20,7 +20,7 @@ public class DeleteFactory {
         Stage window;
         String windowTitle = "Delete unwanted project files";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
         List<ProjectFile> projects = getProjectFiles(model);
 

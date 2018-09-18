@@ -1,6 +1,5 @@
 package gopher.model.viewpoint;
 
-import gopher.exception.GopherException;
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.log4j.Logger;
@@ -295,7 +294,6 @@ public class SegmentTest {
         Integer expectedEnd=44;
         Assert.assertEquals(expectedStart,segmentA.getStartPos());
         Assert.assertEquals(expectedEnd,segmentA.getEndPos());
-        String seg=FastaReader.getSubsequenceAt(referenceSequenceID,21,44).getBaseString();
     }
 
     @Test
@@ -373,44 +371,7 @@ public class SegmentTest {
         List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,amp,0.35,0.65,10.0);
         logger.trace(baitList.size());
         for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore());
-        }
-
-    }
-
-    @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
-    @Test
-    public void getBaitsForUpstreamMarginRealData() throws IOException {
-
-        // create segment for testing
-        File fasta = new File("/home/peter/storage_1/VPV_data/hg19/hg19.fa");
-        FastaReader = new IndexedFastaSequenceFile(fasta);
-        Segment testSeg = new Segment.Builder("chr20",50160700,50161090).//up:50158209,50158459;down:
-                fastaReader(FastaReader).
-                marginSize(250).
-                build();
-        List<IntPair> ip = testSeg.getSegmentMargins();
-
-        //AlignabilityMap testMap = new AlignabilityMap("/Users/hansep/data/hg19/chromInfo.txt.gz", "/Users/hansep/data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
-        //AlignabilityMap testMap = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.50mer.alignabilityMap.bedgraph.gz",50);
-        String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
-        String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";
-        AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilityPath,chromInfoPath,50);
-        AlignabilityMap amp=null;
-        while (apiterator.hasNext()) {
-            AlignabilityMap c2m=apiterator.next();
-            if (c2m.getChromName().equals("chr20")) {
-                amp=c2m;
-                break;
-            }
-        }
-        assertNotNull(amp);
-
-        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,amp,0.35,0.65,10.0);
-
-        logger.trace(baitList.size());
-        for (Bait bait : baitList) {
-            logger.trace(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore() + "\t" + bait.getGCContent() + "\t" + bait.getRepeatContent());
+            logger.error(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore());
         }
 
     }

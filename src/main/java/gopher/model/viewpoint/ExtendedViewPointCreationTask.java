@@ -105,6 +105,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
 
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
         model.setEstAvgRestFragLen(meanLen);
+        model.setNormalDistributionsExtended();
         String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
         String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
         int kmerSize=Default.KMER_SIZE;
@@ -130,9 +131,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             }
             int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
             //for (GopherGene gene : group.getGenes()) {
-            group.getGenes().parallelStream().forEach(gene -> {
-                calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen);
-            });
+            group.getGenes().parallelStream().forEach(gene -> calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen));
         }
 
 

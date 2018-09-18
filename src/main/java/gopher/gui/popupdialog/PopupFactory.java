@@ -13,8 +13,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,7 +90,7 @@ public class PopupFactory {
         String defaultProjectName="new project";
         String html=getProjectNameHTML();
         boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
-        if (OK) {
+        if (OK && stringValue!=null) {
             if (stringValue.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
                 PopupFactory.displayError("File name error", "File name contains invalid characters");
                 return null;

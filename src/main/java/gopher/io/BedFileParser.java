@@ -13,7 +13,7 @@ import java.util.*;
  * is identical with the start position of the BED file.
  */
 public class BedFileParser {
-    private static Logger logger = Logger.getLogger(BedFileParser.class.getName());
+    private static Logger logger = Logger.getLogger(BedFileParser.class);
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
@@ -49,7 +49,7 @@ public class BedFileParser {
             BufferedReader br = new BufferedReader(fr);
             String line;
             while ((line = br.readLine()) != null) {
-                if (line==null || line.isEmpty()) {
+                if (line.isEmpty()) {
                     continue; // skip empty lines that might be at the end of the file
                 }
                 String A[] = line.split("\t");

@@ -158,27 +158,22 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-    /**
-     * This function should only be used for the extended approach. It changes the start and end position
-     * of the ViewPoint so that more or less Segments can be selected.
-     * @param zoomfactor amount of zoom to perform
-     */
-    public void zoom(double zoomfactor) {
-        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
-        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
-        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
-        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
-        // TODO do we need to worry about going over end of chromosome?
-        // or start before zero?
-        setStartPos(genomicPos - upstreamNucleotideLength);
-        setEndPos(genomicPos + downstreamNucleotideLength);
-        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
-        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
-        if (this.approach.equals(Approach.EXTENDED)) {
-            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
-        }
-
-    }
+    //    public void zoom(double zoomfactor) {
+//        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
+//        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
+//        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
+//        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
+//        // TODO do we need to worry about going over end of chromosome?
+//        // or start before zero?
+//        setStartPos(genomicPos - upstreamNucleotideLength);
+//        setEndPos(genomicPos + downstreamNucleotideLength);
+//        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
+//        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
+//        if (this.approach.equals(Approach.EXTENDED)) {
+//            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
+//        }
+//
+//    }
 
 
     /**
@@ -599,7 +594,7 @@ public class ViewPoint implements Serializable {
 
         // find the digest that contains genomicPos
         this.centerSegment = restrictionSegmentList.stream().
-                filter(segment -> segment.getStartPos() < genomicPos && segment.getEndPos() >= genomicPos).
+                filter(segment -> segment.getStartPos() <= genomicPos && segment.getEndPos() >= genomicPos).
                 findFirst().
                 orElse(null);
 
@@ -641,14 +636,14 @@ public class ViewPoint implements Serializable {
                 } else {
                     logger.trace("Warning: There is no segment in downstream direction of the center segment!");
                 }
-                Double score = calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                Double score = calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
                 if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
                         // try to add adjacent segment in downstream direction
                         if(isSegmentValid(downstreamSegment)) {
                             downstreamSegment.setSelected(true,true);
-                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
+                            calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, downstreamSegment.getEndPos()); // recalculate score
                             this.setStartPos(centerSegment.getStartPos());
                             this.setEndPos(downstreamSegment.getEndPos());
                         }
@@ -656,7 +651,7 @@ public class ViewPoint implements Serializable {
                         // try add adjacent segment in upstream direction
                         if(isSegmentValid(upstreamSegment)) {
                             upstreamSegment.setSelected(true,true);
-                            calculateViewpointScoreSimple(model.getEstAvgRestFragLen(), upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
+                            calculateViewpointScoreSimple(upstreamSegment.getStartPos(), genomicPos, centerSegment.getEndPos()); // recalculate score
                             this.setStartPos(upstreamSegment.getStartPos());
                             this.setEndPos(centerSegment.getEndPos());
                         }
@@ -744,16 +739,21 @@ public class ViewPoint implements Serializable {
     }
 
     /**
-     * A simplified version of the extended viewpoint score.
+     *  The extended viewpoint score essentially checks how much area of two half-normal distributinos
+     *  (for up and down stream) are filled in by the active segments.
      */
     public void calculateViewpointScoreExtended() {
-        Double score = 0.0;
         // three standard deviations cover 99.7% of the data
         double sd = (double)upstreamNucleotideLength/6; // the factor 1/6 was chosen by eye
         double mean = 0; // shifts the normal distribution, so that almost the entire area under the curve is to the left of the y-axis
-        NormalDistribution nDistUpstream = new NormalDistribution(mean,sd);
-        sd = (double)downstreamNucleotideLength/6;
-        NormalDistribution nDistDownstream= new NormalDistribution(mean,sd);
+        logger.error(sd);
+        NormalDistribution nDistUpstream=model.getNormalDistributionExtendedUp();
+        NormalDistribution nDistDownstream=model.getNormalDistributionExtendedDown();
+
+        logger.trace("nDistUpstream.getMean(): " + nDistUpstream.getMean());
+        logger.trace("nDistUpstream.getStandardDeviation(): " + nDistUpstream.getStandardDeviation());
+        logger.trace("nDistDownstream.getMean(): " + nDistDownstream.getMean());
+        logger.trace("nDistDownstream.getStandardDeviation(): " + nDistDownstream.getStandardDeviation());
 
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
@@ -765,26 +765,29 @@ public class ViewPoint implements Serializable {
 
         for (Segment seg : selectedSegments) {
             // get distance relative to TSS (or genomic pos in general)
-            // The following is a two element list with from and to
+            // The following is a two element list with from and to for each segment
             List<Integer> distance = seg.posToDistance(this.genomicPos);
-           // System.err.println("From "+distance.get(0)+ " To="+distance.get(1));
-            double upProb = getSegmentProbabilityUpstream(distance.get(0),distance.get(1),nDistUpstream);
-            double downProb  = getSegmentProbabilityDownstream(distance.get(0),distance.get(1),nDistDownstream);
+            int FROM=distance.get(0);
+            int TO=distance.get(1);
+            // if this gene is on the negative strand, we need to switch the two distrubtions.
+            double upProb,downProb;
+            if (this.isPositiveStrand) {
+                // switch upstream and downstream if the gene/viewpoint is on the minus strand
+                upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistUpstream);
+                downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistDownstream);
+            } else {
+                 upProb = getSegmentProbabilityUpstream(distance.get(0), distance.get(1), nDistDownstream);
+                 downProb = getSegmentProbabilityDownstream(distance.get(0), distance.get(1), nDistUpstream);
+            }
             totalProbability += (upProb + downProb);
-            //System.err.println("From "+distance.get(0)+ " To="+distance.get(1) + " up="+upProb +", down="+downProb +", total="+totalProbability);
-
         }
        this.score= totalProbability;
 
     }
 
 
-    public Double calculateViewpointScoreSimple(Double avgRestFragSize, Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
-
-        double mean = 0; // corresponds to TSS position
-        double sd = avgRestFragSize/6; // chosen by eye
-        NormalDistribution nD = new NormalDistribution(mean,sd);
-        this.score = nD.cumulativeProbability(vpEndPos - centerPos) - nD.cumulativeProbability(vpStaPos - centerPos);
+    public Double calculateViewpointScoreSimple(Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
+        this.score = model.getNormalDistributionSimple().cumulativeProbability(vpEndPos - centerPos) - model.getNormalDistributionSimple().cumulativeProbability(vpStaPos - centerPos);
         return score;
     }
 
@@ -820,16 +823,32 @@ public class ViewPoint implements Serializable {
         return getActiveSegments().stream().mapToInt(Segment::getEndPos).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
+//    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
+//     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
+//     * @return leftmost confirmDialog position
+//     */
+//    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
+
     /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected digest overlaps that boundary, the start pos of that digest.
+     * @param zoomfactor Amount of zooming to do
      * @return leftmost confirmDialog position
      */
-    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
-    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
-     * @return rightmost confirmDialog position
-     */
-    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
+    public int getMinimumDisplayPosition(double zoomfactor) {
+        return this.genomicPos-(int)(upstreamNucleotideLength*zoomfactor);
+    }
+
+
+//    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
+//     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
+//     * @return rightmost confirmDialog position
+//     */
+//    @Deprecated
+//    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
+
+    public int getMaximumDisplayPosition(double zoomfactor) {
+        return this.genomicPos+(int)(downstreamNucleotideLength*zoomfactor);
+    }
 
 
     public int getUpstreamSpan() {
