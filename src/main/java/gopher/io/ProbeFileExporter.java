@@ -79,6 +79,7 @@ public class ProbeFileExporter {
         // use a hashMap of Integer sets to get rid of duplicated probes
         Set<String> uniqueProbes = new HashSet<>();
         HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<>();
+        HashMap<String, String> coordsTogeneNames = new HashMap<>();
 
         for (ViewPoint vp : viewpointlist) {
             if (vp.getNumOfSelectedFrags() == 0) { continue; }
@@ -89,6 +90,8 @@ public class ProbeFileExporter {
                 for(Bait b : seg.getBaitsForUpstreamMargin()) {
                     String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
                     uniqueProbes.add(key);
+                    String key2 = b.getRefId() + ":" + b.getStartPos();
+                    coordsTogeneNames.put(key2,vp.getTargetName());
                     if(!uniqueBaits.containsKey(b.getRefId())) {
                         ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
@@ -100,6 +103,8 @@ public class ProbeFileExporter {
                 for(Bait b : seg.getBaitsForDownstreamMargin()) {
                     String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
                     uniqueProbes.add(key);
+                    String key2 = b.getRefId() + ":" + b.getStartPos();
+                    coordsTogeneNames.put(key2,vp.getTargetName());
                     if(!uniqueBaits.containsKey(b.getRefId())) {
                         ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
@@ -134,6 +139,9 @@ public class ProbeFileExporter {
                 probeID += refID;
                 probeID += "_";
                 probeID += (sortedPositions.get(i)-1);
+                probeID += "_";
+                String key3 = refID + ":" + sortedPositions.get(i);
+                probeID += coordsTogeneNames.get(key3);
                 // get sequence
                 ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+probe_length-1);
                 String printToZip=String.format(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1) + "\n");
