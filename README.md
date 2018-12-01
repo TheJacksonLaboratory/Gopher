@@ -9,14 +9,17 @@ You will require Java 1.8 to run Gopher. (Java 1.10 currently will not work; GOP
 On most computers you should be able to start the app with a double click. If desired, you can
 also start Gopher from the command line as follows.
 
+A publication about GOPHER will appear in BMC Genomics, and the 0.5.8 release of GOPHER is the
+version that corresponds to the manuscript.
+
 ```aidl
-$ java -jar GOPHER-0.5.7.jar
+$ java -jar GOPHER-0.5.8.jar
 ```
 
 We recommend starting GOPHER with 2Gb (min)/6Gb (max) memory.
 
 ```aidl
-$ java -Xms2g -Xmx6g -jar GOPHER-0.5.7.jar
+$ java -Xms2g -Xmx6g -jar GOPHER-0.5.8.jar
 ```
 
 GOPHER will run without problems on 2GB for small panels (-Xmx2g), but 6GB is preferable for probe design
