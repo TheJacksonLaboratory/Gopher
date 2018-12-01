@@ -3,6 +3,11 @@ Changelog
 =========
 
 ------
+v0.5.8
+------
+- this release corresponds with the publication of GOPHER in BMC Genomics
+
+------
 v0.5.7
 ------
 - bug fixes and improved responsiveness of GUI for promoterome
