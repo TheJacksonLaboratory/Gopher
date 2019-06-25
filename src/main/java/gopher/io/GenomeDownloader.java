@@ -1,16 +1,12 @@
 package gopher.io;
 
+import gopher.model.genome.*;
 import javafx.scene.control.ProgressIndicator;
 import org.apache.log4j.Logger;
 import gopher.exception.DownloadFileNotFoundException;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.DataSource;
-import gopher.model.genome.Genome;
-import gopher.model.genome.HumanHg19;
-import gopher.model.genome.HumanHg38;
-import gopher.model.genome.MouseMm9;
-import gopher.model.genome.MouseMm10;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,10 +25,9 @@ public class GenomeDownloader {
     private boolean successful=false;
 
 
-
     public GenomeDownloader(String build) {
         this.genomebuild=build;
-        logger.debug("Constructor of GenomeDownloader, build="+build);
+        logger.debug("Constructor of GenomeDownloader, build=" + build);
         try {
             this.url=getGenomeURL(build);
             this.genome=getGenome(build);
@@ -59,8 +54,8 @@ public class GenomeDownloader {
      */
     public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
-        logger.trace(String.format("Starting download of %s to %s",directory,url));
-        downloadTask.setOnSucceeded(e -> logger.trace("Finished downloading genome file to "+directory));
+        logger.trace(String.format("Starting download of %s to %s",url,directory));
+        downloadTask.setOnSucceeded(e -> logger.trace("Finished downloading genome file to " + directory));
         downloadTask.setOnFailed(eh -> {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -90,6 +85,10 @@ public class GenomeDownloader {
             return DataSource.createUCSCmm9().getGenomeURL();
         } else if (gb.equals("mm10")) {
             return DataSource.createUCSCmm10().getGenomeURL();
+        } else if (gb.equals("xenTro9")) {
+            return DataSource.createUCSCxenTro9().getGenomeURL();
+        } else if (gb.equals("danRer10")) {
+            return DataSource.createUCSCdanRer10().getGenomeURL();
         } else {
             throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
         }
@@ -105,6 +104,10 @@ public class GenomeDownloader {
             return new MouseMm9();
         } else if (genomebuild.equals("mm10")) {
             return new MouseMm10();
+        } else if (genomebuild.equals("xenTro9")) {
+            return new FrogXenTro9();
+        } else if (genomebuild.equals("danRer10")) {
+            return new FishDanRer10();
         } else {
             throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
         }

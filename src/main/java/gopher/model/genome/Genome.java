@@ -25,7 +25,7 @@ public abstract class Genome implements Serializable {
     protected static final String localFilename = "chromFa.tar.gz";
     /** The valid chromosomes for the current genome build. (will be initialized from the subclasses).*/
     protected Set<String> valid=null;
-    /** Set of base chromosome file names for canonical chromosomes. For instnace, "chr1.fa", but not "chr1random12432.fa" .*/
+    /** Set of base chromosome file names for canonical chromosomes. For instance, "chr1.fa", but not "chr1random12432.fa" .*/
     protected Set<String> chromosomeFileNames;
     /** This is the name of the file we download from UCSC for any of the genomes. */
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";

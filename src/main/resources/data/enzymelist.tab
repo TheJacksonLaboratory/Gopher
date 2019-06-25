@@ -1,6 +1,10 @@
 #name   site
 HindIII A^AGCTT
 DpnII ^GATC
+DpnIIcA ^GAATC
+DpnIIcC ^GACTC
+DpnIIcG ^GAGTC
+DpnIIcT ^GATTC
 NlaIII  CATG^
 AatII   GACGT^C
 ApaI	GGGCC^C

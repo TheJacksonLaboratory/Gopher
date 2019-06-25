@@ -80,7 +80,7 @@ public class GopherMainPresenter implements Initializable {
     private Node rootNode;
     /** List of genome builds. Used by genomeChoiceBox */
     @FXML
-    private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9", "mm10");
+    private final ObservableList<String> genomeTranscriptomeList = FXCollections.observableArrayList("hg19", "hg38", "mm9", "mm10", "xenTro9", "danRer10");
     /** List of Design approaches.  */
     @FXML
     private final ObservableList<String> approachList = FXCollections.observableArrayList("Simple", "Extended");
@@ -808,7 +808,7 @@ public class GopherMainPresenter implements Initializable {
      * @param build Name of genome build.
      */
     private void setGenomeBuild(String build) {
-        logger.info("Setting genome build to "+build);
+        logger.info("Setting genome build to "+ build);
         this.model.setGenomeBuild(build);
         this.transcriptDownloadPI.setProgress(0.0);
         this.alignabilityDownloadPI.setProgress(0.0);
@@ -1028,6 +1028,14 @@ public class GopherMainPresenter implements Initializable {
             case "mm10":
                 url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/mm10_50.m2.bedGraph.gz";
                 url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/mm10/database/chromInfo.txt.gz";
+                break;
+            case "xenTro9":
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/xenTro9_50.bedGraph.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/xenTro9/database/chromInfo.txt.gz";
+                break;
+            case "danRer10":
+                url = "ftp://ftp.jax.org/robinp/GOPHER/alignability_maps/danRer10_50.bedGraph.gz";
+                url2 = "http://hgdownload.cse.ucsc.edu/goldenPath/danRer10/database/chromInfo.txt.gz";
                 break;
             default:
                 //this.downloadAlignabilityLabel.setText(("No map available for " + genomeBuild));
