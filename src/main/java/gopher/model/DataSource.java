@@ -32,11 +32,13 @@ public class DataSource {
 
     private static final String UCSChg38url = "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz";
 
-
     private static final String UCSCmm9url = "http://hgdownload.soe.ucsc.edu/goldenPath/mm9/bigZips/chromFa.tar.gz";
 
-
     private static final String UCSCmm10url = "http://hgdownload.soe.ucsc.edu/goldenPath/mm10/bigZips/chromFa.tar.gz";
+
+    private static final String UCSCxenTro9url = "http://hgdownload.soe.ucsc.edu/goldenPath/xenTro9/bigZips/xenTro9.fa.gz";
+
+    private static final String UCSCdanRer10url = "http://hgdownload.soe.ucsc.edu/goldenPath/danRer10/bigZips/danRer10.fa.gz";
 
 
     private DataSource(){
@@ -69,6 +71,20 @@ public class DataSource {
         DataSource ds = new DataSource();
         ds.genomeName="UCSC-mm10";
         ds.genomeURL=UCSCmm10url;
+        return ds;
+    }
+
+    public static DataSource createUCSCxenTro9() {
+        DataSource ds = new DataSource();
+        ds.genomeName="UCSC-xenTro9";
+        ds.genomeURL=UCSCxenTro9url;
+        return ds;
+    }
+
+    public static DataSource createUCSCdanRer10() {
+        DataSource ds = new DataSource();
+        ds.genomeName="UCSC-danRer10";
+        ds.genomeURL=UCSCdanRer10url;
         return ds;
     }
 }
