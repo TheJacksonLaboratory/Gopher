@@ -66,7 +66,7 @@ public class Downloader extends Task<Void> {
 
     protected void setLocalFilePath (String bname) {
         this.localFilePath = new File(this.localDir + File.separator + bname);
-        logger.debug("setLocalFilepath for download to: "+localFilePath);
+        logger.debug("setLocalFilepath for download to: " + localFilePath);
     }
 
     /**
@@ -93,8 +93,8 @@ public class Downloader extends Task<Void> {
             URL url = new URL(urlstring);
             URLConnection urlc = url.openConnection();
             reader = urlc.getInputStream();
-            logger.trace("URL host: "+ url.getHost() + "\n reader available="+reader.available());
-            logger.trace("LocalFilePath: "+localFilePath);
+            logger.trace("URL host: "+ url.getHost() + "\n reader available=" + reader.available());
+            logger.trace("LocalFilePath: " + localFilePath);
             writer = new FileOutputStream(localFilePath);
             byte[] buffer = new byte[153600];
             int totalBytesRead = 0;
@@ -113,7 +113,7 @@ public class Downloader extends Task<Void> {
                     threshold += block;
                 }
             }
-            logger.info("Successful download from "+urlstring+": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
+            logger.info("Successful download from " + urlstring + ": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
             updateProgress(0.00);

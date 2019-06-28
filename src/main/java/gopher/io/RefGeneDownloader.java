@@ -15,6 +15,8 @@ public class RefGeneDownloader {
     final private static String hg38="http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz";
     final private static String mm9="http://hgdownload.soe.ucsc.edu/goldenPath/mm9/database/refGene.txt.gz";
     final private static String mm10="http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/refGene.txt.gz";
+    final private static String xenTro9="http://hgdownload.soe.ucsc.edu/goldenPath/xenTro9/database/refGene.txt.gz";
+    final private static String danRer10="http://hgdownload.soe.ucsc.edu/goldenPath/danRer10/database/refGene.txt.gz";
 
     private String genome=null;
 
@@ -33,6 +35,10 @@ public class RefGeneDownloader {
             url=mm9;
         else if (this.genome.equals("mm10"))
             url=mm10;
+        else if (this.genome.equals("xenTro9"))
+            url=xenTro9;
+        else if (this.genome.equals("danRer10"))
+            url=danRer10;
         else
             throw new DownloadFileNotFoundException("Could not identify download URL for genome: "+genome);
         return url;

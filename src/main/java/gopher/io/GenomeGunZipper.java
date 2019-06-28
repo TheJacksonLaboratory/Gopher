@@ -38,11 +38,11 @@ public class GenomeGunZipper extends Task<Void>  {
     public boolean OK() {return OK;}
 
     /**
-     * @param genom Reference to the model for downloaded/unpacked/index genome data.
+     * @param genome Reference to the model for downloaded/unpacked/index genome data.
      */
-    public GenomeGunZipper(Genome genom, ProgressIndicator pi) {
+    public GenomeGunZipper(Genome genome, ProgressIndicator pi) {
         this.progress=pi;
-        this.genome=genom;
+        this.genome=genome;
         this.genomeFileNameTarGZ=this.genome.getGenomeBasename();
         logger.trace(String.format("genomeFileNameTarGZ=%s",genomeFileNameTarGZ));
     }
@@ -80,8 +80,8 @@ public class GenomeGunZipper extends Task<Void>  {
     private void extractCanonicalChromosomes() throws IOException {
         updateProgress(0.01); /* show progress as 1% to start off with */
         String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
-        logger.info("About to gunzip "+INPUT_GZIP_FILE +
-                " ([path to genome directory="+genome.getPathToGenomeDirectory() +
+        logger.info("About to gunzip " + INPUT_GZIP_FILE +
+                " ([path to genome directory=" + genome.getPathToGenomeDirectory() +
                 " and genome filename=" + genomeFileNameTarGZ);
         boolean needToCreateDirectory=true;
         int n_extracted_chromosomes=0;
@@ -94,8 +94,8 @@ public class GenomeGunZipper extends Task<Void>  {
             TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn);
             TarArchiveEntry entry;
             String dirpath =this.genome.getPathToGenomeDirectory();
-            String outputFastaFileName=genome.getGenomeBuild() + ".fa";
-            File outfile = new File( dirpath+ File.separator +outputFastaFileName);
+            String outputFastaFileName = genome.getGenomeBuild() + ".fa";
+            File outfile = new File( dirpath + File.separator + outputFastaFileName);
             FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
             BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
 
@@ -125,7 +125,7 @@ public class GenomeGunZipper extends Task<Void>  {
                     while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
                         dest.write(data, 0, count);
                     }
-                    logger.trace("extracted chromosome:  "+entry.getName());
+                    logger.trace("extracted chromosome:  " + entry.getName());
                     n_extracted_chromosomes++;
                 }
             } // end of loop over Tar archive contents
@@ -134,7 +134,45 @@ public class GenomeGunZipper extends Task<Void>  {
             updateProgress(100.0);
             OK=true;
         } catch (IOException e) {
-            logger.error("Unable to decompress "+INPUT_GZIP_FILE);
+            logger.error("Unable to decompress " + INPUT_GZIP_FILE);
+            // logger.error(e,e);
+            updateProgress(0.0);
+            this.status="extraction could not be completed.";
+            throw e;
+        }
+    }
+
+    private void extractCanonicalChromosomesNoTarArchive() throws IOException {
+        updateProgress(0.01); /* show progress as 1% to start off with */
+        String INPUT_GZIP_FILE = (new File(this.genome.getPathToGenomeDirectory() + File.separator + genomeFileNameTarGZ)).getAbsolutePath();
+        logger.info("About to gunzip " + INPUT_GZIP_FILE +
+                " ([path to genome directory=" + genome.getPathToGenomeDirectory() +
+                " and genome filename=" + genomeFileNameTarGZ);
+        boolean needToCreateDirectory=true;
+        int n_extracted_chromosomes=0;
+        double extracted_bytes_estimate = 3100000000D;
+        double currentProgress=0.0D;
+        updateProgress(currentProgress);
+        try {
+            InputStream in = new FileInputStream(INPUT_GZIP_FILE);
+            GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
+            String dirpath =this.genome.getPathToGenomeDirectory();
+            String outputFastaFileName = genome.getGenomeBuild() + ".fa";
+            File outfile = new File( dirpath + File.separator + outputFastaFileName);
+            FileOutputStream fos = new FileOutputStream(outfile.getAbsolutePath(), false);
+            BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+            int len;
+            byte[] buffer = new byte[BUFFER_SIZE];
+            while ((len = gzipIn.read(buffer)) > 0) {
+                updateProgress(Math.min(0.99, gzipIn.getBytesRead()/extracted_bytes_estimate));
+                fos.write(buffer,0,len);
+            }
+            dest.close();
+            this.status=String.format("extracted %d chromosomes",n_extracted_chromosomes);
+            updateProgress(100.0);
+            OK=true;
+        } catch (IOException e) {
+            logger.error("Unable to decompress " + INPUT_GZIP_FILE);
             // logger.error(e,e);
             updateProgress(0.0);
             this.status="extraction could not be completed.";
@@ -155,7 +193,13 @@ public class GenomeGunZipper extends Task<Void>  {
             OK=true;
 
         } else {
-            extractCanonicalChromosomes();
+            if(this.genome.getGenomeBuild()=="xenTro9" || this.genome.getGenomeBuild()=="danRer10") {
+                logger.trace("Not a tar archive. File needs to be unzipped only.");
+                extractCanonicalChromosomesNoTarArchive();
+                return null;
+            } else {
+                extractCanonicalChromosomes();
+            }
         }
         return null;
     }

@@ -55,9 +55,15 @@ class URLMaker {
             case "mm9":
             url = String.format("%s&%s",url,getURLFragmentMm9());
             break;
-        case "mm10":
+            case "mm10":
             url = String.format("%s&%s",url,getURLFragmentMm10());
             break;
+            case "xenTro9":
+                url = String.format("%s&%s",url,getURLFragmentXenTro9());
+                break;
+            case "danRer10":
+                url = String.format("%s&%s",url,getURLFragmentDanRer10());
+                break;
             default:
                 // should never happen
                 logger.error("Unable to find URL for genome build "+genomebuild);
@@ -77,10 +83,15 @@ class URLMaker {
             url = String.format("%s&%s",url,getURLFragmentMm9());
         } else if (this.genomebuild.equals("mm10")) {
             url=String.format("%s&%s",url,getURLFragmentMm10());
+        }  else if (this.genomebuild.equals("xenTro9")) {
+            url = String.format("%s&%s",url,getURLFragmentXenTro9());
+        } else if (this.genomebuild.equals("danRer10")) {
+            url=String.format("%s&%s",url,getURLFragmentDanRer10());
         }
         logger.trace(String.format("URL for UCSC %s", url));
         return url;
     }
+
     /** These are the things to hide and show to get a nice hg19 image. */
     private String getURLFragmentHg19() {
         return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&ncbiRefSeqView=pack&g=wgEncodeCrgMapabilityAlign50mer&i=wgEncodeCrgMapabilityAlign50mer";
@@ -90,6 +101,7 @@ class URLMaker {
     private String getURLFragmentHg38() {
         return "gc5Base=dense&snp150Common=hide&gtexGene=hide&dgvPlus=hide&pubs=hide&knownGene=hide&ncbiRefSeqView=pack&OmimAvSnp=hide";
     }
+
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm9() {
         return "gc5Base=dense&knownGene=hide&ncbiRefSeqView=pack&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp128=hide&oreganno=full&wgEncodeCrgMapabilityAlign50mer=full";
@@ -98,6 +110,16 @@ class URLMaker {
     /** These are the things to hide and show to get a nice mm9 image. */
     private String getURLFragmentMm10() {
         return "gc5Base=dense&knownGene=hide&ncbiRefSeqView=pack&stsMapMouseNew=hide&xenoRefGene=hide&ensGene=hide&pubs=hide&intronEst=hide&snp142Common=hide&oreganno=full";
+    }
+
+    /** These are the things to hide and show to get a nice xenTro9 image. */
+    private String getURLFragmentXenTro9() {
+        return "gc5BaseBw=dense&rmsk=dense&cons11way=hide";
+    }
+
+    /** These are the things to hide and show to get a nice danRer10 image. */
+    private String getURLFragmentDanRer10() {
+        return "gc5BaseBw=dense&rmsk=dense&cons11way=hide";
     }
 
 

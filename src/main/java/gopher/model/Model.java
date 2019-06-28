@@ -131,6 +131,12 @@ public class Model implements Serializable {
             case "mm10":
                 this.genome = new MouseMm10();
                 break;
+            case "xenTro9":
+                this.genome = new FrogXenTro9();
+                break;
+            case "danRer10":
+                this.genome = new FishDanRer10();
+                break;
             default:
                 PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
         }
