@@ -28,8 +28,8 @@ public class Model implements Serializable {
     private static final Logger logger = Logger.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 6L;
-    private static final String VERSION="0.4.8";
-    private static final String LAST_CHANGE_DATE="2018-08-31";
+    private static final String VERSION="0.6.0";
+    private static final String LAST_CHANGE_DATE="2019-06-28";
     /** This is a list of all possible enzymes from which the user can choose one on more. */
     private List<RestrictionEnzyme> enzymelist=null;
     /** The enzymes chosen by the user for ViewPoint production. */
@@ -570,14 +570,15 @@ public class Model implements Serializable {
 
     /** @return the version number. */
     public static String getVersion() {
-        String version;
-        try {
-            Package p = Model.class.getPackage();
-            version = p.getImplementationVersion();
-        } catch (Exception e) {
-            version=VERSION;
-        }
-        return version;
+        return VERSION;
+//        String version;
+//        try {
+//            Package p = Model.class.getPackage();
+//            version = p.getImplementationVersion();
+//        } catch (Exception e) {
+//            version=VERSION;
+//        }
+//        return version;
     }
 
 }
