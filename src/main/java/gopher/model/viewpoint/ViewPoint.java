@@ -631,7 +631,7 @@ public class ViewPoint implements Serializable {
                 }
                 if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
                     downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
-                    logger.trace("SELECTED DOWNSTREAM " + upstreamSegment.detailedReport() );
+                    logger.trace("SELECTED DOWNSTREAM " + downstreamSegment.detailedReport() );
 
                 } else {
                     logger.trace("Warning: There is no segment in downstream direction of the center segment!");
