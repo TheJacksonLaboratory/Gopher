@@ -1255,7 +1255,7 @@ public class GopherMainPresenter implements Initializable {
         try {
             logger.trace(model.getGenomeFastaFile());
             logger.trace(model.getIndexedGenomeFastaIndexFile());
-            exporter.printProbeFileInAgilentFormat(this.model.getViewPointList(),this.model.getGenomeBuild(), model.getGenomeFastaFile());
+            exporter.printProbeFileInAgilentFormat(this.model.getProbeLength(), this.model.getViewPointList(),this.model.getGenomeBuild(), model.getGenomeFastaFile());
         } catch (Exception exc) {
             PopupFactory.displayException("Could not save probes.", exc.getMessage(),exc);
         }
