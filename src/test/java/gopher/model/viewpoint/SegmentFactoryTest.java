@@ -1,15 +1,16 @@
 package gopher.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
 import gopher.model.RestrictionEnzyme;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -50,7 +51,7 @@ public class SegmentFactoryTest {
     private static List<Integer> gatcsites;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
         RestrictionEnzyme re1 = new RestrictionEnzyme("HindIII", "A^AGCTT");
         RestrictionEnzyme re2 = new RestrictionEnzyme("DpnII", "^GATC");
@@ -84,30 +85,31 @@ public class SegmentFactoryTest {
 
     @Test
     public void testWeCouldReadFASTAFile() {
-        Assert.assertNotNull(testFastaReader);
+        assertNotNull(testFastaReader);
     }
 
 
     @Test
     public void testCuttingPositionMapConstructor() {
-        Assert.assertNotNull(segmentFactory);
+        assertNotNull(segmentFactory);
     }
 
     @Test
     public void testGenomicPosition() {
         Integer expected = genomicPos_1;
-        Assert.assertEquals(expected, segmentFactory.getGenomicPos());
+        assertEquals(expected, segmentFactory.getGenomicPos());
     }
 
+    /*
     @Test
     @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
     public void testMaxDistToGenomicPos() {
         Integer expected = maxDistToGenomicPosUp*3;
-        Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
+        assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
         expected = maxDistToGenomicPosDown*3;
-        Assert.assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
+        assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
     }
-
+*/
     /*
     * Segment factory where the downstream distance is longer than the extent of the chromosome
     * Make sure we still get the right DpnII sites.
@@ -156,7 +158,7 @@ public class SegmentFactoryTest {
                 adjustedGatcSitesOffsetZero.add(pos);
             }
         }
-        Assert.assertEquals(adjustedGatcSitesOffsetZero,cpm.getAllCuts());
+        assertEquals(adjustedGatcSitesOffsetZero,cpm.getAllCuts());
     }
 
 

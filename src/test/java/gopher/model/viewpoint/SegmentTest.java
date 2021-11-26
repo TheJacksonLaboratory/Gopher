@@ -2,18 +2,18 @@ package gopher.model.viewpoint;
 
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
-import org.junit.*;
 import gopher.model.Default;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class SegmentTest {
-    private static Logger logger = Logger.getLogger(SegmentTest.class.getName());
 
     private static IndexedFastaSequenceFile FastaReader;
     private static String referenceSequenceID = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
@@ -25,7 +25,7 @@ public class SegmentTest {
 
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         //String testFastaFile="src/test/resources/testgenome/test_genome.fa";
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
@@ -98,9 +98,9 @@ public class SegmentTest {
         Segment  segment = new Segment.Builder(referenceSequenceID,69,92).fastaReader(FastaReader).marginSize(marg).build();
         double expected = 1.0;
         double epsilon=0.0001;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
         expected=0.0;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
     }
 
     /**
@@ -114,9 +114,9 @@ public class SegmentTest {
         Segment  segment = new Segment.Builder(referenceSequenceID,75,92).fastaReader(FastaReader).marginSize(marg).build();
         double expected = 0.8;
         double epsilon=0.0001;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
         expected=0.0;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
     }
 
 
@@ -132,9 +132,9 @@ public class SegmentTest {
         //System.out.println("D="+FastaReader.getSubsequenceAt(referenceSequenceID, 75, 95).getBaseString());
         double expected = 0.8;
         double epsilon=0.0001;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
         expected=0.6;
-        Assert.assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segment.getRepeatContentMarginDown(),epsilon);
 
     }
 
@@ -144,19 +144,19 @@ public class SegmentTest {
     public void testSegmentCPositions() {
         Integer expectedStart=93;
         Integer expectedEnd=112;
-        Assert.assertEquals(expectedStart,segmentC.getStartPos());
-        Assert.assertEquals(expectedEnd,segmentC.getEndPos());
+        assertEquals(expectedStart,segmentC.getStartPos());
+        assertEquals(expectedEnd,segmentC.getEndPos());
     }
 
     @Test
     public void testSegmentCSelected() {
-        Assert.assertFalse(segmentC.isSelected());
+        assertFalse(segmentC.isSelected());
     }
 
     @Test
     public void testSegmentCLength() {
         Integer expected = 112-93+1;
-        Assert.assertEquals(expected,segmentC.length());
+        assertEquals(expected,segmentC.length());
     }
 
     /* segment C has 20 lower case letters, and is 20 long. */
@@ -164,7 +164,7 @@ public class SegmentTest {
     public void testSegmentCRepeatContent() {
         double expected = 20.0/20;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentC.getRepeatContent(),epsilon);
+        assertEquals(expected,segmentC.getRepeatContent(),epsilon);
     }
 
     /* segment B has 10 lower case letters, and is 24 long. It is so short that it consists of one single margin
@@ -174,25 +174,25 @@ public class SegmentTest {
     public void testSegmentCRepeatContentMargins() {
         double expected = 1.0;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentC.getRepeatContentMarginUp(),epsilon);
-        Assert.assertEquals(expected,segmentC.getRepeatContentMarginDown(),epsilon);
-        Assert.assertEquals(expected,segmentC.getMeanMarginRepeatContent(),epsilon);
+        assertEquals(expected,segmentC.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segmentC.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segmentC.getMeanMarginRepeatContent(),epsilon);
         String expString=String.format("%.2f%%",100.0); /* should be 41.67% */
-        Assert.assertEquals(expString,segmentC.getRepeatContentMarginUpAsPercent());
-        Assert.assertEquals(expString,segmentC.getRepeatContentMarginDownAsPercent());
+        assertEquals(expString,segmentC.getRepeatContentMarginUpAsPercent());
+        assertEquals(expString,segmentC.getRepeatContentMarginDownAsPercent());
     }
 
     /* The margin size cannot be longer than the length of the Segment. */
     @Test
     public void testSegmentCmarginSize() {
         int expected = Math.min(segmentC.length(),Default.MARGIN_SIZE);
-        Assert.assertEquals(expected,segmentC.getMarginSize());
+        assertEquals(expected,segmentC.getMarginSize());
     }
 
     @Test
     public void testGetChromosomealPositionAsStringSegmentC() {
         String expected=String.format("%s:%d-%d",referenceSequenceID,93,112);
-        Assert.assertEquals(expected,segmentC.getChromosomalPositionString());
+        assertEquals(expected,segmentC.getChromosomalPositionString());
     }
 
 
@@ -205,19 +205,19 @@ public class SegmentTest {
     public void testSegmentBPositions() {
         Integer expectedStart=69;
         Integer expectedEnd=92;
-        Assert.assertEquals(expectedStart,segmentB.getStartPos());
-        Assert.assertEquals(expectedEnd,segmentB.getEndPos());
+        assertEquals(expectedStart,segmentB.getStartPos());
+        assertEquals(expectedEnd,segmentB.getEndPos());
     }
 
     @Test
     public void testSegmentBSelected() {
-        Assert.assertFalse(segmentB.isSelected());
+        assertFalse(segmentB.isSelected());
     }
 
     @Test
     public void testSegmentBLength() {
         Integer expected = 92-69+1;
-        Assert.assertEquals(expected,segmentB.length());
+        assertEquals(expected,segmentB.length());
     }
 
     /* segment B has 10 lower case letters, and is 24 long. */
@@ -225,7 +225,7 @@ public class SegmentTest {
     public void testSegmentBRepeatContent() {
         double expected = 10.0/24;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentB.getRepeatContent(),epsilon);
+        assertEquals(expected,segmentB.getRepeatContent(),epsilon);
     }
 
     /* segment B has 10 lower case letters, and is 24 long. It is so short that it consists of one single margin
@@ -235,25 +235,25 @@ public class SegmentTest {
     public void testSegmentBRepeatContentMargins() {
         double expected = 10.0/24;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentB.getRepeatContentMarginUp(),epsilon);
-        Assert.assertEquals(expected,segmentB.getRepeatContentMarginDown(),epsilon);
-        Assert.assertEquals(expected,segmentB.getMeanMarginRepeatContent(),epsilon);
+        assertEquals(expected,segmentB.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segmentB.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segmentB.getMeanMarginRepeatContent(),epsilon);
         String expString=String.format("%.2f%%",100*(10.0/24)); /* should be 41.67% */
-        Assert.assertEquals(expString,segmentB.getRepeatContentMarginUpAsPercent());
-        Assert.assertEquals(expString,segmentB.getRepeatContentMarginDownAsPercent());
+        assertEquals(expString,segmentB.getRepeatContentMarginUpAsPercent());
+        assertEquals(expString,segmentB.getRepeatContentMarginDownAsPercent());
     }
 
     /* The margin size cannot be longer than the length of the Segment. */
     @Test
     public void testSegmentBmarginSize() {
         int expected = Math.min(segmentB.length(),Default.MARGIN_SIZE);
-        Assert.assertEquals(expected,segmentB.getMarginSize());
+        assertEquals(expected,segmentB.getMarginSize());
     }
 
     @Test
     public void testGetChromosomealPositionAsStringSegmentB() {
         String expected=String.format("%s:%d-%d",referenceSequenceID,69,92);
-        Assert.assertEquals(expected,segmentB.getChromosomalPositionString());
+        assertEquals(expected,segmentB.getChromosomalPositionString());
     }
 
     /** Check repeat content for
@@ -282,19 +282,19 @@ public class SegmentTest {
     public void testSegmentAPositions() {
         Integer expectedStart=21;
         Integer expectedEnd=44;
-        Assert.assertEquals(expectedStart,segmentA.getStartPos());
-        Assert.assertEquals(expectedEnd,segmentA.getEndPos());
+        assertEquals(expectedStart,segmentA.getStartPos());
+        assertEquals(expectedEnd,segmentA.getEndPos());
     }
 
     @Test
     public void testSegmentASelected() {
-        Assert.assertFalse(segmentA.isSelected());
+        assertFalse(segmentA.isSelected());
     }
 
     @Test
     public void testSegmentALength() {
         Integer expected = 44-21+1;
-        Assert.assertEquals(expected,segmentA.length());
+        assertEquals(expected,segmentA.length());
     }
 
     /* segment A has no lower case letters, i.e., no repeats. */
@@ -302,7 +302,7 @@ public class SegmentTest {
     public void testSegmentARepeatContent() {
         double expected = 0.0;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentA.getRepeatContent(),epsilon);
+        assertEquals(expected,segmentA.getRepeatContent(),epsilon);
     }
 
     /* segment A has no lower case letters, i.e., no repeats. */
@@ -310,25 +310,25 @@ public class SegmentTest {
     public void testSegmentARepeatContentMargins() {
         double expected = 0.0;
         double epsilon=0.0000001;
-        Assert.assertEquals(expected,segmentA.getRepeatContentMarginUp(),epsilon);
-        Assert.assertEquals(expected,segmentA.getRepeatContentMarginDown(),epsilon);
-        Assert.assertEquals(expected,segmentA.getMeanMarginRepeatContent(),epsilon);
+        assertEquals(expected,segmentA.getRepeatContentMarginUp(),epsilon);
+        assertEquals(expected,segmentA.getRepeatContentMarginDown(),epsilon);
+        assertEquals(expected,segmentA.getMeanMarginRepeatContent(),epsilon);
         String expString="0.00%";
-        Assert.assertEquals(expString,segmentA.getRepeatContentMarginUpAsPercent());
-        Assert.assertEquals(expString,segmentA.getRepeatContentMarginDownAsPercent());
+        assertEquals(expString,segmentA.getRepeatContentMarginUpAsPercent());
+        assertEquals(expString,segmentA.getRepeatContentMarginDownAsPercent());
     }
 
     /* The margin size cannot be longer than the length of the Segment. */
     @Test
     public void testSegmentAmarginSize() {
         int expected = Math.min(segmentA.length(),Default.MARGIN_SIZE);
-        Assert.assertEquals(expected,segmentA.getMarginSize());
+        assertEquals(expected,segmentA.getMarginSize());
     }
 
     @Test
     public void testGetChromosomealPositionAsStringSegmentA() {
         String expected=String.format("%s:%d-%d",referenceSequenceID,21,44);
-        Assert.assertEquals(expected,segmentA.getChromosomalPositionString());
+        assertEquals(expected,segmentA.getChromosomalPositionString());
     }
 
     @Test
@@ -357,12 +357,5 @@ public class SegmentTest {
             }
         }
         assertNotNull(amp);
-
-        List<Bait> baitList = testSeg.setUsableBaitsForUpstreamMargin(1,120,amp,0.35,0.65,10.0);
-        logger.trace(baitList.size());
-        for (Bait bait : baitList) {
-            logger.error(bait.getStartPos() + "\t" + bait.getEndPos() + "\t" + bait.getAlignabilityScore());
-        }
-
     }
 }

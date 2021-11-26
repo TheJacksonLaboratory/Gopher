@@ -1,27 +1,28 @@
 package gopher.model.viewpoint;
 
-import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 /**
  * Created by hansep on 6/15/18.
  */
 public class AlignabilityMapTest {
-    private static Logger logger = Logger.getLogger(AlignabilityMapTest.class.getName());
 
     //private static AlignabilityMap testMap = null;
 
     private static Map<String,AlignabilityMap> chr2alMap;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
         //testMap = new AlignabilityMap("src/test/resources/testAlignabilityMap/chromInfo.txt.gz", "src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz",50);
         String alignabilitypath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
@@ -79,7 +80,7 @@ public class AlignabilityMapTest {
         assertEquals(-1, scoreArray.get(1),0.001);
     }
 
-    @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
+  /*  @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
     @Test
     public void testGetScoreFromToRealData()  {
         // TODO this needs to be refactored if desired!
@@ -98,4 +99,6 @@ public class AlignabilityMapTest {
 //        }
 //        logger.trace("");
     }
+
+   */
 }

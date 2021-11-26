@@ -2,23 +2,23 @@ package gopher.model.viewpoint;
 
 import gopher.model.IntPair;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.File;
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class ProbeFactoryTest {
-    private static Logger logger = Logger.getLogger(ProbeFactoryTest.class.getName());
 
     private static Segment testSeg = null;
     private static IndexedFastaSequenceFile FastaReader;
     private static AlignabilityMap alignMap;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws Exception {
 
         // create AlignabilityMap object for testing
@@ -57,13 +57,6 @@ public class ProbeFactoryTest {
         Integer downStreamEndPos = ip.get(1).getEndPos();
         assertNotNull(upStreamEndPos); // todo -- need to test something
 
-//        logger.trace(upStreamStaPos);
-//        logger.trace(upStreamEndPos);
-//        logger.trace(alignMap.getScoreFromTo(upStreamStaPos, upStreamEndPos));
-//        logger.trace(downStreamStaPos);
-//        logger.trace(downStreamEndPos);
-//        logger.trace(alignMap.getScoreFromTo( downStreamStaPos, downStreamEndPos));
-//
     }
 
 

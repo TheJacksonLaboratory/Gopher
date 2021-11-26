@@ -1,8 +1,9 @@
 package gopher.model;
 
-import org.junit.Assert;
-import org.junit.Test;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by peterrobinson on 7/11/17.
@@ -21,7 +22,7 @@ public class GopherGeneTest {
         String contig="chr2";
         String strand="+";
         GopherGene gene = new GopherGene(geneid,symbol,isNoncoding,contig,strand);
-        Assert.assertEquals(symbol,gene.getGeneSymbol());
-        Assert.assertEquals(geneid,gene.getRefSeqID());
+        assertEquals(symbol,gene.getGeneSymbol());
+        assertEquals(geneid,gene.getRefSeqID());
     }
 }

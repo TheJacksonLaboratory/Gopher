@@ -2,17 +2,17 @@ package gopher.io;
 
 import gopher.exception.GopherException;
 import gopher.model.GopherGene;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class BedFileParserTest {
 
@@ -21,7 +21,7 @@ public class BedFileParserTest {
     private static  List<GopherGene> gopherGeneList;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws GopherException {
         ClassLoader classLoader = RefGeneParserTest.class.getClassLoader();
         String refgene = classLoader.getResource("gwas-test.bed").getFile();
