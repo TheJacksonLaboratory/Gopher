@@ -8,8 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.apache.log4j.Logger;
 import gopher.framework.Signal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 
 
 public class QCCheckPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(QCCheckPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(QCCheckPresenter.class.getName());
     @FXML
     private WebView wview;
 

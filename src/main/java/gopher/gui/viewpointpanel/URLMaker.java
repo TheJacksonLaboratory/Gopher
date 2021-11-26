@@ -2,9 +2,10 @@ package gopher.gui.viewpointpanel;
 
 
 import gopher.model.RestrictionEnzyme;
-import org.apache.log4j.Logger;
 import gopher.model.Model;
 import gopher.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * @version 0.1.2 (2018-02-19)
  */
 class URLMaker {
-    private static final Logger logger = Logger.getLogger(URLMaker.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(URLMaker.class);
     private String genomebuild=null;
     /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
     private int xdim;

@@ -5,7 +5,8 @@ import gopher.model.Default;
 import gopher.model.GopherGene;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +20,7 @@ import java.util.List;
  * @version 0.2.2 (2018-02-15)
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
-    private static final Logger logger = Logger.getLogger(SimpleViewPointCreationTask.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SimpleViewPointCreationTask.class.getName());
 
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model

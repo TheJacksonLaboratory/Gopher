@@ -2,8 +2,9 @@ package gopher.io;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.GopherException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +21,7 @@ import java.net.URLConnection;
  */
 public class Downloader extends Task<Void> {
 
-    static Logger logger = Logger.getLogger(Downloader.class.getName());
+    static Logger logger = LoggerFactory.getLogger(Downloader.class.getName());
     /**
      * The absolute path to the place (directory) where the downloaded file will be
      * saved in the local filesystem.*/

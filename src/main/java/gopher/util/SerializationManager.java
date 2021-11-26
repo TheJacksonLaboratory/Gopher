@@ -1,7 +1,8 @@
 package gopher.util;
 
-import org.apache.log4j.Logger;
 import gopher.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.*;
@@ -10,7 +11,7 @@ import java.io.*;
  * This class is responsible for serializing and deserializing the {@link Model} object that represents the project.
  */
 public class SerializationManager {
-    private static final Logger logger = Logger.getLogger(SerializationManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SerializationManager.class.getName());
     /** This serializes the Model object. It replaces any spaces in the filename with underscores. */
     public static void serializeModel(Model model, String fileName)
             throws IOException {

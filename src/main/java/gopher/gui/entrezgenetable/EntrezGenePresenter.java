@@ -16,7 +16,8 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -43,7 +44,7 @@ import java.util.function.Consumer;
  * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGenePresenter implements Initializable {
-    private static Logger logger = Logger.getLogger(EntrezGenePresenter.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(EntrezGenePresenter.class.getName());
     /** This webview explains how to enter genes */
     @FXML private WebView wview;
 
@@ -174,8 +175,7 @@ public class EntrezGenePresenter implements Initializable {
                 symbols.add(line.trim());
             }
         } catch (IOException err) {
-            logger.error("I/O Error reading file with target genes");
-            logger.error(err,err);
+            logger.error("I/O Error reading file with target genes: {}", err.getMessage());
         }
         setData(getInitialGeneListHTML(symbols));
         logger.info(String.format("Uploaded a total of %d genes",this.symbols.size()));

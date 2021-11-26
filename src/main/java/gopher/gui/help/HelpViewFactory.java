@@ -9,7 +9,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * @version 0.2.1 (2017-11-02)
  */
 public class HelpViewFactory {
-    private static final Logger logger = Logger.getLogger(HelpViewFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(HelpViewFactory.class.getName());
     private static final String READTHEDOCS_SITE = "http://gopher.readthedocs.io/en/latest/";
 
 

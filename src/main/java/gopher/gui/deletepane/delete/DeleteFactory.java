@@ -2,18 +2,19 @@ package gopher.gui.deletepane.delete;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Platform;
 import gopher.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DeleteFactory {
-    private static Logger logger = Logger.getLogger(DeleteFactory.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(DeleteFactory.class.getName());
 
     /** This causes the gene upload window to be displayed with an introductory text. */
     public static void display(Model model) {

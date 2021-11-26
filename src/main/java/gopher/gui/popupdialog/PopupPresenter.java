@@ -11,8 +11,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.apache.log4j.Logger;
 import gopher.framework.Signal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.File;
@@ -21,7 +22,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class PopupPresenter  implements Initializable  {
-    static Logger logger = Logger.getLogger(PopupPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(PopupPresenter.class.getName());
     @FXML
     AnchorPane apane;
     @FXML

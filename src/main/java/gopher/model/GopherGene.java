@@ -1,6 +1,8 @@
 package gopher.model;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
  * @version 0.1.3 (2017-10-02)
  */
 public class GopherGene implements Comparable<GopherGene>, Serializable {
-    static Logger logger = Logger.getLogger(GopherGene.class.getName());
+    static Logger logger = LoggerFactory.getLogger(GopherGene.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 3L;
     /** An NCBI RefSeq id such as NM_001353311. */

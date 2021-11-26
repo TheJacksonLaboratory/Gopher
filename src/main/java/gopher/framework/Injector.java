@@ -2,8 +2,8 @@ package gopher.framework;
 
 
 import javax.inject.Inject;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+//import javax.annotation.PostConstruct;
+//import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -174,14 +174,14 @@ public class Injector {
 
     static void initialize(Object instance) {
         Class<? extends Object> clazz = instance.getClass();
-        invokeMethodWithAnnotation(clazz, instance, PostConstruct.class
-        );
+//        invokeMethodWithAnnotation(clazz, instance, PostConstruct.class
+//        );
     }
 
     static void destroy(Object instance) {
         Class<? extends Object> clazz = instance.getClass();
-        invokeMethodWithAnnotation(clazz, instance, PreDestroy.class
-        );
+//        invokeMethodWithAnnotation(clazz, instance, PreDestroy.class
+//        );
     }
 
     static void invokeMethodWithAnnotation(Class<?> clazz, final Object instance, final Class<? extends Annotation> annotationClass) throws IllegalStateException, SecurityException {

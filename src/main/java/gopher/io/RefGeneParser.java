@@ -4,8 +4,9 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import gopher.model.GopherGene;
-import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -41,7 +42,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.2.4 (2017-11-26)
  */
 public class RefGeneParser {
-    private final static Logger logger = Logger.getLogger(RefGeneParser.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(RefGeneParser.class.getName());
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
@@ -124,7 +125,7 @@ public class RefGeneParser {
             br.close();
         } catch (IOException e) {
             logger.error("Error while attempting to parse the RefGene file from UCSC:"+path);
-            logger.error(e,e);
+            logger.error("IOException: {}", e.getMessage());
         }
         n_totalGenes=geneSymbolMap.size();
         n_totalTSS=0;

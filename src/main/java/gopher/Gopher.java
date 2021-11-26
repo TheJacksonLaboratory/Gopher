@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.log4j.PropertyConfigurator;
 import gopher.framework.Injector;
 import gopher.gui.splash.SplashPresenter;
 import gopher.gui.splash.SplashView;
@@ -119,7 +118,7 @@ public class Gopher extends Application {
         //LogManager.resetConfiguration();
         props.setProperty("log4j.appender.logfile.File", logpath);
         System.setProperty("logfile.name",logpath);
-        PropertyConfigurator.configure(props);
+        //PropertyConfigurator.configure(props);
     }
 
     /**

@@ -2,10 +2,11 @@ package gopher.io;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.UnindexableFastaFileException;
 import gopher.exception.GopherException;
 import gopher.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.BufferedWriter;
@@ -23,7 +24,7 @@ import java.util.*;
  * @version 0.2.2 (2018-02-15)
  */
 public class Faidx extends Task<Void> {
-    private static Logger logger = Logger.getLogger(Faidx.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(Faidx.class.getName());
     /**  Path to the directory where we will search for the genome FASTA file and produce the faidx file. */
     private final String genomeDirectoryPath;
     /** Basename of the genome fasta file, e.g., hg19.fa */

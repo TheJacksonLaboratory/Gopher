@@ -7,9 +7,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import org.apache.log4j.Logger;
 import gopher.framework.Signal;
 import gopher.model.RestrictionEnzyme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.*;
@@ -19,7 +20,7 @@ import java.util.function.Consumer;
  * Created by peterrobinson on 7/11/17.
  */
 public class EnzymeBoxPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(EnzymeBoxPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(EnzymeBoxPresenter.class.getName());
     @FXML
     Label restrictionLabel;
 

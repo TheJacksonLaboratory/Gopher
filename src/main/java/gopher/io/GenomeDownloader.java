@@ -2,17 +2,18 @@ package gopher.io;
 
 import gopher.model.genome.*;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.DownloadFileNotFoundException;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class GenomeDownloader {
-    static Logger logger = Logger.getLogger(GenomeDownloader.class.getName());
+    static Logger logger = LoggerFactory.getLogger(GenomeDownloader.class.getName());
     /** genome build symbol, e.g., hg19, mm10. */
     private String genomebuild=null;
     /** Representation of the genome we will download. */
@@ -33,7 +34,7 @@ public class GenomeDownloader {
             this.genome=getGenome(build);
             logger.debug("Setting url to "+ url);
         } catch (DownloadFileNotFoundException e){
-            logger.error(e,e);
+            logger.error("Error: {}",e.getMessage());
         }
     }
     /** @return a simple message summarizing how much work has been completed. */

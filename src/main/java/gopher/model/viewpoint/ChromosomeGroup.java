@@ -2,7 +2,8 @@ package gopher.model.viewpoint;
 
 
 import gopher.model.GopherGene;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,7 @@ import java.util.List;
  * @version 0.0.1 (2017-09-27).
  */
 public class ChromosomeGroup {
-    private static final Logger logger = Logger.getLogger(ChromosomeGroup.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ChromosomeGroup.class.getName());
     private final String referenceSequenceID;
 
     private final List<GopherGene> genes;

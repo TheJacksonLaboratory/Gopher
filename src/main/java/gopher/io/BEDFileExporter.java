@@ -1,9 +1,10 @@
 package gopher.io;
 
 import gopher.model.viewpoint.Bait;
-import org.apache.log4j.Logger;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 public class BEDFileExporter {
 
-    private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BEDFileExporter.class.getName());
     private final String allTracksBEDfile;
     private final String targetRegionBEDfile;
     private final String vpvSummaryTSVfile;

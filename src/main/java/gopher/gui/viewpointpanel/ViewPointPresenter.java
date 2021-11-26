@@ -25,7 +25,8 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
  * @version 0.2.8 (2018-07-12)
  */
 public class ViewPointPresenter implements Initializable {
-    private static final Logger logger = Logger.getLogger(ViewPointPresenter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ViewPointPresenter.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
@@ -208,8 +209,7 @@ public class ViewPointPresenter implements Initializable {
                 i2 = Integer.parseInt(s2);
                 return i1.compareTo(i2);
             } catch (Exception e) {
-                logger.error(String.format("Error while sorting chromosome strings s1=%s s2=%s ", s1, s2));
-                logger.error(e,e);
+                logger.error("Error while sorting chromosome strings s1={} s2={}} ({})", s1, s2, e.getMessage());
                 return 0;
             }
         }

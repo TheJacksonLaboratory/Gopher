@@ -1,7 +1,8 @@
 package gopher.model.regulatoryexome;
 
-import org.apache.log4j.Logger;
 import gopher.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of this class is to store data from the Ensembl regulatory build and to calculate whether
@@ -12,7 +13,7 @@ import gopher.model.viewpoint.ViewPoint;
  * @version 0.1.3 (2017-11-12)
  */
 public class RegulatoryElement {
-    static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
+    static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
 
     private RegulationCategory category;
     private String chrom;

@@ -1,6 +1,8 @@
 package gopher.model;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -9,7 +11,7 @@ import java.io.Serializable;
  * @version 0.2.1
  */
 public class RestrictionEnzyme implements Serializable {
-    static Logger logger = Logger.getLogger(RestrictionEnzyme.class.getName());
+    static Logger logger = LoggerFactory.getLogger(RestrictionEnzyme.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /** A name of a restirction enzyme, something like HindIII */

@@ -1,6 +1,8 @@
 package gopher.model.genome;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -16,7 +18,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-24)
  */
 public abstract class Genome implements Serializable {
-    private static Logger logger = Logger.getLogger(Genome.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(Genome.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 2L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */

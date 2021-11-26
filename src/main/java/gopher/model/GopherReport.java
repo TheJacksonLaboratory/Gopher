@@ -2,7 +2,8 @@ package gopher.model;
 
 
 import com.google.common.collect.ImmutableList;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * @version 0.1.2 (2018-06-07)
  */
 public class GopherReport {
-    private static final Logger logger = Logger.getLogger(GopherReport.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GopherReport.class.getName());
     private final Model model;
 
     private static final NumberFormat dformater= NumberFormat.getInstance(Locale.US);

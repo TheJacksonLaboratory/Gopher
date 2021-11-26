@@ -5,10 +5,11 @@ import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.log4j.Logger;
 
 
 import gopher.model.genome.Genome;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -22,7 +23,7 @@ import java.io.*;
  * @version 0.2.3 (2018-02-17)
  */
 public class GenomeGunZipper extends Task<Void>  {
-    private static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(GenomeGunZipper.class.getName());
     /** Model of the current genome, e.g., hg19, with paths and canonical chromosomes etc. */
     private final Genome genome;
     /** This is the basename of the compressed genome file that we download from UCSC. */

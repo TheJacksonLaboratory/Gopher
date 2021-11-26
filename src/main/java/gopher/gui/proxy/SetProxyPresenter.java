@@ -13,8 +13,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
-import org.apache.log4j.Logger;
 import gopher.framework.Signal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.net.URL;
@@ -23,7 +24,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class SetProxyPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(SetProxyPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(SetProxyPresenter.class.getName());
     @FXML
     private Button acceptButton;
     @FXML

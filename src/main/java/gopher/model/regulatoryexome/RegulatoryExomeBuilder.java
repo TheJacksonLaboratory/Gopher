@@ -2,12 +2,13 @@ package gopher.model.regulatoryexome;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.GopherException;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.GeneRegGTFParser;
 import gopher.model.Model;
 import gopher.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.1.3 (2018-02-16)
  */
 public class RegulatoryExomeBuilder extends Task<Void> {
-    private static Logger logger = Logger.getLogger(RegulatoryExomeBuilder.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
     /** Path to regulatory build file, e.g., homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz */
     private final String pathToEnsemblRegulatoryBuild;
     /** Path to transcript definition file, refGene.txt.gz */

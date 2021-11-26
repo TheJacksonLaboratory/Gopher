@@ -1,8 +1,9 @@
 package gopher.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
 import gopher.model.RestrictionEnzyme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
  * @version 0.1.2 (2017-11-26)
  */
 public class SegmentFactory implements Serializable {
-    private static final Logger logger = Logger.getLogger(SegmentFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SegmentFactory.class.getName());
     /**
      * serialization version ID
      */

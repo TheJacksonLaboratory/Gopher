@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 import gopher.exception.GopherException;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.popupdialog.PopupFactory;
@@ -13,6 +12,8 @@ import gopher.gui.progresspopup.ProgressPopup;
 import gopher.model.Model;
 import gopher.model.regulatoryexome.RegulationCategory;
 import gopher.model.regulatoryexome.RegulatoryExomeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.Properties;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class RegulatoryExomeBoxFactory {
-    private static Logger logger = Logger.getLogger(EnzymeViewFactory.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
 
     private static List<RegulationCategory> chosenCategories;
     /**

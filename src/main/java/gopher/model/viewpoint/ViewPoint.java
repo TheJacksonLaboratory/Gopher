@@ -4,9 +4,10 @@ import com.google.common.collect.ImmutableList;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.log4j.Logger;
 import gopher.model.Default;
 import gopher.model.RestrictionEnzyme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.text.NumberFormat;
@@ -30,7 +31,7 @@ import java.util.stream.IntStream;
  * @version 0.2.3 (2018-05-11)
  */
 public class ViewPoint implements Serializable {
-    private static final Logger logger = Logger.getLogger(ViewPoint.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ViewPoint.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 4L;
     /** The possible approaches used to generate this Viewpoint. */

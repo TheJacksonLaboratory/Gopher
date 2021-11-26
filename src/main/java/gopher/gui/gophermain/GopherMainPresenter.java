@@ -47,8 +47,9 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
 import javafx.stage.*;
 import javafx.util.StringConverter;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import javax.swing.*;
 import java.io.File;
@@ -68,7 +69,7 @@ import java.util.stream.Collectors;
  * @version 0.5.7 (2018-09-10)
  */
 public class GopherMainPresenter implements Initializable {
-    private final static Logger logger = Logger.getLogger(GopherMainPresenter.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(GopherMainPresenter.class.getName());
     /** The Model for the entire analysis.*/
     private Model model = null;
     /**
@@ -391,9 +392,6 @@ public class GopherMainPresenter implements Initializable {
         return true;
     }
 
-    private void setLoggingLevel(org.apache.log4j.Level level){
-        LogManager.getRootLogger().setLevel(level);
-    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -408,12 +406,12 @@ public class GopherMainPresenter implements Initializable {
         ToggleGroup tGroup = new ToggleGroup();
 
         tGroup.getToggles().addAll(loggingLevelOFF,loggingLevelTrace,loggingLevelInfo,loggingLevelDebug,loggingLevelWarn,loggingLevelError);
-        loggingLevelOFF.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.OFF));
-        loggingLevelTrace.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.TRACE));
-        loggingLevelInfo.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.INFO));
-        loggingLevelDebug.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.DEBUG));
-        loggingLevelWarn.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.WARN));
-        loggingLevelError.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.ERROR));
+//        loggingLevelOFF.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.OFF));
+//        loggingLevelTrace.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.TRACE));
+//        loggingLevelInfo.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.INFO));
+//        loggingLevelDebug.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.DEBUG));
+//        loggingLevelWarn.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.WARN));
+//        loggingLevelError.setOnAction(e-> setLoggingLevel(org.apache.log4j.Level.ERROR));
         loggingLevelError.setSelected(true);
 
         setGUItoSimple();

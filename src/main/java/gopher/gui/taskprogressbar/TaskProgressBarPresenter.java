@@ -7,7 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
  * Presenter for the Viewpoint creation progress bar.
  */
 public class TaskProgressBarPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(TaskProgressBarPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(TaskProgressBarPresenter.class.getName());
     @FXML private Label titleLabel;
     @FXML private Label messageLabel;
     @FXML private ProgressBar progressBar;

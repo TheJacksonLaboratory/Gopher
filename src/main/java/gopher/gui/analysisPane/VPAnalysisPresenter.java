@@ -18,7 +18,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.*;
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 0.1.3 (2018-06-07).
  */
 public class VPAnalysisPresenter implements Initializable {
-    private static final Logger logger = Logger.getLogger(VPAnalysisPresenter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(VPAnalysisPresenter.class.getName());
 
     /**
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
@@ -353,7 +354,7 @@ public class VPAnalysisPresenter implements Initializable {
      */
     public void refreshVPTable() {
         if (model == null) {
-            logger.fatal("Model null--should never happen");
+            logger.error("Model null--should never happen");
             return;
         }
         javafx.application.Platform.runLater(() -> {
@@ -385,7 +386,7 @@ public class VPAnalysisPresenter implements Initializable {
                 return d1.compareTo(d2);
             } catch (Exception e) {
                 logger.error(String.format("Error encounted while sorting integer values %s and %s", s1, s2));
-                logger.error(e, e);
+                logger.error("Error: {}", e.getMessage());
                 return 0;
             }
         }
@@ -410,7 +411,7 @@ public class VPAnalysisPresenter implements Initializable {
                 return d1.compareTo(d2);
             } catch (Exception e) {
                 logger.error(String.format("Error encounted while sorting percentage values %s and %s", s1, s2));
-                logger.error(e, e);
+                logger.error("Error: {}", e.getMessage());
                 return 0;
             }
         }
@@ -474,7 +475,7 @@ public class VPAnalysisPresenter implements Initializable {
                 }
             } catch (Exception e) {
                 logger.error(String.format("Error encounted while sorting chromosome locations %s and %s", s1, s2));
-                logger.error(e, e);
+                logger.error("Error: {}", e.getMessage());
                 return 0;
             }
         }

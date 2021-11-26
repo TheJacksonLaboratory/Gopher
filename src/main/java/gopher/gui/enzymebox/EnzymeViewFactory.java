@@ -2,14 +2,15 @@ package gopher.gui.enzymebox;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 import gopher.model.Model;
 import gopher.model.RestrictionEnzyme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class EnzymeViewFactory {
-    private static Logger logger = Logger.getLogger(EnzymeViewFactory.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
 
     /**
      * Initialize the Enyzme list to show any previously chosen enzyme with a check,
@@ -27,7 +28,7 @@ public class EnzymeViewFactory {
         Stage window;
         String windowTitle = "Restriction Enzymes";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
 
         presenter.setSignal(signal -> {

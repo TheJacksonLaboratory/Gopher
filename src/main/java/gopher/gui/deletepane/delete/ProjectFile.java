@@ -2,7 +2,8 @@ package gopher.gui.deletepane.delete;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -11,7 +12,7 @@ import java.io.File;
  * old project files.
  */
 public class ProjectFile {
-    static Logger logger = Logger.getLogger(ProjectFile.class.getName());
+    static Logger logger = LoggerFactory.getLogger(ProjectFile.class.getName());
     private StringProperty absolutePath;
     /** Has this file been deleted? */
     private boolean isDeleted=false;

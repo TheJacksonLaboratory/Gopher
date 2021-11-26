@@ -7,7 +7,8 @@ import gopher.io.RestrictionEnzymeParser;
 import gopher.model.genome.*;
 import gopher.model.viewpoint.ViewPoint;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @version 0.2.16 (2018-02-18)
  */
 public class Model implements Serializable {
-    private static final Logger logger = Logger.getLogger(Model.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Model.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 6L;
     private static final String VERSION="0.6.0";

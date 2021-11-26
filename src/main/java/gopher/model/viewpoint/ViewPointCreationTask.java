@@ -6,7 +6,8 @@ import gopher.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.concurrent.Task;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * @version 0.0.3 (2017-09-27)
  */
 public abstract class ViewPointCreationTask extends Task<Void> {
-    private static final Logger logger = Logger.getLogger(ViewPointCreationTask.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ViewPointCreationTask.class.getName());
     /**  Key: Name of chromosome; value: Chromosome with {@link GopherGene} objects located on the chromosome. */
     protected Map<String, ChromosomeGroup> chromosomes = null;
     /** The total number of genes for which we are making viewpoints. This number is only used for the progress

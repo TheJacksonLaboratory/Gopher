@@ -2,13 +2,15 @@ package gopher.model.genome;
 
 
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
 
 public class HumanHg19 extends Genome implements Serializable {
-    static Logger logger = Logger.getLogger(HumanHg19.class.getName());
+    static Logger logger = LoggerFactory.getLogger(HumanHg19.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 4L;
     private static final String[] chromosomes = {"chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9",

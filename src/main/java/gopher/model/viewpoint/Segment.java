@@ -3,9 +3,10 @@ package gopher.model.viewpoint;
 import com.google.common.collect.ImmutableList;
 import gopher.model.Model;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.model.IntPair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -21,7 +22,7 @@ import java.util.Set;
  * @version 0.3.6 (2018-07-17)
  */
 public class Segment implements Serializable {
-    private static final Logger logger = Logger.getLogger(Segment.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Segment.class.getName());
 
     public boolean isOverlapsTSS() {
         return overlapsTSS;

@@ -2,7 +2,8 @@ package gopher.io;
 
 import gopher.exception.GopherException;
 import gopher.model.GopherGene;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.*;
  * is identical with the start position of the BED file.
  */
 public class BedFileParser {
-    private static Logger logger = Logger.getLogger(BedFileParser.class);
+    private static Logger logger = LoggerFactory.getLogger(BedFileParser.class);
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/

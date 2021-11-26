@@ -11,8 +11,8 @@ import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import javafx.concurrent.Task;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
  * @version 0.1.2
  */
 public class DigestCreationTask extends Task<Void> {
-    private static final Logger logger = LogManager.getLogger(DigestCreationTask.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DigestCreationTask.class.getName());
     /** List of restriction enzyme objects representing the enzymes that were used in the capture Hi-C experiment. */
     private final List<RestrictionEnzyme> restrictionEnzymeList;
     /** key: index of enzyme; value: name of enzyme (Note: usually, we just have one enzyme!). Symmetrical with {@link #enzyme2number}).*/

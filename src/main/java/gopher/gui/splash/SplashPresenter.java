@@ -11,9 +11,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import org.apache.log4j.Logger;
 import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -28,7 +29,7 @@ import static gopher.io.Platform.getGopherDir;
  * a list of buttons for opening previous projects.
  */
 public class SplashPresenter implements Initializable {
-    static Logger logger = Logger.getLogger(SplashPresenter.class.getName());
+    static Logger logger = LoggerFactory.getLogger(SplashPresenter.class.getName());
     @FXML
     private ChoiceBox<String> projectBox;
     @FXML private Button newProjectButton;

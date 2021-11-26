@@ -1,9 +1,10 @@
 package gopher.model;
 
 import gopher.model.viewpoint.Bait;
-import org.apache.log4j.Logger;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-17)
  */
 public class Design {
-    static Logger logger = Logger.getLogger(Design.class.getName());
+    static Logger logger = LoggerFactory.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
     /** total length in nt of all unique digest margins  */

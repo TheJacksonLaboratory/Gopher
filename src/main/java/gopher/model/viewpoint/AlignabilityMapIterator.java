@@ -1,7 +1,8 @@
 package gopher.model.viewpoint;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.zip.GZIPInputStream;
  * Input data for the alignability map, one chromosome at a time.
  */
 public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
-    private static Logger logger = Logger.getLogger(AlignabilityMapIterator.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(AlignabilityMapIterator.class.getName());
 
     /**
      * The reader that is being read.

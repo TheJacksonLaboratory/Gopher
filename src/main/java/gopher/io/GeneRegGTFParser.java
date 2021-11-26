@@ -1,7 +1,8 @@
 package gopher.io;
 
-import org.apache.log4j.Logger;
 import gopher.model.regulatoryexome.RegulatoryElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -25,7 +26,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.0.1
  */
 public class GeneRegGTFParser {
-    static Logger logger = Logger.getLogger(GeneRegGTFParser.class.getName());
+    static Logger logger = LoggerFactory.getLogger(GeneRegGTFParser.class.getName());
     private String pathToGTFfile=null;
 
 

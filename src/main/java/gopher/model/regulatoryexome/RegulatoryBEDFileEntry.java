@@ -1,7 +1,8 @@
 package gopher.model.regulatoryexome;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class encapsulates one line in what will become the BED file to order the regulatory exome/gene panel. We
@@ -12,7 +13,7 @@ import org.apache.log4j.Logger;
  * @version 0.1.3 (2017-11-14)
  */
 public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry> {
-    private static Logger logger = Logger.getLogger(RegulatoryBEDFileEntry.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(RegulatoryBEDFileEntry.class.getName());
     private final String chromosome;
     private final int fromPos;
     private final int toPos;

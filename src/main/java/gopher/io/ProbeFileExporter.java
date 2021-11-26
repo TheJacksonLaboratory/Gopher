@@ -5,7 +5,8 @@ import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -21,7 +22,7 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class ProbeFileExporter {
-    private static final Logger logger = Logger.getLogger(gopher.io.BEDFileExporter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(gopher.io.BEDFileExporter.class.getName());
 
         private final String ProbeFileAgilentFormat;
     private final String ProbeFileAgilentFormatZip;

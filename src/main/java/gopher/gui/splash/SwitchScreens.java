@@ -3,7 +3,6 @@ package gopher.gui.splash;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 
 import gopher.Gopher;
 import gopher.gui.popupdialog.PopupFactory;
@@ -13,6 +12,8 @@ import gopher.util.SerializationManager;
 import gopher.util.Utils;
 import gopher.gui.gophermain.GopherMainPresenter;
 import gopher.gui.gophermain.GopherMainView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ import java.io.IOException;
  * @version 0.1.1 (2 December, 2017)
  */
 public class SwitchScreens {
-    private static final Logger logger = Logger.getLogger(SwitchScreens.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SwitchScreens.class.getName());
     /** A reference to the primary stage of the application. */
     private Stage primarystage;
     /** The width of the current screen, which is calculated in {@link gopher.gui.viewpointpanel.ViewPointView}. 800 is a default value,

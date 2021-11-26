@@ -1,7 +1,8 @@
 package gopher.model.viewpoint;
 
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  * for the individual properties such as GC content.
  */
 public class Bait implements Serializable {
-    private static Logger logger = Logger.getLogger(Bait.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     // coordinates of the bait
