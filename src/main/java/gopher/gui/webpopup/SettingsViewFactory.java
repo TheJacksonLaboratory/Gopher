@@ -1,7 +1,7 @@
 package gopher.gui.webpopup;
 
+import gopher.service.GopherService;
 import gopher.service.model.Approach;
-import gopher.service.model.GopherModel;
 import javafx.stage.Stage;
 
 import java.util.LinkedHashMap;
@@ -16,40 +16,41 @@ import java.util.Map;
 public class SettingsViewFactory {
 
 
-    public static void showSettings(GopherModel model) {
+
+    public static void showSettings(GopherService service) {
         Stage window;
         String windowTitle = "GOPHER Settings";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
 
-        Map<String,String> settingsMap=getSettingsMap(model);
+        Map<String,String> settingsMap=getSettingsMap(service);
         SettingsPopup popup = new SettingsPopup(settingsMap, window);
         popup.popup();
     }
 
-    private static Map<String,String> getSettingsMap(GopherModel model) {
+    private static Map<String,String> getSettingsMap(GopherService service) {
         Map<String,String> orderedmap = new LinkedHashMap<>();
-        if (model == null) return orderedmap; // not initialized yet
-        orderedmap.put("Genome build",model.getGenomeBuild());
-        orderedmap.put("Path to genome directory",model.getGenomeDirectoryPath());
-        orderedmap.put("Genome unpacked?",model.isGenomeUnpacked() ? "yes":"no");
-        orderedmap.put("Genome indexed?",model.isGenomeIndexed() ? "yes":"no");
-        orderedmap.put("Transcript file",model.getTranscriptsBasename());
-        orderedmap.put("Targets path",model.getTargetGenesPath());
-        orderedmap.put("RefGene path", model.getRefGenePath());
-        orderedmap.put("Alignability map",model.getAlignabilityMapPathIncludingFileNameGz());
-        orderedmap.put("Approach" ,model.getApproach().toString());
-        if (model.getApproach().equals(Approach.SIMPLE)) {
-            orderedmap.put("Allow patching?", model.getAllowPatching()? "yes":"no");
+        if (service == null) return orderedmap; // not initialized yet
+        orderedmap.put("Genome build", service.getGenomeBuild());
+        orderedmap.put("Path to genome directory", service.getGenomeDirectoryPath());
+        orderedmap.put("Genome unpacked?", service.isGenomeUnpacked() ? "yes":"no");
+        orderedmap.put("Genome indexed?", service.isGenomeIndexed() ? "yes":"no");
+        orderedmap.put("Transcript file", service.getTranscriptsBasename());
+        orderedmap.put("Targets path", service.getTargetGenesPath());
+        orderedmap.put("RefGene path", service.getRefGenePath());
+        orderedmap.put("Alignability map", service.getAlignabilityMapPathIncludingFileNameGz());
+        orderedmap.put("Approach" , service.getApproach().toString());
+        if (service.getApproach().equals(Approach.SIMPLE)) {
+            orderedmap.put("Allow patching?", service.getAllowPatching()? "yes":"no");
         }
-        orderedmap.put("Upstream size", String.format("%s bp",model.getSizeUp()));
-        orderedmap.put("Downstream size", String.format("%s bp",model.getSizeDown()));
-        orderedmap.put("Minimum fragment size", String.format("%s bp",model.getMinFragSize()));
-        orderedmap.put("Minimum probe/fragment count", String.valueOf(model.getMinBaitCount()));
-        orderedmap.put("Max. k-mer alignability", String.valueOf(model.getMaxMeanKmerAlignability()));
-        orderedmap.put("Allow unbalanced margins?", model.getAllowUnbalancedMargins()? "yes":"no");
-        orderedmap.put("Restriction enzymes", model.getAllSelectedEnzymeString());
+        orderedmap.put("Upstream size", String.format("%s bp", service.getSizeUp()));
+        orderedmap.put("Downstream size", String.format("%s bp", service.getSizeDown()));
+        orderedmap.put("Minimum fragment size", String.format("%s bp", service.getMinFragSize()));
+        orderedmap.put("Minimum probe/fragment count", String.valueOf(service.getMinBaitCount()));
+        orderedmap.put("Max. k-mer alignability", String.valueOf(service.getMaxMeanKmerAlignability()));
+        orderedmap.put("Allow unbalanced margins?", service.getAllowUnbalancedMargins()? "yes":"no");
+        orderedmap.put("Restriction enzymes", service.getAllSelectedEnzymeString());
         return orderedmap;
     }
 

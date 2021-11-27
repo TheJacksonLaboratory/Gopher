@@ -7,9 +7,14 @@ import gopher.service.model.RestrictionEnzyme;
 import gopher.service.model.genome.Genome;
 import gopher.service.model.viewpoint.ViewPoint;
 import javafx.scene.control.ProgressIndicator;
+import org.apache.commons.math3.distribution.IntegerDistribution;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public interface GopherService {
 
@@ -173,4 +178,34 @@ public interface GopherService {
     double getMaxGCcontent();
 
     double getMinGCcontent();
+
+    List<String> initializeEntrezGene(String pathToEntrezGeneFile);
+
+    void setEstAvgRestFragLen(double estAvgRestFragLen);
+
+    void importProtjectFromFile(File file);
+
+    List<ViewPoint> getActiveViewPointList();
+
+    double getMaxRepeatContent();
+
+    NormalDistribution getNormalDistributionExtendedUp();
+
+    NormalDistribution getNormalDistributionExtendedDown();
+
+    NormalDistribution getNormalDistributionSimple();
+
+    Double getEstAvgRestFragLen();
+
+    void setNormalDistributionSimple(double meanLen);
+
+    String getChromInfoPathIncludingFileNameGz();
+
+    void setViewPoints(List<ViewPoint> viewpointlist);
+
+    String getRegulatoryBuildPath();
+
+    void setRegulatoryExomeProperties(Properties regulatoryProperties);
+
+    void setNormalDistributionsExtended();
 }

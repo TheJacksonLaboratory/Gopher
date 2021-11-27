@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.entrezgenetable.EntrezGenePresenter">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.controllers.EntrezGenePresenter">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -16,9 +16,9 @@
         <WebView fx:id="wview" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
     </HBox>
     <HBox alignment="CENTER" prefHeight="39.0" prefWidth="510.0" VBox.vgrow="NEVER">
-      <Label styleClass="bold-label" stylesheets="@entrezgene.css" text="1." />
+      <Label styleClass="bold-label" stylesheets="@../css/entrezgene.css" text="1." />
       <Region HBox.hgrow="ALWAYS" />
-        <Button minWidth="120.0" mnemonicParsing="false" onAction="#uploadGenes" stylesheets="@entrezgene.css" text="Upload">
+        <Button minWidth="120.0" mnemonicParsing="false" onAction="#uploadGenes" stylesheets="@../css/entrezgene.css" text="Upload">
             <HBox.margin>
                 <Insets right="10.0" />
             </HBox.margin>
@@ -28,7 +28,7 @@
             <Insets left="30.0" right="30.0" />
          </HBox.margin>
       </Label>
-      <Button minWidth="120.0" mnemonicParsing="false" onAction="#getGenesFromClipboard" stylesheets="@entrezgene.css" text="Clipboard">
+      <Button minWidth="120.0" mnemonicParsing="false" onAction="#getGenesFromClipboard" stylesheets="@../css/entrezgene.css" text="Clipboard">
          <HBox.margin>
             <Insets left="10.0" />
          </HBox.margin>
@@ -36,9 +36,9 @@
       <Region HBox.hgrow="ALWAYS" />
     </HBox>
     <HBox alignment="CENTER" prefHeight="43.0" prefWidth="510.0">
-      <Label styleClass="bold-label" stylesheets="@entrezgene.css" text="2." />
+      <Label styleClass="bold-label" stylesheets="@../css/entrezgene.css" text="2." />
       <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-        <Button minWidth="120.0" mnemonicParsing="false" onAction="#validateGeneSymbols" stylesheets="@entrezgene.css" text="Validate">
+        <Button minWidth="120.0" mnemonicParsing="false" onAction="#validateGeneSymbols" stylesheets="@../css/entrezgene.css" text="Validate">
             <HBox.margin>
                 <Insets right="30.0" />
             </HBox.margin>
@@ -46,11 +46,11 @@
       <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
     </HBox>
     <HBox alignment="CENTER" prefHeight="41.0" prefWidth="510.0">
-      <Label styleClass="bold-label" stylesheets="@entrezgene.css" text="3." />
+      <Label styleClass="bold-label" stylesheets="@../css/entrezgene.css" text="3." />
         <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-        <Button minWidth="120.0" mnemonicParsing="false" onAction="#cancel" stylesheets="@entrezgene.css" text="Cancel" />
+        <Button minWidth="120.0" mnemonicParsing="false" onAction="#cancel" stylesheets="@../css/entrezgene.css" text="Cancel" />
         <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-        <Button minWidth="120.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@entrezgene.css" text="Accept" />
+        <Button minWidth="120.0" mnemonicParsing="false" onAction="#acceptGenes" stylesheets="@../css/entrezgene.css" text="Accept" />
         <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
     </HBox>
 </VBox>

@@ -1,4 +1,4 @@
-package gopher.gui.entrezgenetable;
+package gopher.controllers;
 
 
 import com.google.common.collect.ImmutableList;

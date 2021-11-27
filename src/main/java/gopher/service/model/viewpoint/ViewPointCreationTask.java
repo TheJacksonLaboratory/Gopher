@@ -1,7 +1,7 @@
 package gopher.service.model.viewpoint;
 
+import gopher.service.GopherService;
 import gopher.service.model.GopherGene;
-import gopher.service.model.GopherModel;
 import gopher.service.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
@@ -32,7 +32,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
 
     private int n_total_promoters;
     /** Referece to the model with all project data. */
-    protected GopherModel model;
+    protected GopherService gopherService;
     /** Total number of viewpoints (used for the progress dialog) */
     protected int total;
     /** Index of current viewpoint (used for the progress dialog) */
@@ -46,14 +46,14 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     protected abstract Void call() throws Exception;
 
 
-    ViewPointCreationTask(GopherModel model) {
-        this.model = model;
+    ViewPointCreationTask(GopherService service) {
+        this.gopherService = service;
         this.viewpointlist = new ArrayList<>();
-        assignGopherGenesToChromosomes(model.getGopherGeneList());
+        assignGopherGenesToChromosomes(service.getGopherGeneList());
         logger.trace(String.format("ViewPointCreationTask -- we got %d total genes",n_totalGenes));
-        ViewPoint.setChosenEnzymes(model.getChosenEnzymelist());
+        ViewPoint.setChosenEnzymes(service.getChosenEnzymelist());
         SegmentFactory.restrictionEnzymeMap = new HashMap<>();
-        List<RestrictionEnzyme> chosen = model.getChosenEnzymelist();
+        List<RestrictionEnzyme> chosen = service.getChosenEnzymelist();
         if (chosen == null) {
             logger.error("Unable to retrieve list of chosen restriction enzymes");
             return;
@@ -102,7 +102,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
         logger.trace("Estimating the average length of restriction fragments from at least 100,000 fragments...");
         int THRESHOLD_NUMBER_OF_FRAGMENTS=100_000;
         // Combine all patterns into one regular expression.
-        String regExCombinedCutPat = model.getChosenEnzymelist().
+        String regExCombinedCutPat = gopherService.getChosenEnzymelist().
                 stream().
                 map(RestrictionEnzyme::getPlainSite).
                 collect(Collectors.joining("|"));
@@ -131,7 +131,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
         }
 
         double estAvgRestFragLen = (double)totalLength/totalNumOfCuts;
-        model.setEstAvgRestFragLen(estAvgRestFragLen);
+        gopherService.setEstAvgRestFragLen(estAvgRestFragLen);
         logger.trace("Total number of cuts: " + totalNumOfCuts +"; Total length: " + totalLength);
         logger.trace("Estimated average length : " + estAvgRestFragLen);
         return estAvgRestFragLen;

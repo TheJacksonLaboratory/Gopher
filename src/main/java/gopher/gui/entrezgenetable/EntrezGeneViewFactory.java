@@ -1,10 +1,19 @@
 package gopher.gui.entrezgenetable;
 
+import gopher.controllers.EntrezGenePresenter;
+import gopher.service.GopherService;
 import gopher.service.model.GopherModel;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
 
 /**
  * Coordinate processing of the uploaded genes (target genes) and their comparison with the refGene.txt.gz file. THe main
@@ -13,36 +22,40 @@ import java.io.Reader;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
  */
+
 public class EntrezGeneViewFactory {
+    private final static Logger logger = LoggerFactory.getLogger(EntrezGeneViewFactory.class);
+
+    GopherService service;
+
+    public EntrezGeneViewFactory(GopherService service) {
+        this.service = service;
+    }
+
+
+
 
     /** This is intended to be used to confirmDialog example sets of genes chosen from the Help menu. */
-    public static void displayFromFile(GopherModel model, Reader reader) {
+    public static void displayWithGenes(List<String> genes) {
         Stage window;
         String windowTitle = "Target Gene List";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
-
-        EntrezGeneView view = new EntrezGeneView();
-        EntrezGenePresenter presenter = (EntrezGenePresenter) view.getPresenter();
-        presenter.setModel(model);
-        presenter.uploadGenesFromFile(reader);
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                case CANCEL:
-                    window.close();
-                    break;
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-        });
-
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();
+        try {
+            ClassPathResource entrezGeneResource = new ClassPathResource("fxml/entrezgene.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(entrezGeneResource.getURL());
+            //fxmlLoader.setControllerFactory(applicationContext::getBean);
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent);
+            window.setScene(scene);
+            window.showAndWait();
+        } catch (IOException e) {
+            logger.error("Could not open Entrez Gene dialog");
+        }
     }
 
-    /** This causes the gene upload window to be displayed with an introductory text. */
+    /** This causes the gene upload window to be displayed with an introductory text.
     public static void display(GopherModel model) {
         Stage window;
         String windowTitle = "Target Gene List";
@@ -68,7 +81,7 @@ public class EntrezGeneViewFactory {
         presenter.setData(html);
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
-    }
+    }*/
 
     private static String getHTML() {
         return "<html><body><h3>Enter genes</h3>" +

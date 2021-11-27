@@ -1,62 +1,108 @@
 package gopher.gui.qcCheckPane;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
+import gopher.io.Platform;
+import gopher.service.GopherService;
 import gopher.service.model.GopherModel;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import gopher.framework.Signal;
+import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
-/**
- * This class coordinates the creation of the HTML code for the parameter check window.
- * @author Peter Robinson
- * @version 0.0.2 (2017-11-01)
- */
-public class QCCheckFactory {
+@Component
+public class QCCheckController implements Initializable {
+    static Logger logger = LoggerFactory.getLogger(QCCheckController.class.getName());
+    @FXML
+    private WebView wview;
+
+    private WebEngine webEngine;
+
+    @FXML private Button cancelButon;
+    @FXML private Button continueButton;
+    @FXML private Label warning;
+
+    private boolean wasCanceled=true;
+
+    @Autowired
+    GopherService gopherService;
+
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
     private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
     /** This will be set to false if files are missing and we should not go on with the analysis. */
     private static boolean qc_ok=true;
 
-    public static boolean showQCCheck(GopherModel model) {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        webEngine = wview.getEngine();
+        webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
+    }
+
+    public QCCheckController() {
+
+    }
+
+    public void setData(String html) {
+        webEngine.loadContent(html);
+    }
+
+    @FXML public void cancelButtonClicked(ActionEvent e) {
+        e.consume();
+        wasCanceled=true;
+    }
+
+    @FXML public void continueButtonClicked(ActionEvent e) {
+        e.consume();
+        wasCanceled=false;
+    }
+
+
+    public boolean wasCanceled() { return  this.wasCanceled;}
+
+    public void setLabel(String text) {
+        warning.setStyle("-fx-text-alignment: right; -fx-font-size: 14pt; -fx-text-fill: red; ");
+        warning.setText(text);
+    }
+    public boolean showQCCheck(GopherModel model) {
         Stage window;
         String windowTitle = "GOPHER Parameter Check";
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
 
-        QCCheckView view = new QCCheckView();
-        QCCheckPresenter presenter = (QCCheckPresenter) view.getPresenter();
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
+      //  QCCheckView view = new QCCheckView();
+       // QCCheckPresenter presenter = (QCCheckPresenter) view.getPresenter();
 
-        });
         String html= getHTML(model);
         if (!qc_ok) {
             html=getErrorHTML(model);
         }
-        presenter.setData(html);
+        setData(html);
 
         if (model.getViewPointList() != null && model.getViewPointList().size()>0) {
-            presenter.setLabel("Warning: this step will overwrite current Viewpoints");
+            setLabel("Warning: this step will overwrite current Viewpoints");
         }
 
-        window.setScene(new Scene(view.getView()));
+        //window.setScene(new Scene(view.getView()));
         window.showAndWait();
-        return (! presenter.wasCanceled() && qc_ok);
+        return (! wasCanceled() && qc_ok);
     }
 
-    private static String getHTML(GopherModel model) {
+    private String getHTML(GopherModel model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
         return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
@@ -64,7 +110,7 @@ public class QCCheckFactory {
 
 
 
-    private static String validateParams(GopherModel model) {
+    private String validateParams(GopherModel model) {
         StringBuilder sb = new StringBuilder();
         sb.append("<thead>");
         sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
@@ -163,7 +209,7 @@ public class QCCheckFactory {
      * @param model Model of the probe design
      * @return HTML string with summary of Q/C
      */
-    private static String validateData(GopherModel model) {
+    private String validateData(GopherModel model) {
         qc_ok=true;  // reset
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
@@ -264,8 +310,8 @@ public class QCCheckFactory {
         if (model.getGenomeDirectoryPath()==null) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Path to genome directory not initialized.</td></tr>");
         }
-         if (! model.isGenomeUnpacked()) {
-             sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not unpacked</td></tr>");
+        if (! model.isGenomeUnpacked()) {
+            sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not unpacked</td></tr>");
         }
         if (! model.isGenomeIndexed()) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not correctly indexed</td></tr>");
@@ -361,6 +407,5 @@ public class QCCheckFactory {
                 "}\n" +
                 "</style>";
     }
-
 
 }

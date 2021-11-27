@@ -1,8 +1,8 @@
 package gopher.service.model.viewpoint;
 
 import com.google.common.collect.ImmutableList;
+import gopher.service.GopherService;
 import gopher.service.model.Default;
-import gopher.service.model.GopherModel;
 import gopher.service.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -82,7 +82,7 @@ public class ViewPoint implements Serializable {
     /** This is a reference to the segment that overlaps the TSS */
     private Segment centerSegment=null;
 
-    private final GopherModel model;
+    private final GopherService gopherService;
 
     void setPromoterNumber(int n, int total) { promoterNumber=n; totalPromoters=total;}
 
@@ -202,7 +202,7 @@ public class ViewPoint implements Serializable {
         this.marginSize= builder.marginSize;
         this.accession=builder.accessionNr;
         this.maximumRepeatContent=builder.maximumRepeatContent;
-        this.model=builder.model;
+        this.gopherService =builder.service;
         init(builder.fastaReader,builder.c2alignmap, builder.chromosomelen);
     }
 
@@ -211,9 +211,9 @@ public class ViewPoint implements Serializable {
         this.restrictionSegmentList=new ArrayList<>();
         boolean changed;
         /* Create segmentFactory */
-        if(model.getApproach().equals(Approach.SIMPLE)) {
-            this.upstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
-            this.downstreamNucleotideLength=model.getEstAvgRestFragLen().intValue();
+        if(gopherService.getApproach().equals(Approach.SIMPLE)) {
+            this.upstreamNucleotideLength= gopherService.getEstAvgRestFragLen().intValue();
+            this.downstreamNucleotideLength= gopherService.getEstAvgRestFragLen().intValue();
             /*
              For the simple approach, iteratively increase range for initial restriction fragments as long as
              genomicPos occurs on first or last fragment of the list in order to make sure that adjacent fragments
@@ -269,7 +269,7 @@ public class ViewPoint implements Serializable {
             int upstreamLength = this.upstreamNucleotideLength;
             int downstreamLength = this.downstreamNucleotideLength;
             int iteration = 0;
-            int increment = model.getEstAvgRestFragLen().intValue()*2;
+            int increment = gopherService.getEstAvgRestFragLen().intValue()*2;
             do {
                 logger.trace("segmentFactory iteration = " + iteration + " (" + this.targetName + ")");
                 changed=false;
@@ -363,8 +363,8 @@ public class ViewPoint implements Serializable {
                     segmentFactory.getUpstreamCut(j),
                     segmentFactory.getDownstreamCut(j) - 1).
                     fastaReader(fastaReader).marginSize(marginSize).build();
-            double maxMeanAlignabilityScore = 1.0 * model.getMaxMeanKmerAlignability();
-            restFrag.setUsableBaits(model,c2align,maxMeanAlignabilityScore);
+            double maxMeanAlignabilityScore = 1.0 * gopherService.getMaxMeanKmerAlignability();
+            restFrag.setUsableBaits(gopherService,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
 /*
@@ -520,7 +520,7 @@ public class ViewPoint implements Serializable {
             }
 
             // if allow single margin is false, do not select unbalanced digests
-            if(!model.getAllowUnbalancedMargins() && segment.isUnbalanced()) {
+            if(!gopherService.getAllowUnbalancedMargins() && segment.isUnbalanced()) {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
@@ -538,7 +538,7 @@ public class ViewPoint implements Serializable {
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
-    void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, GopherModel model ) {
+    void generateViewpointExtendedApproach(Integer maxSizeUp, Integer maxSizeDown, GopherService model ) {
         boolean allowSingleMargin=model.getAllowUnbalancedMargins();
         if(!this.isPositiveStrand) {
             Integer tmp=maxSizeUp;
@@ -587,10 +587,10 @@ public class ViewPoint implements Serializable {
     }
 
 
-    void generateViewpointSimple(GopherModel model) {
+    void generateViewpointSimple(GopherService service) {
 
-        boolean allowSingleMargin = model.getAllowUnbalancedMargins();
-        boolean allowPatchedViewpoints = model.getAllowPatching();
+        boolean allowSingleMargin = service.getAllowUnbalancedMargins();
+        boolean allowPatchedViewpoints = service.getAllowPatching();
         approach = Approach.SIMPLE;
 
         // find the digest that contains genomicPos
@@ -692,7 +692,7 @@ public class ViewPoint implements Serializable {
         if(seg.isBalanced()) {
             return true;
         }
-        return (model.getAllowUnbalancedMargins() && seg.isUnbalanced());
+        return (gopherService.getAllowUnbalancedMargins() && seg.isUnbalanced());
     }
 
 
@@ -763,8 +763,8 @@ public class ViewPoint implements Serializable {
      *  (for up and down stream) are filled in by the active segments.
      */
     public void calculateViewpointScoreExtended() {
-        NormalDistribution nDistUpstream=model.getNormalDistributionExtendedUp();
-        NormalDistribution nDistDownstream=model.getNormalDistributionExtendedDown();
+        NormalDistribution nDistUpstream= gopherService.getNormalDistributionExtendedUp();
+        NormalDistribution nDistDownstream= gopherService.getNormalDistributionExtendedDown();
 
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
@@ -798,7 +798,7 @@ public class ViewPoint implements Serializable {
 
 
     public Double calculateViewpointScoreSimple(Integer vpStaPos, Integer centerPos, Integer vpEndPos) {
-        this.score = model.getNormalDistributionSimple().cumulativeProbability(vpEndPos - centerPos) - model.getNormalDistributionSimple().cumulativeProbability(vpStaPos - centerPos);
+        this.score = gopherService.getNormalDistributionSimple().cumulativeProbability(vpEndPos - centerPos) - gopherService.getNormalDistributionSimple().cumulativeProbability(vpStaPos - centerPos);
         return score;
     }
 
@@ -942,7 +942,7 @@ public class ViewPoint implements Serializable {
         private double maxGcContent=Default.MAX_GC_CONTENT;
         private double minGcContent= Default.MIN_GC_CONTENT;
         private int marginSize=Default.MARGIN_SIZE;
-        private GopherModel model;
+        private GopherService service;
         private AlignabilityMap c2alignmap;
 
         private final int chromosomelen;
@@ -991,8 +991,8 @@ public class ViewPoint implements Serializable {
         Builder marginSize(int val) {
             this.marginSize=val; return this;
         }
-        Builder model(GopherModel model) {
-            this.model=model; return this;
+        Builder model(GopherService model) {
+            this.service =model; return this;
         }
         Builder c2alignabilityMap(AlignabilityMap c2am) {
             this.c2alignmap = c2am; return this;

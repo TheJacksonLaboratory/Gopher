@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
-<AnchorPane prefHeight="703.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.qcCheckPane.QCCheckPresenter">
+<AnchorPane prefHeight="703.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.qcCheckPane.QCCheckController">
     <WebView fx:id="wview" prefHeight="552.0" prefWidth="600.0" AnchorPane.bottomAnchor="158.0" />
     <VBox prefHeight="158.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0">
         <Label fx:id="warning" alignment="CENTER_RIGHT" minHeight="30.0" minWidth="-Infinity" prefHeight="30.0" prefWidth="600.0">

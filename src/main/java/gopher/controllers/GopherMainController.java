@@ -12,7 +12,6 @@ import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.gui.proxy.SetProxyPresenter;
 import gopher.gui.proxy.SetProxyView;
-import gopher.gui.qcCheckPane.QCCheckFactory;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.webpopup.SettingsViewFactory;
 import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
@@ -38,8 +37,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
@@ -49,14 +50,13 @@ import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -542,7 +542,9 @@ public class GopherMainController implements Initializable {
     public void setModelInMainAndInAnalysisPresenter(GopherModel mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
-        logger.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",mod.getGenome().getGenomeBuild(),model.getGenome().getGenomeBasename()));
+        logger.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",
+                mod.getGenome().getGenomeBuild(),
+                gopherService.getGenome().getGenomeBasename()));
         if (gopherService.getMaxGCcontent()>0){
             this.maxGCContentTextField.setText(String.format("%.1f%%",gopherService.getMaxGCContentPercent()));
         } else {
@@ -984,7 +986,7 @@ public class GopherMainController implements Initializable {
      * @param e event triggered by enter gene command.
      */
     @FXML private void enterGeneList(ActionEvent e) {
-        EntrezGeneViewFactory.display(this.model);
+        //EntrezGeneViewFactory.display(this.model);
         gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
         setTargetFeedback(GopherModel.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
         e.consume();
@@ -1099,7 +1101,7 @@ public class GopherMainController implements Initializable {
 
         String path = dir.getAbsolutePath();
         path += File.separator;
-        DigestCreationTask task = new DigestCreationTask(path,model);
+        DigestCreationTask task = new DigestCreationTask(path,gopherService);
 
         TaskProgressBarView pbview = new TaskProgressBarView();
         TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
@@ -1189,17 +1191,32 @@ public class GopherMainController implements Initializable {
             PopupFactory.displayError("Data incomplete", "Choose target genes/regions before proceding");
             return;
         }
-        boolean OK=QCCheckFactory.showQCCheck(model);
-        if (! OK ) {
-            return;
+
+        try {
+            ClassPathResource gopherResource = new ClassPathResource("fxml/qccheck.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
+            //fxmlLoader.setControllerFactory(applicationContext::getBean);
+            Parent parent = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(parent, 1200, 900));
+            stage.setResizable(true);
+            stage.setTitle("Quality assessment");
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        // TODO return boolean value
+//        boolean OK=QCCheckFactory.showQCCheck(model);
+//        if (! OK ) {
+//            return;
+//        }
 
         ViewPointCreationTask task;
 
         if (gopherService.useSimpleApproach()) {
-            task = new SimpleViewPointCreationTask(model);
+            task = new SimpleViewPointCreationTask(gopherService);
         } else {
-            task = new ExtendedViewPointCreationTask(model);
+            task = new ExtendedViewPointCreationTask(gopherService);
         }
 
         TaskProgressBarView pbview = new TaskProgressBarView();
@@ -1265,7 +1282,7 @@ public class GopherMainController implements Initializable {
 
     /** Display the settings (parameters) of the current viewpoint. */
     public void showSettingsOfCurrentProject() {
-        SettingsViewFactory.showSettings(model);
+        SettingsViewFactory.showSettings(gopherService);
     }
 
     /**
@@ -1349,31 +1366,33 @@ public class GopherMainController implements Initializable {
      * to give new users an easy way to get a list of genes to try out the software.
      */
     @FXML private void openGeneWindowWithExampleHumanGenes() {
-        InputStream is = GopherMainController.class.getResourceAsStream("/data/humangenesymbols.txt");
-
-        if (is == null) {
-            logger.warn("Could not open bundled example human gene list at path '/humangenesymbols.txt'");
-            PopupFactory.displayError("Could not open example human gene list","Please report to developers");
+        URL url = GopherMainController.class.getResource("/data/humangenesymbols.txt");
+        if (url == null) {
+            PopupFactory.displayError("Could not find human gene list", "error");
             return;
         }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
+        List<String> humanGeneSymbols = gopherService.initializeEntrezGene(url.getFile());
+        openGeneWithExamples(humanGeneSymbols);
+    }
+
+    @FXML private void openGeneWindowWithExampleMouseGenes() {
+        URL url = GopherMainController.class.getResource("/data/mousegenesymbols.txt");
+        if (url == null) {
+            PopupFactory.displayError("Could not find human gene list", "error");
+            return;
+        }
+        List<String> mouseGeneSymbols = gopherService.initializeEntrezGene(url.getFile());
+        openGeneWithExamples(mouseGeneSymbols);
+    }
+
+    private void openGeneWithExamples(List<String> geneSymbols) {
+        EntrezGeneViewFactory.displayWithGenes(geneSymbols);
         gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
         setTargetFeedback(GopherModel.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
     }
 
 
-    @FXML private void openGeneWindowWithExampleMouseGenes() {
-        InputStream is = GopherMainController.class.getResourceAsStream("/data/mousegenesymbols.txt");
 
-        if (is == null) {
-            logger.warn("Could not open bundled example fly gene list at path '/mousegenesymbols.txt'");
-            PopupFactory.displayError("Could not open example mouse gene list","Please report to developers");
-            return;
-        }
-        EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
-        setTargetFeedback(GopherModel.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
-    }
 
 
     @FXML public void exportBEDFiles(ActionEvent e) {
@@ -1418,7 +1437,7 @@ public class GopherMainController implements Initializable {
      * @param e action event.*/
     @FXML
     public void deleteProjectFiles(ActionEvent e) {
-        DeleteFactory.display(this.model);
+        DeleteFactory.display(this.gopherService);
         e.consume();
     }
 
@@ -1448,12 +1467,11 @@ public class GopherMainController implements Initializable {
         if (file==null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;
         }
-        try {
-            removePreviousValuesFromTextFields();
-            this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
-            if (this.primaryStage!=null)
-                this.primaryStage.setTitle(String.format("GOPHER: %s",
-                        model.getProjectName()));
+        removePreviousValuesFromTextFields();
+        gopherService.importProtjectFromFile(file);
+        if (this.primaryStage!=null)
+            this.primaryStage.setTitle(String.format("GOPHER: %s",
+                    gopherService.getProjectName()));
 
 //        this.vpanalysisview = new VPAnalysisView();
 //        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
@@ -1463,12 +1481,7 @@ public class GopherMainController implements Initializable {
         setInitializedValuesInGUI();
         //setModelInMainAndInAnalysisPresenter(this.model);
         vpanalysispresenter.refreshVPTable();
-            logger.trace(String.format("Opened model %s from file %s",gopherService.getProjectName(), file.getAbsolutePath()));
-        } catch (IOException ex) {
-            PopupFactory.displayException("Error","I/O Error opening project file", ex);
-        } catch (ClassNotFoundException clnf) {
-            PopupFactory.displayException("Error","Deserialization error",clnf);
-        }
+        logger.trace(String.format("Opened model %s from file %s",gopherService.getProjectName(), file.getAbsolutePath()));
         e.consume();
     }
 
@@ -1536,7 +1549,7 @@ public class GopherMainController implements Initializable {
             final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
             logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
             javafx.application.Platform.runLater(() ->
-                        RegulatoryExomeBoxFactory.exportRegulatoryExome(model, regulatoryExomeDirectory));
+                        RegulatoryExomeBoxFactory.exportRegulatoryExome(gopherService, regulatoryExomeDirectory));
         } catch (Exception e) {
             PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
         }
@@ -1588,13 +1601,13 @@ public class GopherMainController implements Initializable {
     }
 
     @FXML public void displayReport(ActionEvent e) {
-        GopherReport report = new GopherReport(this.model);
+        GopherReport report = new GopherReport(this.gopherService);
         PopupFactory.showReportListDialog(report.getReportList());
         e.consume();
     }
 
     @FXML public void exportReport(ActionEvent e) {
-        GopherReport report = new GopherReport(this.model);
+        GopherReport report = new GopherReport(this.gopherService);
         String filename =String.format("%s-report.txt",gopherService.getProjectName());
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));

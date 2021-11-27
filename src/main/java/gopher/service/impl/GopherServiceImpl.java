@@ -1,5 +1,6 @@
 package gopher.service.impl;
 
+import com.sun.source.tree.BreakTree;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Faidx;
 import gopher.io.Platform;
@@ -12,14 +13,20 @@ import gopher.service.model.viewpoint.ViewPoint;
 import gopher.service.GopherService;
 import gopher.util.SerializationManager;
 import javafx.scene.control.ProgressIndicator;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 @Component
 public class GopherServiceImpl implements GopherService  {
@@ -522,6 +529,101 @@ public class GopherServiceImpl implements GopherService  {
     @Override
     public double getMinGCcontent() {
         return model.getMinGCcontent();
+    }
+
+    @Override
+    public List<String> initializeEntrezGene(String pathToEntrezGeneFile) {
+        List<String> symbols = new ArrayList<>();
+        File f = new File(pathToEntrezGeneFile);
+        if (! f.isFile()) {
+            LOGGER.error("Could not find entrez Gene file at {}", f.getAbsoluteFile());
+            return List.of();
+        }
+        this.model.setTargetGenesPath(f.getAbsolutePath());
+
+        try {
+            BufferedReader br =new BufferedReader(new FileReader(f));
+            String line;
+            while ((line=br.readLine())!=null) {
+                symbols.add(line.trim());
+            }
+        } catch (IOException err) {
+            LOGGER.error("I/O Error reading file with target genes: {}", err.getMessage());
+        }
+        return symbols;
+    }
+
+    @Override
+    public void setEstAvgRestFragLen(double estAvgRestFragLen) {
+        model.setEstAvgRestFragLen(estAvgRestFragLen);
+    }
+
+    @Override
+    public void importProtjectFromFile(File file) {
+        try {
+            this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
+        } catch (IOException | ClassNotFoundException e) {
+            LOGGER.error("Could not import model from {}", file.getAbsoluteFile());
+        }
+    }
+
+    @Override
+    public List<ViewPoint> getActiveViewPointList() {
+        return model.getActiveViewPointList();
+    }
+
+    @Override
+    public double getMaxRepeatContent() {
+        return model.getMaxRepeatContent();
+    }
+
+    @Override
+    public NormalDistribution getNormalDistributionExtendedUp() {
+        return model.getNormalDistributionExtendedUp();
+    }
+
+    @Override
+    public NormalDistribution getNormalDistributionExtendedDown() {
+        return model.getNormalDistributionExtendedDown();
+    }
+    @Override
+    public NormalDistribution getNormalDistributionSimple() {
+        return model.getNormalDistributionSimple();
+    }
+
+    @Override
+    public Double getEstAvgRestFragLen() {
+        return model.getEstAvgRestFragLen();
+    }
+
+    @Override
+    public void setNormalDistributionSimple(double meanLen) {
+        model.setNormalDistributionSimple(meanLen);
+    }
+
+    @Override
+    public String getChromInfoPathIncludingFileNameGz() {
+        return model.getChromInfoPathIncludingFileNameGz();
+    }
+
+    @Override
+    public void setViewPoints(List<ViewPoint> viewpointlist) {
+        model.setViewPoints(viewpointlist);
+    }
+
+    @Override
+    public String getRegulatoryBuildPath() {
+        return model.getRegulatoryBuildPath();
+    }
+
+    @Override
+    public void setRegulatoryExomeProperties(Properties regulatoryProperties) {
+        model.setRegulatoryExomeProperties(regulatoryProperties);
+    }
+
+    @Override
+    public void setNormalDistributionsExtended() {
+        model.setNormalDistributionsExtended();
     }
 
 

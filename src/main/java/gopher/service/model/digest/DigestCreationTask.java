@@ -4,6 +4,7 @@ package gopher.service.model.digest;
 import com.google.common.collect.ImmutableList;
 import gopher.exception.GopherException;
 import gopher.gui.popupdialog.PopupFactory;
+import gopher.service.GopherService;
 import gopher.service.model.GopherModel;
 import gopher.service.model.RestrictionEnzyme;
 import gopher.service.model.viewpoint.Segment;
@@ -78,7 +79,7 @@ public class DigestCreationTask extends Task<Void> {
     /** Name of output file. */
     private final String outfilename;
     /** Reference to current model. */
-    private final GopherModel model;
+    private final GopherService service;
     /**  We will use this to show progress in digest creation. */
     private int totalDigestCounter=0;
 
@@ -113,7 +114,7 @@ public class DigestCreationTask extends Task<Void> {
      * @param outfile name of output file
      * @param model Reference to the model
      */
-    public DigestCreationTask(String outfile, GopherModel model) {
+    public DigestCreationTask(String outfile, GopherService model) {
         int msize = model.getMarginSize();
         this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath=model.getGenomeFastaFile();
@@ -126,14 +127,14 @@ public class DigestCreationTask extends Task<Void> {
 
         logger.trace(String.format("Digest Factory initialize with FASTA file=%s",this.genomeFastaFilePath));
         marginSize=msize;
-        this.model=model;
+        this.service =model;
     }
 
 
-    private void extractChosenSegments(GopherModel model) {
+    private void extractChosenSegments() {
         btree = new BinaryTree();
         //A list of Viewpoints that contain at least one selected digest.
-        List<ViewPoint> vplist = model.getActiveViewPointList();
+        List<ViewPoint> vplist = service.getActiveViewPointList();
         for (ViewPoint vp : vplist) {
             String chrom = vp.getReferenceID();
             List<Segment> seglist = vp.getActiveSegments();
@@ -149,7 +150,7 @@ public class DigestCreationTask extends Task<Void> {
     public Void call() {
         updateTitle("Creating Digest file");
         updateMessage("Creating binary tree of selected fragments...");
-        extractChosenSegments(model);
+        extractChosenSegments();
         logger.trace(String.format("We got a total of %d chosen segments in the binary tree",
                 this.btree.getN_nodes()));
 

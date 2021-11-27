@@ -1,9 +1,9 @@
 package gopher.service.model.viewpoint;
 
 import gopher.exception.GopherException;
+import gopher.service.GopherService;
 import gopher.service.model.Default;
 import gopher.service.model.GopherGene;
-import gopher.service.model.GopherModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,10 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      * Since we use the same enzymes for all ViewPoints; therefore, ViewPoint .chosenEnzymes and
      * CuttingPositionMap.restrictionEnzymeMap are static class-wide variables that get set with the corresponding
      * values for the enzymes.
-     *  @param model Model of the panel design project
+     *  @param service Model of the panel design project
    */
-  public SimpleViewPointCreationTask(GopherModel model) {
-      super(model);
-
+  public SimpleViewPointCreationTask(GopherService service) {
+      super(service);
   }
 
     /**
@@ -53,23 +52,23 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos,chromLen).
                     targetName(vpvgene.getGeneSymbol()).
-                    upstreamLength(model.getSizeUp()).
-                    downstreamLength(model.getSizeDown()).
-                    maximumGcContent(model.getMaxGCcontent()).
-                    minimumGcContent(model.getMinGCcontent()).
+                    upstreamLength(gopherService.getSizeUp()).
+                    downstreamLength(gopherService.getSizeDown()).
+                    maximumGcContent(gopherService.getMaxGCcontent()).
+                    minimumGcContent(gopherService.getMinGCcontent()).
                     fastaReader(fastaReader).
-                    minimumFragmentSize(model.getMinFragSize()).
-                    maximumRepeatContent(model.getMaxRepeatContent()).
-                    marginSize(model.getMarginSize()).
+                    minimumFragmentSize(gopherService.getMinFragSize()).
+                    maximumRepeatContent(gopherService.getMaxRepeatContent()).
+                    marginSize(gopherService.getMarginSize()).
                     isForwardStrand(vpvgene.isForward()).
                     accessionNr(vpvgene.getRefSeqID()).
                     c2alignabilityMap(chr2alignMap).
-                    model(this.model).
+                    model(this.gopherService).
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
             updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene.toString()));
-            vp.generateViewpointSimple(model);
+            vp.generateViewpointSimple(gopherService);
             viewpointlist.add(vp);
         }
     }
@@ -91,8 +90,8 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         logger.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
 
-        String faipath = this.model.getIndexedGenomeFastaIndexFile();
-        String fastapath = this.model.getGenomeFastaFile();
+        String faipath = this.gopherService.getIndexedGenomeFastaIndexFile();
+        String fastapath = this.gopherService.getGenomeFastaFile();
         if (faipath == null) {
             logger.error("Could not retrieve faidx file for " + fastapath);
             throw new GopherException("Could not retrieve faidx file for " + fastapath);
@@ -104,10 +103,10 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
-        model.setEstAvgRestFragLen(meanLen);
-        model.setNormalDistributionSimple(meanLen);
-        String chromInfoPath=model.getChromInfoPathIncludingFileNameGz();
-        String alignabilitMapPath=model.getAlignabilityMapPathIncludingFileNameGz();
+        gopherService.setEstAvgRestFragLen(meanLen);
+        gopherService.setNormalDistributionSimple(meanLen);
+        String chromInfoPath= gopherService.getChromInfoPathIncludingFileNameGz();
+        String alignabilitMapPath= gopherService.getAlignabilityMapPathIncludingFileNameGz();
         int kmerSize=Default.KMER_SIZE;
         try {
             AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
@@ -137,7 +136,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         }
         long end = milli - System.currentTimeMillis();
         logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
-        this.model.setViewPoints(viewpointlist);
+        this.gopherService.setViewPoints(viewpointlist);
         return null;
     }
 

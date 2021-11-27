@@ -1,5 +1,6 @@
 package gopher.service.model.regulatoryexome;
 
+import gopher.service.GopherService;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import gopher.exception.GopherException;
@@ -29,7 +30,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** Path to transcript definition file, refGene.txt.gz */
     private final String pathToRefGeneFile;
 
-    private GopherModel model;
+    private GopherService model;
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
     private Set<RegulatoryBEDFileEntry> regulatoryElementSet;
@@ -46,7 +47,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private List<String> status=new ArrayList<>();
     private final List<RegulationCategory> chosenCategories;
 
-    public RegulatoryExomeBuilder(GopherModel model, List<RegulationCategory>  chosen, ProgressIndicator pi) {
+    public RegulatoryExomeBuilder(GopherService model, List<RegulationCategory>  chosen, ProgressIndicator pi) {
         this.pathToEnsemblRegulatoryBuild=model.getRegulatoryBuildPath();
         this.pathToRefGeneFile=model.getRefGenePath();
         this.model=model;
@@ -62,7 +63,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
      * @param model reference to the {@link GopherModel} object
      * @return Map with key: a chromosome, and value: list of all {@link ViewPoint} objects on that chromosome.
      */
-    private Map<String,List<ViewPoint>> getChrom2PosListMap(GopherModel model) {
+    private Map<String,List<ViewPoint>> getChrom2PosListMap(GopherService model) {
         // get all of the viewpoints with at least one selected digest.
         List<ViewPoint> activeVP = model.getActiveViewPointList();
         // key- a chromosome; value--list of genomicPos for all active viewpoints on the chromosome
@@ -88,7 +89,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         logger.info("Checking overlap of entries for regulatory exome");
         for (RegulatoryBEDFileEntry entry : elementlist) {
             if (entry.overlaps(currententry)) {
-                logger.info(entry.toString() + " overlaps " + currententry.toString());
+                logger.info(entry.toString() + " overlaps " + (currententry != null ? currententry.toString() : ""));
             }
             currententry=entry;
         }
@@ -191,7 +192,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** extractRegulomeForTargetGenes. We will guestimate the progress based on the number of viewpoints*10*/
     @Override
     protected Void call() throws GopherException {
-        Map<String,List<ViewPoint>> chrom2vpListMap=getChrom2PosListMap(model);
+        Map<String,List<ViewPoint>> chrom2vpListMap = getChrom2PosListMap(model);
         if (chrom2vpListMap.size()==0) {
                 PopupFactory.displayError("No Viewpoints chosen",
                         "Create view points before exporting regulatory bed file");

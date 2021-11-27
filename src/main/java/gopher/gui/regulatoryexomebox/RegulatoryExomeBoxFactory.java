@@ -1,5 +1,6 @@
 package gopher.gui.regulatoryexomebox;
 
+import gopher.service.GopherService;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
@@ -34,7 +35,7 @@ public class RegulatoryExomeBoxFactory {
      * and return the enzymes that the user chooses.
      * @param model
      */
-    public static void exportRegulatoryExome(GopherModel model, final File exportDir) {
+    public static void exportRegulatoryExome(GopherService model, final File exportDir) {
         RegulatoryExomeBoxView view = new RegulatoryExomeBoxView();
         RegulatoryExomeBoxPresenter presenter = (RegulatoryExomeBoxPresenter) view.getPresenter();
         Stage window;
