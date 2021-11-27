@@ -14,7 +14,7 @@ import gopher.gui.proxy.SetProxyPresenter;
 import gopher.gui.proxy.SetProxyView;
 import gopher.gui.qcCheckPane.QCCheckFactory;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
-import gopher.gui.settings.SettingsViewFactory;
+import gopher.gui.webpopup.SettingsViewFactory;
 import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
 import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.util.WindowCloser;

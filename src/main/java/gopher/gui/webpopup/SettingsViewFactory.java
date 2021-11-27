@@ -1,5 +1,6 @@
-package gopher.gui.settings;
+package gopher.gui.webpopup;
 
+import gopher.gui.webpopup.SettingsPopup;
 import gopher.model.Model;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -23,28 +24,14 @@ public class SettingsViewFactory {
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
 
-        SettingsView view = new SettingsView();
-        SettingsPresenter presenter = (SettingsPresenter) view.getPresenter();
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
         Map<String,String> settingsMap=getSettingsMap(model);
-        presenter.setSettingsMap(settingsMap);
-
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();
+        SettingsPopup popup = new SettingsPopup(settingsMap, window);
+        popup.popup();
     }
 
     private static Map<String,String> getSettingsMap(Model model) {
         Map<String,String> orderedmap = new LinkedHashMap<>();
+        if (model == null) return orderedmap; // not initialized yet
         orderedmap.put("Genome build",model.getGenomeBuild());
         orderedmap.put("Path to genome directory",model.getGenomeDirectoryPath());
         orderedmap.put("Genome unpacked?",model.isGenomeUnpacked() ? "yes":"no");
