@@ -1,4 +1,4 @@
-package gopher.gui.splash;
+package gopher.controllers;
 
 
 import javafx.scene.Scene;
@@ -39,7 +39,7 @@ public class SwitchScreens {
         this.primarystage= stage;
     }
 
-    void createNewProject(String name){
+    public void createNewProject(String name){
         GopherMainView appView = new GopherMainView();
         GopherMainPresenter presenter = (GopherMainPresenter) appView.getPresenter();
         presenter.setPrimaryStageReference(this.primarystage);
@@ -55,7 +55,7 @@ public class SwitchScreens {
 
     }
 
-    void openExistingModel(String name) {
+    public void openExistingModel(String name) {
         GopherMainView appView = new GopherMainView();
         GopherMainPresenter presenter = (GopherMainPresenter) appView.getPresenter();
         presenter.setPrimaryStageReference(this.primarystage);

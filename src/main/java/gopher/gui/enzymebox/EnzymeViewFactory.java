@@ -30,20 +30,6 @@ public class EnzymeViewFactory {
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
-
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
-
-
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
         logger.trace(String.format("Presented n chosen %d", presenter.getChosenEnzymes().size()));

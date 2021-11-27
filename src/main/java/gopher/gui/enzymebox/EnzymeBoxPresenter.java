@@ -11,6 +11,7 @@ import gopher.framework.Signal;
 import gopher.model.RestrictionEnzyme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.*;
@@ -19,6 +20,7 @@ import java.util.function.Consumer;
 /**
  * Created by peterrobinson on 7/11/17.
  */
+@Component
 public class EnzymeBoxPresenter implements Initializable {
     static Logger logger = LoggerFactory.getLogger(EnzymeBoxPresenter.class.getName());
     @FXML
@@ -38,8 +40,6 @@ public class EnzymeBoxPresenter implements Initializable {
     private List<RestrictionEnzyme> chosen = null;
 
     private Map<String, RestrictionEnzyme> enzymemap;
-
-    private Consumer<gopher.framework.Signal> signal;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -82,11 +82,6 @@ public class EnzymeBoxPresenter implements Initializable {
     }
 
 
-    public void setSignal(Consumer<Signal> signal) {
-        this.signal = signal;
-    }
-
-
     public List<RestrictionEnzyme> getChosenEnzymes() {
         logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
         return this.chosen;
@@ -123,7 +118,6 @@ public class EnzymeBoxPresenter implements Initializable {
     @FXML
     public void okButtonClicked(javafx.event.ActionEvent e) {
         e.consume();
-        signal.accept(Signal.DONE);
     }
 
 }

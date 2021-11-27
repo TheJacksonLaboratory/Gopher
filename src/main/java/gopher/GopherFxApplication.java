@@ -22,6 +22,7 @@ package gopher;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.application.Preloader;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,19 @@ public class GopherFxApplication extends Application {
 
     @Override
     public void start(Stage stage) {
+
         applicationContext.publishEvent(new StageReadyEvent(stage));
+        // (Simulation of heavy background work)
+        int numberOfUpdates = 10;
+        for (int i = 0; i < numberOfUpdates; i++) {
+            // Gradually update the loading bar
+            try {
+                notifyPreloader(new Preloader.ProgressNotification((double) i / numberOfUpdates));
+                Thread.sleep(3000L / numberOfUpdates);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

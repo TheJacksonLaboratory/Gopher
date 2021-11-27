@@ -1,25 +1,31 @@
-package gopher.gui.splash;
+package gopher.controllers;
 
+import javafx.application.Preloader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.function.Consumer;
+
 
 import static gopher.io.Platform.getGopherDir;
 
@@ -28,8 +34,8 @@ import static gopher.io.Platform.getGopherDir;
  * This will show the startup screen that will include a button for creating a new viewpoint as well as
  * a list of buttons for opening previous projects.
  */
-public class SplashPresenter implements Initializable {
-    static Logger logger = LoggerFactory.getLogger(SplashPresenter.class.getName());
+public class SplashController extends Preloader {
+    static Logger logger = LoggerFactory.getLogger(SplashController.class.getName());
     @FXML
     private ChoiceBox<String> projectBox;
     @FXML private Button newProjectButton;
@@ -44,25 +50,61 @@ public class SplashPresenter implements Initializable {
     private SwitchScreens switchscreen=null;
 
 
-    private Consumer<Signal> signal;
-
 
     private ObservableList<String> existingProjectNames;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    private ProgressBar progressBar;
+    private Stage stage;
+
+    public void start(Stage stage) {
         existingProjectNames = getExistingProjectNames();
         projectBox.setItems(existingProjectNames);
         projectBox.getSelectionModel().selectFirst();
-        Image newFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/newFileIcon.png"));
-        Image openFileImage = new Image(SplashPresenter.class.getResourceAsStream("/img/openFileIcon.png"));
+        Image newFileImage = new Image(SplashController.class.getResourceAsStream("/img/newFileIcon.png"));
+        Image openFileImage = new Image(SplashController.class.getResourceAsStream("/img/openFileIcon.png"));
         this.openFileView.setImage(openFileImage);
         this.newFileView.setImage(newFileImage);
+        this.stage = stage;
+        stage.setScene(buildScene());
+        stage.show();
     }
 
-    public void setSignal(Consumer<Signal> signal) {
-        this.signal = signal;
+
+    @Override
+    public void handleStateChangeNotification(StateChangeNotification stateChangeNotification)
+    {
+        if (stateChangeNotification.getType() == StateChangeNotification.Type.BEFORE_START)
+        {
+            stage.hide();
+        }
     }
+
+    @Override
+    public void handleApplicationNotification(PreloaderNotification preloaderNotification)
+    {
+        progressBar.setProgress(((ProgressNotification) preloaderNotification).getProgress());
+    }
+
+    private Scene buildScene() {
+        try {
+            URL url = getClass().getResource("fxml/splash.fxml");
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
+            progressBar = (ProgressBar) loader.getNamespace().get("progressBar"); // Using the ProgressBar's "fx:id" to get it from AppPreloader.fxml
+            return new Scene(root);
+        } catch (Exception ex) {
+            System.err.println("Unable to load FXML from 'fxml/splash.fxml'. Building a backup scene instead.");
+            Label loadingLabel = new Label("Loading...");
+            progressBar = new ProgressBar(0.0);
+            BorderPane root = new BorderPane();
+            root.setCenter(progressBar);
+            root.setTop(loadingLabel);
+            root.setAlignment(loadingLabel, Pos.CENTER);
+            return new Scene(root, 300, 100);
+        }
+    }
+
+
 
 
     public void newProject(ActionEvent e) {
@@ -120,3 +162,4 @@ public class SplashPresenter implements Initializable {
         e.consume();
     }
 }
+

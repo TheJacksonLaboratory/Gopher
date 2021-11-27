@@ -11,9 +11,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import gopher.framework.Injector;
-import gopher.gui.splash.SplashPresenter;
-import gopher.gui.splash.SplashView;
-import gopher.gui.splash.SwitchScreens;
+import gopher.controllers.SplashController;
+import gopher.controllers.SwitchScreens;
 import gopher.model.Model;
 
 import javax.swing.*;
@@ -56,28 +55,20 @@ public class Gopher extends Application {
             PopupFactory.displayException("Error", e.getMessage() + "\nGopher will now exit", e);
             javafx.application.Platform.exit();
         }
-        updateLog4jConfiguration();
+//        updateLog4jConfiguration();
         //logger.info("Starting Gopher Gui");
         this.primarystage = primaryStage;
         Image image = new Image(Gopher.class.getResourceAsStream("/img/gophericon.png"));
         primaryStage.setTitle("GOPHER");
         primaryStage.getIcons().add(image);
-        if (isMacintosh()) {
-            try {
-                URL iconURL = Gopher.class.getResource("/img/gophericon.png");
-                java.awt.Image macimage = new ImageIcon(iconURL).getImage();
-                com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
-            } catch (Exception e) {
-                // Not for Windows or Linux. Just skip it!
-            }
-        }
+
         // get dimensions of users screens to use as Maximum width/height
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         int xdim=(int)primScreenBounds.getWidth();
         int ydim=(int)primScreenBounds.getHeight();
-        SwitchScreens switchscreens=new SwitchScreens(this.primarystage);
-        switchscreens.setBounds(xdim,ydim);
-        loadSplashScreen(switchscreens);
+//        SwitchScreens switchscreens=new SwitchScreens(this.primarystage);
+//        switchscreens.setBounds(xdim,ydim);
+       // loadSplashScreen(switchscreens);
 
     }
 
@@ -86,71 +77,71 @@ public class Gopher extends Application {
         Injector.forgetAll();
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         String jre_version = System.getProperty("java.specification.version");
         if (!jre_version.equals("1.8")) {
             JOptionPane.showMessageDialog(null,
                     "Your current Java version "
                             + jre_version
                             + " is not supported and GOPHER may not work correctly.\n"
-                            + "Please install Java version 1.8 (Java 8) from: https://www.java.com/download/",
+                            + "Please install Java version 17",
                     "Java version warning", JOptionPane.WARNING_MESSAGE);
         }
         Locale.setDefault(new Locale("en", "US"));
         launch(args);
     }
 
-    /**
-     * This sets the location of the log4j log file to the user's .gopher directory.
-     */
-    private void updateLog4jConfiguration() {
-        File dir = getGopherDir();
-        String logpath = (new File(dir + File.separator + "gopher.log")).getAbsolutePath();
-        Properties props = new Properties();
-        try {
-            InputStream configStream = Gopher.class.getResourceAsStream("/log4j.properties");
-            props.load(configStream);
-            configStream.close();
-        } catch (IOException e) {
-            System.out.println("Error: Cannot load configuration file.");
-        }
-        // logger.info("Resetting log file location to "+logpath);
-        //LogManager.resetConfiguration();
-        props.setProperty("log4j.appender.logfile.File", logpath);
-        System.setProperty("logfile.name",logpath);
-        //PropertyConfigurator.configure(props);
-    }
+//    /**
+//     * This sets the location of the log4j log file to the user's .gopher directory.
+//     */
+//    private void updateLog4jConfiguration() {
+//        File dir = getGopherDir();
+//        String logpath = (new File(dir + File.separator + "gopher.log")).getAbsolutePath();
+//        Properties props = new Properties();
+//        try {
+//            InputStream configStream = Gopher.class.getResourceAsStream("/log4j.properties");
+//            props.load(configStream);
+//            configStream.close();
+//        } catch (IOException e) {
+//            System.out.println("Error: Cannot load configuration file.");
+//        }
+//        // logger.info("Resetting log file location to "+logpath);
+//        //LogManager.resetConfiguration();
+//        props.setProperty("log4j.appender.logfile.File", logpath);
+//        System.setProperty("logfile.name",logpath);
+//        //PropertyConfigurator.configure(props);
+//    }
 
-    /**
-     * This will load the splash screen where a user can choose an existing viewpoint or create a new one.
-     * @param switchscreen An object that will switch the main screen when the user has chosen the viewpoint to be worked on
-     */
-    private void loadSplashScreen(SwitchScreens switchscreen) {
-        SplashView splashview = new SplashView();
-        SplashPresenter splashpresenter = (SplashPresenter) splashview.getPresenter();
-        splashpresenter.setSwitchScreen(switchscreen);
-        Scene scene = new Scene(splashview.getView());
-        this.primarystage.setTitle("GOPHER");
-        FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
-        fadeIn.setCycleCount(1);
+//    /**
+//     * This will load the splash screen where a user can choose an existing viewpoint or create a new one.
+//     * @param switchscreen An object that will switch the main screen when the user has chosen the viewpoint to be worked on
+//     */
+//    private void loadSplashScreen(SwitchScreens switchscreen) {
+//        SplashView splashview = new SplashView();
+//        SplashController splashpresenter = (SplashController) splashview.getPresenter();
+//        splashpresenter.setSwitchScreen(switchscreen);
+//        Scene scene = new Scene(splashview.getView());
+//        this.primarystage.setTitle("GOPHER");
+//        FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
+//        fadeIn.setFromValue(0);
+//        fadeIn.setToValue(1);
+//        fadeIn.setCycleCount(1);
+//
+//
+//        primarystage.setScene(scene);
+//        primarystage.show();
+//
+//        fadeIn.play();
+//    }
 
-
-        primarystage.setScene(scene);
-        primarystage.show();
-
-        fadeIn.play();
-    }
-
-    /**
-     * @return true if the current platform is a Mac.
-     */
-    private boolean isMacintosh() {
-        String osName = System.getProperty("os.name").toLowerCase();
-        return (osName.contains("mac"));
-    }
-
+//    /**
+//     * @return true if the current platform is a Mac.
+//     */
+//    private boolean isMacintosh() {
+//        String osName = System.getProperty("os.name").toLowerCase();
+//        return (osName.contains("mac"));
+//    }
+//
 
 
 }
