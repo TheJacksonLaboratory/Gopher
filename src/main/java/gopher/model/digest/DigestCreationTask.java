@@ -313,7 +313,7 @@ public class DigestCreationTask extends Task<Void> {
             baitNumDown = seg.getBaitNumDown();
         }
         if (selected) {
-            System.out.println(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
+            System.out.printf("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n%n",
                     scaffoldName,
                     (previousCutPosition+1),
                     endpos,
@@ -327,7 +327,7 @@ public class DigestCreationTask extends Task<Void> {
                     result.getThreePrimeRepeatContent(),
                     selected ? "T" : "F",
                     baitNumUp,
-                    baitNumDown));
+                    baitNumDown);
             System.out.println("SELECTED: " + scaffoldName + ": "+startpos);
         }
         out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",

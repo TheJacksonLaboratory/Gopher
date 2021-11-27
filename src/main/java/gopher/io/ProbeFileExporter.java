@@ -66,7 +66,7 @@ public class ProbeFileExporter {
         ZipOutputStream zipOutAgillent = new ZipOutputStream(bos);
         zipOutAgillent.putNextEntry(new ZipEntry(ProbeFileAgilentFormat));
 
-        zipOutAgillent.write(String.format("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates\n").getBytes());
+        zipOutAgillent.write("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates\n".getBytes());
 
 
 
@@ -117,7 +117,7 @@ public class ProbeFileExporter {
             }
         }
 
-        List<String> sortedKeyList = new ArrayList(uniqueBaits.keySet());
+        List<String> sortedKeyList = new ArrayList<>(uniqueBaits.keySet());
         Collections.sort(sortedKeyList);
         Date curDate = new Date();
         SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
@@ -130,7 +130,7 @@ public class ProbeFileExporter {
             ArrayList<Integer> sortedPositions = new ArrayList<>(foo);
 
             Collections.sort(sortedPositions);
-            for(int i = 0; i < sortedPositions.size(); i++) {
+            for (Integer sortedPosition : sortedPositions) {
                 // build ProbeID
                 String probeID = "probe_";
                 probeID += dateToStr;
@@ -139,16 +139,15 @@ public class ProbeFileExporter {
                 probeID += "_";
                 probeID += refID;
                 probeID += "_";
-                probeID += (sortedPositions.get(i)-1);
+                probeID += (sortedPosition - 1);
                 probeID += "_";
-                String key3 = refID + ":" + sortedPositions.get(i);
+                String key3 = refID + ":" + sortedPosition;
                 probeID += coordsTogeneNames.get(key3);
                 // get sequence
-                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPositions.get(i),sortedPositions.get(i)+probe_length-1);
-                String printToZip=String.format(refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + (sortedPositions.get(i)) + "-" + (sortedPositions.get(i)+120-1) + "\n");
+                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPosition, sortedPosition + probe_length - 1);
+                String printToZip = refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + sortedPosition + "-" + (sortedPosition + 120 - 1) + "\n";
                 zipOutAgillent.write(printToZip.getBytes());
-                out_probe_file_bed.println(refID + "\t" + (sortedPositions.get(i)-1) + "\t" + (sortedPositions.get(i)+probe_length-2) + "\t" + probeID); // start and end 0-based
-
+                out_probe_file_bed.println(refID + "\t" + (sortedPosition - 1) + "\t" + (sortedPosition + probe_length - 2) + "\t" + probeID); // start and end 0-based
             }
         }
         zipOutAgillent.closeEntry();

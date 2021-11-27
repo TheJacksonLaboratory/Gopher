@@ -378,7 +378,7 @@ public class VPAnalysisPresenter implements Initializable {
     /**
      * Class for sorting items like 100 and 1000
      */
-    class IntegerComparator implements Comparator<String> {
+    static class IntegerComparator implements Comparator<String> {
 
         @Override
         public int compare(String s1, String s2) {
@@ -397,7 +397,7 @@ public class VPAnalysisPresenter implements Initializable {
     /**
      * Class for sorting items like 2.3% and 34.5%
      */
-    class PercentComparator implements Comparator<String> {
+    static class PercentComparator implements Comparator<String> {
 
         @Override
         public int compare(String s1, String s2) {
@@ -422,7 +422,7 @@ public class VPAnalysisPresenter implements Initializable {
     /**
      * Class for sorting items like chr3:4325 and chrY:762
      */
-    class GenomicLocationComparator implements Comparator<String> {
+    static class GenomicLocationComparator implements Comparator<String> {
 
         @Override
         public int compare(String s1, String s2) {

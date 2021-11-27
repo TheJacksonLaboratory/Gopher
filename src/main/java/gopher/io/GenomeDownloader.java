@@ -78,21 +78,15 @@ public class GenomeDownloader {
      * @param gb The genome build
      */
     public String getGenomeURL(String gb) throws DownloadFileNotFoundException {
-        if (gb.equals("hg19")) {
-            return  DataSource.createUCSChg19().getGenomeURL();
-        } else if (gb.equals("hg38")) {
-            return DataSource.createUCSChg38().getGenomeURL();
-        } else if (gb.equals("mm9")) {
-            return DataSource.createUCSCmm9().getGenomeURL();
-        } else if (gb.equals("mm10")) {
-            return DataSource.createUCSCmm10().getGenomeURL();
-        } else if (gb.equals("xenTro9")) {
-            return DataSource.createUCSCxenTro9().getGenomeURL();
-        } else if (gb.equals("danRer10")) {
-            return DataSource.createUCSCdanRer10().getGenomeURL();
-        } else {
-            throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
-        }
+        return switch (gb) {
+            case "hg19" -> DataSource.createUCSChg19().getGenomeURL();
+            case "hg38" -> DataSource.createUCSChg38().getGenomeURL();
+            case "mm9" -> DataSource.createUCSCmm9().getGenomeURL();
+            case "mm10" -> DataSource.createUCSCmm10().getGenomeURL();
+            case "xenTro9" -> DataSource.createUCSCxenTro9().getGenomeURL();
+            case "danRer10" -> DataSource.createUCSCdanRer10().getGenomeURL();
+            default -> throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
+        };
     }
 
 

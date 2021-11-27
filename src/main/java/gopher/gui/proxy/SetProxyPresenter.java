@@ -50,7 +50,7 @@ public class SetProxyPresenter implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.portTextField.textProperty().bindBidirectional(portProperty);
         this.portTextField.setText("");
-        this.portTextField.textProperty().addListener(new ChangeListener<String>(){
+        this.portTextField.textProperty().addListener(new ChangeListener<>(){
             @Override public void changed(ObservableValue<? extends String> observable,
                 String oldValue, String newValue) {
             validateInteger(portTextField);
@@ -59,7 +59,7 @@ public class SetProxyPresenter implements Initializable {
         logger.trace("initialized port to "+portTextField.getText());
 
         this.proxyTextField.textProperty().bindBidirectional(proxyProperty);
-        this.proxyTextField.textProperty().addListener(new ChangeListener<String>(){
+        this.proxyTextField.textProperty().addListener(new ChangeListener<>(){
             @Override public void changed(ObservableValue<? extends String> observable,
                                           String oldValue, String newValue) {
                 validateHttpUrl(proxyTextField);

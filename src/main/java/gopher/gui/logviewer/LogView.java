@@ -106,7 +106,7 @@ public class LogView extends ListView<LogRecord> {
         });
         filterLevel.set(Level.TRACE);
 
-        setCellFactory(param -> new ListCell<LogRecord>() {
+        setCellFactory(param -> new ListCell<>() {
             {
                 showTimestamp.addListener(observable -> updateItem(this.getItem(), this.isEmpty()));
                 showLocation.addListener(observable -> updateItem(this.getItem(), this.isEmpty()));

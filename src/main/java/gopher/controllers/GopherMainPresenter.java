@@ -697,11 +697,12 @@ public class GopherMainPresenter implements Initializable {
      * This object is used to convert doubles in the bindings. It stops exceptions
      * from being thrown if the user enters non-numbers.
      */
-    private final StringConverter<Number> doubleConverter = new StringConverter<Number>() {
+    private final StringConverter<Number> doubleConverter = new StringConverter<>() {
         @Override
         public String toString(Number object) {
             return object == null ? "" : object.toString();
         }
+
         @Override
         public Number fromString(String string) {
             if (string == null) {
@@ -716,11 +717,12 @@ public class GopherMainPresenter implements Initializable {
         }
     };
 
-    private final StringConverter<Number> integerConverter = new StringConverter<Number>() {
+    private final StringConverter<Number> integerConverter = new StringConverter<>() {
         @Override
         public String toString(Number object) {
             return object == null ? "" : object.toString();
         }
+
         @Override
         public Number fromString(String string) {
             if (string == null) {

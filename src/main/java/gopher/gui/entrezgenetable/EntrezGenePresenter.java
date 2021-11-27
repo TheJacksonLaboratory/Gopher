@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -241,7 +242,7 @@ public class EntrezGenePresenter implements Initializable {
         if (invalid.size()>0) {
             sb.append("<p>Invalid genes:<br/>");
             for (String inv : invalid) {
-                sb.append("<span class=\"bold-red\">"+ inv + "</span><br/>");
+                sb.append("<span class=\"bold-red\">").append(inv).append("</span><br/>");
             }
             sb.append("</p>");
             sb.append("<p><i>Please correct the gene symbol in the input file before proceeding. ");
@@ -287,9 +288,7 @@ public class EntrezGenePresenter implements Initializable {
         String A[] = clip.split("\\s+");
         if (A.length==0) return;
         this.symbols = new ArrayList<>();
-        for (String  sym : A) {
-            symbols.add(sym);
-        }
+        symbols.addAll(Arrays.asList(A));
         setData(getInitialGeneListHTML(symbols));
         logger.info(String.format("Copied a total of %d genes from clipboard",this.symbols.size()));
         model.setTargetGenesPath("from clipboard");

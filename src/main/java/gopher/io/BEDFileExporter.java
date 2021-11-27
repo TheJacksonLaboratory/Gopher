@@ -84,7 +84,7 @@ public class BEDFileExporter {
             String url= getDefaultURL(vp,genomeBuild);
             int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
             String SCORE = String.format("%.2f", vp.getScore());
-            out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen()));
+            out_ucscURL.printf("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b%n",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen());
         }
         out_ucscURL.close();
 
@@ -116,12 +116,12 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "GOPHER: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
-            out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
+            out_allTracks.printf("%s\t%d\t%d\t%s\t%d%n",
                     vp.getReferenceID(),
                     (vp.getStartPos()-1),
                     vp.getEndPos(),
                     vp.getTargetName(),
-                    (int) Math.round(vp.getScore()*1000)));
+                    (int) Math.round(vp.getScore()*1000));
         }
 
         // print restriction fragments and get unique digest margins

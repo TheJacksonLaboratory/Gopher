@@ -85,7 +85,7 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
            // no-op
         } else {
             String posstring = positions.stream().map(String::valueOf).collect(Collectors.joining(";"));
-            sb.append("-TSS pos: " + posstring);
+            sb.append("-TSS pos: ").append(posstring);
         }
         return sb.toString();
     }

@@ -21,14 +21,14 @@ public enum Level {
      * @return corresponding enum constant.
      */
     public static Level string2level(String s) {
-        switch (s) {
-            case "TRACE": return TRACE;
-            case "DEBUG": return DEBUG;
-            case "INFO": return INFO;
-            case "WARN": return WARN;
-            case "ERROR": return ERROR;
-            case "FATAL": return FATAL;
-            default: return TRACE;
-        }
+        return switch (s) {
+            case "DEBUG" -> DEBUG;
+            case "INFO" -> INFO;
+            case "WARN" -> WARN;
+            case "ERROR" -> ERROR;
+            case "FATAL" -> FATAL;
+            case "TRACE" -> TRACE;
+            default -> TRACE;
+        };
     }
 }

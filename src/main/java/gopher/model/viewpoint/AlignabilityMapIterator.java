@@ -120,7 +120,7 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
         String A[];
         String chromosome;
         Integer startPos;
-        Integer endPos;
+        int endPos;
         Integer alignabilityScore;
         try {
             // This will be the first line for each chromosome, but may

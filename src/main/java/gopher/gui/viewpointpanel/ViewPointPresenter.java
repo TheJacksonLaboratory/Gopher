@@ -191,7 +191,7 @@ public class ViewPointPresenter implements Initializable {
     }
 
     /** class for sorting chromosome locations like chr5:43679423 */
-    class FormattedChromosomeComparator implements Comparator<String> {
+    static class FormattedChromosomeComparator implements Comparator<String> {
         @Override
         public int compare(String s1, String s2) {
             Integer i1;
@@ -227,7 +227,7 @@ public class ViewPointPresenter implements Initializable {
         viewPointSplitPane.prefWidthProperty().bind(ucscContentWebView.widthProperty());
 
         // Todo -- not catching lack of internet connect error.
-        ucscWebEngine.setOnError(new EventHandler<WebErrorEvent>() {
+        ucscWebEngine.setOnError(new EventHandler<>() {
             @Override
             public void handle(WebErrorEvent event) {
                 System.out.println("BAD ERRL " + event.toString());
@@ -240,7 +240,7 @@ public class ViewPointPresenter implements Initializable {
          * when opening the UCSC Browser. */
         System.setProperty("jsse.enableSNIExtension", "false");
         // This is a hack when by using dummy column a color for the cell's TableRow is set.
-        colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+        colorTableColumn.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -259,7 +259,7 @@ public class ViewPointPresenter implements Initializable {
             //this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
-            ChangeListener changeListener = cdf.getValue().getChangeListener();
+            ChangeListener<Boolean> changeListener = cdf.getValue().getChangeListener();
             if (segment.isUnselectable()) {
                 checkBox.setDisable(true);
             } else if (segment.isSelected()) {// inspect state of the segment and initialize CheckBox state accordingly
@@ -283,7 +283,7 @@ public class ViewPointPresenter implements Initializable {
                             public void run() {
                                 updateScore();
                                 refreshUCSCButtonAction();
-                                colorTableColumn.setCellFactory(col -> new TableCell<ColoredSegment, String>() {
+                                colorTableColumn.setCellFactory(col -> new TableCell<>() {
                                     @Override
                                     protected void updateItem(String item, boolean empty) {
                                         super.updateItem(item, empty);
@@ -307,7 +307,7 @@ public class ViewPointPresenter implements Initializable {
 
         locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getChromosomalPositionString())));
-        locationTableColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        locationTableColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -321,7 +321,7 @@ public class ViewPointPresenter implements Initializable {
         locationTableColumn.setSortable(false);
 
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
-        segmentLengthColumn.setCellFactory( column -> new TableCell<ColoredSegment, String>() {
+        segmentLengthColumn.setCellFactory( column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -342,7 +342,7 @@ public class ViewPointPresenter implements Initializable {
             double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
         });
-        alignabilityContentColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        alignabilityContentColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
@@ -369,7 +369,7 @@ public class ViewPointPresenter implements Initializable {
                 return new ReadOnlyStringWrapper(val);
         });
        // repeatContentUpColumn.setComparator(new PercentComparator());
-        repeatContentUpColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        repeatContentUpColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
@@ -396,7 +396,7 @@ public class ViewPointPresenter implements Initializable {
 
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getMeanGCcontentOfBaitsAsPercent())));
-        gcContentUpDownColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        gcContentUpDownColumn.setCellFactory(column -> new TableCell<>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -427,7 +427,7 @@ public class ViewPointPresenter implements Initializable {
 
         numberOfBaitsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getNumberOfBaitsUpDownAsString())));
-        numberOfBaitsColumn.setCellFactory(column -> new TableCell<ColoredSegment, String>() {
+        numberOfBaitsColumn.setCellFactory(column -> new TableCell<>() {
             // this code highlights GC content that outside of GC boundaries set in 'Set up' pane
             @Override
             protected void updateItem(String item, boolean empty) {
