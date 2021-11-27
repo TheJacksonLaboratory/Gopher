@@ -2,28 +2,17 @@ package gopher;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Platform;
-import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import gopher.framework.Injector;
-import gopher.controllers.SplashController;
-import gopher.controllers.SwitchScreens;
 import gopher.model.Model;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Locale;
-import java.util.Properties;
-
-import static gopher.io.Platform.getGopherDir;
 
 
 /**

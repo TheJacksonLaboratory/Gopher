@@ -1,10 +1,8 @@
-package gopher.gui.gophermain;
+package gopher.controllers;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
-import gopher.gui.analysisPane.VPAnalysisPresenter;
-import gopher.gui.analysisPane.VPAnalysisView;
 import gopher.gui.deletepane.delete.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.enzymebox.EnzymeViewFactory;
@@ -49,6 +47,7 @@ import javafx.stage.*;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 
 import javax.swing.*;
@@ -68,6 +67,7 @@ import java.util.stream.Collectors;
  * @author Peter Hansen
  * @version 0.5.7 (2018-09-10)
  */
+@Component
 public class GopherMainPresenter implements Initializable {
     private final static Logger logger = LoggerFactory.getLogger(GopherMainPresenter.class.getName());
     /** The Model for the entire analysis.*/
@@ -196,7 +196,7 @@ public class GopherMainPresenter implements Initializable {
     /**
      * View for the second tab.
      */
-    private VPAnalysisView vpanalysisview;
+//    private VPAnalysisView vpanalysisview;
     /**
      * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
      */
@@ -417,10 +417,10 @@ public class GopherMainPresenter implements Initializable {
         setGUItoSimple();
         initializePromptTexts();
 
-        this.vpanalysisview = new VPAnalysisView();
-        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        this.analysisPane.getChildren().add(vpanalysisview.getView());
+//        this.vpanalysisview = new VPAnalysisView();
+//        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+//        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+//        this.analysisPane.getChildren().add(vpanalysisview.getView());
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
             String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
@@ -549,11 +549,11 @@ public class GopherMainPresenter implements Initializable {
         this.model.setProjectName(projectname);
         if (this.primaryStage!=null)
             this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
-        this.vpanalysisview = new VPAnalysisView();
-        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-        this.vpanalysispresenter.setModel(this.model);
-        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        this.analysisPane.getChildren().add(vpanalysisview.getView());
+//        this.vpanalysisview = new VPAnalysisView();
+//        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+//        this.vpanalysispresenter.setModel(this.model);
+//        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+//        this.analysisPane.getChildren().add(vpanalysisview.getView());
         initializeNewModelInGui();
         e.consume();
     }
@@ -1546,11 +1546,11 @@ public class GopherMainPresenter implements Initializable {
                 this.primaryStage.setTitle(String.format("GOPHER: %s",
                         model.getProjectName()));
 
-        this.vpanalysisview = new VPAnalysisView();
-        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-        this.vpanalysispresenter.setModel(this.model);
-        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-        this.analysisPane.getChildren().add(vpanalysisview.getView());
+//        this.vpanalysisview = new VPAnalysisView();
+//        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
+//        this.vpanalysispresenter.setModel(this.model);
+//        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
+//        this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
         setModelInMainAndInAnalysisPresenter(this.model);
         vpanalysispresenter.refreshVPTable();

@@ -47,7 +47,6 @@ public class SplashController extends Preloader {
 
 
     /** This object is responsible for closing the splash screen and opening the main analysis GUI. */
-    private SwitchScreens switchscreen=null;
 
 
 
@@ -122,7 +121,7 @@ public class SplashController extends Preloader {
                         String.format("Project name %s already exists",projectname));
                 return;
             }
-            this.switchscreen.createNewProject(projectname);
+          //  this.switchscreen.createNewProject(projectname);
         }
         e.consume();
     }
@@ -151,14 +150,10 @@ public class SplashController extends Preloader {
    public Pane getRootPane() { return this.pane; }
 
 
-    public void setSwitchScreen(SwitchScreens screenswitcher) {
-        this.switchscreen=screenswitcher;
-    }
 
 
     public void openExistingProject(ActionEvent e){
         String selected = this.projectBox.getSelectionModel().getSelectedItem();
-        switchscreen.openExistingModel(selected);
         e.consume();
     }
 }

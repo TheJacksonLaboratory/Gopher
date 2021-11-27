@@ -1,4 +1,4 @@
-package gopher.gui.analysisPane;
+package gopher.controllers;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.viewpointpanel.ViewPointPresenter;
@@ -20,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.*;
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Peter Robinson
  * @version 0.1.3 (2018-06-07).
  */
+@Component
 public class VPAnalysisPresenter implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(VPAnalysisPresenter.class.getName());
 

@@ -1,6 +1,6 @@
 package gopher.gui.viewpointpanel;
 
-import gopher.gui.analysisPane.VPAnalysisPresenter;
+import gopher.controllers.VPAnalysisPresenter;
 import gopher.model.Model;
 import gopher.model.viewpoint.Segment;
 import gopher.model.viewpoint.ViewPoint;

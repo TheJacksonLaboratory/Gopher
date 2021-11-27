@@ -39,8 +39,8 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
     @Override
     public void onApplicationEvent(GopherFxApplication.StageReadyEvent event) {
         try {
-            ClassPathResource hpowbResource = new ClassPathResource("fxml/main.fxml");
-            FXMLLoader fxmlLoader = new FXMLLoader(hpowbResource.getURL());
+            ClassPathResource gopherResource = new ClassPathResource("fxml/gophermain.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
             fxmlLoader.setControllerFactory(applicationContext::getBean);
             Parent parent = fxmlLoader.load();
             Stage stage = event.getStage();
@@ -58,6 +58,7 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
         if (Platform.isMacintosh()) {
             try {
                 URL iconURL = StageInitializer.class.getResource("/img/phenomenon.png");
+
                 java.awt.Image macimage = new ImageIcon(iconURL).getImage();
                 // not working
                 com.apple.eawt.Application.getApplication().setDockIconImage(macimage);
