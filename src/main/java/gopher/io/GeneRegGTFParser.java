@@ -1,6 +1,6 @@
 package gopher.io;
 
-import gopher.model.regulatoryexome.RegulatoryElement;
+import gopher.service.model.regulatoryexome.RegulatoryElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

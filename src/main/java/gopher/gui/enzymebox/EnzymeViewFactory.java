@@ -2,8 +2,7 @@ package gopher.gui.enzymebox;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import gopher.model.Model;
-import gopher.model.RestrictionEnzyme;
+import gopher.service.model.RestrictionEnzyme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

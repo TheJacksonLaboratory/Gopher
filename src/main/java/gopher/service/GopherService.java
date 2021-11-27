@@ -1,16 +1,15 @@
 package gopher.service;
 
-import gopher.model.Approach;
-import gopher.model.GopherGene;
-import gopher.model.Model;
-import gopher.model.RestrictionEnzyme;
-import gopher.model.genome.Genome;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.Approach;
+import gopher.service.model.GopherGene;
+import gopher.service.model.GopherModel;
+import gopher.service.model.RestrictionEnzyme;
+import gopher.service.model.genome.Genome;
+import gopher.service.model.viewpoint.ViewPoint;
 import javafx.scene.control.ProgressIndicator;
 
-import java.net.URL;
-import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 public interface GopherService {
 
@@ -31,7 +30,7 @@ public interface GopherService {
 
     void setProjectName(String projectname);
 
-    void setModel(Model mod);
+    void setModel(GopherModel mod);
 
     int getSizeUp();
     int getSizeDown();
@@ -40,7 +39,7 @@ public interface GopherService {
 
     int getMarginSize();
 
-    Model.TargetType getTargetType();
+    GopherModel.TargetType getTargetType();
     Approach getApproach();
 
     int getN_validGeneSymbols();
@@ -101,7 +100,7 @@ public interface GopherService {
     List<RestrictionEnzyme> getAllEnyzmes();
     List<RestrictionEnzyme> getSelectedEnyzmes();
 
-    void setTargetType(Model.TargetType targetGenes);
+    void setTargetType(GopherModel.TargetType targetGenes);
 
     void setTargetGenesPath(String absolutePath);
 
@@ -150,4 +149,28 @@ public interface GopherService {
     void setAllowPatching(boolean b);
 
     void setAllowUnbalancedMargins(boolean b);
+
+    int getMaxMeanKmerAlignability();
+
+    double getMinGCContentPercent();
+
+    double getMaxGCContentPercent();
+
+    int getMinFragSize();
+
+    String getAlignabilityMapPathIncludingFileNameGz();
+
+    String getTargetGenesPath();
+
+    String getTranscriptsBasename();
+
+    String getGenomeDirectoryPath();
+
+    Properties getRegulatoryExomeProperties();
+
+    int getMinBaitCount();
+
+    double getMaxGCcontent();
+
+    double getMinGCcontent();
 }

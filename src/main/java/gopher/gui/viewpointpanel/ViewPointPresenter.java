@@ -1,9 +1,9 @@
 package gopher.gui.viewpointpanel;
 
 import gopher.controllers.VPAnalysisPresenter;
-import gopher.model.Model;
-import gopher.model.viewpoint.Segment;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.GopherModel;
+import gopher.service.model.viewpoint.Segment;
+import gopher.service.model.viewpoint.ViewPoint;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -103,7 +103,7 @@ public class ViewPointPresenter implements Initializable {
      */
     private Tab tab;
 
-    private Model model;
+    private GopherModel model;
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
     private VPAnalysisPresenter analysisPresenter=null;
 
@@ -476,7 +476,7 @@ public class ViewPointPresenter implements Initializable {
         }
     }
 
-    public void setModel(Model m) {
+    public void setModel(GopherModel m) {
         this.model = m;
     }
 

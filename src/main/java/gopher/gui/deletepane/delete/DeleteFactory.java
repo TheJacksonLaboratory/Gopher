@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Platform;
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public class DeleteFactory {
     private static Logger logger = LoggerFactory.getLogger(DeleteFactory.class.getName());
 
     /** This causes the gene upload window to be displayed with an introductory text. */
-    public static void display(Model model) {
+    public static void display(GopherModel model) {
         Stage window;
         String windowTitle = "Delete unwanted project files";
         window = new Stage();
@@ -46,7 +46,7 @@ public class DeleteFactory {
     }
 
 
-    private static List<ProjectFile> getProjectFiles(Model model) {
+    private static List<ProjectFile> getProjectFiles(GopherModel model) {
         List<ProjectFile> projects = new ArrayList<>();
         String activeProject = model.getProjectName();
         List<String> projectfiles = getProjectFiles();

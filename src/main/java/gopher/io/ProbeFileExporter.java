@@ -1,8 +1,8 @@
 package gopher.io;
 
-import gopher.model.viewpoint.Bait;
-import gopher.model.viewpoint.Segment;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.viewpoint.Bait;
+import gopher.service.model.viewpoint.Segment;
+import gopher.service.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;
 import org.slf4j.Logger;

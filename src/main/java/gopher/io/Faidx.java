@@ -4,7 +4,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import gopher.exception.UnindexableFastaFileException;
 import gopher.exception.GopherException;
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class Faidx extends Task<Void> {
     /** The progress indicator on the GUI that will show progress of indexing. */
     private final ProgressIndicator progress;
 
-    public Faidx(Model model, ProgressIndicator pi) {
+    public Faidx(GopherModel model, ProgressIndicator pi) {
         this.genomeDirectoryPath = model.getGenomeDirectoryPath();
         this.genomeFastaBaseName =model.getGenome().getGenomeFastaName();
         this.genomeFastaIndexBaseName =genomeFastaBaseName + ".fai"; // fai suffix

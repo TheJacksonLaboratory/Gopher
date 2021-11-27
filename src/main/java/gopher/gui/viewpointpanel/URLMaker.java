@@ -1,9 +1,9 @@
 package gopher.gui.viewpointpanel;
 
 
-import gopher.model.RestrictionEnzyme;
-import gopher.model.Model;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.RestrictionEnzyme;
+import gopher.service.model.GopherModel;
+import gopher.service.model.viewpoint.ViewPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +30,14 @@ class URLMaker {
     private static final int OFFSET = 200;
 
 
-    URLMaker(Model model, int width) {
+    URLMaker(GopherModel model, int width) {
         this.genomebuild=model.getGenomeBuild();
         xdim=width;
         this.enzymeString = model.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 
-    URLMaker(Model model){
+    URLMaker(GopherModel model){
         this(model, UCSC_DEFAULT_WIDTH);
     }
 

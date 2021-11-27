@@ -3,12 +3,12 @@ package gopher.service.impl;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Faidx;
 import gopher.io.Platform;
-import gopher.model.Approach;
-import gopher.model.GopherGene;
-import gopher.model.Model;
-import gopher.model.RestrictionEnzyme;
-import gopher.model.genome.Genome;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.Approach;
+import gopher.service.model.GopherGene;
+import gopher.service.model.GopherModel;
+import gopher.service.model.RestrictionEnzyme;
+import gopher.service.model.genome.Genome;
+import gopher.service.model.viewpoint.ViewPoint;
 import gopher.service.GopherService;
 import gopher.util.SerializationManager;
 import javafx.scene.control.ProgressIndicator;
@@ -18,17 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 @Component
 public class GopherServiceImpl implements GopherService  {
     private final static Logger LOGGER = LoggerFactory.getLogger(GopherServiceImpl.class);
 
-    private Model model;
+    private GopherModel model;
 
     @Autowired
-    public GopherServiceImpl(Model model) {
+    public GopherServiceImpl(GopherModel model) {
         this.model = model;
     }
 
@@ -108,7 +108,7 @@ public class GopherServiceImpl implements GopherService  {
     }
 
     @Override
-    public void setModel(Model mod) {
+    public void setModel(GopherModel mod) {
         this.model = mod;
     }
 
@@ -133,7 +133,7 @@ public class GopherServiceImpl implements GopherService  {
     }
 
     @Override
-    public Model.TargetType getTargetType() {
+    public GopherModel.TargetType getTargetType() {
         return model.getTargetType();
     }
 
@@ -338,7 +338,7 @@ public class GopherServiceImpl implements GopherService  {
     }
 
     @Override
-    public void setTargetType(Model.TargetType targetType) {
+    public void setTargetType(GopherModel.TargetType targetType) {
         model.setTargetType(targetType);
     }
 
@@ -371,6 +371,7 @@ public class GopherServiceImpl implements GopherService  {
     public void setTotalRefGeneCount(int n_genes) {
         model.setTotalRefGeneCount(n_genes);
     }
+
 
     @Override
     public void setGopherGenes(List<GopherGene> gopherGeneList) {
@@ -461,6 +462,66 @@ public class GopherServiceImpl implements GopherService  {
     @Override
     public void setAllowUnbalancedMargins(boolean b) {
         model.setAllowUnbalancedMargins(b);
+    }
+
+    @Override
+    public int getMaxMeanKmerAlignability() {
+        return model.getMaxMeanKmerAlignability();
+    }
+
+    @Override
+    public double getMinGCContentPercent() {
+        return model.getMinGCContentPercent();
+    }
+
+    @Override
+    public double getMaxGCContentPercent() {
+        return model.getMaxGCContentPercent();
+    }
+
+    @Override
+    public int getMinFragSize() {
+        return model.getMinFragSize();
+    }
+
+    @Override
+    public String getAlignabilityMapPathIncludingFileNameGz() {
+        return model.getAlignabilityMapPathIncludingFileNameGz();
+    }
+
+    @Override
+    public String getTargetGenesPath() {
+        return model.getTargetGenesPath();
+    }
+
+    @Override
+    public String getTranscriptsBasename() {
+        return model.getTranscriptsBasename();
+    }
+
+    @Override
+    public String getGenomeDirectoryPath() {
+        return model.getGenomeDirectoryPath();
+    }
+
+    @Override
+    public Properties getRegulatoryExomeProperties() {
+        return model.getRegulatoryExomeProperties();
+    }
+
+    @Override
+    public int getMinBaitCount() {
+        return model.getMinBaitCount();
+    }
+
+    @Override
+    public double getMaxGCcontent() {
+        return model.getMaxGCcontent();
+    }
+
+    @Override
+    public double getMinGCcontent() {
+        return model.getMinGCcontent();
     }
 
 

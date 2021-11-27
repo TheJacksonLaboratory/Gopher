@@ -1,6 +1,6 @@
 package gopher.gui.entrezgenetable;
 
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -8,15 +8,15 @@ import java.io.Reader;
 
 /**
  * Coordinate processing of the uploaded genes (target genes) and their comparison with the refGene.txt.gz file. THe main
- * GUI will call {@link #displayFromFile(Model, Reader)} if the dialog is opened from an example file from the Help menu
- * and otherwise will call {@link #display(Model)} to allow the user to choose a file with a FileChooser.
+ * GUI will call {@link #displayFromFile(GopherModel, Reader)} if the dialog is opened from an example file from the Help menu
+ * and otherwise will call {@link #display(GopherModel)} to allow the user to choose a file with a FileChooser.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGeneViewFactory {
 
     /** This is intended to be used to confirmDialog example sets of genes chosen from the Help menu. */
-    public static void displayFromFile(Model model, Reader reader) {
+    public static void displayFromFile(GopherModel model, Reader reader) {
         Stage window;
         String windowTitle = "Target Gene List";
         window = new Stage();
@@ -43,7 +43,7 @@ public class EntrezGeneViewFactory {
     }
 
     /** This causes the gene upload window to be displayed with an introductory text. */
-    public static void display(Model model) {
+    public static void display(GopherModel model) {
         Stage window;
         String windowTitle = "Target Gene List";
         window = new Stage();

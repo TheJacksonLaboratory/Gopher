@@ -19,12 +19,12 @@ import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
 import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.util.WindowCloser;
 import gopher.io.*;
-import gopher.model.*;
-import gopher.model.digest.DigestCreationTask;
-import gopher.model.viewpoint.ExtendedViewPointCreationTask;
-import gopher.model.viewpoint.SimpleViewPointCreationTask;
-import gopher.model.viewpoint.ViewPoint;
-import gopher.model.viewpoint.ViewPointCreationTask;
+import gopher.service.model.*;
+import gopher.service.model.digest.DigestCreationTask;
+import gopher.service.model.viewpoint.ExtendedViewPointCreationTask;
+import gopher.service.model.viewpoint.SimpleViewPointCreationTask;
+import gopher.service.model.viewpoint.ViewPoint;
+import gopher.service.model.viewpoint.ViewPointCreationTask;
 import gopher.service.GopherService;
 import gopher.util.SerializationManager;
 import gopher.util.Utils;
@@ -441,7 +441,7 @@ public class GopherMainController implements Initializable {
     }
 
     private void setInitializedValuesInGUI() {
-        String path_to_downloaded_genome_directory=model.getGenomeDirectoryPath();
+        String path_to_downloaded_genome_directory = gopherService.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory!= null) {
            // this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
@@ -526,45 +526,45 @@ public class GopherMainController implements Initializable {
     }
 
     /**
-     * This allows a caller to set the {@link Model} object for this presenter (for instance, a default
-     * {@link Model} object is set if the user chooses a new viewpoint. If the user chooses to open a previous
-     * viewpoint from a serialized file, then a  {@link Model} object is initialized from the file and set here.
+     * This allows a caller to set the {@link GopherModel} object for this presenter (for instance, a default
+     * {@link GopherModel} object is set if the user chooses a new viewpoint. If the user chooses to open a previous
+     * viewpoint from a serialized file, then a  {@link GopherModel} object is initialized from the file and set here.
      * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
-     * @param mod A {@link Model} object.
+     * @param mod A {@link GopherModel} object.
      */
-    private void setModel(Model mod) {
+    private void setModel(GopherModel mod) {
         this.gopherService.setModel(mod);
         setInitializedValuesInGUI();
         setBindings();
     }
 
 
-    public void setModelInMainAndInAnalysisPresenter(Model mod) {
+    public void setModelInMainAndInAnalysisPresenter(GopherModel mod) {
         setModel(mod);
         this.vpanalysispresenter.setModel(mod);
         logger.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",mod.getGenome().getGenomeBuild(),model.getGenome().getGenomeBasename()));
-        if (model.getMaxGCcontent()>0){
-            this.maxGCContentTextField.setText(String.format("%.1f%%",model.getMaxGCContentPercent()));
+        if (gopherService.getMaxGCcontent()>0){
+            this.maxGCContentTextField.setText(String.format("%.1f%%",gopherService.getMaxGCContentPercent()));
         } else {
             this.maxGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAX_GC_CONTENT));
         }
-        if (model.getMinGCcontent()>0) {
-            this.minGCContentTextField.setText(String.format("%.1f%%",model.getMinGCContentPercent()));
+        if (gopherService.getMinGCcontent()>0) {
+            this.minGCContentTextField.setText(String.format("%.1f%%",gopherService.getMinGCContentPercent()));
         } else {
             this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
         }
-        if (model.getMinBaitCount()>0) {
-            this.minBaitCountTextField.setText(String.valueOf(model.getMinBaitCount()));
+        if (gopherService.getMinBaitCount()>0) {
+            this.minBaitCountTextField.setText(String.valueOf(gopherService.getMinBaitCount()));
         } else {
             this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
         }
-        if (model.getMinFragSize()>0) {
-            this.minFragSizeTextField.setText(String.format("%d",model.getMinFragSize()));
+        if (gopherService.getMinFragSize()>0) {
+            this.minFragSizeTextField.setText(String.format("%d",gopherService.getMinFragSize()));
         } else {
             this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
         }
-        if (model.getMaxMeanKmerAlignability()>0) {
-            this.maxKmerAlignabilityTextField.setText(String.format("%d",model.getMaxMeanKmerAlignability()));
+        if (gopherService.getMaxMeanKmerAlignability()>0) {
+            this.maxKmerAlignabilityTextField.setText(String.format("%d",gopherService.getMaxMeanKmerAlignability()));
         } else {
             this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         }
@@ -593,7 +593,7 @@ public class GopherMainController implements Initializable {
         } else {
             this.marginSizeTextField.setText(String.valueOf(gopherService.getMarginSize()));
         }
-        if (! gopherService.getTargetType().equals(Model.TargetType.NONE))  {
+        if (! gopherService.getTargetType().equals(GopherModel.TargetType.NONE))  {
             int n_targets = gopherService.getN_validGeneSymbols();
             setTargetFeedback(gopherService.getTargetType(),n_targets);
         }
@@ -604,7 +604,7 @@ public class GopherMainController implements Initializable {
             this.approachChoiceBox.setValue("Extended");
         }
 
-        Model.TargetType ttype = gopherService.getTargetType();
+        GopherModel.TargetType ttype = gopherService.getTargetType();
         switch (ttype) {
             case TARGET_GENES:
                 int count = gopherService.getN_validGeneSymbols();
@@ -729,7 +729,7 @@ public class GopherMainController implements Initializable {
     /** This method should be called before we create viewpoints. It updates all of the variables in our model object
      * to have the values specified in the user for the GUI, including the values of the six fields we show in the GUI
      * and that are bound in {@link #setBindings()}. Note that we store GC and repeat content as a proportion in
-     * {@link Model} but confirmDialog it as a proportion in the GUI. The default values are used for any fields that have not
+     * {@link GopherModel} but confirmDialog it as a proportion in the GUI. The default values are used for any fields that have not
      * been filled in by the user.
      */
     private void updateModel() {
@@ -785,7 +785,7 @@ public class GopherMainController implements Initializable {
 
     /** This downloads the tar-gzip genome file as chosen by the user from the UCSC download site.
      * It places the compressed file into the directory chosen by the user. The path to the directory
-     * is stored in the {@link Model} object using the {@link Model#setGenomeDirectoryPath} function.
+     * is stored in the {@link GopherModel} object using the {@link GopherModel#setGenomeDirectoryPath} function.
      * Following this the user needs to uncompress and index the genome files using the function
      * {@link #decompressGenome(ActionEvent)} which is called after the corresponding button
      * is clicked in the GUI.
@@ -961,7 +961,7 @@ public class GopherMainController implements Initializable {
 
     /** This function is called after the user has chosen restriction enzymes in the
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
-     * objects to the {@link Model}.*/
+     * objects to the {@link GopherModel}.*/
     @FXML public void chooseEnzymes() {
         List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(gopherService.getAllEnyzmes(),
                 gopherService.getSelectedEnyzmes());
@@ -976,8 +976,8 @@ public class GopherMainController implements Initializable {
     /**
      * Open a new dialog where the user can upload gene symbols or Entrez Gene IDs.
      * The effect of the command <pre>EntrezGeneViewFactory.confirmDialog(this.model);</pre>
-     * is to pass a list of {@link GopherGene} objects to the {@link Model}.
-     * These objects are used with other information in the Model to create {@link gopher.model.viewpoint.ViewPoint}
+     * is to pass a list of {@link GopherGene} objects to the {@link GopherModel}.
+     * These objects are used with other information in the Model to create {@link gopher.service.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
      * See {@link EntrezGeneViewFactory} for logic.
      *
@@ -985,8 +985,8 @@ public class GopherMainController implements Initializable {
      */
     @FXML private void enterGeneList(ActionEvent e) {
         EntrezGeneViewFactory.display(this.model);
-        gopherService.setTargetType(Model.TargetType.TARGET_GENES);
-        setTargetFeedback(Model.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
+        gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
+        setTargetFeedback(GopherModel.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
         e.consume();
     }
 
@@ -1020,8 +1020,8 @@ public class GopherMainController implements Initializable {
             this.gopherService.setTotalRefGeneCount(n_genes);
             this.gopherService.setGopherGenes(parser.getGopherGeneList());
             this.gopherService.setUniqueChosenTSScount(genelist.size());
-            this.gopherService.setTargetType(Model.TargetType.BED_TARGETS);
-            setTargetFeedback(Model.TargetType.BED_TARGETS,validGeneSymbols.size());
+            this.gopherService.setTargetType(GopherModel.TargetType.BED_TARGETS);
+            setTargetFeedback(GopherModel.TargetType.BED_TARGETS,validGeneSymbols.size());
         } catch (GopherException ge) {
             PopupFactory.displayException("Error","Could not input BED file",ge);
         }
@@ -1061,12 +1061,12 @@ public class GopherMainController implements Initializable {
         this.gopherService.setTotalRefGeneCount(n_genes);
         this.gopherService.setGopherGenes(parser.getGopherGeneList());
         this.gopherService.setUniqueChosenTSScount(parser.getCountOfChosenTSS());
-        this.gopherService.setTargetType(Model.TargetType.ALL_GENES);
-        setTargetFeedback(Model.TargetType.ALL_GENES,validGeneSymbols.size());
+        this.gopherService.setTargetType(GopherModel.TargetType.ALL_GENES);
+        setTargetFeedback(GopherModel.TargetType.ALL_GENES,validGeneSymbols.size());
     }
 
 
-    private void setTargetFeedback(Model.TargetType ttype, int count) {
+    private void setTargetFeedback(GopherModel.TargetType ttype, int count) {
         this.targetGeneLabel.setText("");
         this.bedTargetsLabel.setText("");
         this.allGenesLabel.setText("");
@@ -1172,9 +1172,9 @@ public class GopherMainController implements Initializable {
 
     /**
      * When the user clicks this button, they should have uploaded and validated a list of gene symbols;
-     * these will have been entered as {@link GopherGene} objects into the {@link Model}
+     * these will have been entered as {@link GopherGene} objects into the {@link GopherModel}
      * object. This function will use the {@link GopherGene} obejcts and other information
-     * to create {@link gopher.model.viewpoint.ViewPoint} objects that will then be displayed in the
+     * to create {@link gopher.service.model.viewpoint.ViewPoint} objects that will then be displayed in the
      * {@link VPAnalysisPresenter} Tab.
      */
     public void createViewPoints()  {
@@ -1269,7 +1269,7 @@ public class GopherMainController implements Initializable {
     }
 
     /**
-     * Content of {@link Model} is written to platform-dependent default location.
+     * Content of {@link GopherModel} is written to platform-dependent default location.
      */
     @FXML private void saveProject(ActionEvent e) {
        // Model.writeSettingsToFile(this.model);
@@ -1277,7 +1277,7 @@ public class GopherMainController implements Initializable {
         if (result) { /* if it didnt work, the serialize method will show an error dialog. */
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information");
-            alert.setHeaderText(String.format("Successfully saved viewpoint data to %s", Platform.getAbsoluteProjectPath(model.getProjectName())));
+            alert.setHeaderText(String.format("Successfully saved viewpoint data to %s", Platform.getAbsoluteProjectPath(gopherService.getProjectName())));
             alert.show();
         }
         e.consume();
@@ -1357,8 +1357,8 @@ public class GopherMainController implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        gopherService.setTargetType(Model.TargetType.TARGET_GENES);
-        setTargetFeedback(Model.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
+        gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
+        setTargetFeedback(GopherModel.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
     }
 
 
@@ -1371,8 +1371,8 @@ public class GopherMainController implements Initializable {
             return;
         }
         EntrezGeneViewFactory.displayFromFile(this.model,new InputStreamReader(is));
-        gopherService.setTargetType(Model.TargetType.TARGET_GENES);
-        setTargetFeedback(Model.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
+        gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
+        setTargetFeedback(GopherModel.TargetType.TARGET_GENES,model.getN_validGeneSymbols());
     }
 
 
@@ -1409,7 +1409,7 @@ public class GopherMainController implements Initializable {
 
     @FXML
     public void about(ActionEvent e) {
-        PopupFactory.showAbout(Model.getVersion(), gopherService.getLastChangeDate());
+        PopupFactory.showAbout(GopherModel.getVersion(), gopherService.getLastChangeDate());
         e.consume();
     }
 

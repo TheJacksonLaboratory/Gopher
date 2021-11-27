@@ -3,10 +3,12 @@ package gopher.controllers;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.viewpointpanel.ViewPointPresenter;
 import gopher.gui.viewpointpanel.ViewPointView;
-import gopher.model.Design;
-import gopher.model.Model;
-import gopher.model.viewpoint.Segment;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.GopherService;
+import gopher.service.model.Approach;
+import gopher.service.model.Design;
+import gopher.service.model.GopherModel;
+import gopher.service.model.viewpoint.Segment;
+import gopher.service.model.viewpoint.ViewPoint;
 import gopher.util.Utils;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -20,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -76,7 +79,7 @@ public class VPAnalysisPresenter implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
-    private Model model;
+    private GopherModel model;
 
     /**
      * A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
@@ -84,6 +87,12 @@ public class VPAnalysisPresenter implements Initializable {
      */
     private TabPane tabpane;
 
+    private final GopherService gopherService;
+
+    @Autowired
+    public VPAnalysisPresenter(GopherService service) {
+        gopherService = service;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -267,7 +276,7 @@ public class VPAnalysisPresenter implements Initializable {
     }
 
 
-    public void setModel(Model m) {
+    public void setModel(GopherModel m) {
         this.model = m;
     }
 
@@ -307,7 +316,7 @@ public class VPAnalysisPresenter implements Initializable {
      * @return Map with info about the panel design
      */
     private Map<String, String> createListViewContent() {
-        Design design = new Design(this.model);
+        Design design = new Design(this.gopherService);
         design.calculateDesignParameters();
         Map<String, String> listItems = new LinkedHashMap<>();
 
@@ -322,7 +331,7 @@ public class VPAnalysisPresenter implements Initializable {
         double avgVpScore = design.getAvgVPscore();
         String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
                 nviewpoints, resolvedVP);
-        if (model.getApproach().equals(Model.Approach.SIMPLE)) {
+        if (model.getApproach().equals(Approach.SIMPLE)) {
             int n_patched = design.getN_patched_viewpoints();
             vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
         }

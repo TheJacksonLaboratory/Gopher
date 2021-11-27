@@ -1,7 +1,7 @@
 package gopher.io;
 
 import gopher.exception.GopherException;
-import gopher.model.GopherGene;
+import gopher.service.model.GopherGene;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

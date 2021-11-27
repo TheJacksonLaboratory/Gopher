@@ -8,7 +8,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import gopher.framework.Injector;
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class Gopher extends Application {
      * A reference to the Model; we will write the current settings to file in
      * the {@link #stop} method by means of a method in the Model class.
      */
-    private Model model;
+    private GopherModel model;
 
     public static final String APPLICATION_ICON = "img/gophericon.png";
 

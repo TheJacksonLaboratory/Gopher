@@ -9,7 +9,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import gopher.gui.enzymebox.EnzymeBoxPresenter;
-import gopher.model.regulatoryexome.RegulationCategory;
+import gopher.service.model.regulatoryexome.RegulationCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

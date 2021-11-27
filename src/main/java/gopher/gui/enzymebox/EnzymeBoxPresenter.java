@@ -1,5 +1,6 @@
 package gopher.gui.enzymebox;
 
+import gopher.service.model.GopherModel;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -7,15 +8,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import gopher.framework.Signal;
-import gopher.model.RestrictionEnzyme;
+import gopher.service.model.RestrictionEnzyme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by peterrobinson on 7/11/17.
@@ -52,7 +51,7 @@ public class EnzymeBoxPresenter implements Initializable {
 
     /**
      * Initialize the list of enyzmes that will be shown in the dialog. If one or more enzymes has been
-     * previously chosen by the user and was stored in the {@link gopher.model.Model} object, then show
+     * previously chosen by the user and was stored in the {@link GopherModel} object, then show
      * it as selected.
      *
      * @param enzymes       List of all enzymes

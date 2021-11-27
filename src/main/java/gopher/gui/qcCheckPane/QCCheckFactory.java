@@ -3,7 +3,7 @@ package gopher.gui.qcCheckPane;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -21,7 +21,7 @@ public class QCCheckFactory {
     /** This will be set to false if files are missing and we should not go on with the analysis. */
     private static boolean qc_ok=true;
 
-    public static boolean showQCCheck(Model model) {
+    public static boolean showQCCheck(GopherModel model) {
         Stage window;
         String windowTitle = "GOPHER Parameter Check";
         window = new Stage();
@@ -56,7 +56,7 @@ public class QCCheckFactory {
         return (! presenter.wasCanceled() && qc_ok);
     }
 
-    private static String getHTML(Model model) {
+    private static String getHTML(GopherModel model) {
         String dataQC = validateData(model);
         String paramQC=validateParams(model);
         return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
@@ -64,7 +64,7 @@ public class QCCheckFactory {
 
 
 
-    private static String validateParams(Model model) {
+    private static String validateParams(GopherModel model) {
         StringBuilder sb = new StringBuilder();
         sb.append("<thead>");
         sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
@@ -163,7 +163,7 @@ public class QCCheckFactory {
      * @param model Model of the probe design
      * @return HTML string with summary of Q/C
      */
-    private static String validateData(Model model) {
+    private static String validateData(GopherModel model) {
         qc_ok=true;  // reset
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
@@ -254,7 +254,7 @@ public class QCCheckFactory {
         return sb.toString();
     }
 
-    private static String getErrorHTML(Model model) {
+    private static String getErrorHTML(GopherModel model) {
         StringBuilder sb=new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead>");

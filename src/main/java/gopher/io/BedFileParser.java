@@ -1,7 +1,7 @@
 package gopher.io;
 
 import gopher.exception.GopherException;
-import gopher.model.GopherGene;
+import gopher.service.model.GopherGene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -9,9 +9,9 @@ import gopher.exception.GopherException;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
-import gopher.model.Model;
-import gopher.model.regulatoryexome.RegulationCategory;
-import gopher.model.regulatoryexome.RegulatoryExomeBuilder;
+import gopher.service.model.GopherModel;
+import gopher.service.model.regulatoryexome.RegulationCategory;
+import gopher.service.model.regulatoryexome.RegulatoryExomeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class RegulatoryExomeBoxFactory {
      * and return the enzymes that the user chooses.
      * @param model
      */
-    public static void exportRegulatoryExome(Model model, final File exportDir) {
+    public static void exportRegulatoryExome(GopherModel model, final File exportDir) {
         RegulatoryExomeBoxView view = new RegulatoryExomeBoxView();
         RegulatoryExomeBoxPresenter presenter = (RegulatoryExomeBoxPresenter) view.getPresenter();
         Stage window;

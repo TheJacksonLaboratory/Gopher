@@ -1,8 +1,7 @@
 package gopher.gui.webpopup;
 
-import gopher.gui.webpopup.SettingsPopup;
-import gopher.model.Model;
-import javafx.scene.Scene;
+import gopher.service.model.Approach;
+import gopher.service.model.GopherModel;
 import javafx.stage.Stage;
 
 import java.util.LinkedHashMap;
@@ -17,7 +16,7 @@ import java.util.Map;
 public class SettingsViewFactory {
 
 
-    public static void showSettings(Model model) {
+    public static void showSettings(GopherModel model) {
         Stage window;
         String windowTitle = "GOPHER Settings";
         window = new Stage();
@@ -29,7 +28,7 @@ public class SettingsViewFactory {
         popup.popup();
     }
 
-    private static Map<String,String> getSettingsMap(Model model) {
+    private static Map<String,String> getSettingsMap(GopherModel model) {
         Map<String,String> orderedmap = new LinkedHashMap<>();
         if (model == null) return orderedmap; // not initialized yet
         orderedmap.put("Genome build",model.getGenomeBuild());
@@ -41,7 +40,7 @@ public class SettingsViewFactory {
         orderedmap.put("RefGene path", model.getRefGenePath());
         orderedmap.put("Alignability map",model.getAlignabilityMapPathIncludingFileNameGz());
         orderedmap.put("Approach" ,model.getApproach().toString());
-        if (model.getApproach().equals(Model.Approach.SIMPLE)) {
+        if (model.getApproach().equals(Approach.SIMPLE)) {
             orderedmap.put("Allow patching?", model.getAllowPatching()? "yes":"no");
         }
         orderedmap.put("Upstream size", String.format("%s bp",model.getSizeUp()));

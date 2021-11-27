@@ -6,8 +6,8 @@ import gopher.framework.Signal;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Platform;
 import gopher.io.RefGeneParser;
-import gopher.model.GopherGene;
-import gopher.model.Model;
+import gopher.service.model.GopherGene;
+import gopher.service.model.GopherModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,10 +37,10 @@ import java.util.function.Consumer;
  *     only one transcriptmodel is stored per distinct transcription start site. The function also displays lists of valid and invalid
  *     gene symbols in the dialog</li>
  *     <li>Accept causes {@link #acceptGenes(ActionEvent)} to be run, which creates a list of {@link GopherGene} objects - one for
- *     each valid symbol -- and passes this to the {@link Model}. It also causes the dialog to close</li>
+ *     each valid symbol -- and passes this to the {@link GopherModel}. It also causes the dialog to close</li>
  * </ol>
  * Therefore, if all goes well, the effect of this dialog is to pass a list of {@link GopherGene} objects to the model.
- * This list should then be used to create {@link gopher.model.viewpoint.ViewPoint} objects elsewhere in the code.
+ * This list should then be used to create {@link gopher.service.model.viewpoint.ViewPoint} objects elsewhere in the code.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
  */
@@ -51,7 +51,7 @@ public class EntrezGenePresenter implements Initializable {
 
     private WebEngine webEngine;
     /** A reference to the Model. We will use it to add genes information to the model.*/
-    private Model model=null;
+    private GopherModel model=null;
     /** This class parses {@link GopherGene} objects from the refGene.txt.gz file. */
     private RefGeneParser parser=null;
     /** reference to the stage of the primary App. */
@@ -85,7 +85,7 @@ public class EntrezGenePresenter implements Initializable {
     }
 
 
-    public void setModel(Model mod){this.model=mod;}
+    public void setModel(GopherModel mod){this.model=mod;}
 
     /** Closes the stage of this view. */
     private void closeStage() {

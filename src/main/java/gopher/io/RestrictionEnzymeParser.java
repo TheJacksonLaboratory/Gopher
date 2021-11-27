@@ -1,7 +1,7 @@
 package gopher.io;
 
 import com.google.common.collect.ImmutableList;
-import gopher.model.RestrictionEnzyme;
+import gopher.service.model.RestrictionEnzyme;
 
 import java.io.*;
 import java.util.List;

@@ -7,7 +7,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 
-import gopher.model.genome.Genome;
+import gopher.service.model.genome.Genome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
