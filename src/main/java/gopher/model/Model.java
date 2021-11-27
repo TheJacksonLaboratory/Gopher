@@ -9,6 +9,7 @@ import gopher.model.viewpoint.ViewPoint;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * @author Hannah Blau
  * @version 0.2.16 (2018-02-18)
  */
+@Component
 public class Model implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(Model.class.getName());
     /** serialization version ID */
@@ -43,20 +45,7 @@ public class Model implements Serializable {
      * We initialize it to true so that we have a fresh slate at the start of each session. */
     private transient boolean clean=true;
 
-    public enum Approach {
-        SIMPLE, EXTENDED, UNINITIALIZED;
-        public String toString() {
-            switch (this) {
-                case SIMPLE:
-                    return "simple";
-                case EXTENDED:
-                    return "extended";
-                case UNINITIALIZED:
-                default:
-                    return "uninitialized";
-            }
-        }
-    }
+
 
     NormalDistribution simpleNd;
     NormalDistribution extendedNdUp;

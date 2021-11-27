@@ -17,9 +17,8 @@ public class EnzymeViewFactory {
      * and return the enzymes that the user chooses.
      * @param model
      */
-    public static List<RestrictionEnzyme> getChosenEnzymes(Model model) {
-        List<RestrictionEnzyme> allEnzymes = model.getRestrictionEnymes();
-        List<RestrictionEnzyme> chosenEnzymes = model.getChosenEnzymelist();
+    public static List<RestrictionEnzyme> getChosenEnzymes(List<RestrictionEnzyme> allEnzymes,
+                                                           List<RestrictionEnzyme> chosenEnzymes ) {
         logger.trace("Getting chosen enzymes");
         EnzymeBoxView view = new EnzymeBoxView();
         EnzymeBoxPresenter presenter = (EnzymeBoxPresenter) view.getPresenter();
