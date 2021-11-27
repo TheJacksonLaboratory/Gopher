@@ -10,8 +10,6 @@ import gopher.gui.help.HelpViewFactory;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
-import gopher.gui.proxy.SetProxyPresenter;
-import gopher.gui.proxy.SetProxyView;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.webpopup.SettingsViewFactory;
 import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
@@ -25,7 +23,6 @@ import gopher.service.model.viewpoint.SimpleViewPointCreationTask;
 import gopher.service.model.viewpoint.ViewPoint;
 import gopher.service.model.viewpoint.ViewPointCreationTask;
 import gopher.service.GopherService;
-import gopher.util.SerializationManager;
 import gopher.util.Utils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -45,6 +42,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
@@ -60,8 +58,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import static javafx.application.Platform.runLater;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -393,14 +394,9 @@ public class GopherMainController implements Initializable {
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
             String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
             switch (selectedItem) {
-                case "Simple":
-                    setGUItoSimple();
-                    break;
-                case "Extended":
-                    setGUItoExtended();
-                    break;
-                default:
-                    logger.error(String.format("Did not recognize approach in menu %s", selectedItem));
+                case "Simple" -> setGUItoSimple();
+                case "Extended" -> setGUItoExtended();
+                default -> logger.error(String.format("Did not recognize approach in menu %s", selectedItem));
             }
         });
     }
@@ -608,18 +604,18 @@ public class GopherMainController implements Initializable {
 
         GopherModel.TargetType ttype = gopherService.getTargetType();
         switch (ttype) {
-            case TARGET_GENES:
+            case TARGET_GENES -> {
                 int count = gopherService.getN_validGeneSymbols();
-                this.targetGeneLabel.setText(String.format("%d genes",count));
-                break;
-            case ALL_GENES:
+                this.targetGeneLabel.setText(String.format("%d genes", count));
+            }
+            case ALL_GENES -> {
                 int allgenes = gopherService.getN_validGeneSymbols();
-                this.allGenesLabel.setText(String.format("%d genes",allgenes));
-                break;
-            case BED_TARGETS:
+                this.allGenesLabel.setText(String.format("%d genes", allgenes));
+            }
+            case BED_TARGETS -> {
                 int n_bedtargets = gopherService.getN_validGeneSymbols();
-                this.bedTargetsLabel.setText(String.format("%d targets",n_bedtargets));
-                break;
+                this.bedTargetsLabel.setText(String.format("%d targets", n_bedtargets));
+            }
         }
 
         this.genomeChoiceBox.setValue(gopherService.getGenomeBuild());
@@ -1116,15 +1112,12 @@ public class GopherMainController implements Initializable {
         window.setTitle(windowTitle);
         pbpresent.setSignal(signal -> {
             switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
+                case DONE -> window.close();
+                case CANCEL -> {
                     task.cancel();
                     window.close();
-                    break;
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+                }
+                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
 
         });
@@ -1232,14 +1225,9 @@ public class GopherMainController implements Initializable {
         window.setOnCloseRequest( event -> window.close() );
         pbpresent.setSignal(signal -> {
             switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                    task.cancel();
-                    break;
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+                case DONE -> window.close();
+                case CANCEL -> task.cancel();
+                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
 
         });
@@ -1322,43 +1310,46 @@ public class GopherMainController implements Initializable {
      * @param e event triggered by set proxy command.
      */
     @FXML void setProxyDialog(ActionEvent e) {
-        Stage window;
-        String windowTitle = "Proxy Settings";
-        window = new Stage();
-        window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
-
-        SetProxyView view = new SetProxyView();
-        SetProxyPresenter presenter = (SetProxyPresenter) view.getPresenter();
-        presenter.setSignal(signal -> {
-            switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-        });
+        Dialog<ProxyResults> dialog = new Dialog<>();
+        dialog.setTitle("Set Proxy");
+        dialog.setHeaderText("Please specify…");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        Label proxyLabel = new Label("Proxy");
+        TextField textField = new TextField();
         if (gopherService.getHttpProxy()!=null) {
-            presenter.setProxyProperty(gopherService.getHttpProxy());
+            textField.setText(gopherService.getHttpProxy());
         }
+        textField.setTooltip(new Tooltip("http proxy"));
+        Label proxyPortLabel = new Label("Proxy Port");
+        TextField portTextField = new TextField();
+        portTextField.setTooltip(new Tooltip("http proxy port"));
         if (gopherService.getHttpProxyPort()!=null) {
             logger.trace(String.format("http proxy port: %s",gopherService.getHttpProxyPort()));
-            presenter.setPort(gopherService.getHttpProxyPort());
+            portTextField.setText(gopherService.getHttpProxyPort());
         }
-        window.setScene(new Scene(view.getView()));
-        window.showAndWait();
-        String port=presenter.getPort();
-        String proxy=presenter.getProxy();
-        if (proxy==null) {
-            PopupFactory.displayError("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
-            return;
-        }
-        this.gopherService.setHttpProxy(proxy);
-        this.gopherService.setHttpProxyPort(port);
-        logger.info(String.format("Set proxy to %s[%s]",proxy,port));
-        Utils.setSystemProxyAndPort(proxy,port);
+        dialogPane.setContent(new VBox(8, proxyLabel, textField, proxyPortLabel, portTextField));
+        runLater(textField::requestFocus);
+        dialog.setResultConverter((ButtonType button) -> {
+            if (button == ButtonType.OK) {
+                return new ProxyResults(textField.getText(),
+                        portTextField.getText());
+            }
+            return null;
+        });
+        Optional<ProxyResults> optionalResult = dialog.showAndWait();
+        optionalResult.ifPresent((ProxyResults results) -> {
+            String port=results.getPort();
+            String proxy=results.getProxy();
+            if (proxy==null) {
+                PopupFactory.displayError("Error obtaining Proxy","Proxy string could not be obtained. Please try again");
+                return;
+            }
+            this.gopherService.setHttpProxy(proxy);
+            this.gopherService.setHttpProxyPort(port);
+            logger.info(String.format("Set proxy to %s[%s]",proxy,port));
+            Utils.setSystemProxyAndPort(proxy,port);
+        });
     }
 
     /**
@@ -1548,7 +1539,7 @@ public class GopherMainController implements Initializable {
         try {
             final File regulatoryExomeDirectory = RegulatoryExomeBoxFactory.getDirectoryForExport(this.rootNode);
             logger.info("downloadGenome to directory  " + regulatoryExomeDirectory.getAbsolutePath());
-            javafx.application.Platform.runLater(() ->
+            runLater(() ->
                         RegulatoryExomeBoxFactory.exportRegulatoryExome(gopherService, regulatoryExomeDirectory));
         } catch (Exception e) {
             PopupFactory.displayException("Error", "Could not create regulatory exome panel data", e);
@@ -1623,20 +1614,12 @@ public class GopherMainController implements Initializable {
 
 
     @FXML private void setUnbalancedMargin(ActionEvent e) {
-        if (unbalancedMarginCheckbox.isSelected()) {
-            this.gopherService.setAllowUnbalancedMargins(true);
-        } else {
-            this.gopherService.setAllowUnbalancedMargins(false);
-        }
+        this.gopherService.setAllowUnbalancedMargins(unbalancedMarginCheckbox.isSelected());
         e.consume();
     }
 
     @FXML private void setAllowPatching(ActionEvent e) {
-        if (patchedViewpointCheckbox.isSelected()) {
-            this.gopherService.setAllowPatching(true);
-        } else {
-            this.gopherService.setAllowPatching(false);
-        }
+        this.gopherService.setAllowPatching(patchedViewpointCheckbox.isSelected());
         e.consume();
     }
 
