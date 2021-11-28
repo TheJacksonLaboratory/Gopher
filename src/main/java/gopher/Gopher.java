@@ -7,8 +7,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import gopher.framework.Injector;
 import gopher.service.model.GopherModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -24,8 +25,7 @@ import java.util.Locale;
  * @version 0.3.1 (2017-11-12)
  */
 public class Gopher extends Application {
-
-    //static Logger logger = Logger.getLogger(Gopher.class.getName());
+    static Logger logger = LoggerFactory.getLogger(Gopher.class.getName());
     /**
      * A reference to the Model; we will write the current settings to file in
      * the {@link #stop} method by means of a method in the Model class.
@@ -44,7 +44,6 @@ public class Gopher extends Application {
             PopupFactory.displayException("Error", e.getMessage() + "\nGopher will now exit", e);
             javafx.application.Platform.exit();
         }
-//        updateLog4jConfiguration();
         //logger.info("Starting Gopher Gui");
         this.primarystage = primaryStage;
         Image image = new Image(Gopher.class.getResourceAsStream("/img/gophericon.png"));
@@ -61,45 +60,9 @@ public class Gopher extends Application {
 
     }
 
-    @Override
-    public void stop() {
-        Injector.forgetAll();
-    }
 
-    public static void main2(String[] args) {
-        String jre_version = System.getProperty("java.specification.version");
-        if (!jre_version.equals("1.8")) {
-            JOptionPane.showMessageDialog(null,
-                    "Your current Java version "
-                            + jre_version
-                            + " is not supported and GOPHER may not work correctly.\n"
-                            + "Please install Java version 17",
-                    "Java version warning", JOptionPane.WARNING_MESSAGE);
-        }
-        Locale.setDefault(new Locale("en", "US"));
-        launch(args);
-    }
 
-//    /**
-//     * This sets the location of the log4j log file to the user's .gopher directory.
-//     */
-//    private void updateLog4jConfiguration() {
-//        File dir = getGopherDir();
-//        String logpath = (new File(dir + File.separator + "gopher.log")).getAbsolutePath();
-//        Properties props = new Properties();
-//        try {
-//            InputStream configStream = Gopher.class.getResourceAsStream("/log4j.properties");
-//            props.load(configStream);
-//            configStream.close();
-//        } catch (IOException e) {
-//            System.out.println("Error: Cannot load configuration file.");
-//        }
-//        // logger.info("Resetting log file location to "+logpath);
-//        //LogManager.resetConfiguration();
-//        props.setProperty("log4j.appender.logfile.File", logpath);
-//        System.setProperty("logfile.name",logpath);
-//        //PropertyConfigurator.configure(props);
-//    }
+
 
 //    /**
 //     * This will load the splash screen where a user can choose an existing viewpoint or create a new one.

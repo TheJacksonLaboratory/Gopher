@@ -477,10 +477,10 @@ public class VPAnalysisPresenter implements Initializable {
                 } else {
                     return 0;
                 }
-                if (!chr1.equals(chr2)) {
-                    return chr1.compareTo(chr2);
+                if (chr1 != chr2) {
+                    return Integer.compare(chr1, chr2);
                 } else {
-                    return pos1.compareTo(pos2);
+                    return Integer.compare(pos1, pos2);
                 }
             } catch (Exception e) {
                 logger.error(String.format("Error encounted while sorting chromosome locations %s and %s", s1, s2));

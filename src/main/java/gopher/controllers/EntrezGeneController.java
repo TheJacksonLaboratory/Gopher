@@ -2,7 +2,6 @@ package gopher.controllers;
 
 
 import com.google.common.collect.ImmutableList;
-import gopher.framework.Signal;
 import gopher.gui.factories.PopupFactory;
 import gopher.io.Platform;
 import gopher.io.RefGeneParser;
@@ -59,7 +58,6 @@ public class EntrezGeneController implements Initializable {
     /** List of the uploaded symbols prior to validation, i.e., may contain invalid symbols. */
     private List<String> symbols=null;
     /** Signal to close the dialog. */
-    private Consumer<Signal> signal;
     /** Flag as to whether the user has validated the uploaded gene symbols. */
     private boolean isvalidated=false;
 
@@ -71,9 +69,6 @@ public class EntrezGeneController implements Initializable {
         webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
-   public void setSignal(Consumer<Signal> signal) {
-        this.signal = signal;
-    }
 
 
     /**
@@ -216,7 +211,6 @@ public class EntrezGeneController implements Initializable {
         isvalidated=true;
         this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
-        signal.accept(Signal.DONE);
     }
 
 
@@ -312,13 +306,11 @@ public class EntrezGeneController implements Initializable {
         }
         this.model.setGopherGenes(this.parser.getGopherGeneList());
         this.model.setUniqueChosenTSScount(this.parser.getCountOfChosenTSS());
-        signal.accept(Signal.DONE);
         e.consume();
     }
 
     @FXML private void cancel(ActionEvent e) {
         e.consume();
-        signal.accept(Signal.CANCEL);
     }
 
 }

@@ -1,6 +1,5 @@
 package gopher.gui.regulatoryexomebox;
 
-import gopher.framework.Signal;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -26,7 +25,6 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
     private int count;
     private List<RegulationCategory> chosen = null;
     private Map<String,RegulationCategory> categories;
-    private Consumer<gopher.framework.Signal> signal;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -57,10 +55,6 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
         }
     }
 
-
-    public void setSignal(Consumer<Signal> signal) {
-        this.signal = signal;
-    }
 
 
     List<RegulationCategory> getChosenCategories() {
@@ -98,7 +92,6 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
     @FXML
     public void okButtonClicked(javafx.event.ActionEvent e) {
         e.consume();
-        signal.accept(Signal.DONE);
     }
 
 
