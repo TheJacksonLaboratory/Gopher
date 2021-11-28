@@ -97,11 +97,7 @@ public class Bait implements Serializable {
         int GC = 0;
         for (int i = 0; i < subsequence.length(); i++) {
             switch (subsequence.charAt(i)) {
-                case 'G':
-                case 'g':
-                case 'C':
-                case 'c':
-                    GC++;
+                case 'G', 'g', 'C', 'c' -> GC++;
             }
         }
         this.GCcontent = (double) GC / (double) subsequence.length();

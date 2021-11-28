@@ -3,9 +3,9 @@ package gopher.controllers;
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
-import gopher.gui.deletepane.delete.DeleteFactory;
+import gopher.gui.factories.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
-import gopher.gui.enzymebox.EnzymeViewFactory;
+import gopher.gui.factories.EnzymeViewFactory;
 import gopher.gui.help.HelpViewFactory;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
@@ -400,6 +400,7 @@ public class GopherMainController implements Initializable {
                 default -> logger.error(String.format("Did not recognize approach in menu %s", selectedItem));
             }
         });
+        File userDir = Platform.getGopherDir();
     }
 
 

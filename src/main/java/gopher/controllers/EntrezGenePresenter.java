@@ -225,16 +225,17 @@ public class EntrezGenePresenter implements Initializable {
     private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
-        sb.append("<style type=\"text/css\">\n" +
-                " span.bold-red {\n" +
-                "    color: red;\n" +
-                "    font-weight: bold;\n" +
-                "}\n" +
-                 " span.blu {\n" +
-                 "    color: #4e89a4;\n" +
-                 "    font-weight: normal;\n" +
-                "}\n" +
-                "</style>");
+        sb.append("""
+                <style type="text/css">
+                 span.bold-red {
+                    color: red;
+                    font-weight: bold;
+                }
+                 span.blu {
+                    color: #4e89a4;
+                    font-weight: normal;
+                }
+                </style>""");
         sb.append("<body><h3>Validated gene list</h3>");
         sb.append(String.format("<p>We parsed a total number of %d genes and found a total of %d associated transcripts.</p>",n_genes,n_transcripts));
         sb.append(String.format("<p>%d of the uploaded gene symbols were valid, and %d were invalid or could not be parsed.</p>",

@@ -1,4 +1,4 @@
-package gopher.gui.deletepane.delete;
+package gopher.gui.factories;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

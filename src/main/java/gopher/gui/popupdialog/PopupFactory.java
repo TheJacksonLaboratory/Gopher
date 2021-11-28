@@ -34,12 +34,8 @@ public class PopupFactory {
         PopupPresenter presenter = (PopupPresenter) view.getPresenter();
         presenter.setSignal(signal -> {
             switch (signal) {
-                case DONE:
-                    window.close();
-                    break;
-                case CANCEL:
-                case FAILED:
-                    throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+                case DONE -> window.close();
+                case CANCEL, FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
             }
 
         });

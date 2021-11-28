@@ -191,12 +191,8 @@ public class Segment implements Serializable {
         for (int i = 0; i < subsequence.length(); i++) {
             if (Character.isLowerCase(subsequence.charAt(i))) lowerCase++;
             if (Character.isUpperCase(subsequence.charAt(i))) upperCase++;
-            switch (subsequence.charAt(i)){
-                case 'G':
-                case 'g':
-                case 'C':
-                case 'c':
-                    GC++;
+            switch (subsequence.charAt(i)) {
+                case 'G', 'g', 'C', 'c' -> GC++;
             }
         }
         this.repeatContent = ((double) lowerCase / (lowerCase + (double) upperCase));

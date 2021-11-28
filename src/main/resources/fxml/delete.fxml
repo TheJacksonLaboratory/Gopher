@@ -3,8 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="apane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="550.0" styleClass="pane" stylesheets="@delete.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.deletepane.delete.DeletePresenter">
-    <Label fx:id="deleteLabel" styleClass="popup-label" stylesheets="@delete.css" text="Delete unwanted project files" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+<AnchorPane fx:id="apane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="398.0" prefWidth="550.0" styleClass="pane" stylesheets="@../css/delete.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.deletepane.delete.DeletePresenter">
+    <Label fx:id="deleteLabel" styleClass="popup-label" stylesheets="@../css/delete.css" text="Delete unwanted project files" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
     <TableView fx:id="tableView" layoutX="45.0" layoutY="75.0" prefHeight="220.0" prefWidth="450.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="70.0">
       <columns>
           <TableColumn fx:id="deleteButtonColumn" prefWidth="100.0" />

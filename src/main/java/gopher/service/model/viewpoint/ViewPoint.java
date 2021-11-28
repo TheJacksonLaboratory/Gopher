@@ -703,16 +703,15 @@ public class ViewPoint implements Serializable {
         double gc=0;
 
         switch (dir) {
-            case "Up":
+            case "Up" -> {
                 repeat = segment.getRepeatContentMarginUp();
                 gc = segment.getGcContentMarginUp();
-                break;
-            case "Down":
+            }
+            case "Down" -> {
                 repeat = segment.getRepeatContentMarginDown();
                 gc = segment.getGcContentMarginDown();
-                break;
-            default:
-                logger.error("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'");
+            }
+            default -> logger.error("Function 'isSegmentMarginValid()' was called with argument different from 'Up' and 'Down'");
         }
         return (this.minGcContent <= gc) && (gc <= this.maxGcContent) && (repeat <= this.maximumRepeatContent);
     }

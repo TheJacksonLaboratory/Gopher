@@ -84,8 +84,7 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
     public boolean equals(Object other) {
         if (other == null) return false;
         if (other == this) return true;
-        if (!(other instanceof RegulatoryBEDFileEntry)) return false;
-        RegulatoryBEDFileEntry oth = (RegulatoryBEDFileEntry) other;
+        if (!(other instanceof RegulatoryBEDFileEntry oth)) return false;
         return chromosome.equals(oth.chromosome) &&
                 fromPos == oth.fromPos &&
                 toPos == oth.toPos &&

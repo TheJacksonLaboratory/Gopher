@@ -1,14 +1,6 @@
 package gopher.gui.logviewer;
 
-public class MyLogger {
-
-    private final Log log;
-    private final String context;
-
-    public MyLogger(Log log, String context) {
-        this.log = log;
-        this.context = context;
-    }
+public record MyLogger(Log log, String context) {
 
     public void log(LogRecord record) {
         log.offer(record);

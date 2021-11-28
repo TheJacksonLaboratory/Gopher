@@ -6,15 +6,7 @@ import gopher.service.model.RestrictionEnzyme;
 import java.io.*;
 import java.util.List;
 
-public class RestrictionEnzymeParser {
-
-    private final File pathToRestrictionEnzymeFile;
-
-
-    public RestrictionEnzymeParser(File pathToRestrictionEnzymeFile) {
-        this.pathToRestrictionEnzymeFile = pathToRestrictionEnzymeFile;
-    }
-
+public record RestrictionEnzymeParser(File pathToRestrictionEnzymeFile) {
 
     public static List<RestrictionEnzyme> getEnzymes(InputStream inputStream) throws IOException {
         ImmutableList.Builder<RestrictionEnzyme> builder = new ImmutableList.Builder<>();

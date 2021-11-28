@@ -36,9 +36,8 @@ public class Platform {
      * currently supported.
      * @return File to directory
      */
-    public static File getFenominalDir() {
+    public static File getGopherDir() {
         CurrentPlatform platform = figureOutPlatform();
-
         File linuxPath = new File(System.getProperty("user.home") + File.separator + ".gopher");
         File windowsPath = new File(System.getProperty("user.home") + File.separator + "gopher");
         File osxPath = new File(System.getProperty("user.home") + File.separator + ".gopher");
@@ -63,7 +62,7 @@ public class Platform {
      * @return the absolute path,e.g., /home/user/.vpvgui/vpvgui.log
      */
     public static String getAbsoluteLogPath() {
-        File dir = getFenominalDir();
+        File dir = getGopherDir();
         return dir + File.separator +  "gopher.log";
     }
 
@@ -71,7 +70,7 @@ public class Platform {
 
     public static File getParametersFile() {
         String parametersFileName = "parameters.yml";
-        return new File(getFenominalDir() + File.separator + parametersFileName);
+        return new File(getGopherDir() + File.separator + parametersFileName);
     }
 
 
@@ -101,12 +100,10 @@ public class Platform {
 
 
     private enum CurrentPlatform {
-
         LINUX("Linux"),
         WINDOWS("Windows"),
-        OSX("Os X"),
+        OSX("Mac OSX"),
         UNKNOWN("Unknown");
-
         private final String name;
 
         CurrentPlatform(String n) {this.name = n; }

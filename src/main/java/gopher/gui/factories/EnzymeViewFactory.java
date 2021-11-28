@@ -1,4 +1,4 @@
-package gopher.gui.enzymebox;
+package gopher.gui.factories;
 
 import gopher.service.model.dialog.RestrictionEnzymeResult;
 import javafx.scene.control.*;
@@ -75,7 +75,7 @@ public class EnzymeViewFactory {
         });
         Optional<RestrictionEnzymeResult> optionalResult = dialog.showAndWait();
         if (optionalResult.isPresent()) {
-            return optionalResult.get().getChosenEzymes();
+            return optionalResult.get().chosenEzymes();
         } else {
             return List.of();
         }

@@ -16,8 +16,8 @@ import java.util.List;
 
 /**
  * Coordinate processing of the uploaded genes (target genes) and their comparison with the refGene.txt.gz file. THe main
- * GUI will call {@link #displayFromFile(GopherModel, Reader)} if the dialog is opened from an example file from the Help menu
- * and otherwise will call {@link #display(GopherModel)} to allow the user to choose a file with a FileChooser.
+ * GUI will call  if the dialog is opened from an example file from the Help menu
+ * and otherwise will call  to allow the user to choose a file with a FileChooser.
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
  */

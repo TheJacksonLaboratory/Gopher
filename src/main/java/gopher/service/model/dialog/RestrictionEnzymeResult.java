@@ -4,16 +4,9 @@ import gopher.service.model.RestrictionEnzyme;
 
 import java.util.List;
 
-public class RestrictionEnzymeResult {
-
-    private final List<RestrictionEnzyme> chosenEzymes;
-
-
-    public RestrictionEnzymeResult(List<RestrictionEnzyme> chosenEzymes) {
-        this.chosenEzymes = chosenEzymes;
-    }
-
-    public List<RestrictionEnzyme> getChosenEzymes() {
-        return chosenEzymes;
-    }
+/**
+ * Simple class designed to hold the results of a Dialog for choosing restriction enzymes.
+ * @author Peter N Robinson
+ */
+public record RestrictionEnzymeResult(List<RestrictionEnzyme> chosenEzymes) {
 }

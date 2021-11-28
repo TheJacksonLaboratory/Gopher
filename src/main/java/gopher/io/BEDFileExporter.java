@@ -105,11 +105,11 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "GOPHER: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
-            out_allTracks.println(String.format("%s\t%d\t%d\t%s",
+            out_allTracks.printf("%s\t%d\t%d\t%s%n",
                     vp.getReferenceID(),
                     vp.getGenomicPos()-1,
                     (vp.getGenomicPos()),
-                    vp.getTargetName()));
+                    vp.getTargetName());
         }
 
         // print viewpoints

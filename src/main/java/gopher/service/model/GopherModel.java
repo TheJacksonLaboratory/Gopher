@@ -109,26 +109,13 @@ public class GopherModel implements Serializable {
     /** @param newDatabase The genome build chosen by the user, e.g., hg19, GRCh38, mm10  */
     public void setGenomeBuild(String newDatabase) {
         switch (newDatabase) {
-            case "hg19":
-                this.genome = new HumanHg19();
-                break;
-            case "hg38":
-                this.genome = new HumanHg38();
-                break;
-            case "mm9":
-                this.genome = new MouseMm9();
-                break;
-            case "mm10":
-                this.genome = new MouseMm10();
-                break;
-            case "xenTro9":
-                this.genome = new FrogXenTro9();
-                break;
-            case "danRer10":
-                this.genome = new FishDanRer10();
-                break;
-            default:
-                PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
+            case "hg19" -> this.genome = new HumanHg19();
+            case "hg38" -> this.genome = new HumanHg38();
+            case "mm9" -> this.genome = new MouseMm9();
+            case "mm10" -> this.genome = new MouseMm10();
+            case "xenTro9" -> this.genome = new FrogXenTro9();
+            case "danRer10" -> this.genome = new FishDanRer10();
+            default -> PopupFactory.displayError("setGenomeBuild error", String.format("genome build %s not implemented", newDatabase));
         }
         clean=false;
     }
