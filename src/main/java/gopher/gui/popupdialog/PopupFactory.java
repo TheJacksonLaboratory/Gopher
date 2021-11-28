@@ -17,17 +17,19 @@ import java.util.List;
 import java.util.Optional;
 
 public class PopupFactory {
-    /** Indicates if the entry made by the user is valid and should be transmitted to the main controller.*/
-    private boolean valid=false;
+    /**
+     * Indicates if the entry made by the user is valid and should be transmitted to the main controller.
+     */
+    private boolean valid = false;
 
-    private boolean wasCancelled=false;
+    private boolean wasCancelled = false;
 
-    private String stringValue=null;
+    private String stringValue = null;
 
-    private boolean showDialogToGetStringFromUser(String windowTitle, String html, String labeltext, String previousValue, String defaultValue){
+    private boolean showDialogToGetStringFromUser(String windowTitle, String html, String labeltext, String previousValue, String defaultValue) {
         Stage window;
         window = new Stage();
-        window.setOnCloseRequest( event -> window.close() );
+        window.setOnCloseRequest(event -> window.close());
         window.setTitle(windowTitle);
 
         PopupView view = new PopupView();
@@ -41,7 +43,7 @@ public class PopupFactory {
         });
         presenter.setData(html);
         presenter.setLabelText(labeltext);
-        if (previousValue!=null) {
+        if (previousValue != null) {
             presenter.setPreviousValue(String.valueOf(previousValue));
         } else {
             presenter.setPromptValue(defaultValue);
@@ -51,50 +53,55 @@ public class PopupFactory {
         window.setScene(new Scene(view.getView()));
         window.showAndWait();
         if (presenter.wasCanceled()) {
-            wasCancelled=true;
+            wasCancelled = true;
             return false; // do nothing, the user canceled the entry
         }
         String value = presenter.getValue();
-        if (value!=null && value.length()>0 ) {
-            this.stringValue=value;
-            valid=true;
+        if (value != null && value.length() > 0) {
+            this.stringValue = value;
+            valid = true;
         } else {
-            valid=false;
+            valid = false;
         }
 
-        return (! presenter.wasCanceled());
+        return (!presenter.wasCanceled());
     }
 
 
     private static String getProjectNameHTML() {
-        return  "<h1>GOPHER Projects</h1>\n"+
+        return "<h1>GOPHER Projects</h1>\n" +
                 "<p>Enter a name for a new GOPHER project. Names should start with letters, numbers, or an underscore." +
-               " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
+                " By default, Gopher stores the projects in a hidden .gopher directory in the user's home directory." +
                 " Projects can also be exported to other locations on the file system using the File|Export project... menu item." +
                 " Projects can be imported with File|Import project...</p>";
     }
 
 
-    /** Open up a dialog where the user can enter a new project name.
-     *  The function checks that the filename does not contain weird and potentially
-     *  invalid characters.
+    /**
+     * Open up a dialog where the user can enter a new project name.
+     * The function checks that the filename does not contain weird and potentially
+     * invalid characters.
+     *
      * @return String representing the chosen project name or null if the chosen name was invalid.
-     * */
-    public String getProjectName() {
-        String title="Enter New Project Name";
-        String labelText="Enter project name:";
-        String defaultProjectName="new project";
-        String html=getProjectNameHTML();
-        boolean  OK = showDialogToGetStringFromUser(title,html,labelText,null,defaultProjectName);
-        if (OK && stringValue!=null) {
-            if (stringValue.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
-                PopupFactory.displayError("File name error", "File name contains invalid characters");
-                return null;
-            }
-            return stringValue;
+     */
+    public static Optional<String> getProjectName() {
+        String title = "Enter New Project Name";
+        String labelText = "Enter project name:";
+        String defaultProjectName = "new project";
+        TextInputDialog dialog = new TextInputDialog(labelText);
+        dialog.setTitle(title);
+        dialog.setHeaderText(null);
+        dialog.setContentText(labelText);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isEmpty()) {
+            return result;
+        }
+        String answer = result.get();
+        if (answer.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
+            PopupFactory.displayError("File name error", "File name contains invalid characters");
+            return Optional.empty();
         } else {
-            valid = false;
-            return null;
+            return result;
         }
     }
 
@@ -173,7 +180,7 @@ public class PopupFactory {
         );
 
         Button button = new Button("OK");
-        button.setOnAction(e -> window.close() );
+        button.setOnAction(e -> window.close());
 
 
         VBox layout = new VBox(10);
@@ -185,7 +192,6 @@ public class PopupFactory {
         window.setScene(scene);
         window.showAndWait();
     }
-
 
 
     public static void displayException(String title, String message, Exception e) {
@@ -217,13 +223,11 @@ public class PopupFactory {
     }
 
 
-
-
     public static void showAbout(String versionString, String dateString) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("GOPHER");
         alert.setHeaderText(null);
-        alert.setContentText(String.format("Version %s\nLast changed: %s",versionString,dateString ));
+        alert.setContentText(String.format("Version %s\nLast changed: %s", versionString, dateString));
 
         alert.showAndWait();
     }
@@ -270,24 +274,29 @@ public class PopupFactory {
     }
 
 
-    public boolean isValid() { return valid;}
-    public boolean wasCancelled() { return wasCancelled; }
+    public boolean isValid() {
+        return valid;
+    }
+
+    public boolean wasCancelled() {
+        return wasCancelled;
+    }
 
 
     private static String getPreHTML(String text) {
-       return String.format("<html><body><h1>GOPHER Report</h1><pre>%s</pre></body></html>",text);
+        return String.format("<html><body><h1>GOPHER Report</h1><pre>%s</pre></body></html>", text);
     }
 
-    public static  void showReportListDialog(List<String> reportlist) {
+    public static void showReportListDialog(List<String> reportlist) {
         Stage window;
         String windowTitle = "GOPHER Report";
         window = new Stage();
-        window.setOnCloseRequest( event -> window.close() );
+        window.setOnCloseRequest(event -> window.close());
         window.setTitle(windowTitle);
 
         ListView<String> list = new ListView<>();
 
-        ObservableList<String> items =FXCollections.observableArrayList (reportlist);
+        ObservableList<String> items = FXCollections.observableArrayList(reportlist);
         list.setItems(items);
         list.setPrefWidth(450);
         list.setPrefHeight(350);
@@ -308,7 +317,7 @@ public class PopupFactory {
     public static void showInfoMessage(String text, String windowTitle) {
         Alert al = new Alert(Alert.AlertType.INFORMATION);
         DialogPane dialogPane = al.getDialogPane();
-        dialogPane.getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
+        dialogPane.getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
         al.setTitle(windowTitle);
         al.setHeaderText(null);
         al.setContentText(text);

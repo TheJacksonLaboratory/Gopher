@@ -492,15 +492,10 @@ public class GopherMainController implements Initializable {
      * @param e Event triggered by new viewpoint command.
      */
     @FXML public void startNewProject(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        String projectname = factory.getProjectName();
-        if (factory.wasCancelled())
+        Optional<String> optName = PopupFactory.getProjectName();
+        if (optName.isEmpty())
             return; // do nothing, the user cancelled!
-        if (projectname == null || projectname.length() <1) {
-            PopupFactory.displayError("Could not get valid project name", "enter a valid name starting with a letter, character or underscore!");
-            return;
-        }
-
+        String projectname = optName.get();
         ObservableList<Tab> panes = this.tabpane.getTabs();
         /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
         List<Tab> tabsToBeRemoved=new ArrayList<>();
@@ -511,6 +506,7 @@ public class GopherMainController implements Initializable {
             tabsToBeRemoved.add(tab);
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
+        logger.info("Starting new project with name {}", projectname);
         gopherService.setProjectName(projectname);
         if (this.primaryStage!=null)
             this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
@@ -1169,20 +1165,6 @@ public class GopherMainController implements Initializable {
             PopupFactory.displayError("Data incomplete", "Choose target genes/regions before proceding");
             return;
         }
-
-//        try {
-//            ClassPathResource gopherResource = new ClassPathResource("fxml/qccheck.fxml");
-//            FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
-//            //fxmlLoader.setControllerFactory(applicationContext::getBean);
-//            Parent parent = fxmlLoader.load();
-//            Stage stage = new Stage();
-//            stage.setScene(new Scene(parent, 1200, 900));
-//            stage.setResizable(true);
-//            stage.setTitle("Quality assessment");
-//            stage.showAndWait();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         QCCheckFactory qcFactory = new QCCheckFactory(this.gopherService);
         boolean OK = qcFactory.loadQcDialog();
         if (! OK ) {
@@ -1196,31 +1178,18 @@ public class GopherMainController implements Initializable {
         } else {
             task = new ExtendedViewPointCreationTask(gopherService);
         }
-
-//        TaskProgressBarView pbview = new TaskProgressBarView();
-//        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-//        pbpresent.titleProperty().bind(task.titleProperty());
-//        pbpresent.messageProperty().bind(task.messageProperty());
-//        pbpresent.progressProperty().bind(task.progressProperty());
-
-
-//        Stage window = new Stage();
-//        window.setTitle("Viewpoint creation");
-//        window.setAlwaysOnTop(true);
-//        window.setOnCloseRequest( event -> window.close() );
-//        pbpresent.setSignal(signal -> {
-//            switch (signal) {
-//                case DONE -> window.close();
-//                case CANCEL -> task.cancel();
-//                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-//            }
-//
-//        });
         ProgressForm pform = new ProgressForm();
+        pform.messageProperty().bind(task.messageProperty());
+        pform.titleProperty().bind(task.titleProperty());
+        pform.progressProperty().bind(task.progressProperty());
 
         task.setOnSucceeded(event -> {
             SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
             //this.vpanalysispresenter.setModel(this.model);
+            if (this.vpanalysispresenter == null) {
+                logger.error("vpanalysispresenter == null");
+                return;
+            }
             this.vpanalysispresenter.showVPTable();
             selectionModel.select(this.analysistab);
             logger.trace("Finished createViewPoints()");
@@ -1265,7 +1234,6 @@ public class GopherMainController implements Initializable {
      * Content of {@link GopherModel} is written to platform-dependent default location.
      */
     @FXML private void saveProject(ActionEvent e) {
-       // Model.writeSettingsToFile(this.model);
         boolean result = gopherService.serialize();
         if (result) { /* if it didnt work, the serialize method will show an error dialog. */
             Alert alert = new Alert(Alert.AlertType.INFORMATION);

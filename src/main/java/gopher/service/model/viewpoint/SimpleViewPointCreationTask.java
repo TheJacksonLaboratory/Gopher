@@ -20,7 +20,7 @@ import java.util.List;
  * @version 0.2.2 (2018-02-15)
  */
 public class SimpleViewPointCreationTask extends ViewPointCreationTask {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleViewPointCreationTask.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleViewPointCreationTask.class.getName());
 
   /**
      * The constructor sets up the Task of creating ViewPoints. It sets the chosen enzymes from the Model
@@ -48,7 +48,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         List<Integer> gPosList = vpvgene.getTSSlist();
         int n=0; // we will order the promoters from first (most upstream) to last
         // Note we do this differently according to strand.
-        logger.trace("Creating simple viewpoint for " + vpvgene.getGeneSymbol());
+        LOGGER.info("Creating simple viewpoint for " + vpvgene.getGeneSymbol());
         for (Integer gPos : gPosList) {
             ViewPoint vp = new ViewPoint.Builder(referenceSequenceID, gPos,chromLen).
                     targetName(vpvgene.getGeneSymbol()).
@@ -82,18 +82,18 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
     protected Void call() throws GopherException {
         updateTitle("Creating viewpoints using 'simple' approach");
         if (ViewPoint.chosenEnzymes == null) {
-            logger.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
+            LOGGER.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
         }
         this.total = getTotalPromoterCount();
         this.i = 0;
-        logger.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
+        LOGGER.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
 
         String faipath = this.gopherService.getIndexedGenomeFastaIndexFile();
         String fastapath = this.gopherService.getGenomeFastaFile();
         if (faipath == null) {
-            logger.error("Could not retrieve faidx file for " + fastapath);
+            LOGGER.error("Could not retrieve faidx file for " + fastapath);
             throw new GopherException("Could not retrieve faidx file for " + fastapath);
         }
         IndexedFastaSequenceFile fastaReader;
@@ -113,18 +113,18 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             while (apiterator.hasNext()) {
                 AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
-                logger.trace("Creating viewpoints for RefID=" + referenceSequenceID);
+                LOGGER.trace("Creating viewpoints for RefID=" + referenceSequenceID);
                 if (!chromosomes.containsKey(referenceSequenceID)) {
                     continue; // skip if we have no gene on this chromosome
                 }
                 ChromosomeGroup group = chromosomes.get(referenceSequenceID);
                 if (group == null) {
-                    logger.error("group is null while searching for \"" + referenceSequenceID + "\"");
+                    LOGGER.error("group is null while searching for \"" + referenceSequenceID + "\"");
                     for (ChromosomeGroup g : chromosomes.values()) {
-                        logger.error(g.getReferenceSequenceID());
+                        LOGGER.error(g.getReferenceSequenceID());
                     }
                 } else {
-                    logger.trace("group=" + group.getReferenceSequenceID());
+                    LOGGER.trace("group=" + group.getReferenceSequenceID());
                 }
                 int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
                 //for (GopherGene vpvGene : gopherGene.getGenes()) {
@@ -135,7 +135,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             e.printStackTrace();
         }
         long end = milli - System.currentTimeMillis();
-        logger.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
+        LOGGER.trace(String.format("Generation of viewpoints (simple approach) took %.1f sec", end / 1000.0));
         this.gopherService.setViewPoints(viewpointlist);
         return null;
     }

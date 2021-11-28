@@ -33,7 +33,7 @@ public class GopherConfig {
      * @param configFilePath path where the properties file is supposed to be present (it's ok if the file itself doesn't exist).
      * @return {@link Properties} with user configuration
      */
-    @Bean(value="configProperties")
+    @Bean(value="pgProperties")
     @Primary
     public Properties pgProperties(@Qualifier("configFilePath") File configFilePath) {
         Properties properties = new Properties();
@@ -85,22 +85,4 @@ public class GopherConfig {
         }
         return appHomeDir;
     }
-
-//    @Bean("appNameVersion")
-//    String appNameVersion(String appVersion, String appName) {
-//        return String.format("%s : %s", appName, appVersion);
-//    }
-//
-//
-//    @Bean("appVersion")
-//    String appVersion() {
-//        // this property is set in FenominalApplication#init()
-//        return System.getProperty(FenominalApplication.FENOMINAL_VERSION_PROP_KEY);
-//    }
-//
-//    @Bean("appName")
-//    String appName() {
-//        // this property is set in FenominalApplication#init()
-//        return System.getProperty(FenominalApplication.FENOMINAL_NAME_KEY);
-//    }
 }

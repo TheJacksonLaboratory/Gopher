@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 
 
 import static gopher.io.Platform.getGopherDir;
@@ -107,22 +108,20 @@ public class SplashController extends Preloader {
 
 
     public void newProject(ActionEvent e) {
-        PopupFactory factory = new PopupFactory();
-        String projectname = factory.getProjectName();
-        if (factory.wasCancelled())
-            return; // do nothing, the user cancelled!
-        if (projectname == null || projectname.length() <1) {
+        Optional<String> opt = PopupFactory.getProjectName();
+        if (opt.isEmpty()) {
             PopupFactory.displayError("Could not get valid project name",
                     "Enter a valid name with letters, numbers, or underscore or space!");
-            return;
-        } else {
-            if (existingProjectNames.contains(projectname)) {
-                PopupFactory.displayError("Error creating new project",
+            return; // do nothing, the user cancelled!
+        }
+        String projectname = opt.get();
+        if (existingProjectNames.contains(projectname)) {
+            PopupFactory.displayError("Error creating new project",
                         String.format("Project name %s already exists",projectname));
                 return;
-            }
-          //  this.switchscreen.createNewProject(projectname);
         }
+          // TODO  this.switchscreen.createNewProject(projectname);
+
         e.consume();
     }
 

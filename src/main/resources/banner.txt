@@ -6,4 +6,4 @@
   \_____|\___/| .__/|_| |_|\___|_|
               | |
               |_|
-::  ${application.title}  :: version  ${application.version}
+::  ${application.title}  ::  version  ${application.version}
