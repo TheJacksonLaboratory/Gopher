@@ -1,6 +1,7 @@
 package gopher;
 
 
+import gopher.configuration.ApplicationProperties;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,14 +26,12 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StageInitializer.class);
 
-    private final String applicationTitle;
-
     private final ApplicationContext applicationContext;
+    private final ApplicationProperties applicationProperties;
 
-
-    public StageInitializer(@Value("${spring.application.ui.title}") String applicationTitle, ApplicationContext context) {
-        this.applicationTitle = applicationTitle;
+    public StageInitializer(ApplicationProperties props, ApplicationContext context) {
         this.applicationContext = context;
+        this.applicationProperties = props;
     }
 
 
@@ -46,7 +45,7 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
             Stage stage = event.getStage();
             stage.setScene(new Scene(parent, 1200, 900));
             stage.setResizable(true);
-            stage.setTitle(applicationTitle);
+            stage.setTitle(applicationProperties.getApplicationUiTitle());
             readAppIcon().ifPresent(stage.getIcons()::add);
             stage.show();
         } catch (IOException e) {
