@@ -8,7 +8,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import gopher.exception.GopherException;
 import gopher.gui.factories.EnzymeViewFactory;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.service.model.regulatoryexome.RegulationCategory;
 import gopher.service.model.regulatoryexome.RegulatoryExomeBuilder;

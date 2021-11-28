@@ -342,8 +342,8 @@ public class SegmentTest {
                 marginSize(250).
                 build();
         List<IntPair> ip = testSeg.getSegmentMargins();
-        Integer upStreamStaPos = ip.get(0).getStartPos();
-        Integer upStreamEndPos = ip.get(0).getEndPos();
+        Integer upStreamStaPos = ip.get(0).startPos();
+        Integer upStreamEndPos = ip.get(0).endPos();
 
         String alignabilityPath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
         String chromInfoPath="src/test/resources/testAlignabilityMap/chromInfo.txt.gz";

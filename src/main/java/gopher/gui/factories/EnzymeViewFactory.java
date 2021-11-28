@@ -12,7 +12,7 @@ import java.util.*;
 import static javafx.application.Platform.runLater;
 
 public class EnzymeViewFactory {
-    private static Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
 
     /**
      * Initialize the Enyzme list to show any previously chosen enzyme with a check,
@@ -20,25 +20,23 @@ public class EnzymeViewFactory {
      * @param
      */
 
-    private List<CheckBox> boxlist;
+    private final List<CheckBox> boxlist;
 
     private int count;
 
-    private List<RestrictionEnzyme> chosen = null;
+    private List<RestrictionEnzyme> chosen;
 
-    private Map<String, RestrictionEnzyme> enzymemap;
+    private final Map<String, RestrictionEnzyme> enzymemap;
 
     public EnzymeViewFactory() {
         this.boxlist = new ArrayList<>();
         this.enzymemap = new HashMap<>();
-        //this.restrictionLabel.setText("Choose one or more restriction enzymes");
         this.chosen = new ArrayList<>();
     }
 
     public List<RestrictionEnzyme> getChosenEnzymes(List<RestrictionEnzyme> allEnzymes,
                                                            List<RestrictionEnzyme> chosenEnzymes ) {
         logger.trace("Getting chosen enzymes");
-
         Dialog<RestrictionEnzymeResult> dialog = new Dialog<>();
         dialog.setTitle("Choose Enzymes");
         dialog.setHeaderText("Choose one or more restriction enzymes");

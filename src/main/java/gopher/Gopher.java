@@ -1,6 +1,6 @@
 package gopher;
 
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.Platform;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;

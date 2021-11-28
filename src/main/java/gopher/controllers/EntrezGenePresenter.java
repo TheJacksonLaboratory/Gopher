@@ -3,7 +3,7 @@ package gopher.controllers;
 
 import com.google.common.collect.ImmutableList;
 import gopher.framework.Signal;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.Platform;
 import gopher.io.RefGeneParser;
 import gopher.service.model.GopherGene;
@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * @version 0.2.2 (2017-11-19)
  */
 public class EntrezGenePresenter implements Initializable {
-    private static Logger logger = LoggerFactory.getLogger(EntrezGenePresenter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(EntrezGenePresenter.class.getName());
     /** This webview explains how to enter genes */
     @FXML private WebView wview;
 

@@ -4,7 +4,7 @@ import gopher.service.GopherService;
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
 import gopher.exception.GopherException;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.GeneRegGTFParser;
 import gopher.service.model.GopherModel;
 import gopher.service.model.viewpoint.ViewPoint;

@@ -142,8 +142,8 @@ public class BEDFileExporter {
 
                 // get unique margins of selected fragments and unique fragments
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
-                    Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
-                    Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
+                    Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
+                    Integer fmEndPos = segment.getSegmentMargins().get(l).endPos();
 
                     String key = vp.getReferenceID() + ":" + (fmStaPos-1) + "-" + fmEndPos; // build key
                     if (uniqueFragmentMarginsMap.get(key) == null) { // check if region is already in hash

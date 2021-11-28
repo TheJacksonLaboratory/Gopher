@@ -3,7 +3,7 @@ package gopher.service.model.digest;
 
 import com.google.common.collect.ImmutableList;
 import gopher.exception.GopherException;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.service.GopherService;
 import gopher.service.model.RestrictionEnzyme;
 import gopher.service.model.viewpoint.Segment;

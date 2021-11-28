@@ -1,6 +1,6 @@
 package gopher.service.impl;
 
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.Faidx;
 import gopher.io.Platform;
 import gopher.service.model.Approach;

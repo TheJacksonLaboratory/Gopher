@@ -3,7 +3,7 @@ package gopher.service.model.viewpoint;
 import com.google.common.collect.ImmutableList;
 import gopher.service.GopherService;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.service.model.IntPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,8 +224,8 @@ public class Segment implements Serializable {
 
         for(int i=0; i<margins.size(); ++i) {
             IntPair seg = margins.get(i);
-            int start = seg.getStartPos();
-            int end = seg.getEndPos();
+            int start = seg.startPos();
+            int end = seg.endPos();
             String s = fastaReader.getSubsequenceAt(this.referenceSequenceID,start,end).getBaseString();
 
             /* determine repeat content */

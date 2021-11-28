@@ -2,7 +2,7 @@ package gopher.service.model;
 
 
 import com.google.common.collect.ImmutableList;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.RestrictionEnzymeParser;
 import gopher.service.model.genome.*;
 import gopher.service.model.viewpoint.ViewPoint;

@@ -23,7 +23,7 @@ import java.io.*;
  * @version 0.2.3 (2018-02-17)
  */
 public class GenomeGunZipper extends Task<Void>  {
-    private static Logger logger = LoggerFactory.getLogger(GenomeGunZipper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GenomeGunZipper.class.getName());
     /** Model of the current genome, e.g., hg19, with paths and canonical chromosomes etc. */
     private final Genome genome;
     /** This is the basename of the compressed genome file that we download from UCSC. */

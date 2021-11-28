@@ -24,7 +24,7 @@ import java.util.*;
  * @version 0.2.2 (2018-02-15)
  */
 public class Faidx extends Task<Void> {
-    private static Logger logger = LoggerFactory.getLogger(Faidx.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Faidx.class.getName());
     /**  Path to the directory where we will search for the genome FASTA file and produce the faidx file. */
     private final String genomeDirectoryPath;
     /** Basename of the genome fasta file, e.g., hg19.fa */
@@ -34,7 +34,7 @@ public class Faidx extends Task<Void> {
     /** Number of canonical chromosomes, e.g., chr1 and not chr3random123. */
     private final int n_canonical_chromosomes;
     /** Key: Name of a chromosome (or in general, of a contig). Value: length in nucleotides. */
-    private Map<String, Integer> contigLengths;
+    private final Map<String, Integer> contigLengths;
     /** The progress indicator on the GUI that will show progress of indexing. */
     private final ProgressIndicator progress;
 

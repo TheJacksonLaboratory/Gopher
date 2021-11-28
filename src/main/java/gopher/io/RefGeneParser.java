@@ -4,7 +4,7 @@ package gopher.io;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import gopher.service.model.GopherGene;
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

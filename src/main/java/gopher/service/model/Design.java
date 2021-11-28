@@ -118,8 +118,8 @@ public class Design {
 //                Integer rsEndPos = segment.getEndPos();
                 // get unique margins of selected fragments
                 for (int l = 0; l < segment.getSegmentMargins().size(); l++) {
-                    Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
-                    Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
+                    Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
+                    Integer fmEndPos = segment.getSegmentMargins().get(l).endPos();
                     RC += 0.5 * (segment.getRepeatContentMarginDown() + segment.getRepeatContentMarginUp());
                     double RC2 = 0.5 * (segment.getRepeatContentMarginDown() + segment.getRepeatContentMarginUp());
                     String target = String.format("%s-%d-%d-%s_margin_%d", vp.getReferenceID(), (fmStaPos - 1), fmEndPos, vp.getTargetName(), l);

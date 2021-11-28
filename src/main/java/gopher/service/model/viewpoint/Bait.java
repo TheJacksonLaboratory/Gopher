@@ -15,13 +15,13 @@ import java.util.ArrayList;
  * for the individual properties such as GC content.
  */
 public class Bait implements Serializable {
-    private static Logger logger = LoggerFactory.getLogger(Bait.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     // coordinates of the bait
-    private String refID;
-    private int startPos;
-    private int endPos;
+    private final String refID;
+    private final int startPos;
+    private final int endPos;
 
     // average kmer alignabilty of the bait
     private double averageKmeralignabilty;

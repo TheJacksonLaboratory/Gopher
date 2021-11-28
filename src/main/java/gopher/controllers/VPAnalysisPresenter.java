@@ -1,6 +1,6 @@
 package gopher.controllers;
 
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.service.GopherService;
 import gopher.service.model.Approach;
 import gopher.service.model.Design;

@@ -10,10 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class GopherGeneTest {
 
-    private static String symbol="FAM216B";
-    private static String geneid="NM_182508";
-
-
+    private static final String symbol="FAM216B";
+    private static final String geneid="NM_182508";
 
 
     @Test

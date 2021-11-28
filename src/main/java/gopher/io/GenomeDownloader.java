@@ -4,7 +4,7 @@ import gopher.service.model.genome.*;
 import javafx.scene.control.ProgressIndicator;
 import gopher.exception.DownloadFileNotFoundException;
 
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.service.model.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

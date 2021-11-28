@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ProbeFactoryTest {
@@ -49,14 +49,14 @@ public class ProbeFactoryTest {
 
     @Test
     public void testGetSegmentMargins() {
-
         List<IntPair> ip = testSeg.getSegmentMargins();
-        Integer upStreamStaPos = ip.get(0).getStartPos();
-        Integer upStreamEndPos = ip.get(0).getEndPos();
-        Integer downStreamStaPos = ip.get(1).getStartPos();
-        Integer downStreamEndPos = ip.get(1).getEndPos();
-        assertNotNull(upStreamEndPos); // todo -- need to test something
-
+        Integer upStreamStaPos = ip.get(0).startPos();
+        Integer upStreamEndPos = ip.get(0).endPos();
+        Integer downStreamStaPos = ip.get(1).startPos();
+        Integer downStreamEndPos = ip.get(1).endPos();
+        assertNotNull(upStreamEndPos);
+        assertEquals(upStreamEndPos-upStreamStaPos+1, ip.get(0).length());
+        assertEquals(downStreamEndPos-downStreamStaPos+1, ip.get(1).length());
     }
 
 

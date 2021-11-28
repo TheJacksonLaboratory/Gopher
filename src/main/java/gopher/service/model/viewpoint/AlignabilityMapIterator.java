@@ -14,7 +14,7 @@ import java.util.zip.GZIPInputStream;
  * Input data for the alignability map, one chromosome at a time.
  */
 public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
-    private static Logger logger = LoggerFactory.getLogger(AlignabilityMapIterator.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AlignabilityMapIterator.class.getName());
 
     /**
      * The reader that is being read.
@@ -43,11 +43,11 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
     /**
      * Coordinates for the chromosome we are currently parsing.
      */
-    private List<Integer> coordinateList;
+    private final List<Integer> coordinateList;
     /**
      * Scores for the chromosome we are currently parsing.
      */
-    private List<Integer> scoreList;
+    private final List<Integer> scoreList;
 
 
     private final static int NO_ALIGNABILITY_SCORE_AVAILABLE = -1;
