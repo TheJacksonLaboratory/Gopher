@@ -1,13 +1,13 @@
-package gopher.gui.qcCheckPane;
+package gopher.gui.factories;
 
 import gopher.io.Platform;
 import gopher.service.GopherService;
 import gopher.service.model.GopherModel;
+import gopher.service.model.dialog.RestrictionEnzymeResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -19,12 +19,16 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
-@Component
-public class QCCheckController implements Initializable {
-    static Logger logger = LoggerFactory.getLogger(QCCheckController.class.getName());
+import static javafx.application.Platform.runLater;
+
+
+public class QCCheckFactory implements Initializable {
+    static Logger logger = LoggerFactory.getLogger(QCCheckFactory.class.getName());
     @FXML
     private WebView wview;
 
@@ -36,8 +40,7 @@ public class QCCheckController implements Initializable {
 
     private boolean wasCanceled=true;
 
-    @Autowired
-    GopherService gopherService;
+    private final GopherService gopherService;
 
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
@@ -45,14 +48,51 @@ public class QCCheckController implements Initializable {
     /** This will be set to false if files are missing and we should not go on with the analysis. */
     private static boolean qc_ok=true;
 
-    @Override
+
     public void initialize(URL location, ResourceBundle resources) {
         webEngine = wview.getEngine();
         webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
     }
 
-    public QCCheckController() {
+    public QCCheckFactory(GopherService gopherService) {
+        this.gopherService = gopherService;
+    }
 
+    public boolean loadQcDialog() {
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle("Settings");
+        dialog.setHeaderText("Check the settings you entered");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        WebView wv = new WebView();
+        webEngine = wv.getEngine();
+        webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
+        String html = getHTML();
+        webEngine.loadContent(html);
+        dialogPane.setContent(wv);
+        runLater(wv::requestFocus);
+        dialog.setResultConverter((ButtonType button) -> {
+            if (button == ButtonType.OK) {
+                return true;// Optional.of(new Boolean(true));
+            }
+            return false;
+        });
+        Optional<Boolean> optionalResult = dialog.showAndWait();
+        return optionalResult.get();
+//       dialogPane.setContent(restrictionVBox);
+//        runLater(restrictionVBox::requestFocus);
+//        dialog.setResultConverter((ButtonType button) -> {
+//            if (button == ButtonType.OK) {
+//                return new RestrictionEnzymeResult(this.chosen);
+//            }
+//            return null;
+//        });
+//        Optional<RestrictionEnzymeResult> optionalResult = dialog.showAndWait();
+//        if (optionalResult.isPresent()) {
+//            return optionalResult.get().chosenEzymes();
+//        } else {
+//            return List.of();
+//        }
     }
 
     public void setData(String html) {
@@ -86,9 +126,9 @@ public class QCCheckController implements Initializable {
       //  QCCheckView view = new QCCheckView();
        // QCCheckPresenter presenter = (QCCheckPresenter) view.getPresenter();
 
-        String html= getHTML(model);
+        String html= getHTML();
         if (!qc_ok) {
-            html=getErrorHTML(model);
+            html=getErrorHTML();
         }
         setData(html);
 
@@ -101,82 +141,82 @@ public class QCCheckController implements Initializable {
         return (! wasCanceled() && qc_ok);
     }
 
-    private String getHTML(GopherModel model) {
-        String dataQC = validateData(model);
-        String paramQC=validateParams(model);
+    private String getHTML() {
+        String dataQC = validateData();
+        String paramQC = validateParams();
         return String.format("%s%s%s%s",String.format(HTML_HEADER,getCSSblock()),dataQC,paramQC,HTML_FOOTER);
     }
 
 
 
-    private String validateParams(GopherModel model) {
+    private String validateParams() {
         StringBuilder sb = new StringBuilder();
         sb.append("<thead>");
         sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
         sb.append("</thead>");
         sb.append("<tr><td>Upstream size</td>");
-        if (model.getSizeUp()<100) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeUp()));
+        if (gopherService.getSizeUp()<100) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",gopherService.getSizeUp()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getSizeUp()));
+            sb.append(String.format("<td>%d</td>",gopherService.getSizeUp()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Downstream size</td>");
-        if (model.getSizeDown()<100) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getSizeDown()));
+        if (gopherService.getSizeDown()<100) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",gopherService.getSizeDown()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getSizeDown()));
+            sb.append(String.format("<td>%d</td>",gopherService.getSizeDown()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Minimum digest size</td>");
-        if (model.getMinFragSize()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getMinFragSize()));
+        if (gopherService.getMinFragSize()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",gopherService.getMinFragSize()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getMinFragSize()));
+            sb.append(String.format("<td>%d</td>",gopherService.getMinFragSize()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Minimum GC content</td>");
-        if (model.getMinGCcontent()<0.25) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMinGCContentPercent()));
+        if (gopherService.getMinGCcontent()<0.25) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",gopherService.getMinGCContentPercent()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMinGCContentPercent()));
+            sb.append(String.format("<td>%.1f%%</td>",gopherService.getMinGCContentPercent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum GC content</td>");
-        if (model.getMaxGCcontent()>0.70) {
-            sb.append(String.format("<td class=\"red\">%.1f%%</td>",model.getMaxGCContentPercent()));
+        if (gopherService.getMaxGCcontent()>0.70) {
+            sb.append(String.format("<td class=\"red\">%.1f%%</td>",gopherService.getMaxGCContentPercent()));
         } else {
-            sb.append(String.format("<td>%.1f%%</td>",model.getMaxGCContentPercent()));
+            sb.append(String.format("<td>%.1f%%</td>",gopherService.getMaxGCContentPercent()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Maximum kmer alignability</td>");
-        if (model.getMaxMeanKmerAlignability()>10) {
-            sb.append(String.format("<td class=\"red\">%d</td>",model.getMaxMeanKmerAlignability()));
+        if (gopherService.getMaxMeanKmerAlignability()>10) {
+            sb.append(String.format("<td class=\"red\">%d</td>",gopherService.getMaxMeanKmerAlignability()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getMaxMeanKmerAlignability()));
+            sb.append(String.format("<td>%d</td>",gopherService.getMaxMeanKmerAlignability()));
         }
         sb.append("</tr>");
-        String approach=model.getApproach().toString();
+        String approach = gopherService.getApproach().toString();
         sb.append(String.format("<tr><td>Design approach</td><td>%s</td></tr>",approach));
         sb.append("<tr><td>Probe length</td>");
-        if (model.getProbeLength()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>",model.getProbeLength()));
+        if (gopherService.getProbeLength()<120) {
+            sb.append(String.format("<td class=\"red\">%d nt (unusually short).</td>", gopherService.getProbeLength()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getProbeLength()));
+            sb.append(String.format("<td>%d</td>", gopherService.getProbeLength()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Minimum probe (bait) count</td>");
-        sb.append(String.format("<td>%d</td>",model.getMinBaitCount()));
+        sb.append(String.format("<td>%d</td>", gopherService.getMinBaitCount()));
         sb.append("</tr>");
         sb.append("<tr><td>Patched viewpoints (simple only)</td>");
-        if (model.getAllowPatching()) {
+        if (gopherService.getAllowPatching()) {
             sb.append("<td>yes</td>");
         } else {
             sb.append("<td>no</td>");
         }
         sb.append("</tr>");
         sb.append("<tr><td>Unbalanced margins</td>");
-        if (model.getAllowUnbalancedMargins()) {
+        if (gopherService.getAllowUnbalancedMargins()) {
             sb.append("<td>yes</td>");
         } else {
             sb.append("<td>no</td>");
@@ -185,10 +225,10 @@ public class QCCheckController implements Initializable {
 
 
         sb.append("<tr><td>Margin size</td>");
-        if (model.getMarginSize()>250 || model.getMarginSize()<120) {
-            sb.append(String.format("<td class=\"red\">%d nt</td>",model.getMarginSize()));
+        if (gopherService.getMarginSize() > 250 || gopherService.getMarginSize() < 120) {
+            sb.append(String.format("<td class=\"red\">%d nt</td>",gopherService.getMarginSize()));
         } else {
-            sb.append(String.format("<td>%d</td>",model.getMarginSize()));
+            sb.append(String.format("<td>%d</td>",gopherService.getMarginSize()));
         }
         sb.append("</tr>");
         sb.append("</tbody>\n</table>");
@@ -196,7 +236,7 @@ public class QCCheckController implements Initializable {
 
         sb.append("<p>Click <b><tt>Cancel</tt></b> to go back and adjust parameters. Red values are outside of the usual " +
                 "recommended range but may be appropriate depending on experimental needs and goals. " +
-                "Click <b><tt>Continue</tt></b> to generate Capture Hi-C probes.</p>");
+                "Click <b><tt>OK</tt></b> to generate Capture Hi-C probes.</p>");
 
         return sb.toString();
     }
@@ -205,10 +245,9 @@ public class QCCheckController implements Initializable {
     /**
      * Perform a Q/C check of the data that we are using to create the Viewpoints, mainly whether the data is
      * complete.
-     * @param model Model of the probe design
      * @return HTML string with summary of Q/C
      */
-    private String validateData(GopherModel model) {
+    private String validateData() {
         qc_ok=true;  // reset
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
@@ -217,20 +256,20 @@ public class QCCheckController implements Initializable {
         sb.append("</thead>");
         sb.append("<tbody>");
         sb.append("<tr><td>Genome</td>");
-        if (model.getGenomeDirectoryPath()==null) {
+        if (gopherService.getGenomeDirectoryPath()==null) {
             sb.append("<td class=\"red\">Path to genome directory not initialized.</td>");
             qc_ok=false;
         } else {
-            String g = String.format("%s (at %s).",model.getGenomeBuild(),model.getGenomeDirectoryPath());
+            String g = String.format("%s (at %s).",gopherService.getGenomeBuild(), gopherService.getGenomeDirectoryPath());
             sb.append(String.format("<td>%s</td>",g));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Initialization</td>");
-        if (model.isGenomeUnpacked() && model.isGenomeIndexed()) {
+        if (gopherService.isGenomeUnpacked() && gopherService.isGenomeIndexed()) {
             sb.append("<td>Genome correctly extracted and indexed.</td>");
         } else {
             String msg;
-            if (model.isGenomeUnpacked()) {
+            if (gopherService.isGenomeUnpacked()) {
                 msg="Genome was not correctly indexed";
             } else {
                 msg="Genome has not been unpacked";
@@ -240,99 +279,101 @@ public class QCCheckController implements Initializable {
         }
         sb.append("</tr>");
         sb.append("<tr><td>Alignability map</td>");
-        String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
+        String alignabilityMap = gopherService.getAlignabilityMapPathIncludingFileNameGz();
 
         if (alignabilityMap!=null) {
             int i=alignabilityMap.lastIndexOf(File.separator);
             if (i>0) {
                 alignabilityMap=alignabilityMap.substring(i+1);
             }
-            sb.append("<td>"+alignabilityMap+"</td>");
+            sb.append("<td>").append(alignabilityMap).append("</td>");
         } else {
             sb.append("<td class=\"red\">Alignability map not found</td>");
             qc_ok=false;
         }
         sb.append("</tr>");
         sb.append("<tr><td>Restriction enzyme</td>");
-        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
+        if (gopherService.getChosenEnzymelist()==null || gopherService.getChosenEnzymelist().isEmpty()) {
             sb.append("<td class=\"red\">Restriction enzyme not initialized.</td>");
             qc_ok=false;
         } else {
-            sb.append(String.format("<td>%s</td>",model.getAllSelectedEnzymeString()));
+            sb.append(String.format("<td>%s</td>", gopherService.getAllSelectedEnzymeString()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Project file</td>");
-        if (model.getProjectName()==null) {
+        if (gopherService.getProjectName()==null) {
             sb.append("<td class=\"red\">Project file name not initialized.</td>");
             qc_ok=false;
         } else {
-            sb.append(String.format("<td>%s</td>",model.getProjectName()));
+            sb.append(String.format("<td>%s</td>", gopherService.getProjectName()));
         }
         sb.append("</tr>");
         sb.append("<thead>");
         sb.append("<tr><th colspan=\"2\">Enrichment targets</th></tr>");
         sb.append("</thead>");
         sb.append("<tr><td>Target file</td>");
-        if (model.getRefGenePath()==null) {
+        if (gopherService.getRefGenePath()==null) {
             sb.append("<td class=\"red\">Targets not initialized.</td>");
             qc_ok=false;
         } else {
-            sb.append(String.format("<td>%s</td>",model.getRefGenePath()));
+            sb.append(String.format("<td>%s</td>", gopherService.getRefGenePath()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Gene list</td>");
-        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+        if (gopherService.getGopherGeneList().isEmpty()) {
             sb.append("<td class=\"red\">Gene list not initialized.</td>");
             qc_ok=false;
         } else {
-            sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",model.getChosenGeneCount(), model.getTotalRefGeneCount()));
+            sb.append(String.format("<td>%d chosen genes from %d in transcriptome</td>",
+                    gopherService.getChosenGeneCount(), gopherService.getTotalRefGeneCount()));
         }
         sb.append("</tr>");
         sb.append("<tr><td>Unique TSS</td>");
-        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+        if (gopherService.getGopherGeneList().isEmpty()) {
             sb.append("<td class=\"red\">TSS list not initialized.</td>");
             qc_ok=false;
         } else {
-            sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",model.getUniqueChosenTSScount(),model.getUniqueTSScount()));
+            sb.append(String.format("<td>%d unique transcription starts (from total of %d)</td>",
+                    gopherService.getUniqueChosenTSScount(), gopherService.getUniqueTSScount()));
         }
         sb.append("</tr>");
         return sb.toString();
     }
 
-    private static String getErrorHTML(GopherModel model) {
+    private String getErrorHTML() {
         StringBuilder sb=new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead>");
         sb.append("<tr><th colspan=\"2\">Errors</th></tr>");
         sb.append("</thead>");
         sb.append("<tbody>");
-        if (model.getGenomeDirectoryPath()==null) {
+        if (gopherService.getGenomeDirectoryPath()==null) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Path to genome directory not initialized.</td></tr>");
         }
-        if (! model.isGenomeUnpacked()) {
+        if (! gopherService.isGenomeUnpacked()) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not unpacked</td></tr>");
         }
-        if (! model.isGenomeIndexed()) {
+        if (! gopherService.isGenomeIndexed()) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Genome was not correctly indexed</td></tr>");
         }
-        String alignabilityMap = model.getAlignabilityMapPathIncludingFileNameGz();
+        String alignabilityMap = gopherService.getAlignabilityMapPathIncludingFileNameGz();
 
         if (alignabilityMap==null) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Alignability map not found</td></tr>");
         }
-        if (model.getChosenEnzymelist()==null || model.getChosenEnzymelist().isEmpty()) {
+        if (gopherService.getChosenEnzymelist()==null || gopherService.getChosenEnzymelist().isEmpty()) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Restriction enzyme not initialized.</td></tr>");
         }
-        if (model.getProjectName()==null) {
+        if (gopherService.getProjectName()==null) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Project file name not initialized.</td></tr>");
         }
-        if (model.getRefGenePath()==null) {
+        if (gopherService.getRefGenePath()==null) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Targets not initialized.</td></tr>");
         }
-        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+        if (gopherService.getGopherGeneList()==null|| gopherService.getGopherGeneList().size()==0) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">Gene list not initialized.</td></tr>");
         }
-        if (model.getGopherGeneList()==null|| model.getGopherGeneList().size()==0) {
+        if (gopherService.getGopherGeneList()==null|| gopherService.getGopherGeneList().size()==0) {
             sb.append("<tr colspan=\"2\"><td class=\"red\">TSS list not initialized.</td></tr>");
         }
         sb.append("</table>");

@@ -32,9 +32,9 @@ public class RegulatoryExomeBoxFactory {
     /**
      * Initialize the Enyzme list to show any previously chosen enzyme with a check,
      * and return the enzymes that the user chooses.
-     * @param model
+     * @param service
      */
-    public static void exportRegulatoryExome(GopherService model, final File exportDir) {
+    public static void exportRegulatoryExome(GopherService service, final File exportDir) {
         RegulatoryExomeBoxView view = new RegulatoryExomeBoxView();
         RegulatoryExomeBoxPresenter presenter = (RegulatoryExomeBoxPresenter) view.getPresenter();
         Stage window;
@@ -60,11 +60,11 @@ public class RegulatoryExomeBoxFactory {
         ProgressPopup popup = new ProgressPopup("Exporting BED file...",
                 "Calculating and exporting regulatory gene panel BED file");
         ProgressIndicator progressIndicator = popup.getProgressIndicator();
-        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(model, chosenCategories,progressIndicator);
+        RegulatoryExomeBuilder builder = new RegulatoryExomeBuilder(service, chosenCategories,progressIndicator);
         builder.setOnFailed(e -> {
             PopupFactory.displayError("Failure to build regulatory exome.",
                     builder.getStatus());
-            System.err.println(builder.getStatus());
+            logger.error(builder.getStatus());
             popup.close();
         });
         builder.setOnSucceeded(e -> {
@@ -72,7 +72,7 @@ public class RegulatoryExomeBoxFactory {
                 logger.trace(String.format("Will output regulatory panel BED file to %s", exportDir.getAbsolutePath()));
                 builder.outputRegulatoryExomeBedFile(exportDir.getAbsolutePath());
                 Properties regulatoryProperties = builder.getRegulatoryReport();
-                model.setRegulatoryExomeProperties(regulatoryProperties);
+                service.setRegulatoryExomeProperties(regulatoryProperties);
             } catch (IOException ioe) {
                 PopupFactory.displayException("Error", "Could not write regulatory exome panel to file", ioe);
             }
@@ -83,8 +83,6 @@ public class RegulatoryExomeBoxFactory {
         } catch (InterruptedException e) {
             PopupFactory.displayException("Error", "Could not download regulatory build", e);
         }
-
-        return;
     }
 
 

@@ -207,4 +207,12 @@ public interface GopherService {
     void setNormalDistributionsExtended();
 
     void deleteViewpoint(ViewPoint viewpoint);
+
+    int getTotalRefGeneCount();
+
+    int getChosenGeneCount();
+
+    int getUniqueChosenTSScount();
+
+    int getUniqueTSScount();
 }

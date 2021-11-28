@@ -7,6 +7,7 @@ import gopher.gui.factories.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.factories.EnzymeViewFactory;
 import gopher.gui.factories.HelpViewFactory;
+import gopher.gui.factories.QCCheckFactory;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
@@ -1169,25 +1170,25 @@ public class GopherMainController implements Initializable {
             return;
         }
 
-        try {
-            ClassPathResource gopherResource = new ClassPathResource("fxml/qccheck.fxml");
-            FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
-            //fxmlLoader.setControllerFactory(applicationContext::getBean);
-            Parent parent = fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(parent, 1200, 900));
-            stage.setResizable(true);
-            stage.setTitle("Quality assessment");
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // TODO return boolean value
-//        boolean OK=QCCheckFactory.showQCCheck(model);
-//        if (! OK ) {
-//            return;
+//        try {
+//            ClassPathResource gopherResource = new ClassPathResource("fxml/qccheck.fxml");
+//            FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
+//            //fxmlLoader.setControllerFactory(applicationContext::getBean);
+//            Parent parent = fxmlLoader.load();
+//            Stage stage = new Stage();
+//            stage.setScene(new Scene(parent, 1200, 900));
+//            stage.setResizable(true);
+//            stage.setTitle("Quality assessment");
+//            stage.showAndWait();
+//        } catch (IOException e) {
+//            e.printStackTrace();
 //        }
-
+        QCCheckFactory qcFactory = new QCCheckFactory(this.gopherService);
+        boolean OK = qcFactory.loadQcDialog();
+        if (! OK ) {
+            return;
+        }
+        logger.info("User entered OK for parameter check");
         ViewPointCreationTask task;
 
         if (gopherService.useSimpleApproach()) {

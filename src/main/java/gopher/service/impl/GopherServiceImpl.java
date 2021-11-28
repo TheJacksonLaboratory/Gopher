@@ -630,5 +630,25 @@ public class GopherServiceImpl implements GopherService  {
         model.deleteViewpoint(viewpoint);
     }
 
+    @Override
+    public int getTotalRefGeneCount() {
+        return model.getTotalRefGeneCount();
+    }
+
+    @Override
+    public int getChosenGeneCount() {
+        return model.getChosenGeneCount();
+    }
+
+    @Override
+    public int getUniqueChosenTSScount() {
+        return model.getUniqueChosenTSScount();
+    }
+
+    @Override
+    public int getUniqueTSScount() {
+        return model.getUniqueTSScount();
+    }
+
 
 }
