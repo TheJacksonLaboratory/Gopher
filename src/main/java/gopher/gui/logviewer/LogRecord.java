@@ -10,7 +10,7 @@ class LogRecord {
     private Level  level;
     private String context;
     private String message;
-    private static DateFormat df = new SimpleDateFormat("dd-mm-yyyy kk:mm:ss", Locale.US);
+    private static DateFormat df = new SimpleDateFormat("dd-MM-yyyy kk:mm:ss", Locale.US);
 
      LogRecord(Level level, String date, String context, String message) {
         this.timestamp = date;

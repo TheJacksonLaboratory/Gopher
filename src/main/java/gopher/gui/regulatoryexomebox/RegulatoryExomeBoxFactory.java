@@ -32,7 +32,7 @@ public class RegulatoryExomeBoxFactory {
     /**
      * Initialize the Enyzme list to show any previously chosen enzyme with a check,
      * and return the enzymes that the user chooses.
-     * @param service
+     * @param service GopherService
      */
     public static void exportRegulatoryExome(GopherService service, final File exportDir) {
         RegulatoryExomeBoxView view = new RegulatoryExomeBoxView();

@@ -77,7 +77,7 @@ public class SegmentFactory implements Serializable {
             maxDistToGenomicPosUp=genomicPos;
         }
         maxDistToGenomicPosDown=maxDistToGenomicPosDown*MAXIMUM_ZOOM_FACTOR;
-        Integer referenceSequenceLen = chromLen;
+        int referenceSequenceLen = chromLen;
         //this.chromosomeLength=fastaReader.getSequence(referenceSequenceID).length();
         this.chromosomeLength=referenceSequenceLen;
         if(referenceSequenceLen < genomicPos + maxDistToGenomicPosDown) {

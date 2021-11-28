@@ -250,7 +250,7 @@ public class DigestCreationTask extends Task<Void> {
         }
         ImmutableList<Digest> fraglist = ImmutableList.sortedCopyOf(builder.build());
         String previousCutEnzyme="None";
-        Integer previousCutPosition = 1; // start of chromosome
+        int previousCutPosition = 1; // start of chromosome
         //Header
 
          int n=0;

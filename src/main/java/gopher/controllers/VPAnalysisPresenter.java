@@ -442,8 +442,8 @@ public class VPAnalysisPresenter implements Initializable {
             s1 = s1.replaceAll(",", "");
             s2 = s2.replaceAll(",", "");
             String chromStr1, chromStr2;
-            Integer chr1, chr2;
-            Integer pos1, pos2;
+            int chr1, chr2;
+            int pos1, pos2;
             try {
                 int i = s1.indexOf(":");
                 if (i > 0) {

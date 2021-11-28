@@ -44,8 +44,8 @@ import java.util.function.Consumer;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.2.2 (2017-11-19)
  */
-public class EntrezGenePresenter implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(EntrezGenePresenter.class.getName());
+public class EntrezGeneController implements Initializable {
+    private static final Logger logger = LoggerFactory.getLogger(EntrezGeneController.class.getName());
     /** This webview explains how to enter genes */
     @FXML private WebView wview;
 
@@ -254,7 +254,7 @@ public class EntrezGenePresenter implements Initializable {
         } else {
             sb.append("<p>Valid genes:<br/>");
             for (String v : valid) {
-                sb.append("<span class=\"blu\">"+ v + "</span><br/>");
+                sb.append("<span class=\"blu\">").append(v).append("</span><br/>");
             }
             sb.append("</p>");
         }

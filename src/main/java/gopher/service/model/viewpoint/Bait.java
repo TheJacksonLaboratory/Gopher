@@ -107,8 +107,8 @@ public class Bait implements Serializable {
 
     private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
 
-        Integer kmerSize = alignabilityMap.getKmersize();
-        Double score = 0.0;
+        int kmerSize = alignabilityMap.getKmersize();
+        double score = 0.0;
         ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(startPos, endPos - kmerSize + 1);
 
         for (Integer d : alignabilityScoreList) {
@@ -124,7 +124,7 @@ public class Bait implements Serializable {
     /**
      * Calculate repeat content based on lower (repeat) and uppercase letters.
      *
-     * @param fastaReader
+     * @param fastaReader file handle for an index FASTA file
      */
     private void setRepeatContent(IndexedFastaSequenceFile fastaReader) {
 

@@ -25,7 +25,7 @@ public class Downloader extends Task<Void> {
     /**
      * The absolute path to the place (directory) where the downloaded file will be
      * saved in the local filesystem.*/
-    private File localDir=null;
+    private File localDir;
 
     /**
      * The full local path of the file we will download. It should be set to be identical
@@ -99,7 +99,7 @@ public class Downloader extends Task<Void> {
             writer = new FileOutputStream(localFilePath);
             byte[] buffer = new byte[153600];
             int totalBytesRead = 0;
-            int bytesRead = 0;
+            int bytesRead;
             int size = urlc.getContentLength();
             if (progress!=null) { updateProgress(0.01); }
             logger.trace("Size of file to be downloaded: "+size);

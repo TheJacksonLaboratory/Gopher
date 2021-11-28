@@ -128,7 +128,7 @@ public class SegmentFactoryTest {
         final File fasta = new File(testFastaFile);
         String refID="veryshort";
         //refID="chr_t4_GATC_short_20bp_and_long_24bp_fragments";
-        Integer genomicPos=42;
+        int genomicPos=42;
         int maxDistUp=20;
         int maxDistDown=15;
         SegmentFactory cpm;

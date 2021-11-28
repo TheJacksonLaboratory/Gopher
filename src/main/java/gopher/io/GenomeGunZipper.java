@@ -194,7 +194,7 @@ public class GenomeGunZipper extends Task<Void>  {
             OK=true;
 
         } else {
-            if(this.genome.getGenomeBuild()=="xenTro9" || this.genome.getGenomeBuild()=="danRer10") {
+            if(this.genome.getGenomeBuild().equals("xenTro9") || this.genome.getGenomeBuild().equals("danRer10")) {
                 logger.trace("Not a tar archive. File needs to be unzipped only.");
                 extractCanonicalChromosomesNoTarArchive();
                 return null;

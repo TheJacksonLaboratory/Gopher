@@ -97,7 +97,7 @@ public class RefGeneParser {
                 if (chrom.contains("_")) { continue;}
                 if (chrom.contains("random")) { continue; } /* do not take gene models on random contigs. */
                 String strand=A[3];
-                Integer gPos;
+                int gPos;
                 // The UCSC database files have 0-based, closed start, open end numbers
                 // we want to return 1-0based, fully closed position (both endpoints included).
                 if (strand.equals("+")) {

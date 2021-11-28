@@ -1,7 +1,6 @@
 package gopher.gui.entrezgenetable;
 
 import gopher.service.GopherService;
-import gopher.service.model.GopherModel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 
 /**

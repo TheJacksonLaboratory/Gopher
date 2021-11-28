@@ -2,7 +2,6 @@ package gopher.service;
 
 
 import gopher.service.model.RestrictionEnzyme;
-import gopher.service.model.GopherModel;
 import gopher.service.model.viewpoint.ViewPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

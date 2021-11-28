@@ -229,16 +229,16 @@ public class Design {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number of covered positions
-        Integer cSize = 0;
+        int cSize = 0;
         for(Segment seg : uniqueDigests) {
             HashSet<Integer> cSizeSet = new HashSet<>();
             for(Bait b : seg.getBaitsForUpstreamMargin()) {
-                for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
+                for(int i = b.getStartPos(); i<=b.getEndPos(); i++) {
                     cSizeSet.add(i);
                 }
             }
             for(Bait b : seg.getBaitsForDownstreamMargin()) {
-                for(Integer i = b.getStartPos(); i<=b.getEndPos(); i++) {
+                for(int i = b.getStartPos(); i<=b.getEndPos(); i++) {
                     cSizeSet.add(i);
                 }
             }

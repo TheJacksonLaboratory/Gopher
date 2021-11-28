@@ -13,9 +13,9 @@ public class ProgressPopup {
 
     private final ProgressIndicator pb = new ProgressIndicator();
 
-    private String progressTitle=null;
+    private String progressTitle;
 
-    private String progressLabel=null;
+    private String progressLabel;
 
     private Stage window=null;
 

@@ -422,7 +422,7 @@ public class ViewPoint implements Serializable {
 
 
     private void setStartPos(int startPos) {
-        this.startPos = startPos>0?startPos:0;
+        this.startPos = Math.max(startPos, 0);
     }
 
 //    private void setMinimumAllowableStartPos(int pos) { this.minimumAllowableStartPosition = pos; }

@@ -202,7 +202,7 @@ public class ViewPointController implements Initializable {
         @Override
         public int compare(String s1, String s2) {
             Integer i1;
-            Integer i2;
+            int i2;
             try {
                 int x1 = s1.indexOf(":") + 1;
                 int y1 = s1.indexOf("-");
@@ -329,7 +329,7 @@ public class ViewPointController implements Initializable {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
                     setText(item);
-                    Integer len = Integer.parseInt(item);
+                    int len = Integer.parseInt(item);
                     if (len < gopherService.getMinFragSize()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
@@ -349,8 +349,8 @@ public class ViewPointController implements Initializable {
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item,empty);
                 if (item != null && !empty) {
-                    Double rp =   Double.parseDouble(item);
-                    if (rp.isNaN()) {
+                    double rp =   Double.parseDouble(item);
+                    if (Double.isNaN(rp)) {
                         setText("n/a");
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {

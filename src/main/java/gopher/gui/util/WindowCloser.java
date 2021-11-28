@@ -36,7 +36,7 @@ public class WindowCloser {
                 .forEach(node -> ButtonBar.setButtonUniformSize(node, false));
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (!result.isPresent()) {
+        if (result.isEmpty()) {
             save=false;
             quit=false;
         } else if (result.get() == saveAndQuitButton){

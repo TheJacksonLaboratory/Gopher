@@ -68,7 +68,7 @@ public class BEDFileExporter {
      * other data on each viewpoint. Users can viewthe chosen fragments by uploading them to the UCSCbrowser.
      * @param viewpointlist List of the viewpoints we will output to BED file
      * @param genomeBuild build of genome we used to generate the viewpoints
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if we cannot find the file
      */
     public void printRestFragsToBed(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
 
@@ -142,8 +142,8 @@ public class BEDFileExporter {
 
                 // get unique margins of selected fragments and unique fragments
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
-                    Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
-                    Integer fmEndPos = segment.getSegmentMargins().get(l).endPos();
+                    int fmStaPos = segment.getSegmentMargins().get(l).startPos();
+                    int fmEndPos = segment.getSegmentMargins().get(l).endPos();
 
                     String key = vp.getReferenceID() + ":" + (fmStaPos-1) + "-" + fmEndPos; // build key
                     if (uniqueFragmentMarginsMap.get(key) == null) { // check if region is already in hash

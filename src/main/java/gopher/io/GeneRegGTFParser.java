@@ -73,7 +73,7 @@ public class GeneRegGTFParser {
         if (! A[2].equals("regulatory_region")) {
             logger.error(String.format("Unexpected element type %s",A[2]));
         }
-        Integer from,to;
+        int from,to;
         try {
             from=Integer.parseInt(A[3]);
             to=Integer.parseInt(A[4]);
@@ -96,10 +96,10 @@ public class GeneRegGTFParser {
      ID=ENSR00000283551;bound_end=45929000;bound_start=45927401;description=CTCF binding site;feature_type=CTCF Binding Site
      ID=ENSR00000097936;bound_end=72404800;bound_start=72404601;description=Predicted enhancer region;feature_type=Enhancer
      </pre>
-     * @param chrom
-     * @param from
-     * @param to
-     * @param annot
+     * @param chrom chromosome
+     * @param from start position
+     * @param to end position
+     * @param annot annotation
      */
     private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
         String[] B =annot.split(";");

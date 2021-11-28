@@ -15,7 +15,7 @@ import java.io.StringWriter;
 public class GenomeDownloader {
     static Logger logger = LoggerFactory.getLogger(GenomeDownloader.class.getName());
     /** genome build symbol, e.g., hg19, mm10. */
-    private String genomebuild=null;
+    private String genomebuild;
     /** Representation of the genome we will download. */
     private Genome genome=null;
     /** URL to download the genome from UCSC. */

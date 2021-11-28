@@ -532,7 +532,7 @@ public class Segment implements Serializable {
     private void setUsableBaitsForDownstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
 
-        Integer sta = this.getEndPos() - marginSize + 1;
+        int sta = this.getEndPos() - marginSize + 1;
         Integer end = this.getEndPos();
 
         ArrayList<Bait> baitListDownStreamMargin = new ArrayList<>();
@@ -604,7 +604,7 @@ public class Segment implements Serializable {
     }
 
     public Double getMeanGCcontentOfBaits() {
-        Double meanGCcontentOfBaits = 0.0;
+        double meanGCcontentOfBaits = 0.0;
         for(Bait b : baitListUpStreamMargin) {
             meanGCcontentOfBaits = meanGCcontentOfBaits + b.getGCContent();
         }
@@ -621,7 +621,7 @@ public class Segment implements Serializable {
     }
 
     public Double getMeanAlignabilityOfBaits() {
-        Double meanAlignabilityOfBaits = 0.0;
+        double meanAlignabilityOfBaits = 0.0;
         for(Bait b : baitListUpStreamMargin) {
             meanAlignabilityOfBaits = meanAlignabilityOfBaits + b.getAlignabilityScore();
         }
@@ -632,7 +632,7 @@ public class Segment implements Serializable {
     }
 
     public Double getMeanRepeatContentOfBaits() {
-        Double meanRepeatContentOfBaits = 0.0;
+        double meanRepeatContentOfBaits = 0.0;
         for(Bait b : baitListUpStreamMargin) {
             meanRepeatContentOfBaits = meanRepeatContentOfBaits + b.getRepeatContent();
         }

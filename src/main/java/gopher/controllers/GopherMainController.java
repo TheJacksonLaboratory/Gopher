@@ -192,10 +192,6 @@ public class GopherMainController implements Initializable {
      */
     private VPAnalysisPresenter vpanalysispresenter;
     /**
-     * View for the second tab.
-     */
-//    private VPAnalysisView vpanalysisview;
-    /**
      * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
      */
     private Stage primaryStage = null;
