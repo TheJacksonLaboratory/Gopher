@@ -1,4 +1,4 @@
-package gopher.service.model;
+package gopher.service.model.dialog;
 
 public class ProxyResults {
 

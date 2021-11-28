@@ -20,8 +20,8 @@ import java.util.*;
  * Created by peterrobinson on 7/11/17.
  */
 @Component
-public class EnzymeBoxPresenter implements Initializable {
-    static Logger logger = LoggerFactory.getLogger(EnzymeBoxPresenter.class.getName());
+public class EnzymeBoxController implements Initializable {
+    static Logger logger = LoggerFactory.getLogger(EnzymeBoxController.class.getName());
     @FXML
     Label restrictionLabel;
 
@@ -59,7 +59,7 @@ public class EnzymeBoxPresenter implements Initializable {
      */
     public void initializeEnzymes(List<RestrictionEnzyme> enzymes, List<RestrictionEnzyme> chosenEnzymes) {
         if (chosenEnzymes==null) {
-            logger.error("chosen enzyme list not initialized. Will set it to an empty list");
+            logger.info("chosen enzyme list not initialized. Will set it to an empty list");
             chosenEnzymes=new ArrayList<>();
         }
         for (RestrictionEnzyme re : enzymes) {

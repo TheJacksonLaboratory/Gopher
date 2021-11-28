@@ -118,8 +118,6 @@ public class LogViewerFactory {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
-
-
     }
 
 

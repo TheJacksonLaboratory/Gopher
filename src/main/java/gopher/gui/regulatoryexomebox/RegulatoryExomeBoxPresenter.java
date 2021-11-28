@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import gopher.gui.enzymebox.EnzymeBoxPresenter;
+import gopher.gui.enzymebox.EnzymeBoxController;
 import gopher.service.model.regulatoryexome.RegulationCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class RegulatoryExomeBoxPresenter implements Initializable {
-    private static Logger logger = LoggerFactory.getLogger(EnzymeBoxPresenter.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(EnzymeBoxController.class.getName());
     @FXML private Label label;
     @FXML private VBox regulatoryVBox;
     @FXML private Button okButton;

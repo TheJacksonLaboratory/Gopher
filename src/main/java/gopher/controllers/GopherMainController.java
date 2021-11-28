@@ -17,6 +17,7 @@ import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.util.WindowCloser;
 import gopher.io.*;
 import gopher.service.model.*;
+import gopher.service.model.dialog.ProxyResults;
 import gopher.service.model.digest.DigestCreationTask;
 import gopher.service.model.viewpoint.ExtendedViewPointCreationTask;
 import gopher.service.model.viewpoint.SimpleViewPointCreationTask;
@@ -961,11 +962,15 @@ public class GopherMainController implements Initializable {
      * corresponding popup window. It passes a list of the {@link RestrictionEnzyme}
      * objects to the {@link GopherModel}.*/
     @FXML public void chooseEnzymes() {
-        List<RestrictionEnzyme> chosenEnzymes = EnzymeViewFactory.getChosenEnzymes(gopherService.getAllEnyzmes(),
-                gopherService.getSelectedEnyzmes());
-        if (chosenEnzymes==null || chosenEnzymes.size()==0) {
+        List<RestrictionEnzyme> allEnzymes = gopherService.getAllEnyzmes();
+        List<RestrictionEnzyme> previouslySelectedEnzymes = gopherService.getChosenEnzymelist();
+        EnzymeViewFactory factory = new EnzymeViewFactory();
+        List<RestrictionEnzyme> chosenEnzymes = factory.getChosenEnzymes(allEnzymes, previouslySelectedEnzymes);
+        if (chosenEnzymes.isEmpty()) {
             PopupFactory.displayError("Warning","Warning -- no restriction enzyme chosen!");
             return;
+        } else {
+            logger.info("We retrieved {} enzymes", chosenEnzymes.size());
         }
         this.gopherService.setChosenRestrictionEnzymes(chosenEnzymes);
         this.restrictionEnzymeLabel.setText(this.gopherService.getAllSelectedEnzymeString());
