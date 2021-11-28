@@ -1,7 +1,7 @@
-package gopher.gui.viewpointpanel;
+package gopher.controllers;
 
-import gopher.controllers.VPAnalysisPresenter;
-import gopher.service.model.GopherModel;
+import gopher.service.GopherService;
+import gopher.service.URLMaker;
 import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;
 import javafx.application.Platform;
@@ -25,6 +25,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URL;
@@ -38,8 +40,9 @@ import java.util.stream.Collectors;
  * @author Peter Robinson
  * @version 0.2.8 (2018-07-12)
  */
-public class ViewPointPresenter implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(ViewPointPresenter.class.getName());
+@Component
+public class ViewPointController implements Initializable {
+    private static final Logger logger = LoggerFactory.getLogger(ViewPointController.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
@@ -101,7 +104,7 @@ public class ViewPointPresenter implements Initializable {
      */
     private Tab tab;
 
-    private GopherModel model;
+    private GopherService gopherService;
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
     private VPAnalysisPresenter analysisPresenter=null;
 
@@ -123,6 +126,12 @@ public class ViewPointPresenter implements Initializable {
     private double zoomfactor=1.0d;
 
 
+    @Autowired
+    public ViewPointController(GopherService gopherService) {
+        this.gopherService = gopherService;
+    }
+
+
     /** Remove the current tab from the App.  */
     @FXML void closeButtonAction() {
         Platform.runLater(() -> {
@@ -135,7 +144,7 @@ public class ViewPointPresenter implements Initializable {
     @FXML private void copyToClipboard(Event e) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
-        URLMaker urlmaker = new URLMaker(this.model);
+        URLMaker urlmaker = new URLMaker(this.gopherService);
         String url= urlmaker.getURL(viewpoint,this.zoomfactor,getHighlightRegions());
         content.putString(url);
         clipboard.setContent(content);
@@ -147,7 +156,7 @@ public class ViewPointPresenter implements Initializable {
 
 
     @FXML private void deleteThisViewPoint(Event e) {
-        this.model.deleteViewpoint(this.viewpoint);
+        this.gopherService.deleteViewpoint(this.viewpoint);
         tab.setDisable(true);
         this.tab.getTabPane().getTabs().remove(this.tab);
         this.analysisPresenter.refreshVPTable();
@@ -156,7 +165,7 @@ public class ViewPointPresenter implements Initializable {
 
     @FXML
     private void refreshUCSCButtonAction() {
-        URLMaker urlmaker = new URLMaker(this.model);
+        URLMaker urlmaker = new URLMaker(this.gopherService);
         String url= urlmaker.getImageURL(viewpoint,this.zoomfactor,getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
@@ -268,7 +277,7 @@ public class ViewPointPresenter implements Initializable {
                         if (!old_val.equals(new_val)) {
                             // if the user has changed something, record that we have unsaved data
                             // and also refresh the table to show the new score etc.
-                            model.setClean(false);
+                            gopherService.setClean(false);
                             analysisPresenter.refreshVPTable();
                         }
                         Platform.runLater(new Runnable() {
@@ -321,7 +330,7 @@ public class ViewPointPresenter implements Initializable {
                 if (item != null && !empty) {
                     setText(item);
                     Integer len = Integer.parseInt(item);
-                    if (len < model.getMinFragSize()) {
+                    if (len < gopherService.getMinFragSize()) {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
                         setStyle("-fx-text-fill: black; -fx-font-weight: normal");
@@ -346,7 +355,7 @@ public class ViewPointPresenter implements Initializable {
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
                         setText(String.format("%.1f",rp));
-                        if (rp > model.getMaxMeanKmerAlignability()) {
+                        if (rp > gopherService.getMaxMeanKmerAlignability()) {
                             setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                         } else {
                             setStyle("-fx-text-fill: black; -fx-font-weight: normal");
@@ -374,7 +383,7 @@ public class ViewPointPresenter implements Initializable {
                         String[] A = item.split("/");
                         for (String a : A) {
                             double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
-                            if (rp > model.getMaxRepeatContent()) red = true;
+                            if (rp > gopherService.getMaxRepeatContent()) red = true;
                         }
                     }
                     if (red) {
@@ -404,8 +413,8 @@ public class ViewPointPresenter implements Initializable {
                             // maxGcContent is a proportion (not a percentage) so we need to convert back
                             double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
                             // Show red if we are above or below threshold for either threshold
-                            if (rp > model.getMaxGCcontent()) red = true;
-                            if (rp < model.getMinGCcontent()) red = true;
+                            if (rp > gopherService.getMaxGCcontent()) red = true;
+                            if (rp < gopherService.getMinGCcontent()) red = true;
                         }
                     }
                     if (red) {
@@ -468,11 +477,6 @@ public class ViewPointPresenter implements Initializable {
                     upstreamSpan,downstreamSpan, viewpoint.getStrandAsString()));
         }
     }
-
-    public void setModel(GopherModel m) {
-        this.model = m;
-    }
-
     /**
      * Set the ViewPoint that will be presented. Load UCSC view and populate tableview with ViewPoint segments.
      *
@@ -499,7 +503,7 @@ public class ViewPointPresenter implements Initializable {
      * create url & load content from UCSC
      */
     private void showUcscView() {
-        URLMaker maker = new URLMaker(this.model);
+        URLMaker maker = new URLMaker(this.gopherService);
         logger.trace("Getting URL with zoomfactor="+zoomfactor);
         String url= maker.getImageURL(this.viewpoint,this.zoomfactor,getHighlightRegions());
         ucscWebEngine.load(url);
@@ -564,7 +568,7 @@ public class ViewPointPresenter implements Initializable {
      * @return something like this {@code highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>}.
      * . */
     private String getHighlightRegions() {
-        String genome = this.model.getGenomeBuild();
+        String genome = this.gopherService.getGenomeBuild();
         String chromosome = this.viewpoint.getReferenceID();
         List<String> colorsegmentlist = coloredsegments.stream().
                 filter(ColoredSegment::isSelected).

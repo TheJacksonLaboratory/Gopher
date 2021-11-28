@@ -48,6 +48,9 @@ public abstract class WebViewerPopup {
     private Stage adjustStagePosition(Stage childStage, Stage parentStage) {
         ObservableList<Screen> screensForParentWindow = Screen.getScreensForRectangle(parentStage.getX(), parentStage.getY(),
                 parentStage.getWidth(), parentStage.getHeight());
+        if (screensForParentWindow.isEmpty()) {
+            return childStage;
+        }
         Screen actual = screensForParentWindow.get(0);
         Rectangle2D bounds = actual.getVisualBounds();
 

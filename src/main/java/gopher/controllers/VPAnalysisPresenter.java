@@ -1,8 +1,6 @@
 package gopher.controllers;
 
 import gopher.gui.popupdialog.PopupFactory;
-import gopher.gui.viewpointpanel.ViewPointPresenter;
-import gopher.gui.viewpointpanel.ViewPointView;
 import gopher.service.GopherService;
 import gopher.service.model.Approach;
 import gopher.service.model.Design;
@@ -258,13 +256,13 @@ public class VPAnalysisPresenter implements Initializable {
             }
         });
 
-        ViewPointView view = new ViewPointView();
-        ViewPointPresenter presenter = (ViewPointPresenter) view.getPresenter();
-        presenter.setModel(this.model);
-        presenter.setCallback(this);
-        presenter.setTab(tab);
-        presenter.setViewPoint(vp);
-        tab.setContent(presenter.getPane());
+        //ViewPointView view = new ViewPointView();
+        //ViewPointController presenter = (ViewPointController) view.getPresenter();
+//        presenter.setGopherService(this.model);
+//        presenter.setCallback(this);
+//        presenter.setTab(tab);
+//        presenter.setViewPoint(vp);
+//        tab.setContent(presenter.getPane());
 
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);

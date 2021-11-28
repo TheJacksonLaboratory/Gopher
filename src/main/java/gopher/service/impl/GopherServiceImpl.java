@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-@Component
+@Service
 public class GopherServiceImpl implements GopherService  {
     private final static Logger LOGGER = LoggerFactory.getLogger(GopherServiceImpl.class);
 
@@ -622,6 +623,11 @@ public class GopherServiceImpl implements GopherService  {
     @Override
     public void setNormalDistributionsExtended() {
         model.setNormalDistributionsExtended();
+    }
+
+    @Override
+    public void deleteViewpoint(ViewPoint viewpoint) {
+        model.deleteViewpoint(viewpoint);
     }
 
 

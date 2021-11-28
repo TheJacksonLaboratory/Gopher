@@ -1,4 +1,4 @@
-package gopher.gui.help;
+package gopher.gui.factories;
 
 import gopher.io.Platform;
 import javafx.scene.Scene;

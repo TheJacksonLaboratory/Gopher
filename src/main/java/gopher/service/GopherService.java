@@ -205,4 +205,6 @@ public interface GopherService {
     void setRegulatoryExomeProperties(Properties regulatoryProperties);
 
     void setNormalDistributionsExtended();
+
+    void deleteViewpoint(ViewPoint viewpoint);
 }

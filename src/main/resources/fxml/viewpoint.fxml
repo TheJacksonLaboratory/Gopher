@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.gui.viewpointpanel.ViewPointPresenter">
+<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.controllers.ViewPointController">
     <StackPane alignment="TOP_CENTER">
         <SplitPane fx:id="viewPointSplitPane" dividerPositions="0.35" maxWidth="1600.0" minHeight="560.0"
                    minWidth="1100.0" orientation="VERTICAL" prefWidth="1100.0" StackPane.alignment="TOP_CENTER">
@@ -77,7 +77,7 @@
                     <Label fx:id="viewpointExplanationLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel"
                            GridPane.columnSpan="2147483647" GridPane.rowIndex="1"/>
                 </GridPane>
-                <TableView fx:id="segmentsTableView" stylesheets="@viewpoint.css" VBox.vgrow="ALWAYS">
+                <TableView fx:id="segmentsTableView" stylesheets="@../css/viewpoint.css" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="75.0" minWidth="75.0"
                                      prefWidth="75.0" resizable="false" sortable="false" text="Select"/>

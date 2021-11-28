@@ -6,14 +6,13 @@ import gopher.exception.GopherException;
 import gopher.gui.factories.DeleteFactory;
 import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.factories.EnzymeViewFactory;
-import gopher.gui.help.HelpViewFactory;
+import gopher.gui.factories.HelpViewFactory;
 import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
+import gopher.gui.webpopup.ProgressForm;
 import gopher.gui.webpopup.SettingsViewFactory;
-import gopher.gui.taskprogressbar.TaskProgressBarPresenter;
-import gopher.gui.taskprogressbar.TaskProgressBarView;
 import gopher.gui.util.WindowCloser;
 import gopher.io.*;
 import gopher.service.model.*;
@@ -69,7 +68,7 @@ import static javafx.application.Platform.runLater;
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
  * @author Peter Hansen
- * @version 0.5.7 (2018-09-10)
+ * @version 0.7.0 (2021-11-27)
  */
 @Component
 public class GopherMainController implements Initializable {
@@ -1105,32 +1104,13 @@ public class GopherMainController implements Initializable {
         path += File.separator;
         DigestCreationTask task = new DigestCreationTask(path,gopherService);
 
-        TaskProgressBarView pbview = new TaskProgressBarView();
-        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-
-        pbpresent.titleProperty().bind(task.titleProperty());
-        pbpresent.messageProperty().bind(task.messageProperty());
-        pbpresent.progressProperty().bind(task.progressProperty());
-
-        Stage window = new Stage();
-        String windowTitle = "Digest file creation";
-        window.setOnCloseRequest( event -> window.close() );
-        window.setTitle(windowTitle);
-        pbpresent.setSignal(signal -> {
-            switch (signal) {
-                case DONE -> window.close();
-                case CANCEL -> {
-                    task.cancel();
-                    window.close();
-                }
-                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
-
+        ProgressForm pform = new ProgressForm();
+        pform.messageProperty().bind(task.messageProperty());
+        pform.titleProperty().bind(task.titleProperty());
+        pform.progressProperty().bind(task.progressProperty());
         task.setOnSucceeded(event -> {
             logger.trace("Finished creating digest file");
-            window.close();
+            pform.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
@@ -1138,9 +1118,7 @@ public class GopherMainController implements Initializable {
                     "Exception encountered while attempting to create digest file",
                     exc);
         });
-        new Thread(task).start();
-        window.setScene(new Scene(pbview.getView()));
-        window.showAndWait();
+        pform.activateProgressBar(task);
         e.consume();
     }
 
@@ -1218,25 +1196,26 @@ public class GopherMainController implements Initializable {
             task = new ExtendedViewPointCreationTask(gopherService);
         }
 
-        TaskProgressBarView pbview = new TaskProgressBarView();
-        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
-        pbpresent.titleProperty().bind(task.titleProperty());
-        pbpresent.messageProperty().bind(task.messageProperty());
-        pbpresent.progressProperty().bind(task.progressProperty());
+//        TaskProgressBarView pbview = new TaskProgressBarView();
+//        TaskProgressBarPresenter pbpresent = (TaskProgressBarPresenter)pbview.getPresenter();
+//        pbpresent.titleProperty().bind(task.titleProperty());
+//        pbpresent.messageProperty().bind(task.messageProperty());
+//        pbpresent.progressProperty().bind(task.progressProperty());
 
 
-        Stage window = new Stage();
-        window.setTitle("Viewpoint creation");
-        window.setAlwaysOnTop(true);
-        window.setOnCloseRequest( event -> window.close() );
-        pbpresent.setSignal(signal -> {
-            switch (signal) {
-                case DONE -> window.close();
-                case CANCEL -> task.cancel();
-                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
-            }
-
-        });
+//        Stage window = new Stage();
+//        window.setTitle("Viewpoint creation");
+//        window.setAlwaysOnTop(true);
+//        window.setOnCloseRequest( event -> window.close() );
+//        pbpresent.setSignal(signal -> {
+//            switch (signal) {
+//                case DONE -> window.close();
+//                case CANCEL -> task.cancel();
+//                case FAILED -> throw new IllegalArgumentException(String.format("Illegal signal %s received.", signal));
+//            }
+//
+//        });
+        ProgressForm pform = new ProgressForm();
 
         task.setOnSucceeded(event -> {
             SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
@@ -1244,11 +1223,11 @@ public class GopherMainController implements Initializable {
             this.vpanalysispresenter.showVPTable();
             selectionModel.select(this.analysistab);
             logger.trace("Finished createViewPoints()");
-            window.close();
+            pform.close();
         });
         task.setOnFailed(eh -> {
             if (eh.getSource().getException() instanceof OutOfMemoryError) {
-                window.close();
+                pform.close();
                 JOptionPane.showMessageDialog(null,
                         "Out of memory error--see online documentation for how to increase memory",
                         "Out of memory error", JOptionPane.ERROR_MESSAGE);
@@ -1259,10 +1238,12 @@ public class GopherMainController implements Initializable {
                         exc);
             }
         });
-        task.setOnCancelled( e -> window.close() );
+        task.setOnCancelled( e -> pform.close() );
         new Thread(task).start();
-        window.setScene(new Scene(pbview.getView()));
-        window.showAndWait();
+//        window.setScene(new Scene(pbview.getView()));
+//        window.showAndWait();
+
+        pform.activateProgressBar(task);
     }
 
     public void refreshViewPoints() {

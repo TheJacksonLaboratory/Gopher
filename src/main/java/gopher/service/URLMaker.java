@@ -1,4 +1,4 @@
-package gopher.gui.viewpointpanel;
+package gopher.service;
 
 
 import gopher.service.model.RestrictionEnzyme;
@@ -16,33 +16,32 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  * @version 0.1.2 (2018-02-19)
  */
-class URLMaker {
+public class URLMaker {
     private static final Logger logger = LoggerFactory.getLogger(URLMaker.class);
-    private String genomebuild=null;
+    private final String genomebuild;
     /** This variable will be initialized to the number of pixels that we want the UCSC image to be. */
-    private int xdim;
+    private final int xdim;
     /** A String such as DpnII or DpnII,HindIII that will be used to display all cuttings sites on UCSC. */
     private final String enzymeString;
-
     /** We will make the maximum width of the UCSC image 1600. If the user's screen is smaller, we will shrink the image. */
     private static final int UCSC_DEFAULT_WIDTH = 1600;
     /* Number of nucleotides to show before and after first and last base of viewpoint. */
     private static final int OFFSET = 200;
 
 
-    URLMaker(GopherModel model, int width) {
+    public URLMaker(GopherService model, int width) {
         this.genomebuild=model.getGenomeBuild();
         xdim=width;
         this.enzymeString = model.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 
-    URLMaker(GopherModel model){
+    public URLMaker(GopherService model){
         this(model, UCSC_DEFAULT_WIDTH);
     }
 
 
-    String getImageURL(ViewPoint vp, double zoomfactor,String highlight) {
+    public String getImageURL(ViewPoint vp, double zoomfactor, String highlight) {
         final String trackType="hgRenderTracks";
         String url = getDefaultURL(vp,zoomfactor,trackType,highlight);
         switch (genomebuild) {
@@ -73,7 +72,7 @@ class URLMaker {
     }
 
 
-    String getURL(ViewPoint vp,double zoomfactor,String highlights) {
+    public String getURL(ViewPoint vp, double zoomfactor, String highlights) {
         final String trackType="hgTracks";
         String url = getDefaultURL(vp, zoomfactor, trackType, highlights);
         url = switch (this.genomebuild) {
