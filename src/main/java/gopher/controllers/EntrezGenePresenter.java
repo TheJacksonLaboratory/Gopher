@@ -285,7 +285,7 @@ public class EntrezGenePresenter implements Initializable {
         String clip = systemClipboard.getString();
         // The following is necessary in case the clipboard is empty.
         if (clip.startsWith("ActionEvent")) return;
-        String A[] = clip.split("\\s+");
+        String[] A = clip.split("\\s+");
         if (A.length==0) return;
         this.symbols = new ArrayList<>();
         symbols.addAll(Arrays.asList(A));

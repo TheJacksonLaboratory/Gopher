@@ -27,9 +27,9 @@ import java.util.List;
  */
 public class AlignabilityMap {
     /** Array of coordinates with boundaries of the region that has a certain score. */
-    private final int coordArray[];
+    private final int[] coordArray;
      /** Array of alignability score entries */
-    private final int scoreArray[];
+    private final int[] scoreArray;
 
     private final String chromName;
 

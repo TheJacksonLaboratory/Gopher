@@ -91,21 +91,15 @@ public class GenomeDownloader {
 
 
     private Genome getGenome(String genomebuild) throws DownloadFileNotFoundException {
-        if (genomebuild.equals("hg19")) {
-            return new HumanHg19();
-        } else if (genomebuild.equals("hg38")) {
-            return new HumanHg38();
-        } else if (genomebuild.equals("mm9")) {
-            return new MouseMm9();
-        } else if (genomebuild.equals("mm10")) {
-            return new MouseMm10();
-        } else if (genomebuild.equals("xenTro9")) {
-            return new FrogXenTro9();
-        } else if (genomebuild.equals("danRer10")) {
-            return new FishDanRer10();
-        } else {
-            throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
-        }
+        return switch (genomebuild) {
+            case "hg19" -> new HumanHg19();
+            case "hg38" -> new HumanHg38();
+            case "mm9" -> new MouseMm9();
+            case "mm10" -> new MouseMm10();
+            case "xenTro9" -> new FrogXenTro9();
+            case "danRer10" -> new FishDanRer10();
+            default -> throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
+        };
     }
 
 

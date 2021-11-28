@@ -1,6 +1,5 @@
 package gopher.gui.entrezgenetable;
 
-import gopher.controllers.EntrezGenePresenter;
 import gopher.service.GopherService;
 import gopher.service.model.GopherModel;
 import javafx.fxml.FXMLLoader;

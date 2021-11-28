@@ -7,14 +7,11 @@ import gopher.service.model.RestrictionEnzyme;
 import gopher.service.model.genome.Genome;
 import gopher.service.model.viewpoint.ViewPoint;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.commons.math3.distribution.IntegerDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 public interface GopherService {
 

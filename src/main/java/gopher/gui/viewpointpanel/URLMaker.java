@@ -75,20 +75,16 @@ class URLMaker {
 
     String getURL(ViewPoint vp,double zoomfactor,String highlights) {
         final String trackType="hgTracks";
-        String url = getDefaultURL(vp,zoomfactor,trackType,highlights);
-        if (this.genomebuild.equals("hg19")){
-            url=String.format("%s&%s",url,getURLFragmentHg19());
-        }  else if (this.genomebuild.equals("hg38")) {
-            url = String.format("%s&%s",url,getURLFragmentHg38());
-        }  else if (this.genomebuild.equals("mm9")) {
-            url = String.format("%s&%s",url,getURLFragmentMm9());
-        } else if (this.genomebuild.equals("mm10")) {
-            url=String.format("%s&%s",url,getURLFragmentMm10());
-        }  else if (this.genomebuild.equals("xenTro9")) {
-            url = String.format("%s&%s",url,getURLFragmentXenTro9());
-        } else if (this.genomebuild.equals("danRer10")) {
-            url=String.format("%s&%s",url,getURLFragmentDanRer10());
-        }
+        String url = getDefaultURL(vp, zoomfactor, trackType, highlights);
+        url = switch (this.genomebuild) {
+            case "hg19" -> String.format("%s&%s", url, getURLFragmentHg19());
+            case "hg38" -> String.format("%s&%s", url, getURLFragmentHg38());
+            case "mm9" -> String.format("%s&%s", url, getURLFragmentMm9());
+            case "mm10" -> String.format("%s&%s", url, getURLFragmentMm10());
+            case "xenTro9" -> String.format("%s&%s", url, getURLFragmentXenTro9());
+            case "danRer10" -> String.format("%s&%s", url, getURLFragmentDanRer10());
+            default -> getDefaultURL(vp, zoomfactor, trackType, highlights);
+        };
         logger.trace(String.format("URL for UCSC %s", url));
         return url;
     }

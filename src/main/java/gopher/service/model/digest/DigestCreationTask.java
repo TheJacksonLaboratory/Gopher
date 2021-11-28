@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import gopher.exception.GopherException;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.service.GopherService;
-import gopher.service.model.GopherModel;
 import gopher.service.model.RestrictionEnzyme;
 import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;

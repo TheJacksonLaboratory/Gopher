@@ -107,7 +107,7 @@ public class GenomeGunZipper extends Task<Void>  {
                     continue;
                 } else {
                     int count;
-                    byte data[] = new byte[BUFFER_SIZE];
+                    byte[] data = new byte[BUFFER_SIZE];
                     // Note that for hg38, the tar archive expands into a subdirectory called chroms.
                     // If the files begin with "chroms", the direc
                     String filename=entry.getName();

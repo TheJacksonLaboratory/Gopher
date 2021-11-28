@@ -91,7 +91,7 @@ public class RefGeneParser {
             BufferedReader br = new BufferedReader(decoder);
             String line;
             while ((line=br.readLine())!=null) {
-                String A[]=line.split("\t");
+                String[] A =line.split("\t");
                 String accession=A[1];
                 String chrom=A[2];
                 if (chrom.contains("_")) { continue;}

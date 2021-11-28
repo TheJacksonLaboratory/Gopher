@@ -2,7 +2,6 @@ package gopher.service.model.viewpoint;
 
 import com.google.common.collect.ImmutableList;
 import gopher.service.GopherService;
-import gopher.service.model.GopherModel;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.service.model.IntPair;

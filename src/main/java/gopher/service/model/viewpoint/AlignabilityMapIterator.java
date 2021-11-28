@@ -87,7 +87,7 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
                 BufferedReader br = new BufferedReader(decoder) ) {
             String line;
             while ((line = br.readLine()) != null) {
-                String A[] = line.split("\t");
+                String[] A = line.split("\t");
                 String chromosome = A[0];
                 Integer length = Integer.parseInt(A[1]);
                 builder.put(chromosome, length);
@@ -117,7 +117,7 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
     @Override
     public AlignabilityMap next() {
         String line;
-        String A[];
+        String[] A;
         String chromosome;
         Integer startPos;
         int endPos;

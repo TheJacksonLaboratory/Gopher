@@ -135,7 +135,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         BufferedReader br = new BufferedReader(decoder);
         String line;
         while ((line = br.readLine()) != null) {
-            String A[] = line.split("\t");
+            String[] A = line.split("\t");
             String accession = A[1];
             if (!vpmap.containsKey(accession)) {
                 continue; // this transcript is not contained in our active targets, so we can skip it.

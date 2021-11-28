@@ -53,7 +53,7 @@ public class BedFileParser {
                 if (line.isEmpty()) {
                     continue; // skip empty lines that might be at the end of the file
                 }
-                String A[] = line.split("\t");
+                String[] A = line.split("\t");
                 if (A.length < MINIMUM_NUMBER_OF_BED_FIELDS) {
                     throw new GopherException(String.format("Malformed BED6 file line : %s (at least %d fields required but we got %d",
                             line,MINIMUM_NUMBER_OF_BED_FIELDS,A.length));

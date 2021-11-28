@@ -10,7 +10,6 @@ import gopher.exception.GopherException;
 import gopher.gui.enzymebox.EnzymeViewFactory;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
-import gopher.service.model.GopherModel;
 import gopher.service.model.regulatoryexome.RegulationCategory;
 import gopher.service.model.regulatoryexome.RegulatoryExomeBuilder;
 import org.slf4j.Logger;

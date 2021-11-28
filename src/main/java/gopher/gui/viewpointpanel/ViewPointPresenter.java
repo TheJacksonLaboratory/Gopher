@@ -50,7 +50,7 @@ public class ViewPointPresenter implements Initializable {
     private static final String FAILED_HTML_CONTENT  = "<html><body><h3>GOPHER</h3><p><i>Could not connect to UCSC " +
             "Browser. Please check your internet connection and proxy</i></p></body></html>";
 
-    private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
+    private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
             "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
             "FFE4E1","F0FFF0","F0FFFF"};
@@ -227,12 +227,7 @@ public class ViewPointPresenter implements Initializable {
         viewPointSplitPane.prefWidthProperty().bind(ucscContentWebView.widthProperty());
 
         // Todo -- not catching lack of internet connect error.
-        ucscWebEngine.setOnError(new EventHandler<>() {
-            @Override
-            public void handle(WebErrorEvent event) {
-                System.out.println("BAD ERRL " + event.toString());
-            }
-        });
+        ucscWebEngine.setOnError(event -> System.out.println("BAD ERRL " + event.toString()));
 
 
 
@@ -266,7 +261,7 @@ public class ViewPointPresenter implements Initializable {
                 checkBox.setSelected(true);
             }
             if (changeListener == null) {
-                changeListener = new ChangeListener<Boolean>() {
+                changeListener = new ChangeListener<>() {
                     public void changed(ObservableValue<? extends Boolean> ov,
                                         Boolean old_val, Boolean new_val) {
                         // the following updates the selection in the GUI but does not change the originallySelected state of the segment
@@ -378,7 +373,7 @@ public class ViewPointPresenter implements Initializable {
                     boolean red=false;
                     if (item.equals("n/a")) red=true;
                     else { // in this case we expect something like 35.2%/34.8%
-                        String A[] = item.split("/");
+                        String[] A = item.split("/");
                         for (String a : A) {
                             double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));
                             if (rp > model.getMaxRepeatContent()) red = true;
@@ -406,7 +401,7 @@ public class ViewPointPresenter implements Initializable {
                     boolean red=false;
                     if (item.equals("n/a")) red=true;
                     else {
-                        String A[] = item.split("/");
+                        String[] A = item.split("/");
                         for (String a : A) {
                             // maxGcContent is a proportion (not a percentage) so we need to convert back
                             double rp = 0.01 * ((a.endsWith("%")) ? Double.parseDouble(a.substring(0, a.length() - 1)) : Double.parseDouble(a));

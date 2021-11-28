@@ -23,7 +23,7 @@ public class RestrictionEnzymeParser {
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#"))
                     continue; /* skip header*/
-                String a[] = line.split("\\s+");
+                String[] a = line.split("\\s+");
                 RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 builder.add(re);
             }

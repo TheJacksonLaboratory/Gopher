@@ -1,6 +1,5 @@
 package gopher.service.impl;
 
-import com.sun.source.tree.BreakTree;
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Faidx;
 import gopher.io.Platform;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 @Component
 public class GopherServiceImpl implements GopherService  {

@@ -6,7 +6,6 @@ import javafx.stage.Stage;
 
 import gopher.gui.popupdialog.PopupFactory;
 import gopher.io.Platform;
-import gopher.service.model.GopherModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

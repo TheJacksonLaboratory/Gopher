@@ -63,7 +63,7 @@ public class GeneRegGTFParser {
     }
 
     public RegulatoryElement next() throws IOException {
-        String A[]=this.currentLine.split("\t");
+        String[] A =this.currentLine.split("\t");
         this.currentLine=this.reader.readLine(); // advance iterator
         RegulatoryElement elem=null;
         String chrom=A[0];
@@ -102,7 +102,7 @@ public class GeneRegGTFParser {
      * @param annot
      */
     private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
-        String B[]=annot.split(";");
+        String[] B =annot.split(";");
         String id=null;
                 String feature_type=null;
         for (String b:B) {
