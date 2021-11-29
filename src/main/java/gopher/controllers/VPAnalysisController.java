@@ -35,14 +35,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 0.1.3 (2018-06-07).
  */
 @Component
-public class VPAnalysisPresenter implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(VPAnalysisPresenter.class.getName());
+public class VPAnalysisController implements Initializable {
+    private static final Logger logger = LoggerFactory.getLogger(VPAnalysisController.class.getName());
 
     /**
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
      * reference to a Tab that has been opened for it.
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
+
+    @FXML
+    private ScrollPane VpAnalysisPane;
 
     @FXML
     private HBox listviewHbox;
@@ -88,7 +91,7 @@ public class VPAnalysisPresenter implements Initializable {
     private final GopherService gopherService;
 
     @Autowired
-    public VPAnalysisPresenter(GopherService service) {
+    public VPAnalysisController(GopherService service) {
         gopherService = service;
     }
 

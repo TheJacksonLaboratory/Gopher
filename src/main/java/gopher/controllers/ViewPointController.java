@@ -106,7 +106,7 @@ public class ViewPointController implements Initializable {
 
     private GopherService gopherService;
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
-    private VPAnalysisPresenter analysisPresenter=null;
+    private VPAnalysisController analysisPresenter=null;
 
     /** Instance of {@link ViewPoint} presented by this presenter. */
     private ViewPoint viewpoint;
@@ -193,7 +193,7 @@ public class ViewPointController implements Initializable {
                 });
     }
 
-    public void setCallback(VPAnalysisPresenter vpAnalysisPresenter) {
+    public void setCallback(VPAnalysisController vpAnalysisPresenter) {
         this.analysisPresenter=vpAnalysisPresenter;
     }
 

@@ -27,7 +27,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../css/gophermain.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.controllers.GopherMainController">
+<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            stylesheets="@../css/gophermain.css"
+            xmlns="http://javafx.com/javafx/8.0.141"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="gopher.controllers.GopherMainController">
      <top>
          <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
              <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
@@ -77,7 +81,7 @@
      </top>
      <center>
          <TabPane fx:id="tabpane" tabMaxHeight="30.0" tabMaxWidth="200.0">
-             <Tab id="setuptab" closable="false" text="Setup">
+             <Tab fx:id="setuptab" closable="false" text="Setup">
                  <ScrollPane fitToHeight="true" fitToWidth="true">
                      <StackPane alignment="TOP_CENTER">
                          <VBox alignment="TOP_CENTER" maxHeight="714.0" maxWidth="900.0" minHeight="714.0"
@@ -492,8 +496,8 @@
                      </StackPane>
                  </ScrollPane>
              </Tab>
-             <Tab id="analysistab" fx:id="analysistab" closable="false" text="Analysis">
-                 <StackPane fx:id="analysisPane" alignment="TOP_CENTER" />
+             <Tab fx:id="analysistab" closable="false" text="Analysis">
+                 <fx:include source="VpAnalysisPane.fxml"/>
              </Tab>
          </TabPane>
      </center>
