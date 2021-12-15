@@ -430,17 +430,13 @@ public class GopherMainController implements Initializable {
     private void setInitializedValuesInGUI() {
         String path_to_downloaded_genome_directory = gopherService.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory!= null) {
-           // this.downloadedGenomeLabel.setText(path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
         } else {
-           // this.downloadedGenomeLabel.setText("...");
             this.genomeDownloadPI.setProgress(0);
         }
         if (gopherService.isGenomeUnpacked()) {
-           // this.decompressGenomeLabel.setText("Extraction previously completed");
             this.genomeDecompressPI.setProgress(1.00);
         } else {
-           // this.decompressGenomeLabel.setText("...");
             this.genomeDecompressPI.setProgress(0.0);
         }
         String refGenePath = gopherService.getRefGenePath();
@@ -499,11 +495,7 @@ public class GopherMainController implements Initializable {
         gopherService.setProjectName(projectname);
         if (this.primaryStage!=null)
             this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
-//        this.vpanalysisview = new VPAnalysisView();
-//        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-//        this.vpanalysispresenter.setModel(this.model);
-//        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-//        this.analysisPane.getChildren().add(vpanalysisview.getView());
+
         initializeNewModelInGui();
         e.consume();
     }
@@ -623,8 +615,6 @@ public class GopherMainController implements Initializable {
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
         this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
-
-
     }
 
     /** Remove any previous values from the text fields so that if the user chooses "New" from the File menu, they
@@ -653,7 +643,6 @@ public class GopherMainController implements Initializable {
         public String toString(Number object) {
             return object == null ? "" : object.toString();
         }
-
         @Override
         public Number fromString(String string) {
             if (string == null) {
@@ -708,7 +697,6 @@ public class GopherMainController implements Initializable {
         minBaitCountTextField.clear();
         baitLengthTextField.clear();
         marginSizeTextField.clear();
-
     }
 
     /** This method should be called before we create viewpoints. It updates all of the variables in our model object
