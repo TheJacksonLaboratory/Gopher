@@ -222,7 +222,7 @@ public class GopherMainController implements Initializable {
     }
 
     private void setSizeDown(int sd) {
-        sizeUp.set(sd);
+        sizeDown.set(sd);
     }
 
     private IntegerProperty sizeUpProperty() {
