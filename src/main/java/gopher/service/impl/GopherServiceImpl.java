@@ -650,6 +650,11 @@ public class GopherServiceImpl implements GopherService  {
         return model.getUniqueTSScount();
     }
 
+    /**
+     * Called when the user clicks on the get target genes button for loading a list of gene symbols.
+     * TODO The HTML display code does not belong here and should be refactored.
+     * @param f
+     */
     @Override
     public void getTargetGopherGenesFromFile(File f){
         List<String> symbols= new ArrayList<>();
@@ -680,6 +685,7 @@ public class GopherServiceImpl implements GopherService  {
         }
         List<String>  validGeneSymbols = parser.getValidGeneSymbols();
         List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
+
         int uniqueTSSpositions = parser.getTotalTSScount();
         int n_genes=parser.getTotalNumberOfRefGenes();
         int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
@@ -689,6 +695,7 @@ public class GopherServiceImpl implements GopherService  {
         this.model.setUniqueTSScount(uniqueTSSpositions);
         this.model.setUniqueChosenTSScount(uniqueChosenTSS);
         this.model.setChosenGeneCount(chosenGeneCount);
+        this.model.setGopherGenes(parser.getGopherGeneList());
         model.setTotalRefGeneCount(n_genes);
         PopupFactory.displayHtml(html, "Target genes");
 
