@@ -217,11 +217,11 @@ public class GopherModel implements Serializable {
     public double getMaxGCContentPercent() { return 100*maxGCcontent; }
     /** Should we allow Fragments to be chosen if only one of the two margins satisfies GC and repeat criteria? */
 
-    private boolean allowUnbalancedMargins =Default.ALLOW_UNBALANCED_MARGINs; // true
+    private boolean allowUnbalancedMargins = Default.ALLOW_UNBALANCED_MARGINs; // true
     public boolean getAllowUnbalancedMargins() { return allowUnbalancedMargins; }
     public void setAllowUnbalancedMargins(boolean b) { allowUnbalancedMargins =b; clean=false;}
 
-    private boolean allowPatching=Default.ALLOW_PATCHING; // false
+    private boolean allowPatching = Default.ALLOW_PATCHING; // false
     public boolean getAllowPatching() { return this.allowPatching; }
     public void setAllowPatching(boolean b) { this.allowPatching=b; clean=false;}
 
@@ -384,11 +384,12 @@ public class GopherModel implements Serializable {
     }
 
 
-    public void setGopherGenes(List<GopherGene> vpvgenelist) {
-        this.geneList = vpvgenelist;clean=false;
+    public void setGopherGenes(List<GopherGene> gopherGenelist) {
+        this.geneList = gopherGenelist;
+        this.clean=false;
     }
 
-    public void debugPrintVPVGenes() {
+    public void debugPrintGopherGenes() {
         if (this.geneList==null || this.geneList.size()==0) {
             System.err.println("No GOPHER Genes in Model!");
             return;

@@ -1,12 +1,17 @@
 package gopher.gui.factories;
 
+import gopher.gui.webpopup.WebViewerPopup;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +38,7 @@ public class PopupFactory {
             return result;
         }
         String answer = result.get();
-        if (answer.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@\\^`{|}~].*")) {
+        if (answer.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@^`{|}~].*")) {
             PopupFactory.displayError("File name error", "File name contains invalid characters");
             return Optional.empty();
         } else {
@@ -162,4 +167,21 @@ public class PopupFactory {
     }
 
 
+    public static void displayHtml(String html, String title) {
+        Stage window = new Stage();
+        window.setResizable(false);
+        window.centerOnScreen();
+        window.setTitle(title);
+        window.initStyle(StageStyle.UTILITY);
+        window.initModality(Modality.APPLICATION_MODAL);
+        //Stage adjWindow = adjustStagePosition(window, this.primaryStage);
+        window.initStyle(StageStyle.DECORATED);
+        window.setResizable(true);
+
+        WebView browser = new WebView();
+        WebEngine engine = browser.getEngine();
+        engine.loadContent(html);
+        window.setScene(new Scene(browser));
+        window.showAndWait();
+    }
 }

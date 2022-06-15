@@ -237,7 +237,7 @@
                                          </HBox.margin>
                                      </Label>
                                  </HBox>
-                                 <Button mnemonicParsing="false" onAction="#enterGeneList" prefHeight="30.0"
+                                 <Button mnemonicParsing="false" onAction="#enterTargetGeneList" prefHeight="30.0"
                                          prefWidth="145.0" styleClass="Button" stylesheets="@../css/gophermain.css"
                                          text="Target gene list" GridPane.rowIndex="1">
                                      <GridPane.margin>

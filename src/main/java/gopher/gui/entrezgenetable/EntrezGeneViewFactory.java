@@ -61,7 +61,7 @@ public class EntrezGeneViewFactory {
         window.setTitle(windowTitle);
 
         EntrezGeneView view = new EntrezGeneView();
-        EntrezGenePresenter presenter = (EntrezGenePresenter) view.getPresenter();
+        presenter = (EntrezGenePresenter) view.getPresenter();
         presenter.setModel(model);
         presenter.setSignal(signal -> {
             switch (signal) {

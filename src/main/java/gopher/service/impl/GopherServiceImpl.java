@@ -3,6 +3,7 @@ package gopher.service.impl;
 import gopher.gui.factories.PopupFactory;
 import gopher.io.Faidx;
 import gopher.io.Platform;
+import gopher.io.RefGeneParser;
 import gopher.service.model.Approach;
 import gopher.service.model.GopherGene;
 import gopher.service.model.GopherModel;
@@ -649,6 +650,88 @@ public class GopherServiceImpl implements GopherService  {
         return model.getUniqueTSScount();
     }
 
+    @Override
+    public void getTargetGopherGenesFromFile(File f){
+        List<String> symbols= new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String [] fields = line.split("\t");
+                symbols.add(fields[0]);
+            }
+        } catch (IOException e) {
+            PopupFactory.displayError("Error reading target genes",e.getMessage());
+            return;
+        }
+        String path = this.model.getRefGenePath();
+        if (path==null) {
+            LOGGER.error("Attempt to validate gene symbols before refGene.txt.gz file was downloaded");
+            PopupFactory.displayError("Error retrieving refGene data","Download refGene.txt.gz file before proceeding.");
+            return;
+        }
+        LOGGER.info("About to parse refGene.txt.gz file to validate uploaded gene symbols. Path at "+ path);
+        RefGeneParser parser;
+        try {
+            parser = new RefGeneParser(path);
+            parser.checkGenes(symbols);
+        } catch (Exception exc) {
+            PopupFactory.displayException("Error while attempting to validate Gene symbols","Could not validate gene symbols",exc);
+            return;
+        }
+        List<String>  validGeneSymbols = parser.getValidGeneSymbols();
+        List<String> invalidGeneSymbols= parser.getInvalidGeneSymbols();
+        int uniqueTSSpositions = parser.getTotalTSScount();
+        int n_genes=parser.getTotalNumberOfRefGenes();
+        int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
+        int uniqueChosenTSS=parser.getCountOfChosenTSS();
+        String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
+        this.model.setN_validGeneSymbols(validGeneSymbols.size());
+        this.model.setUniqueTSScount(uniqueTSSpositions);
+        this.model.setUniqueChosenTSScount(uniqueChosenTSS);
+        this.model.setChosenGeneCount(chosenGeneCount);
+        model.setTotalRefGeneCount(n_genes);
+        PopupFactory.displayHtml(html, "Target genes");
 
+    }
+
+    private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        sb.append("""
+                <style type="text/css">
+                 span.bold-red {
+                    color: red;
+                    font-weight: bold;
+                }
+                 span.blu {
+                    color: #4e89a4;
+                    font-weight: normal;
+                }
+                </style>""");
+        sb.append("<body><h3>Validated gene list</h3>");
+        sb.append(String.format("<p>We parsed a total number of %d genes and found a total of %d associated transcripts.</p>",n_genes,n_transcripts));
+        sb.append(String.format("<p>%d of the uploaded gene symbols were valid, and %d were invalid or could not be parsed.</p>",
+                valid.size(),invalid.size()));
+        if (invalid.size()>0) {
+            sb.append("<p>Invalid genes:<br/>");
+            for (String inv : invalid) {
+                sb.append("<span class=\"bold-red\">").append(inv).append("</span><br/>");
+            }
+            sb.append("</p>");
+            sb.append("<p><i>Please correct the gene symbol in the input file before proceeding. ");
+            sb.append("Otherwise, the invalid gene symbol will be ignored.</i></p>");
+        }
+        if (valid.size()==0) {
+            sb.append("<p>Error: No valid genes found!</p>");
+        } else {
+            sb.append("<p>Valid genes:<br/>");
+            for (String v : valid) {
+                sb.append("<span class=\"blu\">").append(v).append("</span><br/>");
+            }
+            sb.append("</p>");
+        }
+        sb.append("</body></html>");
+        return sb.toString();
+    }
 
 }

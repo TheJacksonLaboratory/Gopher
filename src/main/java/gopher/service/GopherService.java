@@ -216,4 +216,6 @@ public interface GopherService {
 
     int getUniqueTSScount();
 
+    void getTargetGopherGenesFromFile(File f);
+
 }

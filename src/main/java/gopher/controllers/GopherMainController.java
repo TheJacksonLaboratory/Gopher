@@ -960,8 +960,22 @@ public class GopherMainController implements Initializable {
      *
      * @param e event triggered by enter gene command.
      */
-    @FXML private void enterGeneList(ActionEvent e) {
+    @FXML private void enterTargetGeneList(ActionEvent e) {
         //EntrezGeneViewFactory.display(this.model);
+        e.consume();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose file with list of gene symbols or Entrez Gene IDs");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file == null) {
+            LOGGER.error("Could not get name of BED file");
+            return;
+        } else {
+            LOGGER.info("Uploading targets from "+file.getAbsolutePath());
+            this.gopherService.setTargetGenesPath(file.getAbsolutePath());
+        }
+        LOGGER.trace("Entering target gene list {}", file.getAbsolutePath());
+        gopherService.getTargetGopherGenesFromFile(file);
         gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
         setTargetFeedback(GopherModel.TargetType.TARGET_GENES,gopherService.getN_validGeneSymbols());
         e.consume();
@@ -983,7 +997,7 @@ public class GopherMainController implements Initializable {
         try {
             BedFileParser parser = new BedFileParser(file.getAbsolutePath());
             List<GopherGene> genelist = parser.getGopherGeneList();
-            List<String>  validGeneSymbols = genelist.stream().map(GopherGene::getGeneSymbol).collect(Collectors.toList());
+            List<String>  validGeneSymbols = genelist.stream().map(GopherGene::getGeneSymbol).toList();
             List<String> invalidGeneSymbols= ImmutableList.of();
             int uniqueTSSpositions = genelist.size();
             int n_genes=genelist.size();
