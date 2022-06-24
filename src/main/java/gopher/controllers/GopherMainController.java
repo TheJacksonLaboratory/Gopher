@@ -56,7 +56,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static javafx.application.Platform.runLater;
 
@@ -191,7 +190,7 @@ public class GopherMainController implements Initializable {
     /**
      * Presenter for the second tab.
      */
-    private VPAnalysisController vpanalysispresenter;
+    private VPAnalysisController vpAnalysisController;
     /**
      * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
      */
@@ -516,7 +515,7 @@ public class GopherMainController implements Initializable {
 
     public void setModelInMainAndInAnalysisPresenter(GopherModel mod) {
         setModel(mod);
-        this.vpanalysispresenter.setModel(mod);
+        this.vpAnalysisController.setModel(mod);
         LOGGER.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",
                 mod.getGenome().getGenomeBuild(),
                 gopherService.getGenome().getGenomeBasename()));
@@ -1177,11 +1176,11 @@ public class GopherMainController implements Initializable {
         task.setOnSucceeded(event -> {
             SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
             //this.vpanalysispresenter.setModel(this.model);
-            if (this.vpanalysispresenter == null) {
-                LOGGER.error("vpanalysispresenter == null");
+            if (this.vpAnalysisController == null) {
+                LOGGER.error("vpAnalysisController == null");
                 return;
             }
-            this.vpanalysispresenter.showVPTable();
+            this.vpAnalysisController.showVPTable();
             selectionModel.select(this.analysistab);
             LOGGER.trace("Finished createViewPoints()");
             pform.close();
@@ -1201,18 +1200,15 @@ public class GopherMainController implements Initializable {
         });
         task.setOnCancelled( e -> pform.close() );
         new Thread(task).start();
-//        window.setScene(new Scene(pbview.getView()));
-//        window.showAndWait();
-
         pform.activateProgressBar(task);
     }
 
     public void refreshViewPoints() {
-        if (this.vpanalysispresenter==null) {
+        if (this.vpAnalysisController ==null) {
             LOGGER.error("Could not refresh viewpoint table, since vpanalysispresenter was null");
             return;
         }
-        this.vpanalysispresenter.refreshVPTable();
+        this.vpAnalysisController.refreshVPTable();
     }
 
 
@@ -1418,7 +1414,7 @@ public class GopherMainController implements Initializable {
 //        this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
         //setModelInMainAndInAnalysisPresenter(this.model);
-        vpanalysispresenter.refreshVPTable();
+        vpAnalysisController.refreshVPTable();
         LOGGER.trace(String.format("Opened model %s from file %s",gopherService.getProjectName(), file.getAbsolutePath()));
         e.consume();
     }

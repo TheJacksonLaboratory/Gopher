@@ -67,7 +67,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene.toString()));
+            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vpvgene));
             vp.generateViewpointSimple(gopherService);
             viewpointlist.add(vp);
         }
@@ -81,35 +81,44 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      */
     protected Void call() throws GopherException {
         updateTitle("Creating viewpoints using 'simple' approach");
+        LOGGER.info("SimpleViewPointCreationTask, starting");
         if (ViewPoint.chosenEnzymes == null) {
             LOGGER.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
         }
         this.total = getTotalPromoterCount();
+        LOGGER.info("Got {} total promoters", this.total);
+        updateTitle(String.format("Creating viewpoints using 'simple' approach with %d promoters", this.total));
+        updateProgress(0,1000);
         this.i = 0;
-        LOGGER.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
+        LOGGER.info(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
 
         String faipath = this.gopherService.getIndexedGenomeFastaIndexFile();
+        updateProgress(2,1000);
         String fastapath = this.gopherService.getGenomeFastaFile();
+        updateProgress(20,1000);
         if (faipath == null) {
             LOGGER.error("Could not retrieve faidx file for " + fastapath);
             throw new GopherException("Could not retrieve faidx file for " + fastapath);
         }
         IndexedFastaSequenceFile fastaReader;
+        LOGGER.info("Reading genome FAST from {}", fastapath);
         try {
-            fastaReader =new IndexedFastaSequenceFile(new File(fastapath));
+            fastaReader = new IndexedFastaSequenceFile(new File(fastapath));
         } catch (FileNotFoundException fnfe) {
             throw new GopherException(String.format("Could not find genome fasta file [%s]",fnfe.getMessage()));
         }
+        updateProgress(40,1000);
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
+        LOGGER.info("MeanRestrictionFragmentLength = {}", meanLen);
         gopherService.setEstAvgRestFragLen(meanLen);
         gopherService.setNormalDistributionSimple(meanLen);
         String chromInfoPath= gopherService.getChromInfoPathIncludingFileNameGz();
         String alignabilitMapPath= gopherService.getAlignabilityMapPathIncludingFileNameGz();
         int kmerSize=Default.KMER_SIZE;
         try {
-            AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath,chromInfoPath, kmerSize);
+            AlignabilityMapIterator apiterator = new AlignabilityMapIterator(alignabilitMapPath, chromInfoPath, kmerSize);
             while (apiterator.hasNext()) {
                 AlignabilityMap apair = apiterator.next();
                 String referenceSequenceID = apair.getChromName();
@@ -117,18 +126,19 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                 if (!chromosomes.containsKey(referenceSequenceID)) {
                     continue; // skip if we have no gene on this chromosome
                 }
-                ChromosomeGroup group = chromosomes.get(referenceSequenceID);
-                if (group == null) {
-                    LOGGER.error("group is null while searching for \"" + referenceSequenceID + "\"");
+                ChromosomeGroup chromosome = chromosomes.get(referenceSequenceID);
+                if (chromosome == null) {
+                    LOGGER.error("chromosome is null while searching for \"" + referenceSequenceID + "\"");
                     for (ChromosomeGroup g : chromosomes.values()) {
                         LOGGER.error(g.getReferenceSequenceID());
                     }
+                    continue;
                 } else {
-                    LOGGER.trace("group=" + group.getReferenceSequenceID());
+                    LOGGER.trace("chromosome=" + chromosome.getReferenceSequenceID());
                 }
                 int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
-                //for (GopherGene vpvGene : gopherGene.getGenes()) {
-                group.getGenes().stream().forEach(gopherGene -> calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair,chromosomeLen));
+                chromosome.getGenes().stream().forEach(gopherGene ->
+                        calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair,chromosomeLen));
             }
 
         } catch (IOException e){
