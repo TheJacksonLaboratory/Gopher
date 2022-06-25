@@ -14,7 +14,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.controllers.ViewPointController">
+<ScrollPane fx:id="contentScrollPane" fitToHeight="true" fitToWidth="true"
+            xmlns="http://javafx.com/javafx/9"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="gopher.controllers.ViewPointController">
     <StackPane alignment="TOP_CENTER">
         <SplitPane fx:id="viewPointSplitPane" dividerPositions="0.35" maxWidth="1600.0" minHeight="560.0"
                    minWidth="1100.0" orientation="VERTICAL" prefWidth="1100.0" StackPane.alignment="TOP_CENTER">

@@ -55,8 +55,7 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
     private static Optional<Image> readAppIcon() {
         if (Platform.isMacintosh()) {
             try {
-                URL iconURL = StageInitializer.class.getResource("/img/phenomenon.png");
-
+                URL iconURL = StageInitializer.class.getResource("/img/vpvicon.png");
                 java.awt.Image macimage = new ImageIcon(iconURL).getImage();
                 // not working
                // com.apple.eawt.Application.getApplication().setDockIconImage(macimage);

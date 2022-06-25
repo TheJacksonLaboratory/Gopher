@@ -122,7 +122,7 @@ public class QCCheckFactory implements Initializable {
     private String validateParams() {
         StringBuilder sb = new StringBuilder();
         sb.append("<thead>");
-        sb.append("<tr><th colspan=\"2\">Design parameters</th></tr>");
+        sb.append("<tr><th colspan=\"2\" style=\"color:DodgerBlue;\">Design parameters</th></tr>");
         sb.append("</thead>");
         sb.append("<tr><td>Upstream size</td>");
         if (gopherService.getSizeUp()<100) {

@@ -11,6 +11,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -19,8 +20,10 @@ import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,26 +86,20 @@ public class VPAnalysisController implements Initializable {
      * UCSC browser.
      */
     private TabPane tabpane;
-
-    private final GopherService gopherService;
+    @Autowired
+    private GopherService gopherService;
 
     @Autowired
-    public VPAnalysisController(GopherService service) {
-        gopherService = service;
+    public VPAnalysisController() {
+
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.setProperty("jsse.enableSNIExtension", "false");
-        init();
-    }
-
-
-    public void init() {
         HBox.setHgrow(lviewValue, Priority.ALWAYS);
         initTable();
     }
-
 
     /**
      * Set up the table that will show the ViewPoints.
@@ -222,6 +219,7 @@ public class VPAnalysisController implements Initializable {
      * @param vp This {@link ViewPoint} object will be opened into a new Tab.
      */
     private void openViewPointInTab(ViewPoint vp) {
+        logger.error("Opening viewpoint {}", vp.getTargetName());
         if (openTabs.containsKey(vp)) {
             Tab tab = openTabs.get(vp);
             logger.trace("openTabs containsKey " + vp.getTargetName());
@@ -255,6 +253,20 @@ public class VPAnalysisController implements Initializable {
                 }
             }
         });
+        try {
+            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/viewpoint.fxml");
+            URL url = analysisPaneResource.getURL();
+            logger.error("Loading analysis pane from {}", url.getFile());
+            FXMLLoader loader = new FXMLLoader(url);
+            ScrollPane viewpointPane = loader.load();
+            tab.setContent(viewpointPane);
+        } catch (IOException e) {
+            logger.error("Could not load tab for {}", vp.getTargetName());
+            PopupFactory.displayError("Error loading viewpoint in tab",
+                    String.format("Could not load tab for %s", vp.getTargetName()));
+            return;
+        }
+
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
         openTabs.put(vp, tab);

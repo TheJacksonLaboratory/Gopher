@@ -103,7 +103,7 @@ public class ViewPointController implements Initializable {
      * Reference to the {@link Tab} where this content is placed.
      */
     private Tab tab;
-
+    @Autowired
     private GopherService gopherService;
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
     private VPAnalysisController analysisPresenter=null;
@@ -126,9 +126,7 @@ public class ViewPointController implements Initializable {
     private double zoomfactor=1.0d;
 
 
-    @Autowired
-    public ViewPointController(GopherService gopherService) {
-        this.gopherService = gopherService;
+    public ViewPointController() {
     }
 
 
@@ -221,7 +219,6 @@ public class ViewPointController implements Initializable {
             }
         }
     }
-
 
 
     @Override

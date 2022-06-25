@@ -41,7 +41,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.util.StringConverter;
@@ -179,7 +178,7 @@ public class GopherMainController implements Initializable {
     @FXML
     private TabPane tabpane;
     @FXML
-    private StackPane analysisPane;
+    private ScrollPane analysisPane;
     /** The first table with a summary of parameters for setting up the experiment. */
     @FXML
     private Tab setuptab;
@@ -390,7 +389,7 @@ public class GopherMainController implements Initializable {
         try {
             ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
             URL url = analysisPaneResource.getURL();
-            LOGGER.error("Loading analysis pane from {}", url.getFile());
+            LOGGER.trace("Loading analysis pane from {}", url.getFile());
             FXMLLoader loader = new FXMLLoader(url);
             this.analysisPane = loader.load();
             this.analysistab.setContent(this.analysisPane);
