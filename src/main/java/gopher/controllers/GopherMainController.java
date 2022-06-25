@@ -47,6 +47,7 @@ import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -199,6 +200,11 @@ public class GopherMainController implements Initializable {
     @Autowired
     GopherService gopherService;
 
+    @Value("${application.version}")
+    private String applicationVersion;
+
+    @Value("${application.title}")
+    private String applicationTitle;
 
     final transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
 
@@ -1362,7 +1368,10 @@ public class GopherMainController implements Initializable {
 
     @FXML
     public void about(ActionEvent e) {
-        PopupFactory.showAbout(GopherModel.getVersion(), gopherService.getLastChangeDate());
+        if (applicationVersion == null) {
+            applicationVersion = "0.8.2";
+        }
+        PopupFactory.showAbout(applicationVersion, gopherService.getLastChangeDate());
         e.consume();
     }
 

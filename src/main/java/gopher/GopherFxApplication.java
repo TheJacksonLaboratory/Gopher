@@ -64,18 +64,6 @@ public class GopherFxApplication extends Application {
     @Override
     public void init() {
         applicationContext = new SpringApplicationBuilder(StockUiApplication.class).run();
-        ClassPathResource applicationProps =  new ClassPathResource("/application.properties");
-        // export app's version into System properties
-       try (InputStream is = new FileInputStream(applicationProps.getFilename())) {
-            Properties properties = new Properties();
-            properties.load(is);
-            String version = "1.2";//properties.getProperty(FENOMINAL_VERSION_PROP_KEY, "unknown version");
-            System.setProperty(PHENOTEFX_VERSION_PROP_KEY, version);
-            String name = properties.getProperty(PHENOTEFX_NAME_KEY, "PhenoteFX");
-            System.setProperty(PHENOTEFX_NAME_KEY, name);
-        } catch (IOException e) {
-           LOGGER.error("Could not load application properties: {}", e.getMessage());
-        }
         File f = applicationContext.getBean("appHomeDir", File.class);
     }
 
