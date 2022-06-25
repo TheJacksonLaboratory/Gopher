@@ -99,7 +99,7 @@ public class SplashController extends Preloader {
             BorderPane root = new BorderPane();
             root.setCenter(progressBar);
             root.setTop(loadingLabel);
-            root.setAlignment(loadingLabel, Pos.CENTER);
+            loadingLabel.setAlignment(Pos.CENTER);
             return new Scene(root, 300, 100);
         }
     }

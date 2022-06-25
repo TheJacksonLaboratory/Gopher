@@ -34,8 +34,6 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
      */
     private ImmutableMap<String, Integer> chromSizesMap;
 
-    private AlignabilityMap currentArrayPair = null;
-
     private final int kmerSize;
 
     private boolean ready;
@@ -124,6 +122,7 @@ public class AlignabilityMapIterator implements Iterator<AlignabilityMap> {
         Integer alignabilityScore;
         try {
             // This will be the first line for each chromosome, but may
+            AlignabilityMap currentArrayPair = null;
             while ((line = this.bufferedReader.readLine()) != null) {
                 A = line.split("\t");
                 chromosome = A[0];

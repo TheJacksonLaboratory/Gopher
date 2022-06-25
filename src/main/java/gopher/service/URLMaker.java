@@ -44,28 +44,15 @@ public class URLMaker {
         final String trackType="hgRenderTracks";
         String url = getDefaultURL(vp,zoomfactor,trackType,highlight);
         switch (genomebuild) {
-            case "hg19":
-
-            url = String.format("%s&%s", url, getURLFragmentHg19());
-            break;
-            case "hg38":
-                url = String.format("%s&%s",url,getURLFragmentHg38());
-                break;
-            case "mm9":
-            url = String.format("%s&%s",url,getURLFragmentMm9());
-            break;
-            case "mm10":
-            url = String.format("%s&%s",url,getURLFragmentMm10());
-            break;
-            case "xenTro9":
-                url = String.format("%s&%s",url,getURLFragmentXenTro9());
-                break;
-            case "danRer10":
-                url = String.format("%s&%s",url,getURLFragmentDanRer10());
-                break;
-            default:
+            case "hg19" -> url = String.format("%s&%s", url, getURLFragmentHg19());
+            case "hg38" -> url = String.format("%s&%s", url, getURLFragmentHg38());
+            case "mm9" -> url = String.format("%s&%s", url, getURLFragmentMm9());
+            case "mm10" -> url = String.format("%s&%s", url, getURLFragmentMm10());
+            case "xenTro9" -> url = String.format("%s&%s", url, getURLFragmentXenTro9());
+            case "danRer10" -> url = String.format("%s&%s", url, getURLFragmentDanRer10());
+            default ->
                 // should never happen
-                logger.error("Unable to find URL for genome build "+genomebuild);
+                    logger.error("Unable to find URL for genome build " + genomebuild);
         }
         return url;
     }

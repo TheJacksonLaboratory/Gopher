@@ -1,6 +1,5 @@
 package gopher.gui.factories;
 
-import gopher.gui.webpopup.WebViewerPopup;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;

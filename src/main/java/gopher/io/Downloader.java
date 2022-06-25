@@ -25,7 +25,7 @@ public class Downloader extends Task<Void> {
     /**
      * The absolute path to the place (directory) where the downloaded file will be
      * saved in the local filesystem.*/
-    private File localDir;
+    private final File localDir;
 
     /**
      * The full local path of the file we will download. It should be set to be identical

@@ -34,7 +34,7 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
     private final boolean noncoding;
     /** The transcript start site positions that correspond to this gene. We use a TreeSet to avoid duplicates and keep
      * the entries sorted in ascending order.   */
-    private TreeSet<Integer> positions;
+    private final TreeSet<Integer> positions;
 
     /**
      * @param geneid The RefSeq id (e.g., NM_12345)

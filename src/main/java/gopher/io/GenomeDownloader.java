@@ -14,20 +14,16 @@ import java.io.StringWriter;
 
 public class GenomeDownloader {
     static Logger logger = LoggerFactory.getLogger(GenomeDownloader.class.getName());
-    /** genome build symbol, e.g., hg19, mm10. */
-    private String genomebuild;
     /** Representation of the genome we will download. */
     private Genome genome=null;
     /** URL to download the genome from UCSC. */
     private String url=null;
 
-    private String currentStatus="uninitialized";
-
     private boolean successful=false;
 
 
     public GenomeDownloader(String build) {
-        this.genomebuild=build;
+        /** genome build symbol, e.g., hg19, mm10. */
         logger.debug("Constructor of GenomeDownloader, build=" + build);
         try {
             this.url=getGenomeURL(build);
@@ -37,10 +33,7 @@ public class GenomeDownloader {
             logger.error("Error: {}",e.getMessage());
         }
     }
-    /** @return a simple message summarizing how much work has been completed. */
-    public String getStatus() {
-        return currentStatus;
-    }
+
     /** @return true if the genome was downloaded successfully or is already present.*/
     public boolean successful() {
         return successful;

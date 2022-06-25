@@ -385,63 +385,64 @@ public class QCCheckFactory implements Initializable {
      * @return a block of CSS code intended for the blue-beige Table of data on the design.
      */
     private static String getCSSblock() {
-        return "<style>\n" +
-                "h1 {\n" +
-                "\tfont-size: 16;\n" +
-                "  font-weight: bold;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "h3 {\n" +
-                "\tfont-size: 16;\n" +
-                "  font-weight: italic;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "h4 {\n" +
-                "\tfont-size: 12;\n" +
-                "  font-weight: italic;\n" +
-                "  color: #1C6EA4;\n" +
-                "}\n" +
-                "p.ex {\n" +
-                "\tfont-size: 9;\n" +
-                "}\n" +
-                "table.vpvTable {\n" +
-                "  border: 1px solid #1C6EA4;\n" +
-                "  background-color: #EEEEEE;\n" +
-                "  width: auto;\n" +
-                "  text-align: left;\n" +
-                "  border-collapse: collapse;\n" +
-                "}\n" +
-                "table.vpvTable td, table.vpvTable th {\n" +
-                "  border: 1px solid #AAAAAA;\n" +
-                "  padding: 3px 2px;\n" +
-                "}\n" +
-                "table.vpvTable td.red {\n" +
-                "  color: red;\n" +
-                "  font-weight: bold;\n" +
-                "}\n" +
-                "table.vpvTable tbody td {\n" +
-                "  font-size: 13px;\n" +
-                "}\n" +
-                "table.vpvTable tr:nth-child(even) {\n" +
-                "  background: #D0E4F5;\n" +
-                "}\n" +
-                "table.vpvTable thead {\n" +
-                "  background: #1C6EA4;\n" +
-                "  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);\n" +
-                "  background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);\n" +
-                "  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);\n" +
-                "  border-bottom: 2px solid #444444;\n" +
-                "}\n" +
-                "table.vpvTable thead th {\n" +
-                "  font-size: 15px;\n" +
-                "  font-weight: bold;\n" +
-                "  color: #FFFFFF;\n" +
-                "  border-left: 2px solid #D0E4F5;\n" +
-                "}\n" +
-                "table.vpvTable thead th:first-child {\n" +
-                "  border-left: none;\n" +
-                "}\n" +
-                "</style>";
+        return """
+                <style>
+                h1 {
+                \tfont-size: 16;
+                  font-weight: bold;
+                  color: #1C6EA4;
+                }
+                h3 {
+                \tfont-size: 16;
+                  font-weight: italic;
+                  color: #1C6EA4;
+                }
+                h4 {
+                \tfont-size: 12;
+                  font-weight: italic;
+                  color: #1C6EA4;
+                }
+                p.ex {
+                \tfont-size: 9;
+                }
+                table.vpvTable {
+                  border: 1px solid #1C6EA4;
+                  background-color: #EEEEEE;
+                  width: auto;
+                  text-align: left;
+                  border-collapse: collapse;
+                }
+                table.vpvTable td, table.vpvTable th {
+                  border: 1px solid #AAAAAA;
+                  padding: 3px 2px;
+                }
+                table.vpvTable td.red {
+                  color: red;
+                  font-weight: bold;
+                }
+                table.vpvTable tbody td {
+                  font-size: 13px;
+                }
+                table.vpvTable tr:nth-child(even) {
+                  background: #D0E4F5;
+                }
+                table.vpvTable thead {
+                  background: #1C6EA4;
+                  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+                  background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+                  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+                  border-bottom: 2px solid #444444;
+                }
+                table.vpvTable thead th {
+                  font-size: 15px;
+                  font-weight: bold;
+                  color: #FFFFFF;
+                  border-left: 2px solid #D0E4F5;
+                }
+                table.vpvTable thead th:first-child {
+                  border-left: none;
+                }
+                </style>""";
     }
 
 }

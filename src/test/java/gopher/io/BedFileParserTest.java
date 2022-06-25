@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BedFileParserTest {
 
-    private static BedFileParser parser;
-
     private static  List<GopherGene> gopherGeneList;
 
 
@@ -28,8 +26,8 @@ public class BedFileParserTest {
         Path path = Paths.get("src","test","resources","gwas-test.bed");
         File f = path.toFile();
 
-        parser=new BedFileParser(f.getAbsolutePath());
-        gopherGeneList=parser.getGopherGeneList();
+        BedFileParser parser = new BedFileParser(f.getAbsolutePath());
+        gopherGeneList= parser.getGopherGeneList();
     }
 
     @Test

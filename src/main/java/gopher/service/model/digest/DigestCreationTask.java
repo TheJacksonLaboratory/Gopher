@@ -79,8 +79,7 @@ public class DigestCreationTask extends Task<Void> {
     private final String outfilename;
     /** Reference to current model. */
     private final GopherService service;
-    /**  We will use this to show progress in digest creation. */
-    private int totalDigestCounter=0;
+
 
     /** Fields of the header of the output file. */
     private final String[] headerFields = {

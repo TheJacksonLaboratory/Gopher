@@ -13,9 +13,9 @@ public class ProgressPopup {
 
     private final ProgressIndicator pb = new ProgressIndicator();
 
-    private String progressTitle;
+    private final String progressTitle;
 
-    private String progressLabel;
+    private final String progressLabel;
 
     private Stage window=null;
 
@@ -31,9 +31,7 @@ public class ProgressPopup {
         window.setTitle(this.progressTitle);
         window.setScene(scene);
         window.show();
-//        task.setOnSucceeded(event -> {
-//            window.close();
-//        });
+        task.setOnSucceeded(event -> window.close());
         Thread thread = new Thread(task);
         thread.start();
     }

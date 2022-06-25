@@ -18,35 +18,19 @@ public class Bait implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
-    // coordinates of the bait
+    /**  coordinates of the bait. */
     private final String refID;
     private final int startPos;
     private final int endPos;
 
-    // average kmer alignabilty of the bait
+    /**  average kmer alignabilty of the bait. */
     private double averageKmeralignabilty;
 
-    // GC content of the bait
+    /** GC content of the bait */
     private double GCcontent;
 
-    // repeat content of the bait
+    /** repeat content of the bait . */
     private double repeatContent;
-
-//    // melting temperature of the bait
-//    private Double meltingTemperature = null;
-
-    /*
-    * Todo --remove this and just use other constructor
-     */
-//    @Deprecated
-//    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
-//        this.refID = refID;
-//        this.startPos = startPos;
-//        this.endPos = endPos;
-//        this.setGCContent(fastaReader);
-//        this.setAlignabilityScore(alignabilityMap);
-//        this.setRepeatContent(fastaReader);
-//    }
 
     public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
         this.refID = refID;
@@ -56,11 +40,6 @@ public class Bait implements Serializable {
         this.setAlignabilityScore(alignabilityMap);
         this.setRepeatContent(fastaReader);
     }
-
-
-
-
-
 
 
     public String getRefId() {

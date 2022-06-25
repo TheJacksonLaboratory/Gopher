@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class RegulatoryExomeBoxPresenter implements Initializable {
     private static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBoxPresenter.class.getName());

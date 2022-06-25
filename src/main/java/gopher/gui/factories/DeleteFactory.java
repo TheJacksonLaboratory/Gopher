@@ -43,20 +43,6 @@ public class DeleteFactory {
             e.printStackTrace();
         }
     }
-//
-//    public void updateTable(List<ProjectFile> projects) {
-//        if (projects==null || projects.isEmpty()) {
-//            apane.getChildren().remove(tableView);
-//            apane.getChildren().remove(deleteLabel);
-//            apane.getChildren().remove(undoneLabel);
-//            Label cannot = new Label("Cannot delete active project. No other project files found.");
-//            apane.getChildren().add(cannot );
-//            cannot.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-padding: 10 20 10 20;");
-//            return;
-//        }
-//
-//    }
-
 
 
     public void deleteFilesAtUserRequest() {

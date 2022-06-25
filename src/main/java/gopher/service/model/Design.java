@@ -20,7 +20,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-17)
  */
 public class Design {
-    static Logger logger = LoggerFactory.getLogger(Design.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
     /** total length in nt of all unique digest margins  */
@@ -111,11 +111,7 @@ public class Design {
             if (vp.getNumOfSelectedFrags() == 0) {
                 continue;
             }
-            int k = 0; // index of selected digest
             for (Segment segment : vp.getActiveSegments()) {
-                k++;
-//                Integer rsStaPos = segment.getStartPos();
-//                Integer rsEndPos = segment.getEndPos();
                 // get unique margins of selected fragments
                 for (int l = 0; l < segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
@@ -123,9 +119,7 @@ public class Design {
                     RC += 0.5 * (segment.getRepeatContentMarginDown() + segment.getRepeatContentMarginUp());
                     double RC2 = 0.5 * (segment.getRepeatContentMarginDown() + segment.getRepeatContentMarginUp());
                     String target = String.format("%s-%d-%d-%s_margin_%d", vp.getReferenceID(), (fmStaPos - 1), fmEndPos, vp.getTargetName(), l);
-                    if (uniqueFragmentMargins.contains(target))
-                        continue;
-                    else {
+                    if (! uniqueFragmentMargins.contains(target)) {
                         uniqueFragmentMargins.add(target);
                         nProbes +=  (1-RC2) * (fmEndPos - fmStaPos) / probelen;
                         n_nucleotides_in_unique_fragment_margins += fmEndPos - fmStaPos + 1;
@@ -135,7 +129,7 @@ public class Design {
             }
         }
         n_estimatedProbeCount = nProbes;
-        RC /=(double)N;
+        RC /= N;
         n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / service.getProbeLength();
     }
 

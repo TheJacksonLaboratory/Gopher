@@ -7,7 +7,7 @@ package gopher.gui.logviewer;
 public enum Level {
     TRACE(1), DEBUG(2), INFO(3), WARN(4), ERROR(5),FATAL(6);
 
-    int val;
+    final int val;
 
     Level(int l){val=l;}
 

@@ -2,7 +2,6 @@ package gopher.gui.regulatoryexomebox;
 
 import gopher.service.GopherService;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -38,7 +37,7 @@ public class RegulatoryExomeBoxFactory {
         Stage window;
         String windowTitle = "Regulatory Exome";
         window = new Stage();
-        window.setOnCloseRequest( event -> {window.close();} );
+        window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
 
 

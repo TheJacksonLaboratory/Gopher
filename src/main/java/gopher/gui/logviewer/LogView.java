@@ -94,16 +94,14 @@ public class LogView extends ListView<LogRecord> {
             }
         });
 
-        filterLevel.addListener((observable, oldValue, newValue) -> {
-            setItems(
-                    new FilteredList<>(
-                            logItems,
-                            logRecord ->
-                                    logRecord.getLevel().ordinal() >=
-                                            this.filterLevel.get().ordinal()
-                    )
-            );
-        });
+        filterLevel.addListener((observable, oldValue, newValue) -> setItems(
+                new FilteredList<>(
+                        logItems,
+                        logRecord ->
+                                logRecord.getLevel().ordinal() >=
+                                        this.filterLevel.get().ordinal()
+                )
+        ));
         filterLevel.set(Level.TRACE);
 
         setCellFactory(param -> new ListCell<>() {
@@ -140,29 +138,12 @@ public class LogView extends ListView<LogRecord> {
                 setText(timestamp + location + item.getMessage());
 
                 switch (item.getLevel()) {
-                    case DEBUG:
-                        pseudoClassStateChanged(debug, true);
-                        break;
-
-                    case TRACE:
-                        pseudoClassStateChanged(trace, true);
-                        break;
-
-                    case FATAL:
-                        pseudoClassStateChanged(fatal, true);
-                        break;
-
-                    case INFO:
-                        pseudoClassStateChanged(info, true);
-                        break;
-
-                    case WARN:
-                        pseudoClassStateChanged(warn, true);
-                        break;
-
-                    case ERROR:
-                        pseudoClassStateChanged(error, true);
-                        break;
+                    case DEBUG -> pseudoClassStateChanged(debug, true);
+                    case TRACE -> pseudoClassStateChanged(trace, true);
+                    case FATAL -> pseudoClassStateChanged(fatal, true);
+                    case INFO -> pseudoClassStateChanged(info, true);
+                    case WARN -> pseudoClassStateChanged(warn, true);
+                    case ERROR -> pseudoClassStateChanged(error, true);
                 }
             }
         });

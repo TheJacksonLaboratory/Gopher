@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 /**
  * This is the window that appears so that the user can upload target genes. The dialog has three buttons.

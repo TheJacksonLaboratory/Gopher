@@ -171,8 +171,6 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "GOPHER: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
         Integer totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
-            //out_allTracks.println(s);
-            //out_targetRegions.println(s);
             String[] parts = s.split("\t");
             Integer sta = Integer.parseInt(parts[1]);
             Integer end = Integer.parseInt(parts[2]);

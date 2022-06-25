@@ -23,7 +23,7 @@ public class ProgressForm {
 
     public ProgressForm() {
         dialogStage = new Stage();
-        dialogStage.setWidth(400);
+        dialogStage.setWidth(600);
         dialogStage.setHeight(150);
         dialogStage.initStyle(StageStyle.UTILITY);
         dialogStage.setResizable(false);

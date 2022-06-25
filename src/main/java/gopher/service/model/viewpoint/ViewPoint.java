@@ -899,12 +899,10 @@ public class ViewPoint implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-        if (! (other instanceof ViewPoint)) return false;
-        ViewPoint othervp = (ViewPoint)other;
+        if (! (other instanceof ViewPoint othervp)) return false;
         return (targetName.equals(othervp.targetName) &&
         genomicPos == othervp.genomicPos &&
         chromosomeID.equals(othervp.chromosomeID));
-
     }
 
     public boolean hasNoActiveSegment() {
