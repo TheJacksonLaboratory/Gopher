@@ -4,7 +4,7 @@ package gopher;
  * #%L
  * PhenoteFX
  * %%
- * Copyright (C) 2017 - 2021 Peter Robinson
+ * Copyright (C) 2017 - 2022 Peter Robinson
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,12 @@ package gopher;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.application.Preloader;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,31 +37,16 @@ import java.util.Properties;
 public class GopherFxApplication extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(GopherFxApplication.class);
     private ConfigurableApplicationContext applicationContext;
-    static public final String PHENOTEFX_NAME_KEY = "phenotefx.name";
-    static private final String PHENOTEFX_VERSION_PROP_KEY = "phenotefx_version";
 
-
-    @Override
-    public void start(Stage stage) {
-
-        applicationContext.publishEvent(new StageReadyEvent(stage));
-        // (Simulation of heavy background work)
-//        int numberOfUpdates = 10;
-//        for (int i = 0; i < numberOfUpdates; i++) {
-//            // Gradually update the loading bar
-//            try {
-//                notifyPreloader(new Preloader.ProgressNotification((double) i / numberOfUpdates));
-//                Thread.sleep(3000L / numberOfUpdates);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-    }
 
     @Override
     public void init() {
         applicationContext = new SpringApplicationBuilder(StockUiApplication.class).run();
-        File f = applicationContext.getBean("appHomeDir", File.class);
+    }
+    @Override
+    public void start(Stage stage) {
+        LOGGER.info("Starting application");
+        applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 
     /**
@@ -73,6 +55,7 @@ public class GopherFxApplication extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
+        LOGGER.info("Stopping application");
         final Properties pgProperties = applicationContext.getBean("pgProperties", Properties.class);
         final Path configFilePath = applicationContext.getBean("configFilePath", Path.class);
         try (OutputStream os = Files.newOutputStream(configFilePath)) {

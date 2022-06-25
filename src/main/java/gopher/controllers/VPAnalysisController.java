@@ -359,6 +359,7 @@ public class VPAnalysisController implements Initializable {
             logger.error("GOPHER Service is null--should never happen");
             return;
         }
+
         javafx.application.Platform.runLater(() -> {
             updateListView();
             List<ViewPoint> vpl = this.gopherService.getViewPointList();

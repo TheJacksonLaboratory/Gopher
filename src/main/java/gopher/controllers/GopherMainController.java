@@ -1196,7 +1196,6 @@ public class GopherMainController implements Initializable {
 
         task.setOnSucceeded(event -> {
             SingleSelectionModel<Tab> selectionModel = tabpane.getSelectionModel();
-            //this.vpanalysispresenter.setModel(this.model);
             if (this.vpAnalysisController == null) {
                 LOGGER.error("vpAnalysisController == null");
                 return;
