@@ -12,6 +12,7 @@ import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.factories.PopupFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
+import gopher.gui.util.MyPreloader;
 import gopher.gui.webpopup.ProgressForm;
 import gopher.gui.webpopup.SettingsViewFactory;
 import gopher.gui.util.WindowCloser;
@@ -44,6 +45,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.util.StringConverter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,6 +193,7 @@ public class GopherMainController implements Initializable {
     /**
      * Presenter for the second tab.
      */
+    @Autowired
     private VPAnalysisController vpAnalysisController;
     /**
      * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
@@ -395,6 +398,19 @@ public class GopherMainController implements Initializable {
             }
         });
         File userDir = Platform.getGopherDir();
+        String projectName = MyPreloader.getProjectName();
+        if (MyPreloader.isIsNewProject()) {
+            startNewProject(projectName);
+        } else {
+            File f = new File(userDir.getAbsolutePath() +  File.separator + projectName);
+            if (! f.isFile()) {
+                PopupFactory.displayError("Could not open project", String.format("Could not open GOPHER project at %s",
+                        f.getAbsolutePath()));
+                return;
+            }
+            importProject(f);
+        }
+        System.out.println("Project name " + projectName);
     }
 
 
@@ -481,11 +497,17 @@ public class GopherMainController implements Initializable {
      * the GUI as well
      * @param e Event triggered by new viewpoint command.
      */
-    @FXML public void startNewProject(ActionEvent e) {
+    @FXML public void startNewProjectFromFileMenu(ActionEvent e) {
         Optional<String> optName = PopupFactory.getProjectName();
         if (optName.isEmpty())
             return; // do nothing, the user cancelled!
         String projectname = optName.get();
+        startNewProject(projectname);
+        e.consume();
+    }
+
+    private void startNewProject(String newProjectName) {
+
         ObservableList<Tab> panes = this.tabpane.getTabs();
         /* collect tabs first then remove them -- avoids a ConcurrentModificationException */
         List<Tab> tabsToBeRemoved=new ArrayList<>();
@@ -496,13 +518,12 @@ public class GopherMainController implements Initializable {
             tabsToBeRemoved.add(tab);
         }
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
-        LOGGER.info("Starting new project with name {}", projectname);
-        gopherService.setProjectName(projectname);
+        LOGGER.info("Starting new project with name {}", newProjectName);
+        gopherService.setProjectName(newProjectName);
         if (this.primaryStage!=null)
-            this.primaryStage.setTitle(String.format("GOPHER: %s",projectname));
+            this.primaryStage.setTitle(String.format("GOPHER: %s", newProjectName));
 
         initializeNewModelInGui();
-        e.consume();
     }
 
     /**
@@ -512,16 +533,14 @@ public class GopherMainController implements Initializable {
      * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
      * @param mod A {@link GopherModel} object.
      */
-    private void setModel(GopherModel mod) {
-        this.gopherService.setModel(mod);
-        setInitializedValuesInGUI();
-        setBindings();
-    }
+//    private void setModel(GopherModel mod) {
+//        this.gopherService.setModel(mod);
+//        setInitializedValuesInGUI();
+//        setBindings();
+//    }
 
 
     public void setModelInMainAndInAnalysisPresenter(GopherModel mod) {
-        setModel(mod);
-        this.vpAnalysisController.setModel(mod);
         LOGGER.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",
                 mod.getGenome().getGenomeBuild(),
                 gopherService.getGenome().getGenomeBasename()));
@@ -1403,13 +1422,19 @@ public class GopherMainController implements Initializable {
 
     /** Open a project from a file specified by the user. */
     @FXML
-    public void importProject(ActionEvent e) {
+    public void importProjectFromFileMenu(ActionEvent e) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open Gopher project file");
         File file = chooser.showOpenDialog(null);
         if (file==null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;
         }
+        importProject(file);
+        e.consume();
+    }
+
+    private void importProject(File file) {
+        LOGGER.error("Importing project: {}", file.getAbsolutePath());
         removePreviousValuesFromTextFields();
         gopherService.importProtjectFromFile(file);
         if (this.primaryStage!=null)
@@ -1425,7 +1450,6 @@ public class GopherMainController implements Initializable {
         //setModelInMainAndInAnalysisPresenter(this.model);
         vpAnalysisController.refreshVPTable();
         LOGGER.trace(String.format("Opened model %s from file %s",gopherService.getProjectName(), file.getAbsolutePath()));
-        e.consume();
     }
 
     @FXML

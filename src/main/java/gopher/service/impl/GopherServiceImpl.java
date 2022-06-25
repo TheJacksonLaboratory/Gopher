@@ -27,7 +27,7 @@ import java.util.Properties;
 @Service
 public class GopherServiceImpl implements GopherService, Serializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(GopherServiceImpl.class);
-
+    @Autowired
     private GopherModel model;
 
     @Autowired

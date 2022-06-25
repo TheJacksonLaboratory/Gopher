@@ -79,7 +79,7 @@ public class VPAnalysisController implements Initializable {
 
     @FXML
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
-
+    @Autowired
     private GopherModel model;
 
     /**
@@ -275,12 +275,6 @@ public class VPAnalysisController implements Initializable {
 //            System.err.println(s);
 //        }
     }
-
-
-    public void setModel(GopherModel m) {
-        this.model = m;
-    }
-
 
     public void setTabPaneRef(TabPane tabp) {
         this.tabpane = tabp;

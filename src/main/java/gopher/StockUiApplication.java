@@ -20,7 +20,10 @@ package gopher;
  * #L%
  */
 
+import com.sun.javafx.application.LauncherImpl;
+import gopher.gui.util.MyPreloader;
 import javafx.application.Application;
+import javafx.application.Preloader;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
@@ -31,7 +34,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class StockUiApplication {
     public static void main(String[] args) {
-        Application.launch(GopherFxApplication.class, args);
+        Preloader preloader = new MyPreloader();
+        LauncherImpl.launchApplication(GopherFxApplication.class, MyPreloader.class, args);
+
     }
 }
 

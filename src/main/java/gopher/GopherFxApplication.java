@@ -49,16 +49,16 @@ public class GopherFxApplication extends Application {
 
         applicationContext.publishEvent(new StageReadyEvent(stage));
         // (Simulation of heavy background work)
-        int numberOfUpdates = 10;
-        for (int i = 0; i < numberOfUpdates; i++) {
-            // Gradually update the loading bar
-            try {
-                notifyPreloader(new Preloader.ProgressNotification((double) i / numberOfUpdates));
-                Thread.sleep(3000L / numberOfUpdates);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        int numberOfUpdates = 10;
+//        for (int i = 0; i < numberOfUpdates; i++) {
+//            // Gradually update the loading bar
+//            try {
+//                notifyPreloader(new Preloader.ProgressNotification((double) i / numberOfUpdates));
+//                Thread.sleep(3000L / numberOfUpdates);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override
@@ -76,7 +76,7 @@ public class GopherFxApplication extends Application {
         final Properties pgProperties = applicationContext.getBean("pgProperties", Properties.class);
         final Path configFilePath = applicationContext.getBean("configFilePath", Path.class);
         try (OutputStream os = Files.newOutputStream(configFilePath)) {
-            pgProperties.store(os, "Fenominal properties");
+            pgProperties.store(os, "GOPHER properties");
         }
         Platform.exit();
         applicationContext.close();

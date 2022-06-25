@@ -36,9 +36,9 @@
          <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
              <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
                  <Menu mnemonicParsing="false" text="File">
-                     <MenuItem accelerator="Shortcut+N" mnemonicParsing="false" onAction="#startNewProject" text="New" />
+                     <MenuItem accelerator="Shortcut+N" mnemonicParsing="false" onAction="#startNewProjectFromFileMenu" text="New" />
                      <MenuItem accelerator="Shortcut+S" mnemonicParsing="false" onAction="#saveProject" text="Save project" />
-                     <MenuItem mnemonicParsing="false" onAction="#importProject" text="Import project ..." />
+                     <MenuItem mnemonicParsing="false" onAction="#importProjectFromFileMenu" text="Import project ..." />
                      <MenuItem mnemonicParsing="false" onAction="#exportProject" text="Export project ..." />
                      <MenuItem mnemonicParsing="false" onAction="#saveProjectAndClose" text="Save project and close" />
                      <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#closeWindow" text="Quit" />
