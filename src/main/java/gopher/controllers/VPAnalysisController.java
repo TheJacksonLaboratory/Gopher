@@ -4,8 +4,6 @@ import gopher.gui.factories.PopupFactory;
 import gopher.service.GopherService;
 import gopher.service.model.Approach;
 import gopher.service.model.Design;
-import gopher.service.model.GopherModel;
-import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;
 import gopher.util.Utils;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -45,7 +43,7 @@ public class VPAnalysisController implements Initializable {
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
     @FXML
-    private ScrollPane VpAnalysisPane;
+    private ScrollPane VpAnalysisController;
 
     @FXML
     private HBox listviewHbox;
@@ -79,8 +77,6 @@ public class VPAnalysisController implements Initializable {
 
     @FXML
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
-    @Autowired
-    private GopherModel model;
 
     /**
      * A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
@@ -102,7 +98,7 @@ public class VPAnalysisController implements Initializable {
     }
 
 
-    private void init() {
+    public void init() {
         HBox.setHgrow(lviewValue, Priority.ALWAYS);
         initTable();
     }
@@ -132,7 +128,8 @@ public class VPAnalysisController implements Initializable {
             btn.setOnAction(e -> {
                 logger.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
-                model.deleteViewpoint(vp);
+                gopherService.deleteViewpoint(vp);
+              //  model.deleteViewpoint(vp);
                 if (this.openTabs.containsKey(vp)) { // If the tab is open, remove it from the GUI.
                     Tab tab = openTabs.get(vp);
                     tab.setDisable(true);
@@ -148,7 +145,7 @@ public class VPAnalysisController implements Initializable {
         resetTableColumn.setCellValueFactory(cdf -> {
             ViewPoint vp = cdf.getValue();
             if (vp.wasModified()) {
-                this.model.setClean(false);
+                gopherService.setClean(false);
             }
             Button btn = new Button("Reset");
             btn.setOnAction(e -> {
@@ -258,22 +255,9 @@ public class VPAnalysisController implements Initializable {
                 }
             }
         });
-
-        //ViewPointView view = new ViewPointView();
-        //ViewPointController presenter = (ViewPointController) view.getPresenter();
-//        presenter.setGopherService(this.model);
-//        presenter.setCallback(this);
-//        presenter.setTab(tab);
-//        presenter.setViewPoint(vp);
-//        tab.setContent(presenter.getPane());
-
         this.tabpane.getTabs().add(tab);
         this.tabpane.getSelectionModel().select(tab);
         openTabs.put(vp, tab);
-        List<Segment> seglist = vp.getAllSegments();
-//        for (Segment s : seglist) {
-//            System.err.println(s);
-//        }
     }
 
     public void setTabPaneRef(TabPane tabp) {
@@ -287,7 +271,7 @@ public class VPAnalysisController implements Initializable {
      * upper half of the tab.
      */
     public void showVPTable() {
-        if (!this.model.viewpointsInitialized()) {
+        if (!this.gopherService.viewpointsInitialized()) {
             logger.warn("[View Points not initialized");
             PopupFactory.displayError("Could not confirmDialog viewpoints", "No initialized viewpoints were found");
             return;
@@ -326,7 +310,7 @@ public class VPAnalysisController implements Initializable {
         double avgVpScore = design.getAvgVPscore();
         String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
                 nviewpoints, resolvedVP);
-        if (model.getApproach().equals(Approach.SIMPLE)) {
+        if (gopherService.getApproach().equals(Approach.SIMPLE)) {
             int n_patched = design.getN_patched_viewpoints();
             vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
         }
@@ -359,17 +343,13 @@ public class VPAnalysisController implements Initializable {
      * This method is called to refresh the values of the ViewPoint in the table of the analysis tab.
      */
     public void refreshVPTable() {
-        if (model == null) {
-            logger.error("Model null--should never happen");
+        if (gopherService == null) {
+            logger.error("GOPHER Service is null--should never happen");
             return;
         }
         javafx.application.Platform.runLater(() -> {
             updateListView();
-            if (model == null) {
-                logger.error("model was null while trying to refresh VP table, should never happen");
-                return;
-            }
-            List<ViewPoint> vpl = this.model.getViewPointList();
+            List<ViewPoint> vpl = this.gopherService.getViewPointList();
             logger.trace("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
             viewPointTableView.getItems().clear(); /* clear previous rows, if any */
             viewPointTableView.getItems().addAll(vpl);

@@ -9,9 +9,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="VpAnalysisPane"
+<ScrollPane fx:id="VpAnalysisController"
             fitToHeight="true"
             fitToWidth="true"
+            xmlns="http://javafx.com/javafx/9"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="gopher.controllers.VPAnalysisController">
     <StackPane alignment="TOP_CENTER">
         <VBox alignment="TOP_CENTER" maxWidth="1200.0" minHeight="600.0" minWidth="1105.0" prefWidth="1200.0">

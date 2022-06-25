@@ -29,7 +29,7 @@
 
 <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
             stylesheets="@../css/gophermain.css"
-            xmlns="http://javafx.com/javafx/8.0.141"
+            xmlns="http://javafx.com/javafx/9"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gopher.controllers.GopherMainController">
      <top>

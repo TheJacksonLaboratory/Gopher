@@ -40,7 +40,7 @@ public class QCCheckFactory implements Initializable {
 
     private static final String HTML_HEADER = "<html><head>%s</head><body><h1>Parameter QC</h1>";
     private static final String HTML_FOOTER = "</body></html>";
-    private static NumberFormat dformater= NumberFormat.getInstance(Locale.US);
+    private static final NumberFormat dformater= NumberFormat.getInstance(Locale.US);
     /** This will be set to false if files are missing and we should not go on with the analysis. */
     private static boolean qc_ok=true;
 
@@ -67,28 +67,9 @@ public class QCCheckFactory implements Initializable {
         webEngine.loadContent(html);
         dialogPane.setContent(wv);
         runLater(wv::requestFocus);
-        dialog.setResultConverter((ButtonType button) -> {
-            if (button == ButtonType.OK) {
-                return true;// Optional.of(new Boolean(true));
-            }
-            return false;
-        });
+        dialog.setResultConverter((ButtonType button) -> button == ButtonType.OK);
         Optional<Boolean> optionalResult = dialog.showAndWait();
-        return optionalResult.get();
-//       dialogPane.setContent(restrictionVBox);
-//        runLater(restrictionVBox::requestFocus);
-//        dialog.setResultConverter((ButtonType button) -> {
-//            if (button == ButtonType.OK) {
-//                return new RestrictionEnzymeResult(this.chosen);
-//            }
-//            return null;
-//        });
-//        Optional<RestrictionEnzymeResult> optionalResult = dialog.showAndWait();
-//        if (optionalResult.isPresent()) {
-//            return optionalResult.get().chosenEzymes();
-//        } else {
-//            return List.of();
-//        }
+        return optionalResult.orElse(false);
     }
 
     public void setData(String html) {
@@ -118,21 +99,14 @@ public class QCCheckFactory implements Initializable {
         window = new Stage();
         window.setOnCloseRequest( event -> window.close() );
         window.setTitle(windowTitle);
-
-      //  QCCheckView view = new QCCheckView();
-       // QCCheckPresenter presenter = (QCCheckPresenter) view.getPresenter();
-
         String html= getHTML();
         if (!qc_ok) {
             html=getErrorHTML();
         }
         setData(html);
-
         if (model.getViewPointList() != null && model.getViewPointList().size()>0) {
             setLabel("Warning: this step will overwrite current Viewpoints");
         }
-
-        //window.setScene(new Scene(view.getView()));
         window.showAndWait();
         return (! wasCanceled() && qc_ok);
     }
@@ -248,7 +222,7 @@ public class QCCheckFactory implements Initializable {
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead>");
-        sb.append("<tr><th colspan=\"2\">Data sources</th></tr>");
+        sb.append("<tr><th colspan=\"2\" style=\"color:DodgerBlue;\">Data sources</th></tr>");
         sb.append("</thead>");
         sb.append("<tbody>");
         sb.append("<tr><td>Genome</td>");
@@ -305,7 +279,7 @@ public class QCCheckFactory implements Initializable {
         }
         sb.append("</tr>");
         sb.append("<thead>");
-        sb.append("<tr><th colspan=\"2\">Enrichment targets</th></tr>");
+        sb.append("<tr><th colspan=\"2\" style=\"color:DodgerBlue;\">Enrichment targets</th></tr>");
         sb.append("</thead>");
         sb.append("<tr><td>Target file</td>");
         if (gopherService.getRefGenePath()==null) {
@@ -340,7 +314,7 @@ public class QCCheckFactory implements Initializable {
         StringBuilder sb=new StringBuilder();
         sb.append("<table class=\"vpvTable\">");
         sb.append("<thead>");
-        sb.append("<tr><th colspan=\"2\">Errors</th></tr>");
+        sb.append("<tr><th colspan=\"2\" style=\"color:DodgerBlue;\">Errors</th></tr>");
         sb.append("</thead>");
         sb.append("<tbody>");
         if (gopherService.getGenomeDirectoryPath()==null) {
@@ -374,7 +348,7 @@ public class QCCheckFactory implements Initializable {
         }
         sb.append("</table>");
         sb.append("<p>Please initialize GOPHER with the required items before creating viewpoints.</p>");
-        return String.format("%s%s%s",String.format(HTML_HEADER,getCSSblock()),sb.toString(),HTML_FOOTER);
+        return String.format("%s%s%s",String.format(HTML_HEADER, getCSSblock()), sb, HTML_FOOTER);
     }
 
 

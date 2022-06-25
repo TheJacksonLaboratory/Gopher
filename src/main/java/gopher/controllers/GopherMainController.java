@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static gopher.configuration.GopherConfig.GENOME_DOWNLOAD_DIRECTORY;
 import static javafx.application.Platform.runLater;
 
 /**
@@ -195,6 +196,12 @@ public class GopherMainController implements Initializable {
      */
     @Autowired
     private VPAnalysisController vpAnalysisController;
+    /** This is a Properties object that corresponds to the .gopher/gopher.properties file and
+     * can store information about the download locations.
+     */
+    @Autowired
+    private Properties pgProperties;
+
     /**
      * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
      */
@@ -382,7 +389,9 @@ public class GopherMainController implements Initializable {
 
         try {
             ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
-            FXMLLoader loader = new FXMLLoader(analysisPaneResource.getURL());
+            URL url = analysisPaneResource.getURL();
+            LOGGER.error("Loading analysis pane from {}", url.getFile());
+            FXMLLoader loader = new FXMLLoader(url);
             this.analysisPane = loader.load();
             this.analysistab.setContent(this.analysisPane);
         } catch(IOException iex) {
@@ -402,7 +411,7 @@ public class GopherMainController implements Initializable {
         if (MyPreloader.isIsNewProject()) {
             startNewProject(projectName);
         } else {
-            File f = new File(userDir.getAbsolutePath() +  File.separator + projectName);
+            File f = new File(Objects.requireNonNull(userDir).getAbsolutePath() +  File.separator + projectName);
             if (! f.isFile()) {
                 PopupFactory.displayError("Could not open project", String.format("Could not open GOPHER project at %s",
                         f.getAbsolutePath()));
@@ -410,7 +419,9 @@ public class GopherMainController implements Initializable {
             }
             importProject(f);
         }
+        gopherService.setProjectName(projectName);
         System.out.println("Project name " + projectName);
+        this.vpAnalysisController.setTabPaneRef(tabpane);
     }
 
 
@@ -522,110 +533,96 @@ public class GopherMainController implements Initializable {
         gopherService.setProjectName(newProjectName);
         if (this.primaryStage!=null)
             this.primaryStage.setTitle(String.format("GOPHER: %s", newProjectName));
-
         initializeNewModelInGui();
     }
-
-    /**
-     * This allows a caller to set the {@link GopherModel} object for this presenter (for instance, a default
-     * {@link GopherModel} object is set if the user chooses a new viewpoint. If the user chooses to open a previous
-     * viewpoint from a serialized file, then a  {@link GopherModel} object is initialized from the file and set here.
-     * This method calls {@link #setInitializedValuesInGUI()} in order to show relevant data in the GUI.
-     * @param mod A {@link GopherModel} object.
-     */
-//    private void setModel(GopherModel mod) {
-//        this.gopherService.setModel(mod);
-//        setInitializedValuesInGUI();
-//        setBindings();
+////
+////    public void setModelInMainAndInAnalysisPresenter() {
+////        //Model mod = gopherService.getG
+////        LOGGER.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",
+////                mod.getGenome().getGenomeBuild(),
+////                gopherService.getGenome().getGenomeBasename()));
+////        if (gopherService.getMaxGCcontent()>0){
+////            this.maxGCContentTextField.setText(String.format("%.1f%%",gopherService.getMaxGCContentPercent()));
+////        } else {
+////            this.maxGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAX_GC_CONTENT));
+////        }
+////        if (gopherService.getMinGCcontent()>0) {
+////            this.minGCContentTextField.setText(String.format("%.1f%%",gopherService.getMinGCContentPercent()));
+////        } else {
+////            this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
+////        }
+////        if (gopherService.getMinBaitCount()>0) {
+////            this.minBaitCountTextField.setText(String.valueOf(gopherService.getMinBaitCount()));
+////        } else {
+////            this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
+////        }
+////        if (gopherService.getMinFragSize()>0) {
+////            this.minFragSizeTextField.setText(String.format("%d",gopherService.getMinFragSize()));
+////        } else {
+////            this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
+////        }
+////        if (gopherService.getMaxMeanKmerAlignability()>0) {
+////            this.maxKmerAlignabilityTextField.setText(String.format("%d",gopherService.getMaxMeanKmerAlignability()));
+////        } else {
+////            this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
+////        }
+////        if (gopherService.getSizeUp()>0) {
+////            this.sizeUpTextField.setText(String.format("%d",gopherService.getSizeUp()));
+////        } else {
+////            this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
+////        }
+////        if (gopherService.getSizeDown()>0) {
+////            this.sizeDownTextField.setText(String.format("%d",gopherService.getSizeDown()));
+////        } else {
+////            this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
+////        }
+////        if (! gopherService.getChosenEnzymelist().isEmpty()) {
+////            this.restrictionEnzymeLabel.setText(gopherService.getAllSelectedEnzymeString());
+////        } else {
+////            this.restrictionEnzymeLabel.setText("not initialized");
+////        }
+////        if (gopherService.getProbeLength()==0) {
+////            this.baitLengthTextField.setText(String.valueOf(Default.PROBE_LENGTH));
+////        } else {
+////            this.baitLengthTextField.setText(String.valueOf(gopherService.getProbeLength()));
+////        }
+////        if (gopherService.getMarginSize()==0) {
+////            this.marginSizeTextField.setText(String.valueOf(Default.MARGIN_SIZE));
+////        } else {
+////            this.marginSizeTextField.setText(String.valueOf(gopherService.getMarginSize()));
+////        }
+////        if (! gopherService.getTargetType().equals(GopherModel.TargetType.NONE))  {
+////            int n_targets = gopherService.getN_validGeneSymbols();
+////            setTargetFeedback(gopherService.getTargetType(),n_targets);
+////        }
+////
+////        if (gopherService.useSimpleApproach()) {
+////            this.approachChoiceBox.setValue("Simple");
+////        } else if (gopherService.useExtendedApproach()){
+////            this.approachChoiceBox.setValue("Extended");
+////        }
+////
+////        GopherModel.TargetType ttype = gopherService.getTargetType();
+////        switch (ttype) {
+////            case TARGET_GENES -> {
+////                int count = gopherService.getN_validGeneSymbols();
+////                this.targetGeneLabel.setText(String.format("%d genes", count));
+////            }
+////            case ALL_GENES -> {
+////                int allgenes = gopherService.getN_validGeneSymbols();
+////                this.allGenesLabel.setText(String.format("%d genes", allgenes));
+////            }
+////            case BED_TARGETS -> {
+////                int n_bedtargets = gopherService.getN_validGeneSymbols();
+////                this.bedTargetsLabel.setText(String.format("%d targets", n_bedtargets));
+////            }
+////        }
+//
+//        this.genomeChoiceBox.setValue(gopherService.getGenomeBuild());
+//        // after we have set up the model the first time, mark it as clean. Any changes after this will lead
+//        // to a confirmation window being opened if the user has changed anything.
+//        gopherService.setClean(true);
 //    }
-
-
-    public void setModelInMainAndInAnalysisPresenter(GopherModel mod) {
-        LOGGER.trace(String.format("setModelInMainAndInAnalysisPresenter for genome build %s and basename %s",
-                mod.getGenome().getGenomeBuild(),
-                gopherService.getGenome().getGenomeBasename()));
-        if (gopherService.getMaxGCcontent()>0){
-            this.maxGCContentTextField.setText(String.format("%.1f%%",gopherService.getMaxGCContentPercent()));
-        } else {
-            this.maxGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MAX_GC_CONTENT));
-        }
-        if (gopherService.getMinGCcontent()>0) {
-            this.minGCContentTextField.setText(String.format("%.1f%%",gopherService.getMinGCContentPercent()));
-        } else {
-            this.minGCContentTextField.setPromptText(String.format("%.1f%%",100*Default.MIN_GC_CONTENT));
-        }
-        if (gopherService.getMinBaitCount()>0) {
-            this.minBaitCountTextField.setText(String.valueOf(gopherService.getMinBaitCount()));
-        } else {
-            this.minBaitCountTextField.setText(String.valueOf(Default.MIN_BAIT_NUMBER));
-        }
-        if (gopherService.getMinFragSize()>0) {
-            this.minFragSizeTextField.setText(String.format("%d",gopherService.getMinFragSize()));
-        } else {
-            this.minFragSizeTextField.setPromptText(String.format("%d",Default.MINIMUM_FRAGMENT_SIZE));
-        }
-        if (gopherService.getMaxMeanKmerAlignability()>0) {
-            this.maxKmerAlignabilityTextField.setText(String.format("%d",gopherService.getMaxMeanKmerAlignability()));
-        } else {
-            this.maxKmerAlignabilityTextField.setPromptText(String.format("%d",Default.MAXIMUM_KMER_ALIGNABILITY));
-        }
-        if (gopherService.getSizeUp()>0) {
-            this.sizeUpTextField.setText(String.format("%d",gopherService.getSizeUp()));
-        } else {
-            this.sizeUpTextField.setPromptText(String.format("%d",Default.SIZE_UPSTREAM));
-        }
-        if (gopherService.getSizeDown()>0) {
-            this.sizeDownTextField.setText(String.format("%d",gopherService.getSizeDown()));
-        } else {
-            this.sizeDownTextField.setPromptText(String.format("%d",Default.SIZE_DOWNSTREAM));
-        }
-        if (! gopherService.getChosenEnzymelist().isEmpty()) {
-            this.restrictionEnzymeLabel.setText(gopherService.getAllSelectedEnzymeString());
-        } else {
-            this.restrictionEnzymeLabel.setText("not initialized");
-        }
-        if (gopherService.getProbeLength()==0) {
-            this.baitLengthTextField.setText(String.valueOf(Default.PROBE_LENGTH));
-        } else {
-            this.baitLengthTextField.setText(String.valueOf(gopherService.getProbeLength()));
-        }
-        if (gopherService.getMarginSize()==0) {
-            this.marginSizeTextField.setText(String.valueOf(Default.MARGIN_SIZE));
-        } else {
-            this.marginSizeTextField.setText(String.valueOf(gopherService.getMarginSize()));
-        }
-        if (! gopherService.getTargetType().equals(GopherModel.TargetType.NONE))  {
-            int n_targets = gopherService.getN_validGeneSymbols();
-            setTargetFeedback(gopherService.getTargetType(),n_targets);
-        }
-
-        if (gopherService.useSimpleApproach()) {
-            this.approachChoiceBox.setValue("Simple");
-        } else if (gopherService.useExtendedApproach()){
-            this.approachChoiceBox.setValue("Extended");
-        }
-
-        GopherModel.TargetType ttype = gopherService.getTargetType();
-        switch (ttype) {
-            case TARGET_GENES -> {
-                int count = gopherService.getN_validGeneSymbols();
-                this.targetGeneLabel.setText(String.format("%d genes", count));
-            }
-            case ALL_GENES -> {
-                int allgenes = gopherService.getN_validGeneSymbols();
-                this.allGenesLabel.setText(String.format("%d genes", allgenes));
-            }
-            case BED_TARGETS -> {
-                int n_bedtargets = gopherService.getN_validGeneSymbols();
-                this.bedTargetsLabel.setText(String.format("%d targets", n_bedtargets));
-            }
-        }
-
-        this.genomeChoiceBox.setValue(gopherService.getGenomeBuild());
-        // after we have set up the model the first time, mark it as clean. Any changes after this will lead
-        // to a confirmation window being opened if the user has changed anything.
-        gopherService.setClean(true);
-    }
 
 
     /** The prompt (gray) values of the text fields in the settings windows get set to their default values here. */
@@ -793,7 +790,13 @@ public class GopherMainController implements Initializable {
         LOGGER.info("About to download genome for "+build +" (if necessary)");
         GenomeDownloader gdownloader = new GenomeDownloader(build);
         DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        String genomeDir = pgProperties.getProperty(GENOME_DOWNLOAD_DIRECTORY);
+        if (genomeDir != null) {
+            File dir = new File(genomeDir);
+            dirChooser.setInitialDirectory(dir);
+        } else {
+            dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        }
         dirChooser.setTitle("Choose directory for genome build " + build + " (will be downloaded if not found).");
         File file = dirChooser.showDialog(this.rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
@@ -802,6 +805,8 @@ public class GopherMainController implements Initializable {
             return;
         }
         LOGGER.info("downloadGenome to directory  "+ file.getAbsolutePath());
+        String parentDirName = file.getAbsoluteFile().getParent();
+        pgProperties.setProperty(GENOME_DOWNLOAD_DIRECTORY, parentDirName);
         if (this.gopherService.checkDownloadComplete(file.getAbsolutePath())) {
             // we're done!
             //this.downloadedGenomeLabel.setText(String.format("Genome %s was already downloaded",build));
@@ -879,17 +884,13 @@ public class GopherMainController implements Initializable {
             return;
         }
         genomeGunZipper.setOnSucceeded( event -> {
-           // decompressGenomeLabel.setText(genomeGunZipper.getStatus());
             if (genomeGunZipper.OK()) {
                 gopherService.setGenomeUnpacked();
             } else {
                 PopupFactory.displayError("Error","Error from Genome g-unzipper");
             }
         });
-        genomeGunZipper.setOnFailed(eventh -> {
-            //decompressGenomeLabel.setText("Decompression failed");
-            PopupFactory.displayError("Could not decompress genome file" ,genomeGunZipper.getException().getMessage());
-        });
+        genomeGunZipper.setOnFailed(eventh -> PopupFactory.displayError("Could not decompress genome file" ,genomeGunZipper.getException().getMessage()));
         Thread th = new Thread(genomeGunZipper);
         th.setDaemon(true);
         th.start();
@@ -909,9 +910,7 @@ public class GopherMainController implements Initializable {
      * @param e event triggered by command to download appropriate {@code refGene.txt.gz} file.
      */
     @FXML public void downloadAlignabilityMap(ActionEvent e) {
-
         String genomeBuild = genomeChoiceBox.getValue(); // e.g. hg19 or mm9
-
         DirectoryChooser dirChooser = new DirectoryChooser(); // choose directory to which the map will be downloaded
         dirChooser.setTitle("Choose directory where the alignability map for " + genomeBuild + " is located (will be" +
                 " downloaded if not found).");
@@ -1063,12 +1062,10 @@ public class GopherMainController implements Initializable {
             return;
         }
         List<String>  validGeneSymbols = parser.getAllProteinCodingGeneSymbols();
-        List<String> invalidGeneSymbols= ImmutableList.of();
         int uniqueTSSpositions = parser.getTotalTSScount();
         int n_genes=parser.getTotalNumberOfRefGenes();
         int chosenGeneCount=parser.getNumberOfRefGenesChosenByUser();
         int uniqueChosenTSS=parser.getCountOfChosenTSS();
-        // String html = getValidatedGeneListHTML(validGeneSymbols, invalidGeneSymbols,n_genes, uniqueTSSpositions);
         this.gopherService.setN_validGeneSymbols(validGeneSymbols.size());
         this.gopherService.setUniqueTSScount(uniqueTSSpositions);
         this.gopherService.setUniqueChosenTSScount(uniqueChosenTSS);
@@ -1434,20 +1431,13 @@ public class GopherMainController implements Initializable {
     }
 
     private void importProject(File file) {
-        LOGGER.error("Importing project: {}", file.getAbsolutePath());
+        LOGGER.trace("Importing project: {}", file.getAbsolutePath());
         removePreviousValuesFromTextFields();
         gopherService.importProtjectFromFile(file);
         if (this.primaryStage!=null)
             this.primaryStage.setTitle(String.format("GOPHER: %s",
                     gopherService.getProjectName()));
-
-//        this.vpanalysisview = new VPAnalysisView();
-//        this.vpanalysispresenter = (VPAnalysisPresenter) this.vpanalysisview.getPresenter();
-//        this.vpanalysispresenter.setModel(this.model);
-//        this.vpanalysispresenter.setTabPaneRef(this.tabpane);
-//        this.analysisPane.getChildren().add(vpanalysisview.getView());
         setInitializedValuesInGUI();
-        //setModelInMainAndInAnalysisPresenter(this.model);
         vpAnalysisController.refreshVPTable();
         LOGGER.trace(String.format("Opened model %s from file %s",gopherService.getProjectName(), file.getAbsolutePath()));
     }
