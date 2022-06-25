@@ -1497,7 +1497,7 @@ public class GopherMainController implements Initializable {
      */
     public void closeWindow(ActionEvent e) {
         if (gopherService.isClean()) {
-            boolean answer = PopupFactory.confirmDialog("Alert", "Are you sure you want to quit?");
+            boolean answer = PopupFactory.confirmQuitDialog("Alert", "Are you sure you want to quit?");
             if (answer) {
                 LOGGER.info("Closing Gopher Gui");
                 javafx.application.Platform.exit();

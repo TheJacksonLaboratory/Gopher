@@ -64,7 +64,7 @@ public class GopherFxApplication extends Application {
     @Override
     public void init() {
         applicationContext = new SpringApplicationBuilder(StockUiApplication.class).run();
-        ClassPathResource applicationProps =  new ClassPathResource("application.properties");
+        ClassPathResource applicationProps =  new ClassPathResource("/application.properties");
         // export app's version into System properties
        try (InputStream is = new FileInputStream(applicationProps.getFilename())) {
             Properties properties = new Properties();

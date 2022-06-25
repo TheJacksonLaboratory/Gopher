@@ -37,7 +37,7 @@ public class PopupFactory {
             return result;
         }
         String answer = result.get();
-        if (answer.matches(".*[\\]\\[!#$%&'()*+,/:;<=>?@^`{|}~].*")) {
+        if (answer.matches(".*[]\\[!#$%&'()*+,/:;<=>?@^`{|}~].*")) {
             PopupFactory.displayError("File name error", "File name contains invalid characters");
             return Optional.empty();
         } else {
@@ -115,12 +115,14 @@ public class PopupFactory {
         alert.showAndWait();
     }
 
-    public static boolean confirmDialog(String title, String message) {
-        Dialog<Boolean> dialog = new Dialog<>();
-        dialog.setTitle(title);
-        dialog.setContentText(message);
-        Optional<Boolean> result = dialog.showAndWait();
-        return result.get();
+    public static boolean confirmQuitDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Quit?");
+        alert.setHeaderText("Quit GOPHER");
+        alert.setContentText("Are you sure you want to exit?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
 
