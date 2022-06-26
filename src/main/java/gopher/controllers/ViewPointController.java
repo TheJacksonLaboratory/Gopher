@@ -569,13 +569,12 @@ public class ViewPointController implements Initializable {
         String chromosome = this.viewpoint.getReferenceID();
         List<String> colorsegmentlist = coloredsegments.stream().
                 filter(ColoredSegment::isSelected).
-                map( c -> String.format("%s.%s%%3A%d-%d%s",
+                map(c -> String.format("%s.%s%%3A%d-%d%s",
                         genome,
                         chromosome,
                         c.segment.getStartPos(),
                         c.segment.getEndPos(),
-                        c.getColor()) ).
-                collect(Collectors.toList());
+                        c.getColor())).toList();
         String highlightregions=colorsegmentlist.stream().collect( Collectors.joining( "%7C" ) );
         return String.format("highlight=%s", highlightregions);
     }

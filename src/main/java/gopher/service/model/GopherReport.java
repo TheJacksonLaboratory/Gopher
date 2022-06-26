@@ -47,7 +47,7 @@ public class GopherReport {
         builder.add("\n");
         builder.addAll(getDesignReport());
         // TODO -- re add regulatory exome
-        return builder.build().stream().collect(Collectors.joining(" "));
+        return String.join(" ", builder.build());
     }
 
     public List<String> getReportList() {

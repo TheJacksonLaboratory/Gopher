@@ -73,7 +73,7 @@ public class DeleteFactory {
         projectFileColumn.setCellValueFactory(cdf ->
                 new ReadOnlyStringWrapper(cdf.getValue().getProjectName()));
         List<String> files = getProjectFiles();
-        List<ProjectFile> projectFiles = files.stream().map(ProjectFile::new).collect(Collectors.toList());
+        List<ProjectFile> projectFiles = files.stream().map(ProjectFile::new).toList();
         ObservableList<ProjectFile> obsProjs = FXCollections.observableArrayList();
         obsProjs.addAll(projectFiles);
         tableView.getItems().clear();

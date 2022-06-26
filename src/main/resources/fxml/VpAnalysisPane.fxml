@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="VpAnalysisController"
+<ScrollPane fx:id="VpAnalysisScrollPane"
             fitToHeight="true"
             fitToWidth="true"
             xmlns="http://javafx.com/javafx/9"

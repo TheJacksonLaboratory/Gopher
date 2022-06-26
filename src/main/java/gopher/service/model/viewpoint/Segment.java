@@ -474,8 +474,10 @@ public class Segment implements Serializable {
     public Integer getBaitNumDown() {return this.baitListDownStreamMargin.size(); }
 
 
-    /** NEW VERSION */
-    public List<Bait> setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap,  Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    /**
+     * NEW VERSION
+     */
+    public void setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
 
         Integer sta = this.getStartPos();
         Integer end = this.getStartPos() + marginSize - 1;
@@ -498,7 +500,6 @@ public class Segment implements Serializable {
             if(i + baitSize - 1 == this.getEndPos()) { break; }
         }
         this.baitListUpStreamMargin=baitListUpStreamMargin;
-        return this.baitListUpStreamMargin;
     }
 
 
@@ -561,13 +562,11 @@ public class Segment implements Serializable {
 
 
     /**
-     *  If the segment is shorter than 2 times the margin size and the baits are derived independently for the
+     * If the segment is shorter than 2 times the margin size and the baits are derived independently for the
      * up and down stream margin, then there are potentially redundant baits with in the overlapping part
      * of the two margins. This fuction removes redundant baits from the list od baits of the downstream margin.
-     *
-     * @return Number of redundant baits removed from downstream margin
      */
-    private Integer removeRedundantBaits() {
+    private void removeRedundantBaits() {
 
         Integer numOfRedundantBaitsRemoved = 0;
 
@@ -587,8 +586,8 @@ public class Segment implements Serializable {
             }
 
         }
+        logger.info("Number of redundant baits removed: {}", numOfRedundantBaitsRemoved);
         this.baitListDownStreamMargin = newBaitListDownStreamMargin;
-        return numOfRedundantBaitsRemoved;
     }
 
     public boolean isBalanced() {

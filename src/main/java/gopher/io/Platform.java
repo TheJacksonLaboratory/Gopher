@@ -128,7 +128,7 @@ public class Platform {
      */
     public static String getAbsoluteLogPath() {
         File dir = getGopherDir();
-        return new String(dir + File.separator + "gopher.log");
+        return dir + File.separator + "gopher.log";
     }
 
 

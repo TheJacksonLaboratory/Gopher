@@ -187,8 +187,8 @@ public class Design {
         );
         if (n_viewpoints > 0) {
             this.avgFragmentsPerVP = (double) n_unique_fragments / (double) n_viewpoints;
-            this.avgVPsize /= (double) n_viewpoints;
-            this.avgVPscore /= (double) n_viewpoints;
+            this.avgVPsize /= n_viewpoints;
+            this.avgVPscore /= n_viewpoints;
         } else {
             // something didn't work. Set everything to zeero.
             this.avgFragmentsPerVP = 0;

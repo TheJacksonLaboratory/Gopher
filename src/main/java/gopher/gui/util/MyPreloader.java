@@ -55,12 +55,11 @@ public final class MyPreloader extends Preloader {
         if (opt.isPresent()) {
             ButtonType btype = opt.get();
             switch (btype.getText()) {
-                case "New Project":
+                case "New Project" -> {
                     getNewProjectName();
                     isNewProject = true;
-                    break;
-                default:
-                    this.projectName = btype.getText();
+                }
+                default -> this.projectName = btype.getText();
             }
         }
     }

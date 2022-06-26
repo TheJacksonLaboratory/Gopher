@@ -31,6 +31,7 @@ public class ProgressPopup {
         window.setTitle(this.progressTitle);
         window.setScene(scene);
         window.show();
+        //noinspection unchecked
         task.setOnSucceeded(event -> window.close());
         Thread thread = new Thread(task);
         thread.start();

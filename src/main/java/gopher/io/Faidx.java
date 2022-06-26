@@ -158,7 +158,7 @@ public class Faidx extends Task<Void> {
 
             // Write out index
             String faipath = getGenomeFastaIndexPath();
-            BufferedWriter wr = new BufferedWriter(new FileWriter(new File(faipath)));
+            BufferedWriter wr = new BufferedWriter(new FileWriter(faipath));
             for (FastaIndexEntry rec : records) {
                 wr.write(rec.toString() + "\n");
                 // also record the contig lengths

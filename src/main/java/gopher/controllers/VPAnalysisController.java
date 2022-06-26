@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class VPAnalysisController implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(VPAnalysisController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VPAnalysisController.class.getName());
 
     /**
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
@@ -46,7 +46,7 @@ public class VPAnalysisController implements Initializable {
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
 
     @FXML
-    private ScrollPane VpAnalysisController;
+    private ScrollPane VpAnalysisScrollPane;
 
     @FXML
     private HBox listviewHbox;
@@ -110,7 +110,7 @@ public class VPAnalysisController implements Initializable {
             ViewPoint vp = cdf.getValue();
             Button btn = new Button("Show");
             btn.setOnAction(e -> {
-                logger.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
+                LOGGER.trace(String.format("Adding tab for row with Target: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
                 openViewPointInTab(vp);
             });
@@ -123,10 +123,10 @@ public class VPAnalysisController implements Initializable {
             ViewPoint vp = cdf.getValue();
             Button btn = new Button("Delete");
             btn.setOnAction(e -> {
-                logger.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
+                LOGGER.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
                 gopherService.deleteViewpoint(vp);
-              //  model.deleteViewpoint(vp);
+                //  model.deleteViewpoint(vp);
                 if (this.openTabs.containsKey(vp)) { // If the tab is open, remove it from the GUI.
                     Tab tab = openTabs.get(vp);
                     tab.setDisable(true);
@@ -204,13 +204,18 @@ public class VPAnalysisController implements Initializable {
 
     public void removeViewPointTab(ViewPoint vp) {
         if (this.openTabs.containsKey(vp)) {
-            Tab tab=this.openTabs.get(vp);
+            Tab tab = this.openTabs.get(vp);
             tab.setDisable(true);
             tab.getTabPane().getTabs().remove(tab);
             this.openTabs.remove(vp);
         } else {
-            logger.error("Could not find opened viewpoint in openTabs list: "+vp.getTargetName());
+            LOGGER.error("Could not find opened viewpoint in openTabs list: " + vp.getTargetName());
         }
+    }
+
+
+    public void setTabPane(TabPane tpane) {
+        this.tabpane = tpane;
     }
 
     /**
@@ -219,57 +224,56 @@ public class VPAnalysisController implements Initializable {
      * @param vp This {@link ViewPoint} object will be opened into a new Tab.
      */
     private void openViewPointInTab(ViewPoint vp) {
-        logger.error("Opening viewpoint {}", vp.getTargetName());
+        LOGGER.error("Opening viewpoint {}", vp.getTargetName());
         if (openTabs.containsKey(vp)) {
             Tab tab = openTabs.get(vp);
-            logger.trace("openTabs containsKey " + vp.getTargetName());
+            LOGGER.trace("openTabs containsKey " + vp.getTargetName());
 
             if (tab == null || tab.isDisabled()) {
-                logger.trace("openTabs REMOVING " + vp.getTargetName());
+                LOGGER.trace("openTabs REMOVING " + vp.getTargetName());
                 openTabs.remove(vp);
             } else {
-                logger.trace("openTabs SELECTING " + vp.getTargetName());
+                LOGGER.trace("openTabs SELECTING " + vp.getTargetName());
                 this.tabpane.getSelectionModel().select(tab);
                 return;
             }
         }
-        logger.trace("openTabs containsKey NO " + vp.getTargetName());
-
-        final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
-        tab.setId(vp.getTargetName());
-        tab.setClosable(true);
-        tab.setOnClosed(event -> {
-            if (tabpane.getTabs()
-                    .size() == 2) {
-                event.consume();
-            }
-        });
-
-        tab.setOnCloseRequest((e)-> {
-            for (ViewPoint vpnt : this.openTabs.keySet()) {
-                Tab t = this.openTabs.get(vpnt);
-                if (t.equals(tab)) {
-                    this.openTabs.remove(vpnt);
-                }
-            }
-        });
+        LOGGER.trace("openTabs containsKey NO " + vp.getTargetName());
         try {
+            final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
+            tab.setId(vp.getTargetName());
+            tab.setClosable(true);
+            tab.setOnClosed(event -> {
+                if (tabpane.getTabs()
+                        .size() == 2) {
+                    event.consume();
+                }
+            });
+
+            tab.setOnCloseRequest((e) -> {
+                for (ViewPoint vpnt : this.openTabs.keySet()) {
+                    Tab t = this.openTabs.get(vpnt);
+                    if (t.equals(tab)) {
+                        this.openTabs.remove(vpnt);
+                    }
+                }
+            });
+
             ClassPathResource analysisPaneResource = new ClassPathResource("fxml/viewpoint.fxml");
             URL url = analysisPaneResource.getURL();
-            logger.error("Loading analysis pane from {}", url.getFile());
+            LOGGER.error("Loading analysis pane from {}", url.getFile());
             FXMLLoader loader = new FXMLLoader(url);
             ScrollPane viewpointPane = loader.load();
             tab.setContent(viewpointPane);
+            this.tabpane.getTabs().add(tab);
+            this.tabpane.getSelectionModel().select(tab);
+            openTabs.put(vp, tab);
         } catch (IOException e) {
-            logger.error("Could not load tab for {}", vp.getTargetName());
+            LOGGER.error("Could not load tab for {}", vp.getTargetName());
             PopupFactory.displayError("Error loading viewpoint in tab",
                     String.format("Could not load tab for %s", vp.getTargetName()));
-            return;
-        }
 
-        this.tabpane.getTabs().add(tab);
-        this.tabpane.getSelectionModel().select(tab);
-        openTabs.put(vp, tab);
+        }
     }
 
     public void setTabPaneRef(TabPane tabp) {
@@ -284,7 +288,7 @@ public class VPAnalysisController implements Initializable {
      */
     public void showVPTable() {
         if (!this.gopherService.viewpointsInitialized()) {
-            logger.warn("[View Points not initialized");
+            LOGGER.warn("[View Points not initialized");
             PopupFactory.displayError("Could not confirmDialog viewpoints", "No initialized viewpoints were found");
             return;
         }
@@ -328,7 +332,7 @@ public class VPAnalysisController implements Initializable {
         }
         listItems.put("Viewpoints", vpointV);
         String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
-                avVpSize, 100*avgVpScore);
+                avVpSize, 100 * avgVpScore);
         listItems.put(" ", vpointV2);
 
         int nfrags = design.getN_unique_fragments();
@@ -344,7 +348,7 @@ public class VPAnalysisController implements Initializable {
         listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
 
         int n_baits = design.getTotalNumOfUniqueBaits();
-        Double captureSize = design.getCaptureSize()/1000000.0;
+        Double captureSize = design.getCaptureSize() / 1000000.0;
         String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
         listItems.put("Probes", baitV);
         return listItems;
@@ -356,19 +360,20 @@ public class VPAnalysisController implements Initializable {
      */
     public void refreshVPTable() {
         if (gopherService == null) {
-            logger.error("GOPHER Service is null--should never happen");
+            LOGGER.error("GOPHER Service is null--should never happen");
             return;
         }
-
+        LOGGER.info("Refreshing VP Table, gopher service has {} items", gopherService.getViewPointList().size());
         javafx.application.Platform.runLater(() -> {
             updateListView();
             List<ViewPoint> vpl = this.gopherService.getViewPointList();
-            logger.trace("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
+            LOGGER.info("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
             viewPointTableView.getItems().clear(); /* clear previous rows, if any */
             viewPointTableView.getItems().addAll(vpl);
             viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
             viewPointTableView.sort();
+            LOGGER.info("refreshVPTable: got a total of " + viewPointTableView.getItems().size() + " viewPointTableView items");
         });
     }
 
@@ -376,7 +381,6 @@ public class VPAnalysisController implements Initializable {
      * Class for sorting items like 100 and 1000
      */
     static class IntegerComparator implements Comparator<String> {
-
         @Override
         public int compare(String s1, String s2) {
             try {
@@ -384,8 +388,8 @@ public class VPAnalysisController implements Initializable {
                 Integer d2 = Integer.parseInt(s2);
                 return d1.compareTo(d2);
             } catch (Exception e) {
-                logger.error(String.format("Error encounted while sorting integer values %s and %s", s1, s2));
-                logger.error("Error: {}", e.getMessage());
+                LOGGER.error(String.format("Error encounted while sorting integer values %s and %s", s1, s2));
+                LOGGER.error("Error: {}", e.getMessage());
                 return 0;
             }
         }
@@ -409,8 +413,8 @@ public class VPAnalysisController implements Initializable {
                 Double d2 = Double.parseDouble(s2);
                 return d1.compareTo(d2);
             } catch (Exception e) {
-                logger.error(String.format("Error encounted while sorting percentage values %s and %s", s1, s2));
-                logger.error("Error: {}", e.getMessage());
+                LOGGER.error(String.format("Error encounted while sorting percentage values %s and %s", s1, s2));
+                LOGGER.error("Error: {}", e.getMessage());
                 return 0;
             }
         }
@@ -420,7 +424,6 @@ public class VPAnalysisController implements Initializable {
      * Class for sorting items like chr3:4325 and chrY:762
      */
     static class GenomicLocationComparator implements Comparator<String> {
-
         @Override
         public int compare(String s1, String s2) {
             if (!s1.startsWith("chr"))
@@ -473,8 +476,8 @@ public class VPAnalysisController implements Initializable {
                     return Integer.compare(pos1, pos2);
                 }
             } catch (Exception e) {
-                logger.error(String.format("Error encounted while sorting chromosome locations %s and %s", s1, s2));
-                logger.error("Error: {}", e.getMessage());
+                LOGGER.error(String.format("Error encounted while sorting chromosome locations %s and %s", s1, s2));
+                LOGGER.error("Error: {}", e.getMessage());
                 return 0;
             }
         }
