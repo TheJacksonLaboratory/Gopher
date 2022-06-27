@@ -25,7 +25,7 @@ import java.util.Properties;
  * @author <a href="mailto:peter.robinson@jax.org">Peter Robinson</a>
  */
 public class RegulatoryExomeBoxFactory {
-    private static Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
 
     private static List<RegulationCategory> chosenCategories;
     /**
@@ -51,12 +51,12 @@ public class RegulatoryExomeBoxFactory {
         builder.setOnFailed(e -> {
             PopupFactory.displayError("Failure to build regulatory exome.",
                     builder.getStatus());
-            logger.error(builder.getStatus());
+            LOGGER.error(builder.getStatus());
             popup.close();
         });
         builder.setOnSucceeded(e -> {
             try {
-                logger.trace(String.format("Will output regulatory panel BED file to %s", exportDir.getAbsolutePath()));
+                LOGGER.trace(String.format("Will output regulatory panel BED file to %s", exportDir.getAbsolutePath()));
                 builder.outputRegulatoryExomeBedFile(exportDir.getAbsolutePath());
                 Properties regulatoryProperties = builder.getRegulatoryReport();
                 service.setRegulatoryExomeProperties(regulatoryProperties);

@@ -4,26 +4,16 @@ package gopher.service.model;
  * Created by peter on 06.05.17.
  * This class represents a data source we want to download, being
  * a combination of Genome, TranscriptList, and Repeats.
+ *
+ * @param genomeName Name of the genome chosen by the user, e.g., "UCSC-hg19"
  */
-public class DataSource {
-    /** Name of the genome chosen by the user, e.g., "UCSC-hg19" */
-    private final String genomeName;
-    private final String genomeURL;
-    /** Basename of the file that we will store to disk: chromFa.tar.gz (same for all genomes). */
+public record DataSource(String genomeName, String genomeURL) {
+    /**
+     * Basename of the file that we will store to disk: chromFa.tar.gz (same for all genomes).
+     */
     private static final String basename = "chromFa.tar.gz";
 
-    public DataSource(String genomeName, String genomeURL) {
-        this.genomeName = genomeName;
-        this.genomeURL = genomeURL;
-    }
-
-    public String getGenomeURL() {
-        return genomeURL;
-    }
-    public String getGenomeName() {
-        return genomeName;
-    }
-    public String getGenomeBasename() {
+    public String basename() {
         return basename;
     }
 
@@ -40,13 +30,12 @@ public class DataSource {
     private static final String UCSCdanRer10url = "http://hgdownload.soe.ucsc.edu/goldenPath/danRer10/bigZips/danRer10.fa.gz";
 
 
-
     public static DataSource createUCSChg19() {
         return new DataSource("UCSC-hg19", UCSChg19url);
     }
 
     public static DataSource createUCSChg38() {
-       return new DataSource("UCSC-hg38", UCSChg38url);
+        return new DataSource("UCSC-hg38", UCSChg38url);
     }
 
     public static DataSource createUCSCmm9() {

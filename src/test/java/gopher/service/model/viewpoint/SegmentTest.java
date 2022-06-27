@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SegmentTest {
 
     private static IndexedFastaSequenceFile FastaReader;
-    private static String referenceSequenceID = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
+    private static final String referenceSequenceID = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
 
     private static Segment segmentA; // no repeats
     private static Segment segmentB; // repeats in 10 of 24 nucleotides

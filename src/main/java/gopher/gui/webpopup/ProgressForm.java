@@ -18,8 +18,8 @@ public class ProgressForm {
     private final Stage dialogStage;
     private final ProgressBar pb = new ProgressBar();
     private final ProgressIndicator pin = new ProgressIndicator();
-    private Label titleLabel;
-    private Label messageLabel;
+    private final Label titleLabel;
+    private final Label messageLabel;
 
     public ProgressForm() {
         dialogStage = new Stage();

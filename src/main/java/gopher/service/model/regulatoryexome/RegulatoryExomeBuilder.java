@@ -24,7 +24,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.1.3 (2018-02-16)
  */
 public class RegulatoryExomeBuilder extends Task<Void> {
-    private static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
     /** Path to regulatory build file, e.g., homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz */
     private final String pathToEnsemblRegulatoryBuild;
     /** Path to transcript definition file, refGene.txt.gz */
@@ -33,7 +33,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     private GopherService model;
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
-    private Set<RegulatoryBEDFileEntry> regulatoryElementSet;
+    private final Set<RegulatoryBEDFileEntry> regulatoryElementSet;
     /** Maximum distance 3' (downstream) to TSS (genomicPos) to be included as a regulatory element.*/
     private int downstreamThreshold =10_000;
     /** Maximum distance 5' (upstream) to TSS (genomicPos) to be included as a regulatory element.*/
@@ -55,7 +55,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         this.progressInd=pi;
         chosenCategories=chosen;
         String msg = String.format("We will create regulatory build from %s and %s",pathToEnsemblRegulatoryBuild,pathToRefGeneFile);
-        logger.trace(msg);
+        LOGGER.trace(msg);
         status.add(msg);
     }
 
@@ -86,14 +86,14 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
     private void checkOverlap(List<RegulatoryBEDFileEntry> elementlist) {
         RegulatoryBEDFileEntry currententry=null;
-        logger.info("Checking overlap of entries for regulatory exome");
+        LOGGER.info("Checking overlap of entries for regulatory exome");
         for (RegulatoryBEDFileEntry entry : elementlist) {
             if (entry.overlaps(currententry)) {
-                logger.info(entry.toString() + " overlaps " + (currententry != null ? currententry.toString() : ""));
+                LOGGER.info(entry.toString() + " overlaps " + (currententry != null ? currententry.toString() : ""));
             }
             currententry=entry;
         }
-        logger.info("Done overlap check");
+        LOGGER.info("Done overlap check");
     }
 
 
@@ -108,7 +108,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         List<RegulatoryBEDFileEntry> lst = new ArrayList<>(regulatoryElementSet);
         Collections.sort(lst);
         checkOverlap(lst);
-        logger.trace(String.format("We will export reg build to %s",fullpath ));
+        LOGGER.trace(String.format("We will export reg build to %s",fullpath ));
         BufferedWriter writer = new BufferedWriter(new FileWriter(fullpath));
         for (RegulatoryBEDFileEntry rentry : lst) {
             writer.write(rentry.toString() + "\n");
@@ -242,7 +242,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
             status.add(msg);
             throw new GopherException(msg);
         }
-        logger.trace(String.format("We got %d regulatory elements",regulatoryElementSet.size()));
+        LOGGER.trace(String.format("We got %d regulatory elements",regulatoryElementSet.size()));
         return null;
     }
 

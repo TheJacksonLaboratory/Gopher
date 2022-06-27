@@ -48,9 +48,9 @@ public class Design {
     /** NUmber of viewpoints with more than one digest (only applies to simple approach).*/
     private int n_patched_viewpoints;
 
-    private GopherService service;
+    private final GopherService service;
 
-    private Approach approach;
+    private final Approach approach;
 
     public int getN_unique_fragments() {
         return n_unique_fragments;

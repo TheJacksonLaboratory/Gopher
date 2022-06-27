@@ -59,13 +59,13 @@ public final class MyPreloader extends Preloader {
                     getNewProjectName();
                     isNewProject = true;
                 }
-                default -> this.projectName = btype.getText();
+                default -> MyPreloader.projectName = btype.getText();
             }
         }
     }
 
     private void getNewProjectName() {
-       this.projectName =
+        MyPreloader.projectName =
                PopupFactory.getStringFromUser("New Project", "project name", "Enter new project name");
     }
 

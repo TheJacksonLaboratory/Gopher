@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @version 0.2.1
  */
 public class RestrictionEnzyme implements Serializable {
-    static Logger logger = LoggerFactory.getLogger(RestrictionEnzyme.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestrictionEnzyme.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /** A name of a restirction enzyme, something like HindIII */
@@ -33,7 +33,7 @@ public class RestrictionEnzyme implements Serializable {
         site=s;
         this.offset=site.indexOf('^');
         if (offset<0) {
-            logger.error(String.format("Malformed site pattern for enyze %s (%s)",name,site)); /* Should never happen!*/
+            LOGGER.error(String.format("Malformed site pattern for enyze %s (%s)",name,site)); /* Should never happen!*/
         }
         plainSite=site;
         int i= site.indexOf('^');

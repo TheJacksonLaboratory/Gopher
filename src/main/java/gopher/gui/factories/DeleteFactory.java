@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DeleteFactory {
     private static final Logger logger = LoggerFactory.getLogger(DeleteFactory.class.getName());

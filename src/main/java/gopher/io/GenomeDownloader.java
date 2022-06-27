@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class GenomeDownloader {
-    static Logger logger = LoggerFactory.getLogger(GenomeDownloader.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeDownloader.class.getName());
     /** Representation of the genome we will download. */
     private Genome genome=null;
     /** URL to download the genome from UCSC. */
@@ -24,13 +24,13 @@ public class GenomeDownloader {
 
     public GenomeDownloader(String build) {
         /** genome build symbol, e.g., hg19, mm10. */
-        logger.debug("Constructor of GenomeDownloader, build=" + build);
+        LOGGER.debug("Constructor of GenomeDownloader, build=" + build);
         try {
             this.url=getGenomeURL(build);
             this.genome=getGenome(build);
-            logger.debug("Setting url to "+ url);
+            LOGGER.debug("Setting url to "+ url);
         } catch (DownloadFileNotFoundException e){
-            logger.error("Error: {}",e.getMessage());
+            LOGGER.error("Error: {}",e.getMessage());
         }
     }
 
@@ -48,14 +48,14 @@ public class GenomeDownloader {
      */
     public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
-        logger.trace(String.format("Starting download of %s to %s",url,directory));
-        downloadTask.setOnSucceeded(e -> logger.trace("Finished downloading genome file to " + directory));
+        LOGGER.trace(String.format("Starting download of %s to %s",url,directory));
+        downloadTask.setOnSucceeded(e -> LOGGER.trace("Finished downloading genome file to " + directory));
         downloadTask.setOnFailed(eh -> {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             downloadTask.getException().printStackTrace(pw);
             String sStackTrace = sw.toString(); // s
-            logger.trace("Failed to download genome file. "+sStackTrace);
+            LOGGER.trace("Failed to download genome file. "+sStackTrace);
             PopupFactory.displayError("Error", sStackTrace);
         });
         Thread th = new Thread(downloadTask);
@@ -72,12 +72,12 @@ public class GenomeDownloader {
      */
     public String getGenomeURL(String gb) throws DownloadFileNotFoundException {
         return switch (gb) {
-            case "hg19" -> DataSource.createUCSChg19().getGenomeURL();
-            case "hg38" -> DataSource.createUCSChg38().getGenomeURL();
-            case "mm9" -> DataSource.createUCSCmm9().getGenomeURL();
-            case "mm10" -> DataSource.createUCSCmm10().getGenomeURL();
-            case "xenTro9" -> DataSource.createUCSCxenTro9().getGenomeURL();
-            case "danRer10" -> DataSource.createUCSCdanRer10().getGenomeURL();
+            case "hg19" -> DataSource.createUCSChg19().genomeURL();
+            case "hg38" -> DataSource.createUCSChg38().genomeURL();
+            case "mm9" -> DataSource.createUCSCmm9().genomeURL();
+            case "mm10" -> DataSource.createUCSCmm10().genomeURL();
+            case "xenTro9" -> DataSource.createUCSCxenTro9().genomeURL();
+            case "danRer10" -> DataSource.createUCSCdanRer10().genomeURL();
             default -> throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
         };
     }

@@ -26,7 +26,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.0.1
  */
 public class GeneRegGTFParser {
-    static Logger logger = LoggerFactory.getLogger(GeneRegGTFParser.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneRegGTFParser.class.getName());
     private String pathToGTFfile=null;
 
 
@@ -71,7 +71,7 @@ public class GeneRegGTFParser {
             System.exit(1);
         }
         if (! A[2].equals("regulatory_region")) {
-            logger.error(String.format("Unexpected element type %s",A[2]));
+            LOGGER.error(String.format("Unexpected element type %s",A[2]));
         }
         int from,to;
         try {

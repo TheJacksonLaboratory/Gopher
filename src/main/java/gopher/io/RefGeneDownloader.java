@@ -18,7 +18,7 @@ public class RefGeneDownloader {
     final private static String xenTro9="http://hgdownload.soe.ucsc.edu/goldenPath/xenTro9/database/refGene.txt.gz";
     final private static String danRer10="http://hgdownload.soe.ucsc.edu/goldenPath/danRer10/database/refGene.txt.gz";
 
-    private String genome;
+    private final String genome;
 
     /** @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10. */
     public RefGeneDownloader(String genome) {

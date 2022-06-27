@@ -38,7 +38,7 @@ public class RefGeneParserTest {
 
     private static RefGeneParser parser;
     /** five gene symbols that should be found by the parser, and one that should not. */
-    private static String[] symbols={"WASH7P","CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
+    private static final String[] symbols={"WASH7P","CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
 
     @BeforeAll
     public static void setup() {

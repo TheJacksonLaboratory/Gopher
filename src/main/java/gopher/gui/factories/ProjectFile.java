@@ -12,7 +12,7 @@ import java.io.File;
  * old project files.
  */
 public class ProjectFile {
-    static Logger logger = LoggerFactory.getLogger(ProjectFile.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectFile.class.getName());
     private StringProperty absolutePath;
     /** Has this file been deleted? */
     private boolean isDeleted=false;
@@ -27,7 +27,7 @@ public class ProjectFile {
     public void setActive() { this.isActiveFile=true;}
     public void setInActive() { this.isActiveFile=false; }
     public void deleteFile() {
-        logger.trace(String.format("Deleting project files %s",absolutePath.getValue()));
+        LOGGER.trace(String.format("Deleting project files %s",absolutePath.getValue()));
         (new File(absolutePath.getValue())).delete();
     }
 

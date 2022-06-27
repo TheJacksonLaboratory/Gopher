@@ -35,7 +35,7 @@ public class SegmentFactory implements Serializable {
     /** The distance from {@link #genomicPos} in 5' direction.*/
     private Integer maxDistToGenomicPosDown;
 
-    private Integer chromosomeLength;
+    private final Integer chromosomeLength;
 
     /** Map of the positions where the enzymes cut. Key: a site, such as GATC, value: list of cutting site positions
      * relative to {@link #genomicPos}. */

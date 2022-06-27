@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @version 0.1.3 (2017-10-02)
  */
 public class GopherGene implements Comparable<GopherGene>, Serializable {
-    static Logger logger = LoggerFactory.getLogger(GopherGene.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GopherGene.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 3L;
     /** An NCBI RefSeq id such as NM_001353311. */
@@ -48,7 +48,7 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
         if (strand.equals("+")) forward=true;
         else if (strand.equals("-")) forward=false;
         else {
-            logger.error("[ERROR] did not recognize strand \""+ strand + "\"");
+            LOGGER.error("[ERROR] did not recognize strand \""+ strand + "\"");
             forward=false; // this never happens
         }
         this.positions =new TreeSet<>();

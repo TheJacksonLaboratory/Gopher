@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to provide the user with a summary that can be downloaded or copied and that will contain

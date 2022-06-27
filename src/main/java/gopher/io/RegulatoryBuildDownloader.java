@@ -18,7 +18,7 @@ public class RegulatoryBuildDownloader {
     final private static String hg38 = "ftp://ftp.ensembl.org/pub/release-90/regulation/homo_sapiens/homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz";
 
 
-    private String genome;
+    private final String genome;
 
     /**
      * @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10.
