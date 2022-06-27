@@ -23,7 +23,7 @@ public class SettingsViewFactory {
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
-
+        window.setHeight(900);
         Map<String,String> settingsMap=getSettingsMap(service);
         SettingsPopup popup = new SettingsPopup(settingsMap, window);
         popup.popup();

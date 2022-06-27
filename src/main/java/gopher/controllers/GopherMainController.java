@@ -398,18 +398,6 @@ public class GopherMainController implements Initializable {
         setGUItoSimple();
         initializePromptTexts();
         setBindings();
-//        try {
-//            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
-//            URL url = analysisPaneResource.getURL();
-//            LOGGER.trace("Loading analysis pane from {}", url.getFile());
-//            FXMLLoader loader = new FXMLLoader();
-//            loader.setBuilderFactory(new JavaFXBuilderFactory());
-//            this.analysisPane = loader.load(url.openStream());
-//            this.analysistab.setContent(this.analysisPane);
-//        } catch (IOException iex) {
-//            LOGGER.error("Could not load analysis tab: {}", iex.getMessage());
-//        }
-
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
             String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
             switch (selectedItem) {
@@ -1149,6 +1137,7 @@ public class GopherMainController implements Initializable {
             }
             selectionModel.select(this.analysistab);
             this.vpAnalysisController.showVPTable();
+            this.vpAnalysisController.updateListView();
 
             LOGGER.info("Finished createViewPoints()");
             pform.close();
@@ -1487,7 +1476,6 @@ public class GopherMainController implements Initializable {
                 System.exit(0);
             }
         } else {
-//            boolean answer = PopupFactory.confirmDialog("Unsaved work", "Unsaved work. Are you sure you want to quit?");
             WindowCloser closer = new WindowCloser();
             closer.display();
             if (closer.save()) {

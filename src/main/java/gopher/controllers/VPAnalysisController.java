@@ -81,6 +81,8 @@ public class VPAnalysisController implements Initializable {
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
     private final ObservableList<ViewPoint> observableViewPointList = FXCollections.observableArrayList();
+    private final ObservableList<String> summaryTableKeys = FXCollections.observableArrayList();
+    private final ObservableList<String> summaryTablevalues = FXCollections.observableArrayList();
 
 
     /**
@@ -101,6 +103,8 @@ public class VPAnalysisController implements Initializable {
         System.setProperty("jsse.enableSNIExtension", "false");
         HBox.setHgrow(lviewValue, Priority.ALWAYS);
         initTable();
+        this.lviewKey.setItems(summaryTableKeys);
+        this.lviewValue.setItems(summaryTablevalues);
     }
 
     /**
@@ -299,13 +303,10 @@ public class VPAnalysisController implements Initializable {
     }
 
 
-    private void updateListView() {
+    public void updateListView() {
         Map<String, String> summaryMap = createListViewContent();
-        ObservableList<String> keys = FXCollections.observableArrayList(summaryMap.keySet());
-        ObservableList<String> values = FXCollections.observableArrayList(summaryMap.values());
-        lviewKey.setItems(keys);
-        lviewValue.setItems(values);
-
+        summaryTableKeys.setAll(summaryMap.keySet());
+        summaryTablevalues.setAll(summaryMap.values());
     }
 
     /**
@@ -366,26 +367,12 @@ public class VPAnalysisController implements Initializable {
             LOGGER.error("GOPHER Service is null--should never happen");
             return;
         }
-        LOGGER.info("Refreshing VP Table, gopher service has {} items", gopherService.getViewPointList().size());
-        //viewPointTableView.getItems().clear();
-        LOGGER.info("Size of observableViewPointList before clear {}", observableViewPointList.size());
+        LOGGER.trace("Refreshing VP Table, gopher service has {} items", gopherService.getViewPointList().size());
+        LOGGER.trace("Size of observableViewPointList before clear {}", observableViewPointList.size());
         observableViewPointList.clear();
-        LOGGER.info("Size of observableViewPointList after clear {}", observableViewPointList.size());
+        LOGGER.trace("Size of observableViewPointList after clear {}", observableViewPointList.size());
         observableViewPointList.setAll(this.gopherService.getViewPointList());
-        LOGGER.info("Size of observableViewPointList after adding viewpoints {}", observableViewPointList.size());
-
-        //viewPointTableView.setItems(this.gopherService.getViewPointList());
-//        javafx.application.Platform.runLater(() -> {
-//            updateListView();
-//            List<ViewPoint> vpl = this.gopherService.getViewPointList();
-//            LOGGER.info("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
-//            viewPointTableView.getItems().clear(); /* clear previous rows, if any */
-//            viewPointTableView.getItems().addAll(vpl);
-//            viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-//            AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
-//            viewPointTableView.sort();
-//            LOGGER.info("refreshVPTable: got a total of " + viewPointTableView.getItems().size() + " viewPointTableView items");
-//        });
+        LOGGER.trace("Size of observableViewPointList after adding viewpoints {}", observableViewPointList.size());
     }
 
     /**
