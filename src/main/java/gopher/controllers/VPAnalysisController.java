@@ -81,6 +81,9 @@ public class VPAnalysisController implements Initializable {
     @FXML
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
+    private final ObservableList<ViewPoint> observableViewPointList = FXCollections.observableArrayList();
+
+
     /**
      * A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
      * UCSC browser.
@@ -189,6 +192,7 @@ public class VPAnalysisController implements Initializable {
 
         // allow titles of all table columns to be broken into multiple lines
         viewPointTableView.getColumns().forEach(Utils::makeHeaderWrappable);
+        viewPointTableView.setItems(observableViewPointList);
     }
 
 
@@ -364,17 +368,25 @@ public class VPAnalysisController implements Initializable {
             return;
         }
         LOGGER.info("Refreshing VP Table, gopher service has {} items", gopherService.getViewPointList().size());
-        javafx.application.Platform.runLater(() -> {
-            updateListView();
-            List<ViewPoint> vpl = this.gopherService.getViewPointList();
-            LOGGER.info("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
-            viewPointTableView.getItems().clear(); /* clear previous rows, if any */
-            viewPointTableView.getItems().addAll(vpl);
-            viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-            AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
-            viewPointTableView.sort();
-            LOGGER.info("refreshVPTable: got a total of " + viewPointTableView.getItems().size() + " viewPointTableView items");
-        });
+        //viewPointTableView.getItems().clear();
+        LOGGER.info("Size of observableViewPointList before clear {}", observableViewPointList.size());
+        observableViewPointList.clear();
+        LOGGER.info("Size of observableViewPointList after clear {}", observableViewPointList.size());
+        observableViewPointList.setAll(this.gopherService.getViewPointList());
+        LOGGER.info("Size of observableViewPointList after adding viewpoints {}", observableViewPointList.size());
+
+        //viewPointTableView.setItems(this.gopherService.getViewPointList());
+//        javafx.application.Platform.runLater(() -> {
+//            updateListView();
+//            List<ViewPoint> vpl = this.gopherService.getViewPointList();
+//            LOGGER.info("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
+//            viewPointTableView.getItems().clear(); /* clear previous rows, if any */
+//            viewPointTableView.getItems().addAll(vpl);
+//            viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+//            AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
+//            viewPointTableView.sort();
+//            LOGGER.info("refreshVPTable: got a total of " + viewPointTableView.getItems().size() + " viewPointTableView items");
+//        });
     }
 
     /**

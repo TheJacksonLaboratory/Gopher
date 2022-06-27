@@ -439,17 +439,6 @@ public class GopherMainController implements Initializable {
         gopherService.setProjectName(projectName);
         System.out.println("Project name " + projectName);
         this.vpAnalysisController.setTabPaneRef(tabpane);
-        try {
-            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
-            URL url = analysisPaneResource.getURL();
-            LOGGER.error("Loading analysis pane from {}", url.getFile());
-            FXMLLoader loader = new FXMLLoader(url);
-            ScrollPane viewpointPane = loader.load();
-            analysistab.setContent(viewpointPane);
-        } catch (IOException ioe) {
-            PopupFactory.displayError("Could not initialize VPV Tab", ioe.getMessage());
-        }
-
     }
 
 

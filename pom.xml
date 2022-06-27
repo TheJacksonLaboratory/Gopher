@@ -9,7 +9,7 @@
     </parent>
     <groupId>gopher</groupId>
     <artifactId>GopherGui</artifactId>
-    <version>0.8.4</version>
+    <version>0.8.5</version>
     <packaging>jar</packaging>
 
     <prerequisites>
