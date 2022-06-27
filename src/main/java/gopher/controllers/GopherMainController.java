@@ -38,6 +38,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
@@ -401,16 +402,17 @@ public class GopherMainController implements Initializable {
         setGUItoSimple();
         initializePromptTexts();
         setBindings();
-        try {
-            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
-            URL url = analysisPaneResource.getURL();
-            LOGGER.trace("Loading analysis pane from {}", url.getFile());
-            FXMLLoader loader = new FXMLLoader(url);
-            this.analysisPane = loader.load();
-            this.analysistab.setContent(this.analysisPane);
-        } catch (IOException iex) {
-            LOGGER.error("Could not load analysis tab: {}", iex.getMessage());
-        }
+//        try {
+//            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
+//            URL url = analysisPaneResource.getURL();
+//            LOGGER.trace("Loading analysis pane from {}", url.getFile());
+//            FXMLLoader loader = new FXMLLoader();
+//            loader.setBuilderFactory(new JavaFXBuilderFactory());
+//            this.analysisPane = loader.load(url.openStream());
+//            this.analysistab.setContent(this.analysisPane);
+//        } catch (IOException iex) {
+//            LOGGER.error("Could not load analysis tab: {}", iex.getMessage());
+//        }
 
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
             String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
@@ -436,6 +438,7 @@ public class GopherMainController implements Initializable {
         setuptab.setId("setuptab");
         gopherService.setProjectName(projectName);
         System.out.println("Project name " + projectName);
+        this.vpAnalysisController.setTabPaneRef(tabpane);
         try {
             ClassPathResource analysisPaneResource = new ClassPathResource("fxml/VpAnalysisPane.fxml");
             URL url = analysisPaneResource.getURL();
@@ -446,7 +449,7 @@ public class GopherMainController implements Initializable {
         } catch (IOException ioe) {
             PopupFactory.displayError("Could not initialize VPV Tab", ioe.getMessage());
         }
-        this.vpAnalysisController.setTabPaneRef(tabpane);
+
     }
 
 
