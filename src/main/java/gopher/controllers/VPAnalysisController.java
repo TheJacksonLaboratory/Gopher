@@ -120,7 +120,6 @@ public class VPAnalysisController implements Initializable {
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
                 openViewPointInTab(vp);
             });
-            // wrap it so it can be displayed in the TableView
             return new ReadOnlyObjectWrapper<>(btn);
         });
 
@@ -132,7 +131,6 @@ public class VPAnalysisController implements Initializable {
                 LOGGER.trace(String.format("Deleting viewpoint: %s, Chromosome: %s, Genomic pos: %d n selected %d ",
                         vp.getTargetName(), vp.getReferenceID(), vp.getGenomicPos(), vp.getActiveSegments().size()));
                 gopherService.deleteViewpoint(vp);
-                //  model.deleteViewpoint(vp);
                 if (this.openTabs.containsKey(vp)) { // If the tab is open, remove it from the GUI.
                     Tab tab = openTabs.get(vp);
                     tab.setDisable(true);
@@ -157,7 +155,6 @@ public class VPAnalysisController implements Initializable {
                 updateViewPointInTab(vp);
             });
             return new ReadOnlyObjectWrapper<>(btn);
-
         });
 
         // the third column
@@ -165,34 +162,25 @@ public class VPAnalysisController implements Initializable {
         targetTableColumn.setEditable(false);
         // The following shows the gene name with an astrerix if the center segment is selected.
         targetTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getTargetName()));
-
-
         // fourth column--position, e.g.,chr4:622712
         genomicLocationColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGenomicLocationString()));
         genomicLocationColumn.setComparator(new GenomicLocationComparator());
-
-
         //  fifth column--number of selected fragments
         nSelectedTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getActiveSegments().size())));
         nSelectedTableColumn.setComparator(new IntegerComparator());
-
         // sixth column--score of fragments.
         viewpointScoreColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getScoreAsPercentString())));
         viewpointScoreColumn.setComparator(new PercentComparator());
-
         // seventh column--total length of active segments
         viewpointTotalLengthOfActiveSegments.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getTotalLengthOfActiveSegments())));
         viewpointTotalLengthOfActiveSegments.setComparator(new IntegerComparator());
-
         // eight column--total length viewpoint
         viewpointTotalLength.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(((int) cdf.getValue().getTotalLengthOfViewpoint()))));
         viewpointTotalLength.setComparator(new IntegerComparator());
-
         // ninth column -- is central digest with TSS selected?
         fragmentOverlappingTSSColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().isTSSfragmentChosen() ? "yes" : "no"));
 
         manuallyRevisedColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getManuallyRevised()));
-
         // allow titles of all table columns to be broken into multiple lines
         viewPointTableView.getColumns().forEach(Utils::makeHeaderWrappable);
         viewPointTableView.setItems(observableViewPointList);
@@ -220,7 +208,10 @@ public class VPAnalysisController implements Initializable {
         }
     }
 
-
+    /** Add a reference to the TabPane that is managed in {@link GopherMainController} as an FXML field.
+     * We use the same TabPane here to add new panes for selected ViewPoints.
+     * @param tpane
+     */
     public void setTabPane(TabPane tpane) {
         this.tabpane = tpane;
     }
@@ -231,7 +222,7 @@ public class VPAnalysisController implements Initializable {
      * @param vp This {@link ViewPoint} object will be opened into a new Tab.
      */
     private void openViewPointInTab(ViewPoint vp) {
-        LOGGER.error("Opening viewpoint {}", vp.getTargetName());
+        LOGGER.trace("Opening viewpoint {}", vp.getTargetName());
         if (openTabs.containsKey(vp)) {
             Tab tab = openTabs.get(vp);
             LOGGER.trace("openTabs containsKey " + vp.getTargetName());
@@ -245,7 +236,7 @@ public class VPAnalysisController implements Initializable {
                 return;
             }
         }
-        LOGGER.trace("openTabs containsKey NO " + vp.getTargetName());
+        LOGGER.trace("openTabs does not contain Key: {}", vp.getTargetName());
         try {
             final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
             tab.setId(vp.getTargetName());
@@ -271,6 +262,9 @@ public class VPAnalysisController implements Initializable {
             LOGGER.error("Loading analysis pane from {}", url.getFile());
             FXMLLoader loader = new FXMLLoader(url);
             ScrollPane viewpointPane = loader.load();
+            ViewPointController vpcontroller = loader.getController();
+            vpcontroller.setViewPoint(vp);
+            vpcontroller.setGopherService(gopherService);
             tab.setContent(viewpointPane);
             this.tabpane.getTabs().add(tab);
             this.tabpane.getSelectionModel().select(tab);

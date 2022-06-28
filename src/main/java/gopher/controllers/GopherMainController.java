@@ -421,7 +421,7 @@ public class GopherMainController implements Initializable {
         }
         setuptab.setId("setuptab");
         gopherService.setProjectName(projectName);
-        System.out.println("Project name " + projectName);
+        LOGGER.trace("Project name " + projectName);
         this.vpAnalysisController.setTabPaneRef(tabpane);
     }
 
@@ -459,8 +459,8 @@ public class GopherMainController implements Initializable {
      * This method gets called by SwitchScreens when the user wants to start a new project.
      */
     public void initializeNewModelInGui() {
-        setInitializedValuesInGUI();
         removePreviousValuesFromTextFields();
+        setInitializedValuesInGUI();
     }
 
     private void setInitializedValuesInGUI() {
@@ -481,7 +481,6 @@ public class GopherMainController implements Initializable {
         } else {
             this.transcriptDownloadPI.setProgress(0.0);
         }
-
         if (gopherService.alignabilityMapPathIncludingFileNameGzExists()) {
             this.alignabilityDownloadPI.setProgress(1.0);
         } else {
@@ -500,7 +499,7 @@ public class GopherMainController implements Initializable {
         }
         this.unbalancedMarginCheckbox.setSelected(gopherService.getAllowUnbalancedMargins());
         this.patchedViewpointCheckbox.setSelected(gopherService.getAllowPatching());
-
+        setGenomeBuild(gopherService.getGenomeBuild());
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
@@ -670,6 +669,7 @@ public class GopherMainController implements Initializable {
         this.gopherService.setProbeLength(baitlen);
         int marginsize = getMarginLength() > 0 ? getMarginLength() : Default.MARGIN_SIZE;
         this.gopherService.setMarginSize(marginsize);
+
     }
 
     /**
@@ -1102,6 +1102,7 @@ public class GopherMainController implements Initializable {
         String approach = this.approachChoiceBox.getValue();
         this.gopherService.setApproach(approach);
         updateModel();
+
         if (gopherService.getChosenEnzymelist().isEmpty()) {
             PopupFactory.displayError("Data incomplete", "Choose a restriction enzyme before proceding");
             return;

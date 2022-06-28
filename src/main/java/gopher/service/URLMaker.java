@@ -28,10 +28,10 @@ public class URLMaker {
     private static final int OFFSET = 200;
 
 
-    public URLMaker(GopherService model, int width) {
-        this.genomebuild=model.getGenomeBuild();
+    public URLMaker(GopherService gopherService, int width) {
+        this.genomebuild= gopherService.getGenomeBuild();
         xdim=width;
-        this.enzymeString = model.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
+        this.enzymeString = gopherService.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(","));
         logger.trace(String.format("setting genomebuild to %s with default image width of %d",genomebuild,xdim));
     }
 

@@ -28,7 +28,7 @@
     <logger name="org.monarchinitiative.fenominal" level="DEBUG"/>
     <logger name="org.monarchinitiative.phenol" level="INFO"/>
     <logger name="org.springframework.boot" level="WARN"/>
-    <root level="info">
+    <root level="trace">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

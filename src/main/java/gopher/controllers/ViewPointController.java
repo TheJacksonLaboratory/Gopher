@@ -25,7 +25,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,12 +37,14 @@ import java.util.stream.Collectors;
 
 /**
  * This class acts as a controller of the TabPanes which confirmDialog individual ViewPoints.
+ * We define the component as a prototype because we want a separate entity for each viewpoint we display.
  * @author Peter Robinson
- * @version 0.2.8 (2018-07-12)
+ * @version 0.3.8 (2033-06-27)
  */
 @Component
+@Scope("prototype")
 public class ViewPointController implements Initializable {
-    private static final Logger logger = LoggerFactory.getLogger(ViewPointController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewPointController.class.getName());
 
     private static final String INITIAL_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Connecting to UCSC " +
             "Browser to visualize view point...</i></p></body></html>";
@@ -103,7 +105,7 @@ public class ViewPointController implements Initializable {
      * Reference to the {@link Tab} where this content is placed.
      */
     private Tab tab;
-    @Autowired
+    //@Autowired
     private GopherService gopherService;
     /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
     private VPAnalysisController analysisPresenter=null;
@@ -195,6 +197,11 @@ public class ViewPointController implements Initializable {
         this.analysisPresenter=vpAnalysisPresenter;
     }
 
+    public void setGopherService(GopherService gopherService) {
+        LOGGER.error("setGopherService is null {}", gopherService == null);
+        this.gopherService = gopherService;
+    }
+
     /** class for sorting chromosome locations like chr5:43679423 */
     static class FormattedChromosomeComparator implements Comparator<String> {
         @Override
@@ -214,7 +221,7 @@ public class ViewPointController implements Initializable {
                 i2 = Integer.parseInt(s2);
                 return i1.compareTo(i2);
             } catch (Exception e) {
-                logger.error("Error while sorting chromosome strings s1={} s2={}} ({})", s1, s2, e.getMessage());
+                LOGGER.error("Error while sorting chromosome strings s1={} s2={}} ({})", s1, s2, e.getMessage());
                 return 0;
             }
         }
@@ -232,8 +239,6 @@ public class ViewPointController implements Initializable {
 
         // Todo -- not catching lack of internet connect error.
         ucscWebEngine.setOnError(event -> System.out.println("BAD ERRL " + event.toString()));
-
-
 
         /* The following line is needed to avoid an SSL handshake alert
          * when opening the UCSC Browser. */
@@ -500,8 +505,9 @@ public class ViewPointController implements Initializable {
      * create url & load content from UCSC
      */
     private void showUcscView() {
+        LOGGER.trace("showUcscView with gopherService {}", gopherService);
         URLMaker maker = new URLMaker(this.gopherService);
-        logger.trace("Getting URL with zoomfactor="+zoomfactor);
+        LOGGER.trace("Getting URL with zoomfactor="+zoomfactor);
         String url= maker.getImageURL(this.viewpoint,this.zoomfactor,getHighlightRegions());
         ucscWebEngine.load(url);
     }
@@ -548,9 +554,9 @@ public class ViewPointController implements Initializable {
      * @param adjustment If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
      */
     private void zoom(double adjustment) {
-        logger.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",adjustment,viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        LOGGER.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",adjustment,viewpoint.getStartPos(),viewpoint.getEndPos() ));
         setZoomFactor(adjustment);
-        logger.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        LOGGER.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
         showColoredSegmentsInTable();
         showUcscView();
     }
