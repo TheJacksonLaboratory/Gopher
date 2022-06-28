@@ -260,8 +260,8 @@ public class VPAnalysisController implements Initializable {
             ClassPathResource analysisPaneResource = new ClassPathResource("fxml/viewpoint.fxml");
             URL url = analysisPaneResource.getURL();
             LOGGER.error("Loading analysis pane from {}", url.getFile());
-            FXMLLoader loader = new FXMLLoader(url);
-            ScrollPane viewpointPane = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            ScrollPane viewpointPane = loader.load(url.openStream());
             ViewPointController vpcontroller = loader.getController();
             vpcontroller.setViewPoint(vp);
             vpcontroller.setGopherService(gopherService);
