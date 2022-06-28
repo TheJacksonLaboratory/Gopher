@@ -270,10 +270,10 @@ public class VPAnalysisController implements Initializable {
             this.tabpane.getSelectionModel().select(tab);
             openTabs.put(vp, tab);
         } catch (IOException e) {
-            LOGGER.error("Could not load tab for {}", vp.getTargetName());
-            PopupFactory.displayError("Error loading viewpoint in tab",
-                    String.format("Could not load tab for %s", vp.getTargetName()));
-
+            String err = String.format("Could not load tab for %s (%s)",
+                    vp.getTargetName(), e.getMessage());
+            LOGGER.error(err);
+            PopupFactory.displayError("Error loading viewpoint in tab", err);
         }
     }
 
