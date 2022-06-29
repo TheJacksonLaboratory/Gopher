@@ -494,6 +494,8 @@ public class ViewpointScrollPane extends ScrollPane {
         if (startIndexForColor == UNINITIALIZED) {
             this.startIndexForColor = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
         }
+        //getChildren().add(mainStackPane);
+        splitPane.getItems().addAll(ucscContentWebView, vb1);
         updateScore();
         showColoredSegmentsInTable();
         showUcscView();
