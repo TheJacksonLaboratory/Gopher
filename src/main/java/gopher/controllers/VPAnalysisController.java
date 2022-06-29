@@ -237,7 +237,6 @@ public class VPAnalysisController implements Initializable {
             }
         }
         LOGGER.trace("openTabs does not contain Key: {}", vp.getTargetName());
-        try {
             final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
             tab.setId(vp.getTargetName());
             tab.setClosable(true);
@@ -257,24 +256,12 @@ public class VPAnalysisController implements Initializable {
                 }
             });
 
-            ClassPathResource analysisPaneResource = new ClassPathResource("fxml/viewpoint.fxml");
-            URL url = analysisPaneResource.getURL();
-            LOGGER.error("Loading analysis pane from {}", url.getFile());
-            FXMLLoader loader = new FXMLLoader();
-            ScrollPane viewpointPane = loader.load(url.openStream());
-            ViewPointController vpcontroller = loader.getController();
-            vpcontroller.setViewPoint(vp);
-            vpcontroller.setGopherService(gopherService);
-            tab.setContent(viewpointPane);
+            ViewpointScrollPane vpsp = new ViewpointScrollPane(vp, this);
+            tab.setContent(vpsp);
             this.tabpane.getTabs().add(tab);
             this.tabpane.getSelectionModel().select(tab);
             openTabs.put(vp, tab);
-        } catch (IOException e) {
-            String err = String.format("Could not load tab for %s (%s)",
-                    vp.getTargetName(), e.getMessage());
-            LOGGER.error(err);
-            PopupFactory.displayError("Error loading viewpoint in tab", err);
-        }
+
     }
 
     public void setTabPaneRef(TabPane tabp) {
@@ -473,6 +460,10 @@ public class VPAnalysisController implements Initializable {
                 return 0;
             }
         }
+    }
+
+    public GopherService getGopherService() {
+        return this.gopherService;
     }
 
 }

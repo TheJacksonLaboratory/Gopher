@@ -12,17 +12,19 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
-import javafx.fxml.FXML;
+import javafx.event.Event;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 /**
  * This class provides a Scrollpane that is intended to show a single viewpoint. When the user clicks
  * on a viewpoint, a new object is created and the scroll pane is added to a new tab
+ *
  * @author Peter N Robinson
  */
 @Component
@@ -46,55 +49,68 @@ public class ViewpointScrollPane extends ScrollPane {
             "Browser to visualize view point...</i></p></body></html>";
 
 
-    private static final String FAILED_HTML_CONTENT  = "<html><body><h3>GOPHER</h3><p><i>Could not connect to UCSC " +
+    private static final String FAILED_HTML_CONTENT = "<html><body><h3>GOPHER</h3><p><i>Could not connect to UCSC " +
             "Browser. Please check your internet connection and proxy</i></p></body></html>";
 
-    private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
-            "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
-            "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
-            "FFE4E1","F0FFF0","F0FFFF"};
+    private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF", "F7DC6F", "CFFF98", "A1D6E2",
+            "EC96A4", "E6DF44", "F76FDA", "FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6", "FFC300", "F76FF5", "FFFF99",
+            "FF99FF", "99FFFF", "CCFF99", "FFE5CC", "FFD700", "9ACD32", "7FFFD4", "FFB6C1", "FFFACD",
+            "FFE4E1", "F0FFF0", "F0FFFF"};
 
-   
-    private SplitPane viewPointSplitPane;
+    /**
+     * The graphical element where the UCSC browser content is displayed.
+     */
 
-    /** The top-level Pane which contains all other graphical elements of this controller.*/
-
-    private javafx.scene.control.ScrollPane contentScrollPane;
-    /** The graphical element where the UCSC browser content is displayed.*/
-   
     private final WebView ucscContentWebView;
-    /** This will be dynamically set to the name of the gene and the score of the viewpoint. */
-    private javafx.scene.control.Label viewpointScoreLabel;
-    /** This will be dynamically set with details about the view point. */
-    private javafx.scene.control.Label viewpointExplanationLabel;
-    /** This is use to mediate between {@link #viewpointScoreLabel} and the ViewPoint object and score. */
-    private StringProperty vpScoreProperty;
-    /** This is used to mediate between the {@link #viewpointExplanationLabel} and the ViewPoint object. */
-    private StringProperty vpExplanationProperty;
-    /** The backend behind the UCSC browser content. */
-    private WebEngine ucscWebEngine;
-    /** By how much do we change the width of the UCSC confirmDialog when zooming? */
-    private static final double ZOOMFACTOR =1.5;
+    /**
+     * This will be dynamically set to the name of the gene and the score of the viewpoint.
+     */
+    private final Label viewpointScoreLabel;
+    /**
+     * This will be dynamically set with details about the view point.
+     */
+    private final Label viewpointExplanationLabel;
+    /**
+     * This is use to mediate between {@link #viewpointScoreLabel} and the ViewPoint object and score.
+     */
+    private final StringProperty vpScoreProperty;
+    /**
+     * This is used to mediate between the {@link #viewpointExplanationLabel} and the ViewPoint object.
+     */
+    private final StringProperty vpExplanationProperty;
+    /**
+     * The backend behind the UCSC browser content.
+     */
+    private final WebEngine ucscWebEngine;
+    /**
+     * By how much do we change the width of the UCSC confirmDialog when zooming?
+     */
+    private static final double ZOOMFACTOR = 1.5;
     /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
-    
-    private TableView<ColoredSegment> segmentsTableView;
-    private TableColumn<ColoredSegment, String> colorTableColumn;
-    private TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
-    private TableColumn<ColoredSegment, String> locationTableColumn;
+    /**
+     * A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.
+     */
+    private final VPAnalysisController analysisPresenter;
+    private final TableView<ColoredSegment> segmentsTableView;
+    private final TableColumn<ColoredSegment, String> colorTableColumn;
+    private final TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
+    private final TableColumn<ColoredSegment, String> locationTableColumn;
     // private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
-    private TableColumn<ColoredSegment, String> repeatContentUpColumn;
+    private final TableColumn<ColoredSegment, String> repeatContentUpColumn;
     // private TableColumn<ColoredSegment, String> repeatContentDownColumn;
-    private TableColumn<ColoredSegment, String> gcContentUpDownColumn;
-    private TableColumn<ColoredSegment, String> numberOfBaitsColumn;
+    private final TableColumn<ColoredSegment, String> gcContentUpDownColumn;
+    private final TableColumn<ColoredSegment, String> numberOfBaitsColumn;
     // private TableColumn<ColoredSegment, String> gcContentTableColumn;
-    private TableColumn<ColoredSegment,String> segmentLengthColumn;
+    private final TableColumn<ColoredSegment, String> segmentLengthColumn;
 
-    private TableColumn<ColoredSegment, String> alignabilityContentColumn;
+    private final TableColumn<ColoredSegment, String> alignabilityContentColumn;
 
-    private javafx.scene.control.Button deleteButton;
-    private javafx.scene.control.Button copyToClipboardButton;
-    private javafx.scene.control.Button zoomInButton;
-    private javafx.scene.control.Button zoomOutButton;
+    private final Button deleteButton;
+    private final Button copyToClipboardButton;
+    private final Button zoomInButton;
+    private final Button zoomOutButton;
+
+    private final Button closeButton;
 
     private final StackPane mainStackPane;
     /**
@@ -102,34 +118,47 @@ public class ViewpointScrollPane extends ScrollPane {
      */
     private Tab tab;
     //@Autowired
-    private GopherService gopherService;
-    /** A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.*/
-    private VPAnalysisController analysisPresenter=null;
+    private final GopherService gopherService;
 
-    /** Instance of {@link ViewPoint} presented by this presenter. */
-    private ViewPoint viewpoint;
-    /** If {@link #startIndexForColor} is set to this, then we know we need to set it to a random number. Otherwise
-     * leave if unchanged so that the color remains the same.  */
-    private static final int UNINITIALIZED=-1;
-    /** The (random) starting index in our list of colors. */
+
+    /**
+     * Instance of {@link ViewPoint} presented by this presenter.
+     */
+    private final ViewPoint viewpoint;
+    /**
+     * If {@link #startIndexForColor} is set to this, then we know we need to set it to a random number. Otherwise
+     * leave if unchanged so that the color remains the same.
+     */
+    private static final int UNINITIALIZED = -1;
+    /**
+     * The (random) starting index in our list of colors.
+     */
     private int startIndexForColor = UNINITIALIZED;
-    /** The current index for color -- this will be updated by the iteration. */
+    /**
+     * The current index for color -- this will be updated by the iteration.
+     */
     private int idx;
-    /** This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
+    /**
+     * This is a kind of wrapper for the segments that keeps track of how they should be colored in the UCSC view as
      * well as in the table.
      */
     private List<ColoredSegment> coloredsegments;
 
-    /** The amount to zoom a window by. Note that we will limit this to 20%-500% of the original window. */
-    private double zoomfactor=1.0d;
+    /**
+     * The amount to zoom a window by. Note that we will limit this to 20%-500% of the original window.
+     */
+    private double zoomfactor = 1.0d;
 
     private final VBox listviewVBox;
 
     private final ListView<String> listViewKey;
     private final ListView<String> listViewValue;
 
-    public ViewpointScrollPane() {
+    public ViewpointScrollPane(ViewPoint vp, VPAnalysisController analysisPresenter) {
         super();
+        this.viewpoint = vp;
+        this.analysisPresenter = analysisPresenter;
+        this.gopherService = analysisPresenter.getGopherService();
         setFitToHeight(true);
         setFitToWidth(true);
         mainStackPane = new StackPane();
@@ -177,7 +206,7 @@ public class ViewpointScrollPane extends ScrollPane {
         ucscWebEngine.setUserDataDirectory(new File(gopher.io.Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
         ucscWebEngine.loadContent(INITIAL_HTML_CONTENT);
         // allow content of viewpoint tab to be resized to follow width of UCSC image
-        viewPointSplitPane.prefWidthProperty().bind(ucscContentWebView.widthProperty());
+        splitPane.prefWidthProperty().bind(ucscContentWebView.widthProperty());
 
         // Todo -- not catching lack of internet connect error.
         ucscWebEngine.setOnError(event -> System.out.println("BAD ERRL " + event.toString()));
@@ -190,7 +219,7 @@ public class ViewpointScrollPane extends ScrollPane {
 
          */
         GridPane gridPane = new GridPane();
-        for (int i=0; i<5; i++) { // five identical constacut
+        for (int i = 0; i < 5; i++) { // five identical constacut
             ColumnConstraints col1 = new ColumnConstraints();
             col1.setHgrow(Priority.SOMETIMES);
             col1.setMinWidth(10.0);
@@ -211,23 +240,28 @@ public class ViewpointScrollPane extends ScrollPane {
         gridPane.getRowConstraints().addAll(row1, row2, row3);
         viewpointScoreLabel = new Label();
         viewpointScoreLabel.setMaxWidth(1600.0);
-
-/*
- <Label fx:id="viewpointScoreLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel"
-        GridPane.columnSpan="2147483647"/>
-                    <Button fx:id="zoomOutButton" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0"
-        mnemonicParsing="false" onAction="#zoomOut" prefHeight="30.0" prefWidth="90.0"
-        text="Zoom out" GridPane.halignment="CENTER" GridPane.rowIndex="2">
-                        <padding>
-                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                        </padding>
-                        <GridPane.margin>
-                            <Insets/>
-                        </GridPane.margin>
-                    </Button>
-
-*/
-
+        viewpointScoreLabel.setStyle("mylabel");
+        gridPane.add(viewpointScoreLabel, 0, 0, 4, 1); // colspan 5
+        viewpointExplanationLabel = new Label();
+        viewpointExplanationLabel.setMaxWidth(1600);
+        viewpointExplanationLabel.setStyle("mylabel");
+        gridPane.add(viewpointExplanationLabel, 1, 0, 4, 1);
+        zoomOutButton = createButton("Zoom out", 30, 90, 30, 90, 10);
+        zoomOutButton.setOnAction(e -> zoomOut());
+        gridPane.add(zoomOutButton, 2, 0);
+        zoomInButton = createButton("Zoom in", 30, 90, 30, 90, 10);
+        zoomInButton.setOnAction(e -> zoomIn());
+        gridPane.add(zoomInButton, 2, 1);
+        deleteButton = createButton("Delete", 30, 90, 30, 90, 10);
+        deleteButton.setOnAction(e -> deleteThisViewPoint(e));
+        gridPane.add(deleteButton, 2, 2);
+        copyToClipboardButton = createButton("Copy", 30, 90, 30, 90, 10);
+        copyToClipboardButton.setOnAction(e -> copyToClipboard(e));
+        gridPane.add(copyToClipboardButton, 2, 3);
+        closeButton = createButton("Close", 30, 90, 30, 90, 10);
+        closeButton.setOnAction(e -> closeButtonAction());
+        gridPane.add(closeButton, 2, 3);
+        colorTableColumn = new TableColumn<>();
         // This is a hack when by using dummy column a color for the cell's TableRow is set.
         colorTableColumn.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -242,6 +276,7 @@ public class ViewpointScrollPane extends ScrollPane {
         });
 
         colorTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getColor()));
+        isSelectedTableColumn = new TableColumn<>("selected?");
         isSelectedTableColumn.setCellValueFactory(cdf -> {
             // if we get here, the user has selected or deselected the checkbox
             //this.viewpoint.setManuallyRevised();
@@ -293,7 +328,7 @@ public class ViewpointScrollPane extends ScrollPane {
             }
             return new ReadOnlyObjectWrapper<>(cdf.getValue().getCheckBox()); // the same checkbox
         });
-
+        locationTableColumn = new TableColumn<>("Location");
         locationTableColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment()
                 .getChromosomalPositionString())));
         locationTableColumn.setCellFactory(column -> new TableCell<>() {
@@ -305,12 +340,14 @@ public class ViewpointScrollPane extends ScrollPane {
                     setStyle("-fx-text-fill: black; -fx-font-weight: normal");
                 }
 
-            }});
+            }
+        });
         locationTableColumn.setComparator(new ViewPointController.FormattedChromosomeComparator());
         locationTableColumn.setSortable(false);
 
+        segmentLengthColumn = new TableColumn<>("Segment len");
         segmentLengthColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().getSegment().length())));
-        segmentLengthColumn.setCellFactory( column -> new TableCell<>() {
+        segmentLengthColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -327,6 +364,8 @@ public class ViewpointScrollPane extends ScrollPane {
         });
         segmentLengthColumn.setSortable(false);
 
+        alignabilityContentColumn = new TableColumn<>("alignability");
+
         alignabilityContentColumn.setCellValueFactory(cdf -> {
             double alignability = cdf.getValue().getSegment().getMeanAlignabilityOfBaits();
             return new ReadOnlyStringWrapper(String.valueOf(alignability));
@@ -334,14 +373,14 @@ public class ViewpointScrollPane extends ScrollPane {
         alignabilityContentColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
-                super.updateItem(item,empty);
+                super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    double rp =   Double.parseDouble(item);
+                    double rp = Double.parseDouble(item);
                     if (Double.isNaN(rp)) {
                         setText("n/a");
                         setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                     } else {
-                        setText(String.format("%.1f",rp));
+                        setText(String.format("%.1f", rp));
                         if (rp > gopherService.getMaxMeanKmerAlignability()) {
                             setStyle("-fx-text-fill: red; -fx-font-weight: bold");
                         } else {
@@ -353,6 +392,7 @@ public class ViewpointScrollPane extends ScrollPane {
         });
         alignabilityContentColumn.setSortable(false);
 
+        repeatContentUpColumn = new TableColumn<>("repeat content");
         repeatContentUpColumn.setCellValueFactory(cdf -> {
             String val = cdf.getValue().getSegment().getMeanRepeatContentOfBaitsAsPercent();
             return new ReadOnlyStringWrapper(val);
@@ -361,11 +401,11 @@ public class ViewpointScrollPane extends ScrollPane {
         repeatContentUpColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
-                super.updateItem(item,empty);
+                super.updateItem(item, empty);
                 if (item != null && !empty) {
                     setText(item);
-                    boolean red=false;
-                    if (item.equals("n/a")) red=true;
+                    boolean red = false;
+                    if (item.equals("n/a")) red = true;
                     else { // in this case we expect something like 35.2%/34.8%
                         String[] A = item.split("/");
                         for (String a : A) {
@@ -383,6 +423,9 @@ public class ViewpointScrollPane extends ScrollPane {
         });
         repeatContentUpColumn.setSortable(false);
 
+
+        gcContentUpDownColumn = new TableColumn<>("GC content");
+
         gcContentUpDownColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getMeanGCcontentOfBaitsAsPercent())));
         gcContentUpDownColumn.setCellFactory(column -> new TableCell<>() {
@@ -392,8 +435,8 @@ public class ViewpointScrollPane extends ScrollPane {
                 super.updateItem(item, empty);
                 if (item != null && !empty) { // here, item is String like '40.00%'
                     setText(item);
-                    boolean red=false;
-                    if (item.equals("n/a")) red=true;
+                    boolean red = false;
+                    if (item.equals("n/a")) red = true;
                     else {
                         String[] A = item.split("/");
                         for (String a : A) {
@@ -414,6 +457,8 @@ public class ViewpointScrollPane extends ScrollPane {
         });
         gcContentUpDownColumn.setSortable(false);
 
+
+        numberOfBaitsColumn = new TableColumn<>("n baits");
         numberOfBaitsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(String.valueOf(cdf.getValue().
                 getSegment().getNumberOfBaitsUpDownAsString())));
         numberOfBaitsColumn.setCellFactory(column -> new TableCell<>() {
@@ -429,8 +474,19 @@ public class ViewpointScrollPane extends ScrollPane {
         });
         numberOfBaitsColumn.setSortable(false);
 
-        vpScoreProperty=new SimpleStringProperty();
-        vpExplanationProperty=new SimpleStringProperty();
+        segmentsTableView = new TableView<>();
+        segmentsTableView.getColumns().add(colorTableColumn);
+        segmentsTableView.getColumns().add(isSelectedTableColumn);
+        segmentsTableView.getColumns().add(locationTableColumn);
+        segmentsTableView.getColumns().add(segmentLengthColumn);
+        segmentsTableView.getColumns().add(alignabilityContentColumn);
+        segmentsTableView.getColumns().add(repeatContentUpColumn);
+        segmentsTableView.getColumns().add(gcContentUpDownColumn);
+        segmentsTableView.getColumns().add(numberOfBaitsColumn);
+
+
+        vpScoreProperty = new SimpleStringProperty();
+        vpExplanationProperty = new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
 
@@ -438,11 +494,24 @@ public class ViewpointScrollPane extends ScrollPane {
         if (startIndexForColor == UNINITIALIZED) {
             this.startIndexForColor = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, colors.length);
         }
+        updateScore();
+        showColoredSegmentsInTable();
+        showUcscView();
+    }
+
+    private void showColoredSegmentsInTable() {
+        segmentsTableView.getItems().clear();
+        this.idx = this.startIndexForColor; // "reset" the start position for the loop around the colors.
+        this.coloredsegments = this.viewpoint.getAllSegments().stream()
+                .map(s -> new ColoredSegment(s, getNextColor()))
+                .collect(Collectors.toList());
+        segmentsTableView.getItems().addAll(coloredsegments);
+
     }
 
     private void refreshUCSCButtonAction() {
         URLMaker urlmaker = new URLMaker(this.gopherService);
-        String url= urlmaker.getImageURL(viewpoint,this.zoomfactor,getHighlightRegions());
+        String url = urlmaker.getImageURL(viewpoint, this.zoomfactor, getHighlightRegions());
         StackPane sproot = new StackPane();
         final ProgressIndicator progress = new ProgressIndicator(); // or you can use ImageView with animated gif instead
         this.ucscWebEngine.load(url);
@@ -469,59 +538,49 @@ public class ViewpointScrollPane extends ScrollPane {
                 });
     }
 
-    public void setCallback(VPAnalysisController vpAnalysisPresenter) {
-        this.analysisPresenter=vpAnalysisPresenter;
-    }
 
-    public void setGopherService(GopherService gopherService) {
-        LOGGER.error("setGopherService is null {}", gopherService == null);
-        this.gopherService = gopherService;
+    private Button createButton(String label, int minHeight, int minWidth, int maxHeight, int maxWidth, int insetLen) {
+        Button button = new Button(label);
+        button.setMinHeight(minHeight);
+        button.setMinWidth(minWidth);
+        button.setMaxHeight(maxHeight);
+        button.setMaxWidth(maxWidth);
+        button.setPadding(new Insets(insetLen));
+        return button;
     }
 
 
     private void updateScore() {
-        if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
-            this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
+        if (this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
+            this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(), this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
         }
         this.vpScoreProperty.setValue(String.format("%s [%s] - Score: %.1f%% [%s], Length: %s",
                 viewpoint.getTargetName(),
                 viewpoint.getAccession(),
-                100* viewpoint.getScore(),
+                100 * viewpoint.getScore(),
                 viewpoint.getGenomicLocationString(),
                 viewpoint.getTotalAndActiveLengthAsString()));
         if (viewpoint.hasNoActiveSegment()) {
             this.vpExplanationProperty.setValue("No selected fragments");
         } else {
-            int upstreamSpan= viewpoint.getUpstreamSpan();
-            int downstreamSpan= viewpoint.getDownstreamSpan();
+            int upstreamSpan = viewpoint.getUpstreamSpan();
+            int downstreamSpan = viewpoint.getDownstreamSpan();
             int total = viewpoint.getTotalPromoterCount();
             this.vpExplanationProperty.setValue(String.format("Upstream: %d bp; Downstream: %d bp. %s",
-                    upstreamSpan,downstreamSpan, viewpoint.getStrandAsString()));
+                    upstreamSpan, downstreamSpan, viewpoint.getStrandAsString()));
         }
     }
-    /**
-     * Set the ViewPoint that will be presented. Load UCSC view and populate tableview with ViewPoint segments.
-     *
-     * @param vp {@link ViewPoint} which will be presented.
-     */
-    public void setViewPoint(ViewPoint vp) {
-        this.viewpoint = vp;
-        updateScore();
-        showColoredSegmentsInTable();
-        showUcscView();
+
+    private void deleteThisViewPoint(Event e) {
+        this.gopherService.deleteViewpoint(this.viewpoint);
+        tab.setDisable(true);
+        this.tab.getTabPane().getTabs().remove(this.tab);
+        this.analysisPresenter.refreshVPTable();
+        e.consume();
     }
 
-
-    private void showColoredSegmentsInTable() {
-        segmentsTableView.getItems().clear();
-        this.idx=this.startIndexForColor; // "reset" the start position for the loop around the colors.
-        this.coloredsegments = this.viewpoint.getAllSegments().stream()
-                .map(s -> new ColoredSegment(s, getNextColor()))
-                .collect(Collectors.toList());
-        segmentsTableView.getItems().addAll(coloredsegments);
-    }
 
     /**
      * create url & load content from UCSC
@@ -529,20 +588,38 @@ public class ViewpointScrollPane extends ScrollPane {
     private void showUcscView() {
         LOGGER.trace("showUcscView with gopherService {}", gopherService);
         URLMaker maker = new URLMaker(this.gopherService);
-        LOGGER.trace("Getting URL with zoomfactor="+zoomfactor);
-        String url= maker.getImageURL(this.viewpoint,this.zoomfactor,getHighlightRegions());
+        LOGGER.trace("Getting URL with zoomfactor=" + zoomfactor);
+        String url = maker.getImageURL(this.viewpoint, this.zoomfactor, getHighlightRegions());
         ucscWebEngine.load(url);
     }
 
-    /** Adjust the zoom factor and ensure that it stays within 20%-500% of the original range.
+    /**
+     * Adjust the zoom factor and ensure that it stays within 20%-500% of the original range.
+     *
      * @param adjustment Amount to change the zoom factor (1.5 or 0.5).
-     * */
+     */
     private void setZoomFactor(double adjustment) {
         this.zoomfactor *= adjustment;
-        this.zoomfactor = Math.max(0.2,zoomfactor);
-        this.zoomfactor = Math.min(5.0,zoomfactor);
+        this.zoomfactor = Math.max(0.2, zoomfactor);
+        this.zoomfactor = Math.min(5.0, zoomfactor);
     }
 
+    private void copyToClipboard(Event e) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        URLMaker urlmaker = new URLMaker(this.gopherService);
+        String url = urlmaker.getURL(viewpoint, this.zoomfactor, getHighlightRegions());
+        content.putString(url);
+        clipboard.setContent(content);
+        e.consume();
+    }
+
+    void closeButtonAction() {
+        Platform.runLater(() -> {
+            this.analysisPresenter.removeViewPointTab(this.viewpoint);
+            this.analysisPresenter.refreshVPTable();
+        });
+    }
 
     public void setTab(Tab tab) {
         this.tab = tab;
@@ -553,8 +630,8 @@ public class ViewpointScrollPane extends ScrollPane {
      *
      * @return {@link javafx.scene.control.ScrollPane} object.
      */
-    public javafx.scene.control.ScrollPane getPane() {
-        return this.contentScrollPane;
+    public ScrollPane getPane() {
+        return this;
     }
 
 
@@ -562,6 +639,7 @@ public class ViewpointScrollPane extends ScrollPane {
      * This function returns a rotating list of colors for the digest highlights designed to be displayed on the
      * UCSC browser. If a segment is not selected, it returns "" (an emtpy string), which basically causes the corresponding
      * segment to show as not color-highlighted in the UCSC image or in the table.
+     *
      * @return a rotating list of colors for the digest highlights.
      */
     private String getNextColor() {
@@ -573,25 +651,37 @@ public class ViewpointScrollPane extends ScrollPane {
 
     /**
      * Zoom in or out with the UCSC display.
+     *
      * @param adjustment If we zoom in, factor is {@link #ZOOMFACTOR}; if we zoom out, factor is 1/{@link #ZOOMFACTOR};
      */
     private void zoom(double adjustment) {
-        LOGGER.trace(String.format("Before zoom (factor %.2f) start=%d end =%d",adjustment,viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        LOGGER.trace(String.format("Before zoom (factor %.2f) start=%d end =%d", adjustment, viewpoint.getStartPos(), viewpoint.getEndPos()));
         setZoomFactor(adjustment);
-        LOGGER.trace(String.format("After zoom start=%d end =%d",viewpoint.getStartPos(),viewpoint.getEndPos() ));
+        LOGGER.trace(String.format("After zoom start=%d end =%d", viewpoint.getStartPos(), viewpoint.getEndPos()));
         showColoredSegmentsInTable();
         showUcscView();
     }
 
-    /** Change the UCSC view by zooming in. */
-    private void zoomIn() { zoom(1 / ZOOMFACTOR); }
-    /** Change the UCSC view by zooming out. */
-   private void zoomOut() { zoom(ZOOMFACTOR); }
+    /**
+     * Change the UCSC view by zooming in.
+     */
+    private void zoomIn() {
+        zoom(1 / ZOOMFACTOR);
+    }
+
+    /**
+     * Change the UCSC view by zooming out.
+     */
+    private void zoomOut() {
+        zoom(ZOOMFACTOR);
+    }
 
     /**
      * Creates a string to show highlights. Nonselected regions are highlighted in very light grey.
+     *
      * @return something like this {@code highlight=<DB>.<CHROM>:<START>-<END>#<COLOR>}.
-     * . */
+     * .
+     */
     private String getHighlightRegions() {
         String genome = this.gopherService.getGenomeBuild();
         String chromosome = this.viewpoint.getReferenceID();
@@ -603,10 +693,9 @@ public class ViewpointScrollPane extends ScrollPane {
                         c.getSegment().getStartPos(),
                         c.getSegment().getEndPos(),
                         c.getColor())).toList();
-        String highlightregions=colorsegmentlist.stream().collect( Collectors.joining( "%7C" ) );
+        String highlightregions = colorsegmentlist.stream().collect(Collectors.joining("%7C"));
         return String.format("highlight=%s", highlightregions);
     }
-
 
 
 }

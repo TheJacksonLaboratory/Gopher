@@ -80,7 +80,7 @@
                     <Label fx:id="viewpointExplanationLabel" maxWidth="1.7976931348623157E308" styleClass="mylabel"
                            GridPane.columnSpan="2147483647" GridPane.rowIndex="1"/>
                 </GridPane>
-                <TableView fx:id="segmentsTableView" stylesheets="@../css/viewpoint.css" VBox.vgrow="ALWAYS">
+                <TableView fx:id="segmentsTableView" stylesheets="@../css/gopherstyle.css" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="isSelectedTableColumn" editable="false" maxWidth="75.0" minWidth="75.0"
                                      prefWidth="75.0" resizable="false" sortable="false" text="Select"/>
