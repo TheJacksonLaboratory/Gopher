@@ -95,12 +95,9 @@ public class ViewpointScrollPane extends ScrollPane {
     private final TableColumn<ColoredSegment, String> colorTableColumn;
     private final TableColumn<ColoredSegment, CheckBox> isSelectedTableColumn;
     private final TableColumn<ColoredSegment, String> locationTableColumn;
-    // private TableColumn<ColoredSegment, String> inRepetitiveTableColumn;
     private final TableColumn<ColoredSegment, String> repeatContentUpColumn;
-    // private TableColumn<ColoredSegment, String> repeatContentDownColumn;
     private final TableColumn<ColoredSegment, String> gcContentUpDownColumn;
     private final TableColumn<ColoredSegment, String> numberOfBaitsColumn;
-    // private TableColumn<ColoredSegment, String> gcContentTableColumn;
     private final TableColumn<ColoredSegment, String> segmentLengthColumn;
 
     private final TableColumn<ColoredSegment, String> alignabilityContentColumn;
@@ -165,10 +162,6 @@ public class ViewpointScrollPane extends ScrollPane {
         mainStackPane.setAlignment(Pos.TOP_CENTER);
         setContent(mainStackPane);
         SplitPane splitPane = new SplitPane();
-        /*
-         <SplitPane fx:id="viewPointSplitPane" dividerPositions="0.35" maxWidth="1600.0" minHeight="560.0"
-                   minWidth="1100.0" orientation="VERTICAL" prefWidth="1100.0" StackPane.alignment="TOP_CENTER">
-         */
         splitPane.setMaxWidth(1600.0);
         splitPane.setMinHeight(560.0);
         splitPane.setMinWidth(1100.0);
@@ -184,7 +177,12 @@ public class ViewpointScrollPane extends ScrollPane {
         Label lvboxLabel = new Label("Panel design summary");
         ClassLoader classLoader = ViewpointScrollPane.class.getClassLoader();
         URL url = classLoader.getResource("css/gopherstyle.css");
-        getStylesheets().add(url.toExternalForm());
+        if (url != null) {
+            getStylesheets().add(url.toExternalForm());
+        } else {
+            // should never happen!
+            LOGGER.error("Could not load style sheet: css/gopherstyle.css");
+        }
         lvboxLabel.setStyle("toplabel");
         HBox hb1 = new HBox();
         hb1.setAlignment(Pos.TOP_CENTER);
@@ -196,7 +194,6 @@ public class ViewpointScrollPane extends ScrollPane {
         listViewValue = new ListView<>();
         listViewValue.setPrefHeight(170.0);
         listViewValue.setPrefWidth(905.0);
-        //             <WebView fx:id="ucscContentWebView" minHeight="300.0" minWidth="1100.0" prefHeight="-1.0" prefWidth="-1.0"/>
         ucscContentWebView = new WebView();
         ucscContentWebView.setMinHeight(300.0);
         ucscContentWebView.setMinWidth(1100.0);
@@ -248,19 +245,19 @@ public class ViewpointScrollPane extends ScrollPane {
         gridPane.add(viewpointExplanationLabel, 1, 0, 4, 1);
         zoomOutButton = createButton("Zoom out", 30, 90, 30, 90, 10);
         zoomOutButton.setOnAction(e -> zoomOut());
-        gridPane.add(zoomOutButton, 2, 0);
+        gridPane.add(zoomOutButton, 0, 2);
         zoomInButton = createButton("Zoom in", 30, 90, 30, 90, 10);
         zoomInButton.setOnAction(e -> zoomIn());
-        gridPane.add(zoomInButton, 2, 1);
+        gridPane.add(zoomInButton, 1, 2);
         deleteButton = createButton("Delete", 30, 90, 30, 90, 10);
         deleteButton.setOnAction(e -> deleteThisViewPoint(e));
         gridPane.add(deleteButton, 2, 2);
         copyToClipboardButton = createButton("Copy", 30, 90, 30, 90, 10);
         copyToClipboardButton.setOnAction(e -> copyToClipboard(e));
-        gridPane.add(copyToClipboardButton, 2, 3);
+        gridPane.add(copyToClipboardButton, 3, 2);
         closeButton = createButton("Close", 30, 90, 30, 90, 10);
         closeButton.setOnAction(e -> closeButtonAction());
-        gridPane.add(closeButton, 2, 3);
+        gridPane.add(closeButton, 4, 2);
         colorTableColumn = new TableColumn<>();
         // This is a hack when by using dummy column a color for the cell's TableRow is set.
         colorTableColumn.setCellFactory(col -> new TableCell<>() {
@@ -483,7 +480,8 @@ public class ViewpointScrollPane extends ScrollPane {
         segmentsTableView.getColumns().add(repeatContentUpColumn);
         segmentsTableView.getColumns().add(gcContentUpDownColumn);
         segmentsTableView.getColumns().add(numberOfBaitsColumn);
-
+        // add to the VBox
+        vb1.getChildren().addAll(gridPane, segmentsTableView);
 
         vpScoreProperty = new SimpleStringProperty();
         vpExplanationProperty = new SimpleStringProperty();

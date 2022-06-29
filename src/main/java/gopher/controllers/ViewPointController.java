@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Scope("prototype")
+@Deprecated
 public class ViewPointController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewPointController.class.getName());
 
