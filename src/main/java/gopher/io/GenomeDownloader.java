@@ -18,12 +18,11 @@ public class GenomeDownloader {
     private Genome genome=null;
     /** URL to download the genome from UCSC. */
     private String url=null;
-
-    private boolean successful=false;
-
-
+    /**
+     * @param  build genome symbol, e.g., hg19, mm10.
+     */
     public GenomeDownloader(String build) {
-        /** genome build symbol, e.g., hg19, mm10. */
+
         LOGGER.debug("Constructor of GenomeDownloader, build=" + build);
         try {
             this.url=getGenomeURL(build);
@@ -34,10 +33,6 @@ public class GenomeDownloader {
         }
     }
 
-    /** @return true if the genome was downloaded successfully or is already present.*/
-    public boolean successful() {
-        return successful;
-    }
 
 
     /**

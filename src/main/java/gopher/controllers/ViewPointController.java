@@ -2,6 +2,7 @@ package gopher.controllers;
 
 import gopher.service.GopherService;
 import gopher.service.URLMaker;
+import gopher.service.model.Approach;
 import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;
 import javafx.application.Platform;
@@ -459,7 +460,7 @@ public class ViewPointController implements Initializable {
 
 
     private void updateScore() {
-        if(this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
+        if(this.viewpoint.getDerivationApproach().equals(Approach.SIMPLE)) {
             this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(),this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
@@ -582,7 +583,7 @@ public class ViewPointController implements Initializable {
                         c.segment.getStartPos(),
                         c.segment.getEndPos(),
                         c.getColor())).toList();
-        String highlightregions=colorsegmentlist.stream().collect( Collectors.joining( "%7C" ) );
+        String highlightregions= String.join("%7C", colorsegmentlist);
         return String.format("highlight=%s", highlightregions);
     }
 

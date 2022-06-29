@@ -32,7 +32,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
 
     private int n_total_promoters;
     /** Referece to the model with all project data. */
-    protected GopherService gopherService;
+    protected final GopherService gopherService;
     /** Total number of viewpoints (used for the progress dialog) */
     protected int total;
     /** Index of current viewpoint (used for the progress dialog) */
@@ -41,7 +41,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
      */
-    List<ViewPoint> viewpointlist;
+    final List<ViewPoint> viewpointlist;
 
     protected abstract Void call() throws Exception;
 

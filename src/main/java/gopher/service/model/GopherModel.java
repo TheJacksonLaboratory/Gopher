@@ -549,14 +549,6 @@ public class GopherModel implements Serializable {
     /** @return the version number. */
     public static String getVersion() {
         return VERSION;
-//        String version;
-//        try {
-//            Package p = Model.class.getPackage();
-//            version = p.getImplementationVersion();
-//        } catch (Exception e) {
-//            version=VERSION;
-//        }
-//        return version;
     }
 
 }

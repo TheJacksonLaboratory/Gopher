@@ -81,9 +81,7 @@ public class GopherGene implements Comparable<GopherGene>, Serializable {
             strand="+";
         }
         sb.append(String.format("%s [%s,%s]",geneSymbol, contigID,strand));
-        if (this.positions ==null || this.positions.size()==0) {
-           // no-op
-        } else {
+        if (this.positions != null && this.positions.size() > 0) {
             String posstring = positions.stream().map(String::valueOf).collect(Collectors.joining(";"));
             sb.append("-TSS pos: ").append(posstring);
         }

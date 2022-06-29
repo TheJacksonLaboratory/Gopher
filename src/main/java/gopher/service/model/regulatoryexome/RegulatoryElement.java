@@ -13,13 +13,13 @@ import org.slf4j.LoggerFactory;
  * @version 0.1.3 (2017-11-12)
  */
 public class RegulatoryElement {
-    static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegulatoryExomeBuilder.class.getName());
 
     private RegulationCategory category;
-    private String chrom;
-    private int from;
-    private int to;
-    private String id;
+    private final String chrom;
+    private final int from;
+    private final int to;
+    private final String id;
 
     public RegulatoryElement(String chrom, int f, int t, String identifier, String cat) {
         if (cat.equals("Enhancer")) {
@@ -35,7 +35,7 @@ public class RegulatoryElement {
         } else if (cat.equalsIgnoreCase("TF binding site")) {
             this.category = RegulationCategory.TF_BINDING_SITE;
         } else {
-            logger.error("DID NOT RECOGNIZE CATEGORY " + cat);
+            LOGGER.error("DID NOT RECOGNIZE CATEGORY " + cat);
         }
         this.chrom = chrom;
         this.to = t;

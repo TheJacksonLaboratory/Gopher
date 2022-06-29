@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * @version 0.1.3 (2017-11-14)
  */
 public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry> {
-    private static Logger logger = LoggerFactory.getLogger(RegulatoryBEDFileEntry.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RegulatoryBEDFileEntry.class.getName());
     private final String chromosome;
     private final int fromPos;
     private final int toPos;

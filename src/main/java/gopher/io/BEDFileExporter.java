@@ -169,12 +169,12 @@ public class BEDFileExporter {
 
         // print out unique set of margins as targets for enrichment
         out_allTracks.println("track name='" + "GOPHER: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
-        Integer totalLengthOfMargins=0;
+        int totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
             String[] parts = s.split("\t");
             Integer sta = Integer.parseInt(parts[1]);
             Integer end = Integer.parseInt(parts[2]);
-            Integer len = end - sta;
+            int len = end - sta;
             totalLengthOfMargins = totalLengthOfMargins + len;
         }
         totalLengthOfMargins=0;
@@ -187,7 +187,7 @@ public class BEDFileExporter {
             String end = parts2[1];
             out_allTracks.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
             out_targetRegions.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
-            Integer len = Integer.parseInt(end) - Integer.parseInt(sta);
+            int len = Integer.parseInt(end) - Integer.parseInt(sta);
             totalLengthOfMargins = totalLengthOfMargins + len;
             target_id++;
         }

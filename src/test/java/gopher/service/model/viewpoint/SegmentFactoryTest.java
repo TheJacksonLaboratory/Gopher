@@ -40,13 +40,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SegmentFactoryTest {
 
     private static String testFastaFile = null;
-    private static String refSeqID1 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
-    private static Integer genomicPos_1 = 125;
-    private static Integer maxDistToGenomicPosUp = 115;
-    private static Integer maxDistToGenomicPosDown = 115;
+    private static final String refSeqID1 = "chr_t4_GATC_short_20bp_and_long_24bp_fragments";
+    private static final Integer genomicPos_1 = 125;
+    private static final Integer maxDistToGenomicPosUp = 115;
+    private static final Integer maxDistToGenomicPosDown = 115;
     private static IndexedFastaSequenceFile testFastaReader;
     private static List<RestrictionEnzyme> chosenEnzymeList;
     private static SegmentFactory segmentFactory =null;
+
+    private static  int referenceSequenceLength;
 
     private static List<Integer> gatcsites;
 
@@ -66,11 +68,11 @@ public class SegmentFactoryTest {
         testFastaFile = classLoader.getResource("testgenome/test_genome.fa").getFile();
         final File fasta = new File(testFastaFile);
         testFastaReader = new IndexedFastaSequenceFile(fasta);
-        int len = testFastaReader.getSequence(refSeqID1).length();
+        referenceSequenceLength = testFastaReader.getSequence(refSeqID1).length();
         segmentFactory = new SegmentFactory(refSeqID1,
                 genomicPos_1,
                 testFastaReader,
-                len,
+                referenceSequenceLength,
                 maxDistToGenomicPosUp,
                 maxDistToGenomicPosDown,
                 chosenEnzymeList);
@@ -100,16 +102,31 @@ public class SegmentFactoryTest {
         assertEquals(expected, segmentFactory.getGenomicPos());
     }
 
-    /*
+    /**
+     * maxDistToGenomicPosUp is calculate as the minimum of the genomic position or MAXIMUM_ZOOM_FACTOR (3)
+     */
     @Test
-    @Ignore("This test is failing in my environment (@ielis)") // TODO(fixtest)
-    public void testMaxDistToGenomicPos() {
-        Integer expected = maxDistToGenomicPosUp*3;
+    public void testMaxDistToGenomicPosUp() {
+        Integer expected = Math.min(genomicPos_1, maxDistToGenomicPosUp*3);
         assertEquals(expected, segmentFactory.getMaxDistToGenomicPosUp());
-        expected = maxDistToGenomicPosDown*3;
+    }
+
+    /**
+     *      maxDistToGenomicPosDown=maxDistToGenomicPosDown*MAXIMUM_ZOOM_FACTOR;
+     *      if(referenceSequenceLen < genomicPos + maxDistToGenomicPosDown) {
+     *             maxDistToGenomicPosDown = referenceSequenceLen - genomicPos;
+     *         }
+     */
+    @Test
+    public void testMaxDistToGenomicPosDown() {
+        Integer expected = 3 *  Math.min(genomicPos_1, maxDistToGenomicPosUp*3);
+        if (referenceSequenceLength < genomicPos_1 + expected) {
+            expected = referenceSequenceLength - genomicPos_1;
+        }
         assertEquals(expected, segmentFactory.getMaxDistToGenomicPosDown());
     }
-*/
+
+
     /*
     * Segment factory where the downstream distance is longer than the extent of the chromosome
     * Make sure we still get the right DpnII sites.

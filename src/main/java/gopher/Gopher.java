@@ -52,46 +52,8 @@ public class Gopher extends Application {
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         int xdim=(int)primScreenBounds.getWidth();
         int ydim=(int)primScreenBounds.getHeight();
-//        SwitchScreens switchscreens=new SwitchScreens(this.primarystage);
-//        switchscreens.setBounds(xdim,ydim);
-       // loadSplashScreen(switchscreens);
-
     }
 
-
-
-
-
-//    /**
-//     * This will load the splash screen where a user can choose an existing viewpoint or create a new one.
-//     * @param switchscreen An object that will switch the main screen when the user has chosen the viewpoint to be worked on
-//     */
-//    private void loadSplashScreen(SwitchScreens switchscreen) {
-//        SplashView splashview = new SplashView();
-//        SplashController splashpresenter = (SplashController) splashview.getPresenter();
-//        splashpresenter.setSwitchScreen(switchscreen);
-//        Scene scene = new Scene(splashview.getView());
-//        this.primarystage.setTitle("GOPHER");
-//        FadeTransition fadeIn = new FadeTransition(Duration.seconds(2), splashpresenter.getRootPane());
-//        fadeIn.setFromValue(0);
-//        fadeIn.setToValue(1);
-//        fadeIn.setCycleCount(1);
-//
-//
-//        primarystage.setScene(scene);
-//        primarystage.show();
-//
-//        fadeIn.play();
-//    }
-
-//    /**
-//     * @return true if the current platform is a Mac.
-//     */
-//    private boolean isMacintosh() {
-//        String osName = System.getProperty("os.name").toLowerCase();
-//        return (osName.contains("mac"));
-//    }
-//
 
 
 }

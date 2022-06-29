@@ -40,10 +40,6 @@ public class RegulatoryExomeBoxFactory {
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
 
-
-//        window.setScene(new Scene(view.getView()));
-//        window.showAndWait();
-//        chosenCategories = presenter.getChosenCategories();
         ProgressPopup popup = new ProgressPopup("Exporting BED file...",
                 "Calculating and exporting regulatory gene panel BED file");
         ProgressIndicator progressIndicator = popup.getProgressIndicator();

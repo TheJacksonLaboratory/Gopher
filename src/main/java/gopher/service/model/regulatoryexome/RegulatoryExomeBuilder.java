@@ -30,21 +30,21 @@ public class RegulatoryExomeBuilder extends Task<Void> {
     /** Path to transcript definition file, refGene.txt.gz */
     private final String pathToRefGeneFile;
 
-    private GopherService model;
+    private final GopherService model;
     /** Each item that we want to enrich on our regulatory gene set will become an entry in this list, including both
      * regulatory elements and exons of our target genes. */
     private final Set<RegulatoryBEDFileEntry> regulatoryElementSet;
     /** Maximum distance 3' (downstream) to TSS (genomicPos) to be included as a regulatory element.*/
-    private int downstreamThreshold =10_000;
+    private final int downstreamThreshold =10_000;
     /** Maximum distance 5' (upstream) to TSS (genomicPos) to be included as a regulatory element.*/
-    private int upstreamThreshold=50_000;
+    private final int upstreamThreshold=50_000;
     /** Reference to the progress indicator that will be shown while we are creating the elements and the BED file. */
     private final ProgressIndicator progressInd;
 
     private int totalRegulatoryElements;
     private int chosenRegulatoryElements;
     private int totalExons;
-    private List<String> status=new ArrayList<>();
+    private final List<String> status = new ArrayList<>();
     private final List<RegulationCategory> chosenCategories;
 
     public RegulatoryExomeBuilder(GopherService model, List<RegulationCategory>  chosen, ProgressIndicator pi) {

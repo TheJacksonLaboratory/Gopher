@@ -11,7 +11,6 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -19,10 +18,8 @@ import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -210,7 +207,7 @@ public class VPAnalysisController implements Initializable {
 
     /** Add a reference to the TabPane that is managed in {@link GopherMainController} as an FXML field.
      * We use the same TabPane here to add new panes for selected ViewPoints.
-     * @param tpane
+     * @param tpane a TabPane reference
      */
     public void setTabPane(TabPane tpane) {
         this.tabpane = tpane;
@@ -349,9 +346,7 @@ public class VPAnalysisController implements Initializable {
             return;
         }
         LOGGER.trace("Refreshing VP Table, gopher service has {} items", gopherService.getViewPointList().size());
-        LOGGER.trace("Size of observableViewPointList before clear {}", observableViewPointList.size());
         observableViewPointList.clear();
-        LOGGER.trace("Size of observableViewPointList after clear {}", observableViewPointList.size());
         observableViewPointList.setAll(this.gopherService.getViewPointList());
         LOGGER.trace("Size of observableViewPointList after adding viewpoints {}", observableViewPointList.size());
     }

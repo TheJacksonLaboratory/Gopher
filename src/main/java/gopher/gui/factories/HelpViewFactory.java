@@ -57,7 +57,7 @@ public class HelpViewFactory {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonTypeOne){
+        if (result.isPresent() && result.get() == buttonTypeOne){
           openBrowser();
           alert.close();
         } else {
@@ -81,7 +81,7 @@ public class HelpViewFactory {
             window.setScene(scene);
             window.show();
         } catch (Exception e){
-            logger.error(String.format("Could not open browser to show RTD: %s",e.toString()));
+            logger.error("Could not open browser to show RTD: {}",e.toString());
             e.printStackTrace();
         }
     }

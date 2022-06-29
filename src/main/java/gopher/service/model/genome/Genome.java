@@ -19,7 +19,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-24)
  */
 public abstract class Genome implements Serializable {
-    private static Logger logger = LoggerFactory.getLogger(Genome.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Genome.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 2L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */
@@ -32,14 +32,13 @@ public abstract class Genome implements Serializable {
     protected Set<String> chromosomeFileNames;
     /** This is the name of the file we download from UCSC for any of the genomes. */
     private static final String DEFAULT_GENOME_BASENAME = "chromFa.tar.gz";
-    private String genomeBasename = DEFAULT_GENOME_BASENAME;
+    private final String genomeBasename = DEFAULT_GENOME_BASENAME;
 
 
     private boolean unpackingComplete=false;
     /** A flag to indicate that the production of a FAI file for the genome is completed. */
     private boolean indexingComplete=false;
 
-    private String genomeURL = null;
 
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
@@ -53,8 +52,6 @@ public abstract class Genome implements Serializable {
     }
 
     public boolean isIndexingComplete() { return indexingComplete; }
-
-    public String getGenomeURL() { return this.genomeURL;}
 
     public abstract String getGenomeBasename();
 

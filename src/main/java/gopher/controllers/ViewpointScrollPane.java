@@ -2,6 +2,7 @@ package gopher.controllers;
 
 import gopher.service.GopherService;
 import gopher.service.URLMaker;
+import gopher.service.model.Approach;
 import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;
 import javafx.application.Platform;
@@ -18,7 +19,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
@@ -86,7 +86,6 @@ public class ViewpointScrollPane extends ScrollPane {
      * By how much do we change the width of the UCSC confirmDialog when zooming?
      */
     private static final double ZOOMFACTOR = 1.5;
-    /**  Individual {@link Segment}s of {@link ViewPoint} are presented in this TableView.   */
     /**
      * A link back to the analysis tab that allows us to refresh the statistics if the user deletes "this" ViewPoint.
      */
@@ -235,28 +234,29 @@ public class ViewpointScrollPane extends ScrollPane {
         row3.setMinHeight(30.0);
         row3.setPrefHeight(30.0);
         gridPane.getRowConstraints().addAll(row1, row2, row3);
+        gridPane.setPadding(new Insets(5, 10,20, 10));
         viewpointScoreLabel = new Label();
         viewpointScoreLabel.setMaxWidth(1600.0);
         viewpointScoreLabel.setStyle("mylabel");
-        gridPane.add(viewpointScoreLabel, 0, 0, 4, 1); // colspan 5
+        gridPane.add(viewpointScoreLabel, 0, 0, 5, 1); // colspan 5
         viewpointExplanationLabel = new Label();
         viewpointExplanationLabel.setMaxWidth(1600);
         viewpointExplanationLabel.setStyle("mylabel");
-        gridPane.add(viewpointExplanationLabel, 1, 0, 4, 1);
+        gridPane.add(viewpointExplanationLabel, 0, 1, 5, 1);
         zoomOutButton = createButton("Zoom out", 30, 90, 30, 90, 10);
-        zoomOutButton.setOnAction(e -> zoomOut());
+        zoomOutButton.setOnAction(this::zoomOut);
         gridPane.add(zoomOutButton, 0, 2);
         zoomInButton = createButton("Zoom in", 30, 90, 30, 90, 10);
-        zoomInButton.setOnAction(e -> zoomIn());
+        zoomInButton.setOnAction(this::zoomIn);
         gridPane.add(zoomInButton, 1, 2);
         deleteButton = createButton("Delete", 30, 90, 30, 90, 10);
-        deleteButton.setOnAction(e -> deleteThisViewPoint(e));
+        deleteButton.setOnAction(this::deleteThisViewPoint);
         gridPane.add(deleteButton, 2, 2);
         copyToClipboardButton = createButton("Copy", 30, 90, 30, 90, 10);
-        copyToClipboardButton.setOnAction(e -> copyToClipboard(e));
+        copyToClipboardButton.setOnAction(this::copyToClipboard);
         gridPane.add(copyToClipboardButton, 3, 2);
         closeButton = createButton("Close", 30, 90, 30, 90, 10);
-        closeButton.setOnAction(e -> closeButtonAction());
+        closeButton.setOnAction(this::closeButtonAction);
         gridPane.add(closeButton, 4, 2);
         colorTableColumn = new TableColumn<>();
         // This is a hack when by using dummy column a color for the cell's TableRow is set.
@@ -551,7 +551,7 @@ public class ViewpointScrollPane extends ScrollPane {
 
 
     private void updateScore() {
-        if (this.viewpoint.getDerivationApproach().equals(ViewPoint.Approach.SIMPLE)) {
+        if (this.viewpoint.getDerivationApproach().equals(Approach.SIMPLE)) {
             this.viewpoint.calculateViewpointScoreSimple(this.viewpoint.getStartPos(), this.viewpoint.getGenomicPos(), this.viewpoint.getEndPos());
         } else {
             this.viewpoint.calculateViewpointScoreExtended();
@@ -614,7 +614,8 @@ public class ViewpointScrollPane extends ScrollPane {
         e.consume();
     }
 
-    void closeButtonAction() {
+    void closeButtonAction(Event e) {
+        e.consume();
         Platform.runLater(() -> {
             this.analysisPresenter.removeViewPointTab(this.viewpoint);
             this.analysisPresenter.refreshVPTable();
@@ -665,15 +666,17 @@ public class ViewpointScrollPane extends ScrollPane {
     /**
      * Change the UCSC view by zooming in.
      */
-    private void zoomIn() {
+    private void zoomIn(Event e) {
         zoom(1 / ZOOMFACTOR);
+        e.consume();
     }
 
     /**
      * Change the UCSC view by zooming out.
      */
-    private void zoomOut() {
+    private void zoomOut(Event e) {
         zoom(ZOOMFACTOR);
+        e.consume();
     }
 
     /**
@@ -693,7 +696,7 @@ public class ViewpointScrollPane extends ScrollPane {
                         c.getSegment().getStartPos(),
                         c.getSegment().getEndPos(),
                         c.getColor())).toList();
-        String highlightregions = colorsegmentlist.stream().collect(Collectors.joining("%7C"));
+        String highlightregions = String.join("%7C", colorsegmentlist);
         return String.format("highlight=%s", highlightregions);
     }
 

@@ -12,17 +12,11 @@ import java.util.*;
 import static javafx.application.Platform.runLater;
 
 public class EnzymeViewFactory {
-    private static final Logger logger = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnzymeViewFactory.class.getName());
 
-    /**
-     * Initialize the Enyzme list to show any previously chosen enzyme with a check,
-     * and return the enzymes that the user chooses.
-     * @param
-     */
 
     private final List<CheckBox> boxlist;
 
-    private int count;
 
     private List<RestrictionEnzyme> chosen;
 
@@ -36,7 +30,7 @@ public class EnzymeViewFactory {
 
     public List<RestrictionEnzyme> getChosenEnzymes(List<RestrictionEnzyme> allEnzymes,
                                                            List<RestrictionEnzyme> chosenEnzymes ) {
-        logger.trace("Getting chosen enzymes");
+        LOGGER.trace("Getting chosen enzymes");
         Dialog<RestrictionEnzymeResult> dialog = new Dialog<>();
         dialog.setTitle("Choose Enzymes");
         dialog.setHeaderText("Choose one or more restriction enzymes");
@@ -44,7 +38,7 @@ public class EnzymeViewFactory {
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         VBox restrictionVBox = new VBox();
         if (chosenEnzymes==null) {
-            logger.info("chosen enzyme list not initialized. Will set it to an empty list");
+            LOGGER.info("chosen enzyme list not initialized. Will set it to an empty list");
             chosenEnzymes=new ArrayList<>();
         }
         for (RestrictionEnzyme re : allEnzymes) {
@@ -56,7 +50,7 @@ public class EnzymeViewFactory {
             if (chosenEnzymes.contains(re)) {
                 cb.setSelected(true);
                 chosen.add(re);
-                logger.trace(String.format("Set selected to %s for %s",cb.isSelected(),re.getName() ));
+                LOGGER.trace(String.format("Set selected to %s for %s",cb.isSelected(),re.getName() ));
             }
             cb.setId("checkbx");
             boxlist.add(cb);
@@ -80,7 +74,7 @@ public class EnzymeViewFactory {
     }
 
     public List<RestrictionEnzyme> getChosenEnzymes() {
-        logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
         return this.chosen;
     }
 
@@ -88,12 +82,11 @@ public class EnzymeViewFactory {
     /**
      * This gets called every time the use chooses or deselects an enzyme. It resets and fills the
      * set {@link #chosen}, which can then be retrieved using {@link #getChosenEnzymes()}.
-     *
-     * @param site
+     * @param site restriction enzyme site
      */
     private void handle(String site) {
         this.chosen = new ArrayList<>();
-        logger.trace(String.format("handle %s",site ));
+        LOGGER.trace(String.format("handle %s",site ));
         for (CheckBox cb : boxlist) {
             if (cb.isSelected()) {
                 String name = cb.getText(); /* this is something like "HindIII: A^AGCTT", but we need just "HindIII" */
@@ -103,13 +96,13 @@ public class EnzymeViewFactory {
                 }
                 RestrictionEnzyme re = enzymemap.get(name);
                 if (re == null) { /* Should never happen! */
-                    logger.error("We were unable to retrieve the name for enzyme " + name);
+                    LOGGER.error("We were unable to retrieve the name for enzyme " + name);
                     return;
                 }
                 chosen.add(re);
             }
         }
-        logger.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
     }
 
 }

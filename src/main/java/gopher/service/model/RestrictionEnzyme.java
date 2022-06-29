@@ -26,7 +26,7 @@ public class RestrictionEnzyme implements Serializable {
     /** The offset of the cutting site in this restriction enzyme. For instancen the offset for ^GATC is 0 and the
      * offset for A^AGCTT is 1.
      */
-    private Integer offset;
+    private final Integer offset;
 
     public RestrictionEnzyme(String n, String s) {
         name=n;

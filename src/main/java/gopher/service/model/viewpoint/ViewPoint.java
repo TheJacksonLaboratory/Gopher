@@ -2,6 +2,7 @@ package gopher.service.model.viewpoint;
 
 import com.google.common.collect.ImmutableList;
 import gopher.service.GopherService;
+import gopher.service.model.Approach;
 import gopher.service.model.Default;
 import gopher.service.model.RestrictionEnzyme;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
@@ -34,9 +35,7 @@ public class ViewPoint implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ViewPoint.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 4L;
-    /** The possible approaches used to generate this Viewpoint. */
-    public enum Approach {SIMPLE, EXTENDED}
-    /* The approach used to generate this viewpoint */
+    /* The approach used to generate this viewpoint (Simple or Extended) */
     private Approach approach;
     /** Size of the "borders" at the edges of a digest that are especially important because we sequence there. */
     private final int marginSize;
@@ -211,7 +210,7 @@ public class ViewPoint implements Serializable {
         this.restrictionSegmentList=new ArrayList<>();
         boolean changed;
         /* Create segmentFactory */
-        if(gopherService.getApproach().equals(Approach.SIMPLE)) {
+        if(gopherService.getApproach().     equals(Approach.SIMPLE)) {
             this.upstreamNucleotideLength= gopherService.getEstAvgRestFragLen().intValue();
             this.downstreamNucleotideLength= gopherService.getEstAvgRestFragLen().intValue();
             /*
@@ -768,8 +767,7 @@ public class ViewPoint implements Serializable {
         /* iterate over all selected fragments */
         List<Segment> selectedSegments = restrictionSegmentList.
                 stream().
-                filter(Segment::isSelected).
-                collect(Collectors.toList());
+                filter(Segment::isSelected).toList();
 
         double totalProbability=0.0;
 
@@ -1021,11 +1019,7 @@ public class ViewPoint implements Serializable {
      */
     public void resetSegmentsToOriginalState() {
         for(Segment s : this.restrictionSegmentList) {
-            if(s.wasOriginallySelected()) {
-                s.setSelected(true,false);
-            } else {
-                s.setSelected(false, false);
-            }
+            s.setSelected(s.wasOriginallySelected(),false);
         }
     }
 

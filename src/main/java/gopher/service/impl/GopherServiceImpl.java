@@ -650,7 +650,7 @@ public class GopherServiceImpl implements GopherService, Serializable {
     /**
      * Called when the user clicks on the get target genes button for loading a list of gene symbols.
      * TODO The HTML display code does not belong here and should be refactored.
-     * @param f
+     * @param f file with target genes
      */
     @Override
     public void getTargetGopherGenesFromFile(File f){
