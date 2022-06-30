@@ -498,7 +498,8 @@ public class GopherMainController implements Initializable {
         }
         this.unbalancedMarginCheckbox.setSelected(gopherService.getAllowUnbalancedMargins());
         this.patchedViewpointCheckbox.setSelected(gopherService.getAllowPatching());
-        setGenomeBuild(gopherService.getGenomeBuild());
+        String gbuild = gopherService.getGenomeBuild();
+        this.genomeChoiceBox.getSelectionModel().select(gbuild);
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
@@ -1387,7 +1388,7 @@ public class GopherMainController implements Initializable {
     private void importProject(File file) {
         LOGGER.trace("Importing project: {}", file.getAbsolutePath());
         removePreviousValuesFromTextFields();
-        gopherService.importProtjectFromFile(file);
+        gopherService.importProjectFromFile(file);
         if (this.primaryStage != null)
             this.primaryStage.setTitle(String.format("GOPHER: %s",
                     gopherService.getProjectName()));

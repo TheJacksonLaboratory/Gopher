@@ -555,7 +555,7 @@ public class GopherServiceImpl implements GopherService, Serializable {
     }
 
     @Override
-    public void importProtjectFromFile(File file) {
+    public void importProjectFromFile(File file) {
         try {
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
         } catch (IOException | ClassNotFoundException e) {

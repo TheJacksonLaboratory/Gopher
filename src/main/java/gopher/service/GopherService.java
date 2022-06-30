@@ -180,7 +180,7 @@ public interface GopherService {
 
     void setEstAvgRestFragLen(double estAvgRestFragLen);
 
-    void importProtjectFromFile(File file);
+    void importProjectFromFile(File file);
 
     List<ViewPoint> getActiveViewPointList();
 
