@@ -50,9 +50,7 @@ public class ProbeFileExporter {
         return String.format("%s%s%s",this.directoryPath,File.separator,fname);
     }
 
-    public void printProbeFileInAgilentFormat(List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws IOException {
-
-        Integer probe_length = 120;
+    public void printProbeFileInAgilentFormat(Integer probe_length, List<ViewPoint> viewpointlist, String genomeBuild, String IndexedFastaSequenceFilePath) throws IOException {
 
         IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(new File(IndexedFastaSequenceFilePath));
 
