@@ -1,49 +1,38 @@
 package gopher.io;
 
-import gopher.model.genome.*;
+import gopher.service.model.genome.*;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.DownloadFileNotFoundException;
 
-import gopher.gui.popupdialog.PopupFactory;
-import gopher.model.DataSource;
+import gopher.gui.factories.PopupFactory;
+import gopher.service.model.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class GenomeDownloader {
-    static Logger logger = Logger.getLogger(GenomeDownloader.class.getName());
-    /** genome build symbol, e.g., hg19, mm10. */
-    private String genomebuild=null;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenomeDownloader.class.getName());
     /** Representation of the genome we will download. */
     private Genome genome=null;
     /** URL to download the genome from UCSC. */
     private String url=null;
-
-    private String currentStatus="uninitialized";
-
-    private boolean successful=false;
-
-
+    /**
+     * @param  build genome symbol, e.g., hg19, mm10.
+     */
     public GenomeDownloader(String build) {
-        this.genomebuild=build;
-        logger.debug("Constructor of GenomeDownloader, build=" + build);
+
+        LOGGER.debug("Constructor of GenomeDownloader, build=" + build);
         try {
             this.url=getGenomeURL(build);
             this.genome=getGenome(build);
-            logger.debug("Setting url to "+ url);
+            LOGGER.debug("Setting url to "+ url);
         } catch (DownloadFileNotFoundException e){
-            logger.error(e,e);
+            LOGGER.error("Error: {}",e.getMessage());
         }
     }
-    /** @return a simple message summarizing how much work has been completed. */
-    public String getStatus() {
-        return currentStatus;
-    }
-    /** @return true if the genome was downloaded successfully or is already present.*/
-    public boolean successful() {
-        return successful;
-    }
+
 
 
     /**
@@ -54,14 +43,14 @@ public class GenomeDownloader {
      */
     public void downloadGenome(String directory, String basename, ProgressIndicator pi) {
         Downloader downloadTask = new Downloader(directory, this.url, basename, pi);
-        logger.trace(String.format("Starting download of %s to %s",url,directory));
-        downloadTask.setOnSucceeded(e -> logger.trace("Finished downloading genome file to " + directory));
+        LOGGER.trace(String.format("Starting download of %s to %s",url,directory));
+        downloadTask.setOnSucceeded(e -> LOGGER.trace("Finished downloading genome file to " + directory));
         downloadTask.setOnFailed(eh -> {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             downloadTask.getException().printStackTrace(pw);
             String sStackTrace = sw.toString(); // s
-            logger.trace("Failed to download genome file. "+sStackTrace);
+            LOGGER.trace("Failed to download genome file. "+sStackTrace);
             PopupFactory.displayError("Error", sStackTrace);
         });
         Thread th = new Thread(downloadTask);
@@ -77,40 +66,28 @@ public class GenomeDownloader {
      * @param gb The genome build
      */
     public String getGenomeURL(String gb) throws DownloadFileNotFoundException {
-        if (gb.equals("hg19")) {
-            return  DataSource.createUCSChg19().getGenomeURL();
-        } else if (gb.equals("hg38")) {
-            return DataSource.createUCSChg38().getGenomeURL();
-        } else if (gb.equals("mm9")) {
-            return DataSource.createUCSCmm9().getGenomeURL();
-        } else if (gb.equals("mm10")) {
-            return DataSource.createUCSCmm10().getGenomeURL();
-        } else if (gb.equals("xenTro9")) {
-            return DataSource.createUCSCxenTro9().getGenomeURL();
-        } else if (gb.equals("danRer10")) {
-            return DataSource.createUCSCdanRer10().getGenomeURL();
-        } else {
-            throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
-        }
+        return switch (gb) {
+            case "hg19" -> DataSource.createUCSChg19().genomeURL();
+            case "hg38" -> DataSource.createUCSChg38().genomeURL();
+            case "mm9" -> DataSource.createUCSCmm9().genomeURL();
+            case "mm10" -> DataSource.createUCSCmm10().genomeURL();
+            case "xenTro9" -> DataSource.createUCSCxenTro9().genomeURL();
+            case "danRer10" -> DataSource.createUCSCdanRer10().genomeURL();
+            default -> throw new DownloadFileNotFoundException(String.format("Attempt to get URL for unknown genome build: %s.", gb));
+        };
     }
 
 
     private Genome getGenome(String genomebuild) throws DownloadFileNotFoundException {
-        if (genomebuild.equals("hg19")) {
-            return new HumanHg19();
-        } else if (genomebuild.equals("hg38")) {
-            return new HumanHg38();
-        } else if (genomebuild.equals("mm9")) {
-            return new MouseMm9();
-        } else if (genomebuild.equals("mm10")) {
-            return new MouseMm10();
-        } else if (genomebuild.equals("xenTro9")) {
-            return new FrogXenTro9();
-        } else if (genomebuild.equals("danRer10")) {
-            return new FishDanRer10();
-        } else {
-            throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
-        }
+        return switch (genomebuild) {
+            case "hg19" -> new HumanHg19();
+            case "hg38" -> new HumanHg38();
+            case "mm9" -> new MouseMm9();
+            case "mm10" -> new MouseMm10();
+            case "xenTro9" -> new FrogXenTro9();
+            case "danRer10" -> new FishDanRer10();
+            default -> throw new DownloadFileNotFoundException(String.format("Attempt to get Genome object for unknown genome build: %s.", genomebuild));
+        };
     }
 
 

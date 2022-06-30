@@ -1,14 +1,15 @@
 package gopher.io;
 
 
-import gopher.model.GopherGene;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import gopher.service.model.GopherGene;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * We are using an excerpt of the entire refGenefile for hg19 with 25 lines corresponding to the
@@ -37,9 +38,9 @@ public class RefGeneParserTest {
 
     private static RefGeneParser parser;
     /** five gene symbols that should be found by the parser, and one that should not. */
-    private static String[] symbols={"WASH7P","CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
+    private static final String[] symbols={"WASH7P","CUEDC1","DKC1","FAM216B","LINC01010", "FAKE"};
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         ClassLoader classLoader = RefGeneParserTest.class.getClassLoader();
         String refgene = classLoader.getResource("refGeneSmall.txt.gz").getFile();
@@ -55,7 +56,7 @@ public class RefGeneParserTest {
     @Test
     public void testTotalNumberOfGenes() {
         int expected=19;
-        Assert.assertEquals(expected,parser.getTotalNumberOfRefGenes());
+        assertEquals(expected,parser.getTotalNumberOfRefGenes());
     }
 
     @Test
@@ -64,7 +65,7 @@ public class RefGeneParserTest {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
         List<String> valid=parser.getValidGeneSymbols();
-        Assert.assertEquals(expected,valid.size());
+        assertEquals(expected,valid.size());
     }
 
     @Test
@@ -73,9 +74,9 @@ public class RefGeneParserTest {
         List<String> list = Arrays.asList(symbols);
         parser.checkGenes(list);
         List<String> invalid=parser.getInvalidGeneSymbols();
-        Assert.assertEquals(expected,invalid.size());
+        assertEquals(expected,invalid.size());
         String name=invalid.get(0);
-        Assert.assertEquals("FAKE",name);
+        assertEquals("FAKE",name);
     }
 
     /** The following tests the retrieval and information in one of the VPVGenes that
@@ -93,16 +94,16 @@ public class RefGeneParserTest {
                 gene=g; break;
             }
         }
-        Assert.assertNotNull(gene);
+        assertNotNull(gene);
         String exp="chr13";
-        Assert.assertEquals(exp,gene.getContigID());
+        assertEquals(exp,gene.getContigID());
         exp="NM_182508";
-        Assert.assertEquals(exp,gene.getRefSeqID());
-        Assert.assertTrue(gene.isForward());
+        assertEquals(exp,gene.getRefSeqID());
+        assertTrue(gene.isForward());
         List<Integer> gPosList = gene.getTSSlist();
-        Assert.assertEquals(1,gPosList.size());
+        assertEquals(1,gPosList.size());
         Integer expectedPos=43355686; /* Note: one based fully closed numbering! */
-        Assert.assertEquals(expectedPos,gPosList.get(0));
+        assertEquals(expectedPos,gPosList.get(0));
     }
 
     /** There are 25 lines corresponding to 19 genes and 22 distinct transcription start sites
@@ -113,7 +114,7 @@ public class RefGeneParserTest {
     @Test
     public void testNumberOfStartPoints() {
         int expected=22;
-        Assert.assertEquals(expected,parser.getTotalTSScount());
+        assertEquals(expected,parser.getTotalTSScount());
     }
 
 
@@ -135,12 +136,12 @@ public class RefGeneParserTest {
                 gene=g; break;
             }
         }
-        Assert.assertNotNull(gene);
-        Assert.assertFalse(gene.isForward());
+        assertNotNull(gene);
+        assertFalse(gene.isForward());
         List<Integer> tssList=gene.getTSSlist();
-        Assert.assertEquals(1,tssList.size());
+        assertEquals(1,tssList.size());
         Integer expected=29370;
-        Assert.assertEquals(expected,tssList.get(0));
+        assertEquals(expected,tssList.get(0));
     }
 
 
@@ -162,13 +163,13 @@ public class RefGeneParserTest {
                 gene=g; break;
             }
         }
-        Assert.assertNotNull(gene);
-        Assert.assertTrue(gene.isForward());
+        assertNotNull(gene);
+        assertTrue(gene.isForward());
         List<Integer> tssList=gene.getTSSlist();
         //there should be just one TSS for this gene!
-        Assert.assertEquals(1,tssList.size());
+        assertEquals(1,tssList.size());
         Integer expected=134758854;
-        Assert.assertEquals(expected,tssList.get(0));
+        assertEquals(expected,tssList.get(0));
     }
 
 

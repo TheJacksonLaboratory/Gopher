@@ -29,3 +29,6 @@ hs_err_pid*
 *.iml
 
 out/
+/pom.xml.versionsBackup
+/gopher.gui.factories.HelpViewFactory/.lock
+/gopher.gui.factories.QCCheckFactory/.lock

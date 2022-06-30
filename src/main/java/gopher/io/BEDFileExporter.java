@@ -1,9 +1,10 @@
 package gopher.io;
 
-import gopher.model.viewpoint.Bait;
-import org.apache.log4j.Logger;
-import gopher.model.viewpoint.Segment;
-import gopher.model.viewpoint.ViewPoint;
+import gopher.service.model.viewpoint.Bait;
+import gopher.service.model.viewpoint.Segment;
+import gopher.service.model.viewpoint.ViewPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 public class BEDFileExporter {
 
-    private static final Logger logger = Logger.getLogger(BEDFileExporter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BEDFileExporter.class.getName());
     private final String allTracksBEDfile;
     private final String targetRegionBEDfile;
     private final String vpvSummaryTSVfile;
@@ -67,7 +68,7 @@ public class BEDFileExporter {
      * other data on each viewpoint. Users can viewthe chosen fragments by uploading them to the UCSCbrowser.
      * @param viewpointlist List of the viewpoints we will output to BED file
      * @param genomeBuild build of genome we used to generate the viewpoints
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if we cannot find the file
      */
     public void printRestFragsToBed(List<ViewPoint> viewpointlist, String genomeBuild) throws FileNotFoundException {
 
@@ -83,7 +84,7 @@ public class BEDFileExporter {
             String url= getDefaultURL(vp,genomeBuild);
             int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
             String SCORE = String.format("%.2f", vp.getScore());
-            out_ucscURL.println(String.format("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen()));
+            out_ucscURL.printf("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b%n",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen());
         }
         out_ucscURL.close();
 
@@ -104,23 +105,23 @@ public class BEDFileExporter {
         out_allTracks.println("track name='" + "GOPHER: Genomic Positions" + "' description='" + "Genomic positions" + "' color=0,0,0" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
-            out_allTracks.println(String.format("%s\t%d\t%d\t%s",
+            out_allTracks.printf("%s\t%d\t%d\t%s%n",
                     vp.getReferenceID(),
                     vp.getGenomicPos()-1,
                     (vp.getGenomicPos()),
-                    vp.getTargetName()));
+                    vp.getTargetName());
         }
 
         // print viewpoints
         out_allTracks.println("track name='" + "GOPHER: Viewpoints" + "' description='" + "Viewpoints" + "' color=0,0,0" + "' useScore=1" + " visibility=2");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
-            out_allTracks.println(String.format("%s\t%d\t%d\t%s\t%d",
+            out_allTracks.printf("%s\t%d\t%d\t%s\t%d%n",
                     vp.getReferenceID(),
                     (vp.getStartPos()-1),
                     vp.getEndPos(),
                     vp.getTargetName(),
-                    (int) Math.round(vp.getScore()*1000)));
+                    (int) Math.round(vp.getScore()*1000));
         }
 
         // print restriction fragments and get unique digest margins
@@ -141,8 +142,8 @@ public class BEDFileExporter {
 
                 // get unique margins of selected fragments and unique fragments
                 for(int l = 0; l<segment.getSegmentMargins().size(); l++) {
-                    Integer fmStaPos = segment.getSegmentMargins().get(l).getStartPos();
-                    Integer fmEndPos = segment.getSegmentMargins().get(l).getEndPos();
+                    int fmStaPos = segment.getSegmentMargins().get(l).startPos();
+                    int fmEndPos = segment.getSegmentMargins().get(l).endPos();
 
                     String key = vp.getReferenceID() + ":" + (fmStaPos-1) + "-" + fmEndPos; // build key
                     if (uniqueFragmentMarginsMap.get(key) == null) { // check if region is already in hash
@@ -168,14 +169,12 @@ public class BEDFileExporter {
 
         // print out unique set of margins as targets for enrichment
         out_allTracks.println("track name='" + "GOPHER: Target regions" + "' description='" + "Target regions" + "' color=0,64,128" + " visibility=2");
-        Integer totalLengthOfMargins=0;
+        int totalLengthOfMargins=0;
         for (String s : uniqueFragmentMargins) {
-            //out_allTracks.println(s);
-            //out_targetRegions.println(s);
             String[] parts = s.split("\t");
             Integer sta = Integer.parseInt(parts[1]);
             Integer end = Integer.parseInt(parts[2]);
-            Integer len = end - sta;
+            int len = end - sta;
             totalLengthOfMargins = totalLengthOfMargins + len;
         }
         totalLengthOfMargins=0;
@@ -188,7 +187,7 @@ public class BEDFileExporter {
             String end = parts2[1];
             out_allTracks.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
             out_targetRegions.println(ref_id + "\t" + sta + "\t" + end + "\ttarget_" + target_id + ":" + uniqueFragmentMarginsMap.get(key));
-            Integer len = Integer.parseInt(end) - Integer.parseInt(sta);
+            int len = Integer.parseInt(end) - Integer.parseInt(sta);
             totalLengthOfMargins = totalLengthOfMargins + len;
             target_id++;
         }

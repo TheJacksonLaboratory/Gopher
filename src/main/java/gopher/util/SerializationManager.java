@@ -1,18 +1,19 @@
 package gopher.util;
 
-import org.apache.log4j.Logger;
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.*;
 
 /**
- * This class is responsible for serializing and deserializing the {@link Model} object that represents the project.
+ * This class is responsible for serializing and deserializing the {@link GopherModel} object that represents the project.
  */
 public class SerializationManager {
-    private static final Logger logger = Logger.getLogger(SerializationManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SerializationManager.class.getName());
     /** This serializes the Model object. It replaces any spaces in the filename with underscores. */
-    public static void serializeModel(Model model, String fileName)
+    public static void serializeModel(GopherModel model, String fileName)
             throws IOException {
         //fileName = fileName.replaceAll(" ","_");
         FileOutputStream fos = new FileOutputStream(fileName);
@@ -22,7 +23,7 @@ public class SerializationManager {
         model.setClean(true);
     }
 
-    public static Model deserializeModel(String fileName) throws IOException,ClassNotFoundException {
+    public static GopherModel deserializeModel(String fileName) throws IOException,ClassNotFoundException {
         Object obj;
         FileInputStream fis = new FileInputStream(fileName);
         ObjectInputStream ois = new ObjectInputStream(fis);
@@ -31,7 +32,7 @@ public class SerializationManager {
             logger.error("Deserialized object was NULL");
         }
         ois.close();
-        return (Model) obj;
+        return (GopherModel) obj;
     }
 
 
