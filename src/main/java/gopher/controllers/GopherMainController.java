@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
 import gopher.gui.factories.DeleteFactory;
-import gopher.gui.entrezgenetable.EntrezGeneViewFactory;
 import gopher.gui.factories.EnzymeViewFactory;
 import gopher.gui.factories.HelpViewFactory;
 import gopher.gui.factories.QCCheckFactory;
@@ -912,7 +911,6 @@ public class GopherMainController implements Initializable {
      * is to pass a list of {@link GopherGene} objects to the {@link GopherModel}.
      * These objects are used with other information in the Model to create {@link gopher.service.model.viewpoint.ViewPoint}
      * objects when the user clicks on {@code Create ViewPoints}.
-     * See {@link EntrezGeneViewFactory} for logic.
      *
      * @param e event triggered by enter gene command.
      */
@@ -930,12 +928,17 @@ public class GopherMainController implements Initializable {
             LOGGER.info("Uploading targets from " + file.getAbsolutePath());
             this.gopherService.setTargetGenesPath(file.getAbsolutePath());
         }
+        enterEntrezGeneListFromFile(file);
+        e.consume();
+    }
+
+    private void enterEntrezGeneListFromFile(File file) {
         LOGGER.trace("Entering target gene list {}", file.getAbsolutePath());
         gopherService.getTargetGopherGenesFromFile(file);
         gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
         setTargetFeedback(GopherModel.TargetType.TARGET_GENES, gopherService.getN_validGeneSymbols());
-        e.consume();
     }
+
 
     @FXML
     private void enterBedFile(ActionEvent e) {
@@ -1270,8 +1273,13 @@ public class GopherMainController implements Initializable {
             PopupFactory.displayError("Could not find human gene list", "error");
             return;
         }
-        List<String> humanGeneSymbols = gopherService.initializeEntrezGene(url.getFile());
-        openGeneWithExamples(humanGeneSymbols);
+        File file = new File(url.getFile());
+        if (! file.isFile()) {
+            PopupFactory.displayError("Error", "Could not fine humangenesymbols.txt");
+            return;
+        }
+        enterEntrezGeneListFromFile(file);
+
     }
 
     @FXML
@@ -1281,16 +1289,13 @@ public class GopherMainController implements Initializable {
             PopupFactory.displayError("Could not find human gene list", "error");
             return;
         }
-        List<String> mouseGeneSymbols = gopherService.initializeEntrezGene(url.getFile());
-        openGeneWithExamples(mouseGeneSymbols);
+        File file = new File(url.getFile());
+        if (! file.isFile()) {
+            PopupFactory.displayError("Error", "Could not fine mousegenesymbols.txt");
+            return;
+        }
+        enterEntrezGeneListFromFile(file);
     }
-
-    private void openGeneWithExamples(List<String> geneSymbols) {
-        EntrezGeneViewFactory.displayWithGenes(geneSymbols);
-        gopherService.setTargetType(GopherModel.TargetType.TARGET_GENES);
-        setTargetFeedback(GopherModel.TargetType.TARGET_GENES, gopherService.getN_validGeneSymbols());
-    }
-
 
     @FXML
     public void exportBEDFiles(ActionEvent e) {
