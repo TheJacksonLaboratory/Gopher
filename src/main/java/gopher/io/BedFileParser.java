@@ -1,8 +1,9 @@
 package gopher.io;
 
 import gopher.exception.GopherException;
-import gopher.model.GopherGene;
-import org.apache.log4j.Logger;
+import gopher.service.model.GopherGene;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +14,7 @@ import java.util.*;
  * is identical with the start position of the BED file.
  */
 public class BedFileParser {
-    private static Logger logger = Logger.getLogger(BedFileParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(BedFileParser.class);
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
@@ -24,10 +25,10 @@ public class BedFileParser {
     private final Map<String, GopherGene> gene2chromosomePosMap;
     /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
      * they are using nonstandard gene symbols.*/
-    private Set<String> invalidGeneSymbols=null;
+    private Set<String> invalidGeneSymbols;
     /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.
      * These are the genes chosen by the user. */
-    private Set<String> validGeneSymbols=null;
+    private Set<String> validGeneSymbols;
     /** Total number of genes in the refGene.txt.gz file (number of unique gene symbols). */
     private int n_totalGenes;
     private int n_chosenGenes;
@@ -52,7 +53,7 @@ public class BedFileParser {
                 if (line.isEmpty()) {
                     continue; // skip empty lines that might be at the end of the file
                 }
-                String A[] = line.split("\t");
+                String[] A = line.split("\t");
                 if (A.length < MINIMUM_NUMBER_OF_BED_FIELDS) {
                     throw new GopherException(String.format("Malformed BED6 file line : %s (at least %d fields required but we got %d",
                             line,MINIMUM_NUMBER_OF_BED_FIELDS,A.length));

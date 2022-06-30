@@ -12,7 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import gopher.gui.popupdialog.PopupFactory;
+import gopher.gui.factories.PopupFactory;
 import gopher.io.Platform;
 
 import java.io.BufferedReader;
@@ -118,8 +118,6 @@ public class LogViewerFactory {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
-
-
     }
 
 

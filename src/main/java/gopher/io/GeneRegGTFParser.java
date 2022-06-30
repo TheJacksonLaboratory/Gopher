@@ -1,7 +1,8 @@
 package gopher.io;
 
-import org.apache.log4j.Logger;
-import gopher.model.regulatoryexome.RegulatoryElement;
+import gopher.service.model.regulatoryexome.RegulatoryElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -25,7 +26,7 @@ import java.util.zip.GZIPInputStream;
  * @version 0.0.1
  */
 public class GeneRegGTFParser {
-    static Logger logger = Logger.getLogger(GeneRegGTFParser.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneRegGTFParser.class.getName());
     private String pathToGTFfile=null;
 
 
@@ -62,7 +63,7 @@ public class GeneRegGTFParser {
     }
 
     public RegulatoryElement next() throws IOException {
-        String A[]=this.currentLine.split("\t");
+        String[] A =this.currentLine.split("\t");
         this.currentLine=this.reader.readLine(); // advance iterator
         RegulatoryElement elem=null;
         String chrom=A[0];
@@ -70,9 +71,9 @@ public class GeneRegGTFParser {
             System.exit(1);
         }
         if (! A[2].equals("regulatory_region")) {
-            logger.error(String.format("Unexpected element type %s",A[2]));
+            LOGGER.error(String.format("Unexpected element type %s",A[2]));
         }
-        Integer from,to;
+        int from,to;
         try {
             from=Integer.parseInt(A[3]);
             to=Integer.parseInt(A[4]);
@@ -95,13 +96,13 @@ public class GeneRegGTFParser {
      ID=ENSR00000283551;bound_end=45929000;bound_start=45927401;description=CTCF binding site;feature_type=CTCF Binding Site
      ID=ENSR00000097936;bound_end=72404800;bound_start=72404601;description=Predicted enhancer region;feature_type=Enhancer
      </pre>
-     * @param chrom
-     * @param from
-     * @param to
-     * @param annot
+     * @param chrom chromosome
+     * @param from start position
+     * @param to end position
+     * @param annot annotation
      */
     private RegulatoryElement parseAnnot(String chrom,int from, int to, String annot) {
-        String B[]=annot.split(";");
+        String[] B =annot.split(";");
         String id=null;
                 String feature_type=null;
         for (String b:B) {

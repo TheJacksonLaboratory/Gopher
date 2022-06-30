@@ -7,17 +7,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import org.apache.log4j.Logger;
-import gopher.framework.Signal;
-import gopher.gui.enzymebox.EnzymeBoxPresenter;
-import gopher.model.regulatoryexome.RegulationCategory;
+import gopher.service.model.regulatoryexome.RegulationCategory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class RegulatoryExomeBoxPresenter implements Initializable {
-    private static Logger logger = Logger.getLogger(EnzymeBoxPresenter.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(RegulatoryExomeBoxPresenter.class.getName());
     @FXML private Label label;
     @FXML private VBox regulatoryVBox;
     @FXML private Button okButton;
@@ -26,7 +24,6 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
     private int count;
     private List<RegulationCategory> chosen = null;
     private Map<String,RegulationCategory> categories;
-    private Consumer<gopher.framework.Signal> signal;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,13 +55,9 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
     }
 
 
-    public void setSignal(Consumer<Signal> signal) {
-        this.signal = signal;
-    }
-
 
     List<RegulationCategory> getChosenCategories() {
-        logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
         return this.chosen;
     }
 
@@ -76,7 +69,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
      */
     private void handle(String category) {
         this.chosen = new ArrayList<>();
-        logger.trace(String.format("handle %s",category ));
+        LOGGER.trace(String.format("handle %s",category ));
         for (CheckBox cb : boxlist) {
             if (cb.isSelected()) {
                 String name = cb.getText(); /* this is something like "HindIII: A^AGCTT", but we need just "HindIII" */
@@ -86,19 +79,18 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
                 }
                 RegulationCategory re = categories.get(name);
                 if (re == null) { /* Should never happen! */
-                    logger.error("We were unable to retrieve the name for enzyme " + name);
+                    LOGGER.error("We were unable to retrieve the name for enzyme " + name);
                     return;
                 }
                 chosen.add(re);
             }
         }
-        logger.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
     }
 
     @FXML
     public void okButtonClicked(javafx.event.ActionEvent e) {
         e.consume();
-        signal.accept(Signal.DONE);
     }
 
 

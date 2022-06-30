@@ -2,8 +2,9 @@ package gopher.io;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.GopherException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,12 +20,11 @@ import java.net.URLConnection;
  * @version 0.2.0 (2017-10-20)
  */
 public class Downloader extends Task<Void> {
-
-    static Logger logger = Logger.getLogger(Downloader.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Downloader.class.getName());
     /**
      * The absolute path to the place (directory) where the downloaded file will be
      * saved in the local filesystem.*/
-    private File localDir=null;
+    private final File localDir;
 
     /**
      * The full local path of the file we will download. It should be set to be identical
@@ -66,7 +66,7 @@ public class Downloader extends Task<Void> {
 
     protected void setLocalFilePath (String bname) {
         this.localFilePath = new File(this.localDir + File.separator + bname);
-        logger.debug("setLocalFilepath for download to: " + localFilePath);
+        LOGGER.debug("setLocalFilepath for download to: " + localFilePath);
     }
 
     /**
@@ -83,7 +83,7 @@ public class Downloader extends Task<Void> {
      */
     @Override
     protected Void call() throws GopherException {
-        logger.debug("[INFO] Downloading: \"" + urlstring + "\"");
+        LOGGER.debug("[INFO] Downloading: \"" + urlstring + "\"");
         InputStream reader;
         FileOutputStream writer;
 
@@ -93,15 +93,15 @@ public class Downloader extends Task<Void> {
             URL url = new URL(urlstring);
             URLConnection urlc = url.openConnection();
             reader = urlc.getInputStream();
-            logger.trace("URL host: "+ url.getHost() + "\n reader available=" + reader.available());
-            logger.trace("LocalFilePath: " + localFilePath);
+            LOGGER.trace("URL host: "+ url.getHost() + "\n reader available=" + reader.available());
+            LOGGER.trace("LocalFilePath: " + localFilePath);
             writer = new FileOutputStream(localFilePath);
             byte[] buffer = new byte[153600];
             int totalBytesRead = 0;
-            int bytesRead = 0;
+            int bytesRead;
             int size = urlc.getContentLength();
             if (progress!=null) { updateProgress(0.01); }
-            logger.trace("Size of file to be downloaded: "+size);
+            LOGGER.trace("Size of file to be downloaded: "+size);
             if (size >= 0)
                 block = size /100;
             while ((bytesRead = reader.read(buffer)) > 0) {
@@ -113,7 +113,7 @@ public class Downloader extends Task<Void> {
                     threshold += block;
                 }
             }
-            logger.info("Successful download from " + urlstring + ": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
+            LOGGER.info("Successful download from " + urlstring + ": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
             updateProgress(0.00);
@@ -135,7 +135,7 @@ public class Downloader extends Task<Void> {
     private void updateProgress(double pr) {
         javafx.application.Platform.runLater(() -> {
             if (progress==null) {
-                logger.error("NULL pointer to download progress indicator");
+                LOGGER.error("NULL pointer to download progress indicator");
                 return;
             }
             progress.setProgress(pr);
@@ -148,13 +148,11 @@ public class Downloader extends Task<Void> {
      */
     protected void makeDirectoryIfNotExist() {
         if (localDir==null) {
-            logger.error("Null pointer passed, unable to make directory.");
+            LOGGER.error("Null pointer passed, unable to make directory.");
             return;
         }
-        if (this.localDir.getParentFile().exists()) {
-           return;
-        } else {
-            logger.info("Creating directory: "+ localDir);
+        if (! this.localDir.getParentFile().exists()) {
+            LOGGER.info("Creating directory: "+ localDir);
             this.localDir.mkdir();
         }
     }

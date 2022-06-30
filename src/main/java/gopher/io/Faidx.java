@@ -2,10 +2,11 @@ package gopher.io;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.ProgressIndicator;
-import org.apache.log4j.Logger;
 import gopher.exception.UnindexableFastaFileException;
 import gopher.exception.GopherException;
-import gopher.model.Model;
+import gopher.service.model.GopherModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.BufferedWriter;
@@ -23,7 +24,7 @@ import java.util.*;
  * @version 0.2.2 (2018-02-15)
  */
 public class Faidx extends Task<Void> {
-    private static Logger logger = Logger.getLogger(Faidx.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Faidx.class.getName());
     /**  Path to the directory where we will search for the genome FASTA file and produce the faidx file. */
     private final String genomeDirectoryPath;
     /** Basename of the genome fasta file, e.g., hg19.fa */
@@ -33,11 +34,11 @@ public class Faidx extends Task<Void> {
     /** Number of canonical chromosomes, e.g., chr1 and not chr3random123. */
     private final int n_canonical_chromosomes;
     /** Key: Name of a chromosome (or in general, of a contig). Value: length in nucleotides. */
-    private Map<String, Integer> contigLengths;
+    private final Map<String, Integer> contigLengths;
     /** The progress indicator on the GUI that will show progress of indexing. */
     private final ProgressIndicator progress;
 
-    public Faidx(Model model, ProgressIndicator pi) {
+    public Faidx(GopherModel model, ProgressIndicator pi) {
         this.genomeDirectoryPath = model.getGenomeDirectoryPath();
         this.genomeFastaBaseName =model.getGenome().getGenomeFastaName();
         this.genomeFastaIndexBaseName =genomeFastaBaseName + ".fai"; // fai suffix
@@ -46,16 +47,6 @@ public class Faidx extends Task<Void> {
         this.n_canonical_chromosomes = model.getGenome().getNumberOfCanonicalChromosomes();
         this.contigLengths = new HashMap<>();
     }
-    public Faidx(String genomeDirPath, String basename, int n_chroms) {
-        this.genomeDirectoryPath=genomeDirPath;
-        this.genomeFastaBaseName = basename;
-        this.genomeFastaIndexBaseName =genomeFastaBaseName + ".fai"; // fai suffix
-        logger.trace("Initializing fasta indexing at directory " + this.genomeDirectoryPath);
-        this.n_canonical_chromosomes=n_chroms;
-        this.progress=null; // signal not to use the Progress Indicator
-        this.contigLengths=new HashMap<>();
-    }
-
 
     /**
      * We use this method to check if we need to g-unzip the genome files.
@@ -157,7 +148,7 @@ public class Faidx extends Task<Void> {
 
             // Write out index
             String faipath = getGenomeFastaIndexPath();
-            BufferedWriter wr = new BufferedWriter(new FileWriter(new File(faipath)));
+            BufferedWriter wr = new BufferedWriter(new FileWriter(faipath));
             for (FastaIndexEntry rec : records) {
                 wr.write(rec.toString() + "\n");
                 // also record the contig lengths

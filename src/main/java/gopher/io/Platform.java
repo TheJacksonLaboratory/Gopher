@@ -1,6 +1,9 @@
 package gopher.io;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -9,6 +12,8 @@ import java.io.IOException;
  * this would be /home/username/.gopher/...
  */
 public class Platform {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Platform.class);
+
     public static final String WEB_ENGINE_DIRNAME = "web_engine_user_data";
 
 
@@ -61,18 +66,24 @@ public class Platform {
         File windowsPath = new File(System.getProperty("user.home") + File.separator + "gopher");
         File osxPath = new File(System.getProperty("user.home") + File.separator + ".gopher");
 
-        switch (platform) {
-            case LINUX:
-                return linuxPath;
-            case WINDOWS:
-                return windowsPath;
-            case OSX:
-                return osxPath;
-            case UNKNOWN:
-                return null;
-            default:
-                return null;
+        File path = switch (platform) {
+            case LINUX ->linuxPath;
+            case WINDOWS -> windowsPath;
+            case OSX -> osxPath;
+            case UNKNOWN ->  null;
+        };
+        if (path == null) {
+            LOGGER.error("Could not figure out platform");
+            return null;
         }
+        if (!path.isDirectory()) {
+            if (path.mkdirs()) {
+                LOGGER.info("Created new user directory {}", path.getAbsoluteFile());
+            } else {
+                LOGGER.error("Could not create user direcotry at {}", path.getAbsoluteFile());
+            }
+        }
+        return path;
     }
 
 
@@ -106,7 +117,10 @@ public class Platform {
      */
     public static String getAbsoluteProjectPath(String basename) {
         File dir = getGopherDir();
-        return dir + File.separator + basename + ".ser";
+        if (! basename.endsWith(".ser")) {
+            basename = basename + ".ser";
+        }
+        return dir + File.separator + basename;
     }
 
 
@@ -117,7 +131,7 @@ public class Platform {
      */
     public static String getAbsoluteLogPath() {
         File dir = getGopherDir();
-        return new String(dir + File.separator + "gopher.log");
+        return dir + File.separator + "gopher.log";
     }
 
 
@@ -143,7 +157,7 @@ public class Platform {
         OSX("Os X"),
         UNKNOWN("Unknown");
 
-        private String name;
+        private final String name;
 
 
         CurrentPlatform(String n) {

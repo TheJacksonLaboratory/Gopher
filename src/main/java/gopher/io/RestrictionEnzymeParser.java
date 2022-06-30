@@ -1,20 +1,12 @@
 package gopher.io;
 
 import com.google.common.collect.ImmutableList;
-import gopher.model.RestrictionEnzyme;
+import gopher.service.model.RestrictionEnzyme;
 
 import java.io.*;
 import java.util.List;
 
-public class RestrictionEnzymeParser {
-
-    private final File pathToRestrictionEnzymeFile;
-
-
-    public RestrictionEnzymeParser(File pathToRestrictionEnzymeFile) {
-        this.pathToRestrictionEnzymeFile = pathToRestrictionEnzymeFile;
-    }
-
+public record RestrictionEnzymeParser(File pathToRestrictionEnzymeFile) {
 
     public static List<RestrictionEnzyme> getEnzymes(InputStream inputStream) throws IOException {
         ImmutableList.Builder<RestrictionEnzyme> builder = new ImmutableList.Builder<>();
@@ -23,7 +15,7 @@ public class RestrictionEnzymeParser {
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#"))
                     continue; /* skip header*/
-                String a[] = line.split("\\s+");
+                String[] a = line.split("\\s+");
                 RestrictionEnzyme re = new RestrictionEnzyme(a[0], a[1]);
                 builder.add(re);
             }

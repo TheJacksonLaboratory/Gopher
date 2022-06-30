@@ -5,10 +5,11 @@ import javafx.scene.control.ProgressIndicator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.log4j.Logger;
 
 
-import gopher.model.genome.Genome;
+import gopher.service.model.genome.Genome;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -22,7 +23,7 @@ import java.io.*;
  * @version 0.2.3 (2018-02-17)
  */
 public class GenomeGunZipper extends Task<Void>  {
-    private static Logger logger = Logger.getLogger(GenomeGunZipper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GenomeGunZipper.class.getName());
     /** Model of the current genome, e.g., hg19, with paths and canonical chromosomes etc. */
     private final Genome genome;
     /** This is the basename of the compressed genome file that we download from UCSC. */
@@ -102,22 +103,13 @@ public class GenomeGunZipper extends Task<Void>  {
             while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
                 updateProgress(Math.min(0.99, gzipIn.getBytesRead()/extracted_bytes_estimate));
                 // If the entry is a directory, skip, this should never happen with the chromFa.tag.gx data anyway.
-                if (entry.isDirectory()) {
-                    continue;
-                } else {
+                if (entry.isFile()) {
                     int count;
-                    byte data[] = new byte[BUFFER_SIZE];
+                    byte[] data = new byte[BUFFER_SIZE];
                     // Note that for hg38, the tar archive expands into a subdirectory called chroms.
                     // If the files begin with "chroms", the direc
                     String filename=entry.getName();
                     filename=filename.replaceAll("^\\./","");
-                   // commenting the following out will include non-canonical chromosomes.
-//                    if (genome.isCanonicalChromosome(filename)) {
-//                        logger.trace("Including chromosome "+ filename + " in output file");
-//                    } else {
-//                        logger.trace("Omitting non-canonical chromosome " +filename + " from output fasta file");
-//                        continue;
-//                    }
                     if (filename.equals(genome.getGenomeBasename())) {
                         continue;
                     }
@@ -193,7 +185,7 @@ public class GenomeGunZipper extends Task<Void>  {
             OK=true;
 
         } else {
-            if(this.genome.getGenomeBuild()=="xenTro9" || this.genome.getGenomeBuild()=="danRer10") {
+            if(this.genome.getGenomeBuild().equals("xenTro9") || this.genome.getGenomeBuild().equals("danRer10")) {
                 logger.trace("Not a tar archive. File needs to be unzipped only.");
                 extractCanonicalChromosomesNoTarArchive();
                 return null;
