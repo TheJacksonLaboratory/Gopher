@@ -117,7 +117,10 @@ public class Platform {
      */
     public static String getAbsoluteProjectPath(String basename) {
         File dir = getGopherDir();
-        return dir + File.separator + basename + ".ser";
+        if (! basename.endsWith(".ser")) {
+            basename = basename + ".ser";
+        }
+        return dir + File.separator + basename;
     }
 
 
