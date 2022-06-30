@@ -23,7 +23,7 @@ import java.io.IOException;
  * @version 0.3.1 (2017-11-12)
  */
 public class Gopher extends Application {
-    static Logger logger = LoggerFactory.getLogger(Gopher.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Gopher.class.getName());
     /**
      * A reference to the Model; we will write the current settings to file in
      * the {@link #stop} method by means of a method in the Model class.
@@ -32,7 +32,6 @@ public class Gopher extends Application {
 
     public static final String APPLICATION_ICON = "img/gophericon.png";
 
-    private Stage primarystage = null;
 
     @Override
     public void start(Stage primaryStage) {
@@ -42,8 +41,8 @@ public class Gopher extends Application {
             PopupFactory.displayException("Error", e.getMessage() + "\nGopher will now exit", e);
             javafx.application.Platform.exit();
         }
-        //logger.info("Starting Gopher Gui");
-        this.primarystage = primaryStage;
+        LOGGER.info("Starting Gopher Gui");
+
         Image image = new Image(Gopher.class.getResourceAsStream("/img/gophericon.png"));
         primaryStage.setTitle("GOPHER");
         primaryStage.getIcons().add(image);

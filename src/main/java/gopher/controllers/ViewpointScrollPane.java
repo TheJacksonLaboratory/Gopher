@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -339,7 +340,7 @@ public class ViewpointScrollPane extends ScrollPane {
 
             }
         });
-        locationTableColumn.setComparator(new ViewPointController.FormattedChromosomeComparator());
+        locationTableColumn.setComparator(new FormattedChromosomeComparator());
         locationTableColumn.setSortable(false);
 
         segmentLengthColumn = new TableColumn<>("Segment len");
@@ -700,5 +701,28 @@ public class ViewpointScrollPane extends ScrollPane {
         return String.format("highlight=%s", highlightregions);
     }
 
-
+    /** class for sorting chromosome locations like chr5:43679423 */
+    static class FormattedChromosomeComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+            Integer i1;
+            int i2;
+            try {
+                int x1 = s1.indexOf(":") + 1;
+                int y1 = s1.indexOf("-");
+                s1 = s1.substring(x1, y1);
+                s1=s1.replaceAll(",", "");
+                int x2 = s2.indexOf(":") + 1;
+                int y2 = s2.indexOf("-");
+                s2 = s2.substring(x2, y2);
+                s2=s2.replaceAll(",", "");
+                i1 = Integer.parseInt(s1);
+                i2 = Integer.parseInt(s2);
+                return i1.compareTo(i2);
+            } catch (Exception e) {
+                LOGGER.error("Error while sorting chromosome strings s1={} s2={}} ({})", s1, s2, e.getMessage());
+                return 0;
+            }
+        }
+    }
 }
