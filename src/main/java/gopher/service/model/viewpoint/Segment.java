@@ -586,7 +586,7 @@ public class Segment implements Serializable {
             }
 
         }
-        logger.info("Number of redundant baits removed: {}", numOfRedundantBaitsRemoved);
+        logger.trace("Number of redundant baits removed: {}", numOfRedundantBaitsRemoved);
         this.baitListDownStreamMargin = newBaitListDownStreamMargin;
     }
 

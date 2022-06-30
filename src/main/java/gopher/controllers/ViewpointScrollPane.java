@@ -183,7 +183,7 @@ public class ViewpointScrollPane extends ScrollPane {
             // should never happen!
             LOGGER.error("Could not load style sheet: css/gopherstyle.css");
         }
-        lvboxLabel.setStyle("toplabel");
+        lvboxLabel.getStyleClass().add("toplabel");
         HBox hb1 = new HBox();
         hb1.setAlignment(Pos.TOP_CENTER);
         hb1.setPrefHeight(120.0);
@@ -238,11 +238,11 @@ public class ViewpointScrollPane extends ScrollPane {
         gridPane.setPadding(new Insets(5, 10,20, 10));
         viewpointScoreLabel = new Label();
         viewpointScoreLabel.setMaxWidth(1600.0);
-        viewpointScoreLabel.setStyle("mylabel");
+        viewpointScoreLabel.getStyleClass().add("mylabel");
         gridPane.add(viewpointScoreLabel, 0, 0, 5, 1); // colspan 5
         viewpointExplanationLabel = new Label();
         viewpointExplanationLabel.setMaxWidth(1600);
-        viewpointExplanationLabel.setStyle("mylabel");
+        viewpointExplanationLabel.getStyleClass().add("mylabel");
         gridPane.add(viewpointExplanationLabel, 0, 1, 5, 1);
         zoomOutButton = createButton("Zoom out", 30, 90, 30, 90, 10);
         zoomOutButton.setOnAction(this::zoomOut);

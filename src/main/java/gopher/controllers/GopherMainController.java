@@ -1120,7 +1120,7 @@ public class GopherMainController implements Initializable {
         if (!OK) {
             return;
         }
-        LOGGER.info("User entered OK for parameter check");
+        LOGGER.trace("User entered OK for parameter check");
         ViewPointCreationTask task;
 
         if (gopherService.useSimpleApproach()) {

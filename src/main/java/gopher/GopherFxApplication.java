@@ -45,7 +45,7 @@ public class GopherFxApplication extends Application {
     }
     @Override
     public void start(Stage stage) {
-        LOGGER.info("Starting application");
+        LOGGER.trace("Starting application");
         applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 

@@ -151,9 +151,7 @@ public class Downloader extends Task<Void> {
             LOGGER.error("Null pointer passed, unable to make directory.");
             return;
         }
-        if (this.localDir.getParentFile().exists()) {
-           return;
-        } else {
+        if (! this.localDir.getParentFile().exists()) {
             LOGGER.info("Creating directory: "+ localDir);
             this.localDir.mkdir();
         }

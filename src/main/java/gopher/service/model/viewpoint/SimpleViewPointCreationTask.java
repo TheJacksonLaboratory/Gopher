@@ -81,17 +81,17 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
      */
     protected Void call() throws GopherException {
         updateTitle("Creating viewpoints using 'simple' approach");
-        LOGGER.info("SimpleViewPointCreationTask, starting");
+        LOGGER.trace("SimpleViewPointCreationTask, starting");
         if (ViewPoint.chosenEnzymes == null) {
             LOGGER.error("Attempt to start Simple ViewPoint creation thread with null chosenEnzymes");
             return null;
         }
         this.total = getTotalPromoterCount();
-        LOGGER.info("Got {} total promoters", this.total);
+        LOGGER.info("SimpleViewPointCreationTask: Got total of {} promoters", this.total);
         updateTitle(String.format("Creating viewpoints using 'simple' approach with %d promoters", this.total));
         updateProgress(0,1000);
         this.i = 0;
-        LOGGER.info(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
+        LOGGER.trace(String.format("extracting GopherGenes & have %d chromosome groups ", chromosomes.size()));
         long milli = System.currentTimeMillis();
 
         String faipath = this.gopherService.getIndexedGenomeFastaIndexFile();
@@ -103,7 +103,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
             throw new GopherException("Could not retrieve faidx file for " + fastapath);
         }
         IndexedFastaSequenceFile fastaReader;
-        LOGGER.info("Reading genome FAST from {}", fastapath);
+        LOGGER.trace("Reading genome FAST from {}", fastapath);
         try {
             fastaReader = new IndexedFastaSequenceFile(new File(fastapath));
         } catch (FileNotFoundException fnfe) {
@@ -111,7 +111,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
         }
         updateProgress(40,1000);
         double meanLen = getEstimatedMeanRestrictionFragmentLength(fastaReader);
-        LOGGER.info("MeanRestrictionFragmentLength = {}", meanLen);
+        LOGGER.trace("MeanRestrictionFragmentLength = {}", meanLen);
         gopherService.setEstAvgRestFragLen(meanLen);
         gopherService.setNormalDistributionSimple(meanLen);
         String chromInfoPath= gopherService.getChromInfoPathIncludingFileNameGz();
