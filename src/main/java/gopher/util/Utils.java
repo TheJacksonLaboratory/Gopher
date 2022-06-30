@@ -28,7 +28,7 @@ public class Utils {
      *
      * @param col {@link TableColumn} with a name that will be wrapped
      */
-    public static void makeHeaderWrappable(TableColumn col) {
+    public static <T, U> void  makeHeaderWrappable(TableColumn<T, U> col) {
         Label label = new Label(col.getText());
         label.setStyle("-fx-padding: 8px;");
         label.setWrapText(true);

@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.*;
 
 public class RegulatoryExomeBoxPresenter implements Initializable {
-    private static Logger logger = LoggerFactory.getLogger(RegulatoryExomeBoxPresenter.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(RegulatoryExomeBoxPresenter.class.getName());
     @FXML private Label label;
     @FXML private VBox regulatoryVBox;
     @FXML private Button okButton;
@@ -57,7 +57,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
 
 
     List<RegulationCategory> getChosenCategories() {
-        logger.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Returning of chosen enzymes: %d",chosen.size() ));
         return this.chosen;
     }
 
@@ -69,7 +69,7 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
      */
     private void handle(String category) {
         this.chosen = new ArrayList<>();
-        logger.trace(String.format("handle %s",category ));
+        LOGGER.trace(String.format("handle %s",category ));
         for (CheckBox cb : boxlist) {
             if (cb.isSelected()) {
                 String name = cb.getText(); /* this is something like "HindIII: A^AGCTT", but we need just "HindIII" */
@@ -79,13 +79,13 @@ public class RegulatoryExomeBoxPresenter implements Initializable {
                 }
                 RegulationCategory re = categories.get(name);
                 if (re == null) { /* Should never happen! */
-                    logger.error("We were unable to retrieve the name for enzyme " + name);
+                    LOGGER.error("We were unable to retrieve the name for enzyme " + name);
                     return;
                 }
                 chosen.add(re);
             }
         }
-        logger.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
+        LOGGER.trace(String.format("Number of chosen enzymes: %d",chosen.size() ));
     }
 
     @FXML

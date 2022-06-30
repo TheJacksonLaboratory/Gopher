@@ -1053,7 +1053,7 @@ public class GopherMainController implements Initializable {
         pform.titleProperty().bind(task.titleProperty());
         pform.progressProperty().bind(task.progressProperty());
         task.setOnSucceeded(event -> {
-            LOGGER.trace("Finished creating digest file");
+            LOGGER.error("Finished creating digest file");
             pform.close();
         });
         task.setOnFailed(eh -> {
@@ -1061,8 +1061,13 @@ public class GopherMainController implements Initializable {
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create digest file",
                     exc);
+            LOGGER.error("Failed to create digest file");
+            pform.close();
         });
         pform.activateProgressBar(task);
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
         e.consume();
     }
 
@@ -1090,6 +1095,7 @@ public class GopherMainController implements Initializable {
         } catch (Exception exc) {
             PopupFactory.displayException("Could not save probes.", exc.getMessage(), exc);
         }
+        LOGGER.trace("Finished output of probe files");
         e.consume();
     }
 

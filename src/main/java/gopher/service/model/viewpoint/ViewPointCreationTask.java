@@ -41,7 +41,7 @@ public abstract class ViewPointCreationTask extends Task<Void> {
     /**
      * List of {@link ViewPoint} objects that we will return to the Model when this Task is done.
      */
-    final List<ViewPoint> viewpointlist;
+    protected final List<ViewPoint> viewpointlist;
 
     protected abstract Void call() throws Exception;
 

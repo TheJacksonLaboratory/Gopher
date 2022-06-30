@@ -25,7 +25,7 @@ import java.util.Properties;
  * @version 0.1.2 (2018-06-07)
  */
 public class GopherReport {
-    private static final Logger logger = LoggerFactory.getLogger(GopherReport.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GopherReport.class.getName());
     private final GopherService service;
 
     private static final NumberFormat dformater= NumberFormat.getInstance(Locale.US);
@@ -40,13 +40,7 @@ public class GopherReport {
 
 
     private String getReport() {
-        //return String.format("%s\n\n%s\n\n%s",getSettingsReport(),getDesignReport(),getRegulatoryExomeReport());
-        ImmutableList.Builder<String> builder=new ImmutableList.Builder<>();
-        builder.addAll(getSettingsReport());
-        builder.add("\n");
-        builder.addAll(getDesignReport());
-        // TODO -- re add regulatory exome
-        return String.join(" ", builder.build());
+        return String.join("", getSettingsReport());
     }
 
     public List<String> getReportList() {

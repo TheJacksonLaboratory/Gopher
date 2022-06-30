@@ -23,7 +23,7 @@ import java.io.IOException;
  * @version 0.3.1 (2017-11-12)
  */
 public class Gopher extends Application {
-    static Logger LOGGER = LoggerFactory.getLogger(Gopher.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Gopher.class.getName());
     /**
      * A reference to the Model; we will write the current settings to file in
      * the {@link #stop} method by means of a method in the Model class.

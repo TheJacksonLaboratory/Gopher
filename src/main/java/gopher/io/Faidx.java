@@ -47,16 +47,6 @@ public class Faidx extends Task<Void> {
         this.n_canonical_chromosomes = model.getGenome().getNumberOfCanonicalChromosomes();
         this.contigLengths = new HashMap<>();
     }
-    public Faidx(String genomeDirPath, String basename, int n_chroms) {
-        this.genomeDirectoryPath=genomeDirPath;
-        this.genomeFastaBaseName = basename;
-        this.genomeFastaIndexBaseName =genomeFastaBaseName + ".fai"; // fai suffix
-        logger.trace("Initializing fasta indexing at directory " + this.genomeDirectoryPath);
-        this.n_canonical_chromosomes=n_chroms;
-        this.progress=null; // signal not to use the Progress Indicator
-        this.contigLengths=new HashMap<>();
-    }
-
 
     /**
      * We use this method to check if we need to g-unzip the genome files.

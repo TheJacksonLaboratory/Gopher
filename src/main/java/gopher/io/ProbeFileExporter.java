@@ -22,7 +22,7 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class ProbeFileExporter {
-    private static final Logger logger = LoggerFactory.getLogger(gopher.io.BEDFileExporter.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(gopher.io.BEDFileExporter.class.getName());
 
         private final String ProbeFileAgilentFormat;
     private final String ProbeFileAgilentFormatZip;
@@ -83,6 +83,7 @@ public class ProbeFileExporter {
         HashMap<String, String> coordsTogeneNames = new HashMap<>();
 
         for (ViewPoint vp : viewpointlist) {
+            LOGGER.error("ProbeFileExporter vp {}", vp);
             if (vp.getNumOfSelectedFrags() == 0) { continue; }
             for(Segment seg : vp.getActiveSegments()) {
 
@@ -131,6 +132,7 @@ public class ProbeFileExporter {
 
             Collections.sort(sortedPositions);
             for (Integer sortedPosition : sortedPositions) {
+                LOGGER.error("sortedPosition {}", sortedPosition);
                 // build ProbeID
                 String probeID = "probe_";
                 probeID += dateToStr;

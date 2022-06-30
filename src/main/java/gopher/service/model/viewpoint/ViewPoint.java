@@ -496,20 +496,14 @@ public class ViewPoint implements Serializable {
      * @param updateOriginallySelected if true,alter the originallySelected field in {@link Segment}
      */
     private void setFragmentsForExtendedApproach(int lowerLimit, int upperLimit, boolean updateOriginallySelected) {
-//        int c = (int)restrictionSegmentList.stream().filter(Segment::isSelected).count();
-
         for (Segment segment:restrictionSegmentList) {
-
             segment.setSelected(true,updateOriginallySelected); // initial segment selection is done here and nowhere else
-
             // do not select fragments that are too small
             if (segment.length() < this.minFragSize) { // minFragSize should be at least one bait size
                 segment.setSelected(false,updateOriginallySelected);
             }
-
             // do not select segments that are entirely outside the allowed range
-            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) )
-            {
+            if((segment.getEndPos() < lowerLimit) || (upperLimit < segment.getStartPos()) ) {
                 segment.setSelected(false,updateOriginallySelected);
             }
 
@@ -522,7 +516,6 @@ public class ViewPoint implements Serializable {
             if(!gopherService.getAllowUnbalancedMargins() && segment.isUnbalanced()) {
                 segment.setSelected(false,updateOriginallySelected);
             }
-
         }
     }
 

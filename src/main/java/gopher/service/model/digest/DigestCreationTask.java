@@ -198,15 +198,19 @@ public class DigestCreationTask extends Task<Void> {
     private int counter=1;
     /** This will cut all of the chromosomes in the multi-FASTA chromosome file. */
     private void cutChromosomes(String chromosomeFilePath) throws Exception {
-        logger.trace(String.format("cutting chromosomes %s",chromosomeFilePath ));
+        updateProgress(1,100);
         IndexedFastaSequenceFile fastaReader;
         try {
+            String msg = String.format("Indexing Fasta file %s",chromosomeFilePath );
+            logger.trace(msg);
+            updateProgress(10,100);
              fastaReader = new IndexedFastaSequenceFile(new File(chromosomeFilePath));
         } catch (Exception e) {
             throw  new GopherException(String.format("Could not find FAI file for %s [%s]",chromosomeFilePath,e.toString()));
         }
 
         ReferenceSequence refseq;
+        long current = 15;
         while ((refseq=fastaReader.nextSequence())!=null) {
             if (isCancelled()) // true if user has cancelled the task
                 return;
@@ -216,9 +220,16 @@ public class DigestCreationTask extends Task<Void> {
             //ReferenceSequence refseq = fastaReader.nextSequence();
             logger.trace(String.format("Cutting %s (length %d)",seqname,sequence.length() ));
             updateMessage(String.format("Digesting %s",seqname));
+            if (current > 90) {
+                long diff = 100 - current;
+                current += 0.3*diff;
+                updateProgress(current, 100);
+            } else {
+                current += 5;
+            }
             cutOneChromosome(seqname, sequence);
         }
-
+        updateProgress(100,100);
     }
 
     /**
