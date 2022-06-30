@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
-            stylesheets="@../css/gophermain.css"
+            stylesheets="@../css/gopherstyle.css"
             xmlns="http://javafx.com/javafx/9"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gopher.controllers.GopherMainController">
@@ -110,7 +110,7 @@
                                  <VBox.margin>
                                      <Insets/>
                                  </VBox.margin>
-                                 <Separator prefWidth="200.0" styleClass="sep" stylesheets="@../css/gophermain.css">
+                                 <Separator prefWidth="200.0" styleClass="sep" stylesheets="@../css/gopherstyle.css">
                                      <GridPane.margin>
                                          <Insets/>
                                      </GridPane.margin>
@@ -145,7 +145,7 @@
                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                                      </GridPane.margin>
                                  </Label>
-                                 <Label styleClass="biglabel" stylesheets="@../css/gophermain.css" text="Data sources"
+                                 <Label styleClass="biglabel" stylesheets="@../css/gopherstyle.css" text="Data sources"
                                         GridPane.columnIndex="1">
                                      <padding>
                                          <Insets left="10.0"/>
@@ -155,7 +155,7 @@
                                      </GridPane.margin>
                                  </Label>
                                  <ChoiceBox fx:id="genomeChoiceBox" prefHeight="30.0" prefWidth="145.0"
-                                            stylesheets="@../css/gophermain.css" GridPane.columnIndex="1"
+                                            stylesheets="@../css/gopherstyle.css" GridPane.columnIndex="1"
                                             GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -163,7 +163,7 @@
                                  </ChoiceBox>
                                  <Button fx:id="downloadGenomeButton" mnemonicParsing="false" onAction="#downloadGenome"
                                          prefHeight="30.0" prefWidth="145.0" styleClass="Button"
-                                         stylesheets="@../css/gophermain.css" text="Download" GridPane.columnIndex="1"
+                                         stylesheets="@../css/gopherstyle.css" text="Download" GridPane.columnIndex="1"
                                          GridPane.rowIndex="2">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -171,7 +171,7 @@
                                  </Button>
                                  <Button fx:id="decompressGenomeButton" mnemonicParsing="false"
                                          onAction="#decompressGenome" prefHeight="30.0" prefWidth="145.0"
-                                         styleClass="Button" stylesheets="@../css/gophermain.css" text="Start"
+                                         styleClass="Button" stylesheets="@../css/gopherstyle.css" text="Start"
                                          GridPane.columnIndex="1" GridPane.rowIndex="3">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -179,7 +179,7 @@
                                  </Button>
                                  <Button fx:id="indexGenomeButton" mnemonicParsing="false" onAction="#indexGenome"
                                          prefHeight="30.0" prefWidth="145.0" styleClass="Button"
-                                         stylesheets="@../css/gophermain.css" text="Start" GridPane.columnIndex="4"
+                                         stylesheets="@../css/gopherstyle.css" text="Start" GridPane.columnIndex="4"
                                          GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -187,14 +187,14 @@
                                  </Button>
                                  <Button fx:id="downloadTranscriptsButton" mnemonicParsing="false"
                                          onAction="#downloadRefGeneTranscripts" prefHeight="30.0" prefWidth="145.0"
-                                         styleClass="Button" stylesheets="@../css/gophermain.css" text="Download"
+                                         styleClass="Button" stylesheets="@../css/gopherstyle.css" text="Download"
                                          GridPane.columnIndex="4" GridPane.rowIndex="2">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                      </GridPane.margin>
                                  </Button>
                                  <Button mnemonicParsing="false" onAction="#downloadAlignabilityMap" prefHeight="30.0"
-                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gophermain.css"
+                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gopherstyle.css"
                                          text="Download" GridPane.columnIndex="4" GridPane.rowIndex="3">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -226,8 +226,8 @@
                                  <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2147483647"
                                        GridPane.valignment="CENTER">
                                      <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep"
-                                                stylesheets="@../css/gophermain.css"/>
-                                     <Label styleClass="biglabel" stylesheets="@../css/gophermain.css"
+                                                stylesheets="@../css/gopherstyle.css"/>
+                                     <Label styleClass="biglabel" stylesheets="@../css/gopherstyle.css"
                                             text="Enrichment targets">
                                          <padding>
                                              <Insets left="10.0"/>
@@ -238,16 +238,16 @@
                                      </Label>
                                  </HBox>
                                  <Button mnemonicParsing="false" onAction="#enterTargetGeneList" prefHeight="30.0"
-                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gophermain.css"
+                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gopherstyle.css"
                                          text="Target gene list" GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                      </GridPane.margin>
                                  </Button>
                                  <Label fx:id="targetGeneLabel" styleClass="bluelabel"
-                                        stylesheets="@../css/gophermain.css" GridPane.rowIndex="2"/>
+                                        stylesheets="@../css/gopherstyle.css" GridPane.rowIndex="2"/>
                                  <Button mnemonicParsing="false" onAction="#allProteinCodingGenes" prefHeight="30.0"
-                                         styleClass="Button" stylesheets="@../css/gophermain.css"
+                                         styleClass="Button" stylesheets="@../css/gopherstyle.css"
                                          text="All protein-coding genes" GridPane.columnIndex="1"
                                          GridPane.rowIndex="1">
                                      <GridPane.margin>
@@ -255,17 +255,17 @@
                                      </GridPane.margin>
                                  </Button>
                                  <Label fx:id="allGenesLabel" styleClass="bluelabel"
-                                        stylesheets="@../css/gophermain.css" GridPane.columnIndex="1"
+                                        stylesheets="@../css/gopherstyle.css" GridPane.columnIndex="1"
                                         GridPane.rowIndex="2"/>
                                  <Button mnemonicParsing="false" onAction="#enterBedFile" prefHeight="30.0"
-                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gophermain.css"
+                                         prefWidth="145.0" styleClass="Button" stylesheets="@../css/gopherstyle.css"
                                          text="Enter BED file" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                      </GridPane.margin>
                                  </Button>
                                  <Label fx:id="bedTargetsLabel" styleClass="bluelabel"
-                                        stylesheets="@../css/gophermain.css" GridPane.columnIndex="2"
+                                        stylesheets="@../css/gopherstyle.css" GridPane.columnIndex="2"
                                         GridPane.rowIndex="2"/>
                              </GridPane>
                              <GridPane styleClass="grid" VBox.vgrow="NEVER">
@@ -386,7 +386,7 @@
                                  </Label>
                                  <Button alignment="CENTER" defaultButton="true" minHeight="30.0" minWidth="145.0"
                                          mnemonicParsing="false" onAction="#createViewPoints" styleClass="Button"
-                                         stylesheets="@../css/gophermain.css" text="Create viewpoints!"
+                                         stylesheets="@../css/gopherstyle.css" text="Create viewpoints!"
                                          GridPane.columnSpan="2147483647" GridPane.halignment="CENTER"
                                          GridPane.rowIndex="9">
                                      <GridPane.margin>
@@ -468,7 +468,7 @@
                                  </Label>
                                  <Button fx:id="chooseEnzymeButton" mnemonicParsing="false" onAction="#chooseEnzymes"
                                          prefHeight="30.0" prefWidth="145.0" styleClass="Button"
-                                         stylesheets="@../css/gophermain.css" text="Choose" GridPane.columnIndex="1"
+                                         stylesheets="@../css/gopherstyle.css" text="Choose" GridPane.columnIndex="1"
                                          GridPane.rowIndex="2">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -481,8 +481,8 @@
                                      </GridPane.margin>
                                  </Label>
                                  <Separator maxWidth="200.0" prefWidth="190.0" styleClass="sep"
-                                            stylesheets="@../css/gophermain.css"/>
-                                 <Label styleClass="biglabel" stylesheets="@../css/gophermain.css"
+                                            stylesheets="@../css/gopherstyle.css"/>
+                                 <Label styleClass="biglabel" stylesheets="@../css/gopherstyle.css"
                                         text="Design parameters" GridPane.columnIndex="1">
                                      <padding>
                                          <Insets left="10.0"/>
