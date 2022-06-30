@@ -61,6 +61,7 @@ public class QCCheckFactory implements Initializable {
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         WebView wv = new WebView();
+        wv.setPrefHeight(700);
         webEngine = wv.getEngine();
         webEngine.setUserDataDirectory(new File(Platform.getWebEngineUserDataDirectory(), getClass().getCanonicalName()));
         String html = getHTML();

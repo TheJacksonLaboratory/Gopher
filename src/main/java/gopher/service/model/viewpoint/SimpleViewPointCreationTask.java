@@ -137,7 +137,7 @@ public class SimpleViewPointCreationTask extends ViewPointCreationTask {
                     LOGGER.trace("chromosome=" + chromosome.getReferenceSequenceID());
                 }
                 int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
-                chromosome.getGenes().stream().forEach(gopherGene ->
+                chromosome.getGenes().forEach(gopherGene ->
                         calculateViewPoints(gopherGene, referenceSequenceID, fastaReader, apair,chromosomeLen));
             }
 

@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class ProjectFile {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectFile.class.getName());
-    private StringProperty absolutePath;
+    private final StringProperty absolutePath;
     /** Has this file been deleted? */
     private boolean isDeleted=false;
     /** Is this the file that is currently active on the GUI? */
@@ -21,7 +21,7 @@ public class ProjectFile {
 
 
     public ProjectFile(String path) {
-        absolutePath= new SimpleStringProperty(path);
+        absolutePath = new SimpleStringProperty(path);
     }
 
     public void setActive() { this.isActiveFile=true;}

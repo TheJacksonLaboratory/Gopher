@@ -98,8 +98,7 @@ public class SegmentFactoryTest {
 
     @Test
     public void testGenomicPosition() {
-        Integer expected = genomicPos_1;
-        assertEquals(expected, segmentFactory.getGenomicPos());
+        assertEquals(genomicPos_1, segmentFactory.getGenomicPos());
     }
 
     /**

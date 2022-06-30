@@ -156,7 +156,7 @@ public class Design {
         if (viewPointList == null) {
             return;
         }
-        viewPointList.stream().forEach(vp -> {
+        viewPointList.forEach(vp -> {
             uniqueRestrictionFragments.addAll(vp.getActiveSegments());
             uniqueGeneSymbols.add(vp.getTargetName());
             avgVPscore += vp.getScore();
@@ -182,7 +182,7 @@ public class Design {
 
         this.n_nucleotides_in_unique_fragment_margins = 0;
 
-        uniqueRestrictionFragments.stream().forEach(segment ->
+        uniqueRestrictionFragments.forEach(segment ->
             n_nucleotides_in_unique_fragment_margins += Math.min(2 * probeLength, segment.length())
         );
         if (n_viewpoints > 0) {

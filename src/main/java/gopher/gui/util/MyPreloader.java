@@ -54,12 +54,11 @@ public final class MyPreloader extends Preloader {
         Optional<ButtonType> opt = dialog.showAndWait();
         if (opt.isPresent()) {
             ButtonType btype = opt.get();
-            switch (btype.getText()) {
-                case "New Project" -> {
-                    getNewProjectName();
-                    isNewProject = true;
-                }
-                default -> MyPreloader.projectName = btype.getText();
+            if ("New Project".equals(btype.getText())) {
+                getNewProjectName();
+                isNewProject = true;
+            } else {
+                MyPreloader.projectName = btype.getText();
             }
         }
     }

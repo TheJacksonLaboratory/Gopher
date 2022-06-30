@@ -119,13 +119,13 @@ public class Segment implements Serializable {
             this.endPos=end;
         }
         public Builder fastaReader(IndexedFastaSequenceFile val) {
-            this.fastaReader=val; return this;
+            this.fastaReader = val; return this;
         }
         public Builder genomicPos(Integer val) {
-            this.genomicPos=val; return this;
+            this.genomicPos = val; return this;
         }
         public Builder marginSize(Integer val) {
-            this.marginSize=val; return this;
+            this.marginSize = val; return this;
         }
         public Segment build() {
             return new Segment(this);

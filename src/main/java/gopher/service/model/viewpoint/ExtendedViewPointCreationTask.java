@@ -71,7 +71,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
                     build();
             vp.setPromoterNumber(++n,gPosList.size());
             updateProgress(i++, total); /* this will update the progress bar */
-            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vp.toString()));
+            updateMessage(String.format("[%d/%d] Creating view point for %s", i, total, vp));
             vp.generateViewpointExtendedApproach(gopherService.getSizeUp(), gopherService.getSizeDown(), gopherService);
             viewpointlist.add(vp);
         }
@@ -132,7 +132,7 @@ public class ExtendedViewPointCreationTask extends ViewPointCreationTask {
             }
             int chromosomeLen = fastaReader.getSequence(referenceSequenceID).length();
             //for (GopherGene gene : group.getGenes()) {
-            group.getGenes().stream().forEach(gene -> calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen));
+            group.getGenes().forEach(gene -> calculateViewPoints(gene, referenceSequenceID, fastaReader, apair,chromosomeLen));
         }
 
 

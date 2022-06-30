@@ -20,7 +20,7 @@ public class ProgressPopup {
     private Stage window=null;
 
 
-    public void startProgress(final Task task) throws InterruptedException {
+    public <T> void startProgress(final Task<T> task) throws InterruptedException {
         Label label=new Label(progressLabel);
         FlowPane root = new FlowPane();
         root.setPadding(new Insets(10));

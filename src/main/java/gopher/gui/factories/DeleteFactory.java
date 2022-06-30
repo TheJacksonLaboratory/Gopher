@@ -112,9 +112,7 @@ public class DeleteFactory {
 
         } else {
             for (final File fileEntry : projectDir.listFiles()) {
-                if (fileEntry.isDirectory()) {
-                    continue;
-                } else if (fileEntry.getAbsolutePath().endsWith(".ser")) {
+                if (fileEntry.isFile() && fileEntry.getAbsolutePath().endsWith(".ser")) {
                     files.add(fileEntry.getAbsolutePath());
                 }
             }

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -89,7 +88,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
         LOGGER.info("Checking overlap of entries for regulatory exome");
         for (RegulatoryBEDFileEntry entry : elementlist) {
             if (entry.overlaps(currententry)) {
-                LOGGER.info(entry.toString() + " overlaps " + (currententry != null ? currententry.toString() : ""));
+                LOGGER.info(entry + " overlaps " + (currententry != null ? currententry.toString() : ""));
             }
             currententry=entry;
         }
@@ -185,7 +184,7 @@ public class RegulatoryExomeBuilder extends Task<Void> {
 
 
     public String getStatus() {
-        return status.stream().collect(Collectors.joining("\n"));
+        return String.join("\n", status);
     }
 
 

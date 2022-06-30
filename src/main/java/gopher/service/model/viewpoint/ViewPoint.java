@@ -158,24 +158,6 @@ public class ViewPoint implements Serializable {
         return String.format("%.2f kb (all selected fragments: %.2f kb)", (double) getTotalLengthOfViewpoint()/1000,lenInKb);
     }
 
-    //    public void zoom(double zoomfactor) {
-//        logger.trace(String.format("Zooming...Current upstreamNucleotide length %d; downstream %d; factor=%f", upstreamNucleotideLength,downstreamNucleotideLength,zoomfactor));
-//        this.upstreamNucleotideLength =(int)(this.upstreamNucleotideLength *zoomfactor);
-//        this.downstreamNucleotideLength =(int)(this.downstreamNucleotideLength *zoomfactor);
-//        logger.trace(String.format("After zoom...upstreamNucleotide length %d; downstream %d", upstreamNucleotideLength,downstreamNucleotideLength));
-//        // TODO do we need to worry about going over end of chromosome?
-//        // or start before zero?
-//        setStartPos(genomicPos - upstreamNucleotideLength);
-//        setEndPos(genomicPos + downstreamNucleotideLength);
-//        // note that if the approach is SIMPLE, then we do not recalculate the selected viewpoints.
-//        // if the approach is EXTENDED, then we take a valid fragments in the zoomed region
-//        if (this.approach.equals(Approach.EXTENDED)) {
-//            setFragmentsForExtendedApproach(this.startPos, this.endPos, false);
-//        }
-//
-//    }
-
-
     /**
      * This constructor is intended to be used by the builder.
      *
@@ -366,12 +348,7 @@ public class ViewPoint implements Serializable {
             restFrag.setUsableBaits(gopherService,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
         }
-/*
         logger.trace("Done init Restriction Frags");
-        for (Segment er : restrictionSegmentList){
-            logger.trace("\tSegment: " + er.detailedReport());
-        }
-*/
     }
 
     /** @return a 2-tuple with the number of baits: <up,down>. */
@@ -423,10 +400,6 @@ public class ViewPoint implements Serializable {
     private void setStartPos(int startPos) {
         this.startPos = Math.max(startPos, 0);
     }
-
-//    private void setMinimumAllowableStartPos(int pos) { this.minimumAllowableStartPosition = pos; }
-//    private void setMaximumAllowableEndPos(int pos) { this.maximumAllowableEndPosition = pos; }
-
     public final Integer getStartPos() {
         return startPos;
     }
@@ -824,12 +797,6 @@ public class ViewPoint implements Serializable {
         return getActiveSegments().stream().mapToInt(Segment::getEndPos).max().orElse(this.genomicPos+downstreamNucleotideLength);
     }
 
-//    /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-//     * in the case where a selected digest overlaps that boundary, the start pos of that digest.
-//     * @return leftmost confirmDialog position
-//     */
-//    public int getMinimumDisplayPosition() { return Math.min(getMinimumSelectedPosition(),this.genomicPos-upstreamNucleotideLength); }
-
     /** Returns the leftmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
      * in the case where a selected digest overlaps that boundary, the start pos of that digest.
      * @param zoomfactor Amount of zooming to do
@@ -838,14 +805,6 @@ public class ViewPoint implements Serializable {
     public int getMinimumDisplayPosition(double zoomfactor) {
         return this.genomicPos-(int)(upstreamNucleotideLength*zoomfactor);
     }
-
-
-//    /** Returns the rightmost position to confirmDialog in the UCSC browser. This is either the boundary of the initial search region, or
-//     * in the case where a selected digest overlaps that boundary, the end pos of that digest.
-//     * @return rightmost confirmDialog position
-//     */
-//    @Deprecated
-//    public int getMaximumDisplayPosition() { return Math.max(getMaximumSelectedPosition(),this.genomicPos+downstreamNucleotideLength); }
 
     public int getMaximumDisplayPosition(double zoomfactor) {
         return this.genomicPos+(int)(downstreamNucleotideLength*zoomfactor);

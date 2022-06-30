@@ -244,19 +244,19 @@ public class ViewpointScrollPane extends ScrollPane {
         viewpointExplanationLabel.setMaxWidth(1600);
         viewpointExplanationLabel.getStyleClass().add("mylabel");
         gridPane.add(viewpointExplanationLabel, 0, 1, 5, 1);
-        zoomOutButton = createButton("Zoom out", 30, 90, 30, 90, 10);
+        zoomOutButton = createButton("Zoom out");
         zoomOutButton.setOnAction(this::zoomOut);
         gridPane.add(zoomOutButton, 0, 2);
-        zoomInButton = createButton("Zoom in", 30, 90, 30, 90, 10);
+        zoomInButton = createButton("Zoom in");
         zoomInButton.setOnAction(this::zoomIn);
         gridPane.add(zoomInButton, 1, 2);
-        deleteButton = createButton("Delete", 30, 90, 30, 90, 10);
+        deleteButton = createButton("Delete");
         deleteButton.setOnAction(this::deleteThisViewPoint);
         gridPane.add(deleteButton, 2, 2);
-        copyToClipboardButton = createButton("Copy", 30, 90, 30, 90, 10);
+        copyToClipboardButton = createButton("Copy");
         copyToClipboardButton.setOnAction(this::copyToClipboard);
         gridPane.add(copyToClipboardButton, 3, 2);
-        closeButton = createButton("Close", 30, 90, 30, 90, 10);
+        closeButton = createButton("Close");
         closeButton.setOnAction(this::closeButtonAction);
         gridPane.add(closeButton, 4, 2);
         colorTableColumn = new TableColumn<>();
@@ -488,6 +488,7 @@ public class ViewpointScrollPane extends ScrollPane {
         vpExplanationProperty = new SimpleStringProperty();
         viewpointScoreLabel.textProperty().bindBidirectional(vpScoreProperty);
         viewpointExplanationLabel.textProperty().bindBidirectional(vpExplanationProperty);
+        viewpointExplanationLabel.setPadding(new Insets(10));
 
         /* the following will start us off with a different color for each ViewPoint. */
         if (startIndexForColor == UNINITIALIZED) {
@@ -540,13 +541,13 @@ public class ViewpointScrollPane extends ScrollPane {
     }
 
 
-    private Button createButton(String label, int minHeight, int minWidth, int maxHeight, int maxWidth, int insetLen) {
+    private Button createButton(String label) {
         Button button = new Button(label);
-        button.setMinHeight(minHeight);
-        button.setMinWidth(minWidth);
-        button.setMaxHeight(maxHeight);
-        button.setMaxWidth(maxWidth);
-        button.setPadding(new Insets(insetLen));
+        button.setMinHeight(35);
+        button.setMinWidth(90);
+        button.setMaxHeight(35);
+        button.setMaxWidth(90);
+        button.setPadding(new Insets(10));
         return button;
     }
 

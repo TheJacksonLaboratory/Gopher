@@ -122,8 +122,7 @@ public class RegulatoryBEDFileEntry implements Comparable<RegulatoryBEDFileEntry
         if (that == null) return false;
         else if (!this.chromosome.equals(that.chromosome)) return false;
         else if (that.fromPos >= this.fromPos && that.fromPos <= this.toPos) return true;
-        else if (that.toPos >= this.fromPos && that.toPos <= this.toPos) return true;
-        else return false;
+        else return that.toPos >= this.fromPos && that.toPos <= this.toPos;
     }
 
 }

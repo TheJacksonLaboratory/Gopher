@@ -26,7 +26,7 @@ public class RefGeneDownloader {
     }
     /** @return The UCSC URL from which the transcript file is to be downloaded. */
     public String getURL()throws DownloadFileNotFoundException  {
-        String url = switch (this.genome) {
+        return switch (this.genome) {
             case "hg19" -> hg19;
             case "hg38" -> hg38;
             case "mm9" -> mm9;
@@ -35,7 +35,6 @@ public class RefGeneDownloader {
             case "danRer10" -> danRer10;
             default -> throw new DownloadFileNotFoundException("Could not identify download URL for genome: " + genome);
         };
-        return url;
     }
 
     public String getTranscriptName() { return String.format("%s (%s)",getBaseName(),genome); }
