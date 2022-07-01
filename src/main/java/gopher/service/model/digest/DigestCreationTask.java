@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
  * <p>The format of the output program is as follows:</p>
  * <ol>
  *     <li>Chromosome</li>
- *     <li>Fragment_Start_Position  (one-based, inclusive)</li>
- *     <li>Fragment_End_Position  (one-based, inclusive)</li>
- *     <li>Fragment_Number (can be used to search for adjacent fragments)</li>
+ *     <li>Digest_Start_Position  (one-based, inclusive)</li>
+ *     <li>Digest_End_Position  (one-based, inclusive)</li>
+ *     <li>Digest_Number (can be used to search for adjacent fragments)</li>
  *     <li>5'_Restriction_Site</li>
  *     <li>3'_Restriction_Site</li>
  *     <li>Length</li>
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  * This means we will use the following format TODO update
  * <pre>
  * Genome:testgenome       Restriction_Enzyme1:BgIII [A^GATCT]     Restriction_Enzyme2:None        Hicup digester version 0.5.10
- * Chromosome      Fragment_Start_Position Fragment_End_Position   Fragment_Number RE1_Fragment_Number     5'_Restriction_Site     3'_Restriction_Site
+ * Chromosome      Digest_Start_Position Fragment_End_Position   Digest_Number RE1_Fragment_Number     5'_Restriction_Site     3'_Restriction_Site
  * chrUn_KI270745v1        1       1861    1       1       None    Re1
  * chrUn_KI270745v1        1862    29661   2       2       Re1     Re1
  * chrUn_KI270745v1        29662   35435   3       3       Re1     Re1
@@ -100,9 +100,9 @@ public class DigestCreationTask extends Task<Void> {
      */
     private final String[] headerFields = {
             "Chromosome",
-            "Fragment_Start_Position",
-            "Fragment_End_Position",
-            "Fragment_Number",
+            "Digest_Start_Position",
+            "Digest_End_Position",
+            "Digest_Number",
             "5'_Restriction_Site",
             "3'_Restriction_Site",
             "Length",
@@ -110,7 +110,7 @@ public class DigestCreationTask extends Task<Void> {
             "3'_GC_Content",
             "5'_Repeat_Content",
             "3'_Repeat_Content",
-            "Selected",
+            "Enrichment_status",
             "5'_Probes",
             "3'_Probes"
     };
@@ -137,10 +137,12 @@ public class DigestCreationTask extends Task<Void> {
         int msize = model.getMarginSize();
         this.restrictionEnzymeList = model.getChosenEnzymelist();
         this.genomeFastaFilePath = model.getGenomeFastaFile();
-        outfile += model.getProjectName();
+        outfile += model.getProjectName(true); // remove ".ser" suffix
         outfile += "_";
         outfile += model.getGenomeBuild();
-        outfile += "_DigestedGenome.txt";
+        outfile += "_";
+        outfile +=  model.getAllSelectedEnzymeString().replaceAll(";", "_"); // mutliple enzymes would be separated by semicolon
+        outfile += "_digests.txt";
         outfilename = outfile;
         LOGGER.trace(outfilename);
 
@@ -205,6 +207,7 @@ public class DigestCreationTask extends Task<Void> {
             out.write(HEADER + "\n");
             cutChromosomes(this.genomeFastaFilePath);
             out.close();
+            LOGGER.error("Completed writing digest file {}", outfilename);
         } catch (Exception e) {
             e.printStackTrace();
             throw new GopherException(String.format("Could not digest chromosomes: %s", e));
@@ -236,10 +239,10 @@ public class DigestCreationTask extends Task<Void> {
                 if (current > 90) {
                     long diff = 100 - current;
                     current += 0.3 * diff;
-                    updateProgress(current, 100);
                 } else {
                     current += 5;
                 }
+                updateProgress(current, 100);
                 cutOneChromosome(seqname, sequence);
             }
         } catch (Exception e) {

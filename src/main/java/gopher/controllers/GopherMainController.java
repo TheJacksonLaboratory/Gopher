@@ -1090,7 +1090,8 @@ public class GopherMainController implements Initializable {
         try {
             LOGGER.trace(gopherService.getGenomeFastaFile());
             LOGGER.trace(gopherService.getIndexedGenomeFastaIndexFile());
-            exporter.printProbeFileInAgilentFormat(this.gopherService.getViewPointList(),
+            exporter.printProbeFileInAgilentFormat(this.gopherService.getProbeLength(),
+                    this.gopherService.getViewPointList(),
                     this.gopherService.getGenomeBuild(), gopherService.getGenomeFastaFile());
         } catch (Exception exc) {
             PopupFactory.displayException("Could not save probes.", exc.getMessage(), exc);

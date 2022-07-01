@@ -5,25 +5,33 @@ Installing and running GOPHER
 ~~~~~~~~~~~~
 Requirements
 ~~~~~~~~~~~~
-GOPHER needs Java 8 or newer to run.
+GOPHER needs Java 17 or newer to build from source.
 You can determine what version of Java you have on your computer by entering the following command. ::
 
   $ java -version
-    java version "1.8.0_144"
-    Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
-    Java HotSpot(TM) 64-Bit Server VM (build 25.144-b01, mixed mode)
+    java version "17.0.1" 2021-10-19 LTS
+    Java(TM) SE Runtime Environment (build 17.0.1+12-LTS-39)
+    Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+12-LTS-39, mixed mode, sharing)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Using the pre-built GOPHER app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Most users should install the prebuilt application called ``GOPHER.jar`` that is available on the *Releases* section of the GOPHER GitHub repository: https://github.com/TheJacksonLaboratory/GOPHER/releases/.
+Most users should install the prebuilt application called ``GOPHER.jar`` that is available in the *Releases* section of
+the GOPHER GitHub repository: https://github.com/TheJacksonLaboratory/GOPHER/releases/.
 
-On most systems you should be able to start GOPHER by double clicking on the ``GOPHER.jar``.
+Versions are available for different operating systems and can be installed as usual.
+
+We additionally supply an executable jar file that can be run on systems with Java 17 or newer. You should be able to
+start GOPHER by double clicking on the ``GOPHER.jar``.
 Alternatively, you can start ``GOPHER.jar`` from the shell with the following command. ::
 
   $ java -jar GOPHER.jar
 
-**Note:** if you receive an ``OutOfMemoryError`` allow more memory to be allocated for Java heap using ``-Xmx`` option (e.g. ``java -Xmx6g -jar GOPHER.jar``).
+**Note:** if you receive an ``OutOfMemoryError`` allow more memory to be allocated for Java heap using ``-Xmx`` option, e.g.: ::
+
+    java -Xmx8g -jar GOPHER.jar
+
+
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building GOPHER from source

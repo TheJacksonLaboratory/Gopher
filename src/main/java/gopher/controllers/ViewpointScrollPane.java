@@ -545,7 +545,7 @@ public class ViewpointScrollPane extends ScrollPane {
         Button button = new Button(label);
         button.setMinHeight(35);
         button.setMinWidth(90);
-        button.setMaxHeight(35);
+        button.setMaxHeight(38);
         button.setMaxWidth(90);
         button.setPadding(new Insets(10));
         return button;
