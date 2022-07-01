@@ -31,6 +31,8 @@ public interface GopherService {
 
 
     void setProjectName(String projectname);
+    String getProjectName();
+    String getProjectName(boolean removeSuffix);
 
     void setModel(GopherModel mod);
 
@@ -120,7 +122,7 @@ public interface GopherService {
 
     List<ViewPoint> getViewPointList();
 
-    String getProjectName();
+
 
     String getGenomeFastaFile();
 

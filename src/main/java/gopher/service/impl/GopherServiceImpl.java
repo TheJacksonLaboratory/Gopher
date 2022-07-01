@@ -388,7 +388,15 @@ public class GopherServiceImpl implements GopherService, Serializable {
 
     @Override
     public String getProjectName() {
-        return model.getProjectName();
+        return getProjectName(false);
+    }
+    @Override
+    public String getProjectName(boolean removeSuffix) {
+        String projectName = model.getProjectName();
+        if (removeSuffix) {
+            projectName = projectName.replace(".ser", "");
+        }
+        return projectName;
     }
 
     @Override
@@ -695,7 +703,6 @@ public class GopherServiceImpl implements GopherService, Serializable {
         this.model.setGopherGenes(parser.getGopherGeneList());
         model.setTotalRefGeneCount(n_genes);
         PopupFactory.displayHtml(html, "Target genes");
-
     }
 
     private String getValidatedGeneListHTML(List<String> valid, List<String> invalid, int n_genes, int n_transcripts) {
