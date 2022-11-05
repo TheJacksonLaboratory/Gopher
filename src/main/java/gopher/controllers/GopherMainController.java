@@ -181,12 +181,7 @@ public class GopherMainController implements Initializable {
      */
     @FXML
     private Tab analysistab;
-    /**
-     * Click this to choose the restriction enzymes with which to do the capture Hi-C cutting
-     */
-    @FXML
-    private Button chooseEnzymeButton;
-    /**
+   /**
      * Presenter for the second tab.
      */
     @Autowired
@@ -1456,7 +1451,6 @@ public class GopherMainController implements Initializable {
     };
 
     public void setPrimaryStageReference(Stage stage) {
-
         this.primaryStage = stage;
         this.primaryStage.setOnCloseRequest(confirmCloseEventHandler);
     }

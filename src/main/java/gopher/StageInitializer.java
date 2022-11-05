@@ -2,6 +2,7 @@ package gopher;
 
 
 import gopher.configuration.ApplicationProperties;
+import gopher.controllers.GopherMainController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -40,11 +41,16 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
             ClassPathResource gopherResource = new ClassPathResource("fxml/gophermain.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
             fxmlLoader.setControllerFactory(applicationContext::getBean);
+
+
             Parent parent = fxmlLoader.load();
             Stage stage = event.getStage();
             stage.setScene(new Scene(parent, 1200, 900));
             stage.setResizable(true);
             stage.setTitle(applicationProperties.getApplicationUiTitle());
+            GopherMainController mc = fxmlLoader.getController();
+            mc.setPrimaryStageReference(stage);
+           // applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
             readAppIcon().ifPresent(stage.getIcons()::add);
             stage.show();
         } catch (IOException e) {
