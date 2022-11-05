@@ -92,20 +92,6 @@ public class GopherMainController implements Initializable {
     @FXML
     private ChoiceBox<String> approachChoiceBox;
     @FXML
-    private Button decompressGenomeButton;
-    @FXML
-    private Button indexGenomeButton;
-    /**
-     * Clicking this button will download the genome file if it is not found at the indicated directory.
-     */
-    @FXML
-    private Button downloadGenomeButton;
-    /**
-     * Button to download RefSeq.tar.gz (transcript/gene definition file
-     */
-    @FXML
-    private Button downloadTranscriptsButton;
-    @FXML
     private ProgressIndicator genomeDownloadPI;
     /**
      * Show progress in downloading the Genome and corresponding transcript definition file.
@@ -226,43 +212,20 @@ public class GopherMainController implements Initializable {
     @Value("${application.title}")
     private String applicationTitle;
 
-    final transient private IntegerProperty sizeUp = new SimpleIntegerProperty();
-
-    private int getSizeUp() {
-        return sizeUp.get();
-    }
-
-    private void setSizeUp(int su) {
-        sizeUp.set(su);
-    }
+    final transient private IntegerProperty sizeUp = new SimpleIntegerProperty(Default.SIZE_UPSTREAM);
 
     private IntegerProperty sizeDownProperty() {
         return sizeDown;
     }
 
-    final transient private IntegerProperty sizeDown = new SimpleIntegerProperty();
+    final transient private IntegerProperty sizeDown = new SimpleIntegerProperty(Default.SIZE_DOWNSTREAM);
 
-    private int getSizeDown() {
-        return sizeDown.get();
-    }
-
-    private void setSizeDown(int sd) {
-        sizeDown.set(sd);
-    }
 
     private IntegerProperty sizeUpProperty() {
         return sizeUp;
     }
 
-    final transient private IntegerProperty minFragSize = new SimpleIntegerProperty();
-
-    private int getMinFragSize() {
-        return minFragSize.get();
-    }
-
-    private void setMinFragSize(int i) {
-        this.minFragSize.set(i);
-    }
+    final transient private IntegerProperty minFragSize = new SimpleIntegerProperty(Default.MINIMUM_FRAGMENT_SIZE);
 
     private IntegerProperty minFragSizeProperty() {
         return minFragSize;
@@ -276,10 +239,6 @@ public class GopherMainController implements Initializable {
 
     private void setMaxRepeatContent(double r) {
         this.maxRepeatContent.set(r);
-    }
-
-    private DoubleProperty maxRepeatContentProperty() {
-        return maxRepeatContent;
     }
 
     final transient private IntegerProperty maxMeanKmerAlignability = new SimpleIntegerProperty();
@@ -296,43 +255,21 @@ public class GopherMainController implements Initializable {
         return maxMeanKmerAlignability;
     }
 
-    final transient private IntegerProperty minBaitCount = new SimpleIntegerProperty();
-
-    private int getMinimumBaitCount() {
-        return minBaitCount.get();
-    }
-
-    private void setMinimumBaitCount(int bc) {
-        this.minBaitCount.set(bc);
-    }
+    final transient private IntegerProperty minBaitCount = new SimpleIntegerProperty(Default.MIN_BAIT_NUMBER);
 
     private IntegerProperty minimumBaitCountProperty() {
         return minBaitCount;
-    }
+   }
 
-    final transient private IntegerProperty baitLength = new SimpleIntegerProperty();
-
-    private int getBaitLength() {
-        return baitLength.get();
-    }
-
-    private void setBaitLength(int len) {
-        this.baitLength.set(len);
-    }
+    final transient private IntegerProperty baitLength = new SimpleIntegerProperty(Default.BAIT_LENGTH);
 
     private IntegerProperty baitLengthProperty() {
         return baitLength;
     }
 
-    final transient private IntegerProperty marginLength = new SimpleIntegerProperty();
+    final transient private IntegerProperty marginLength = new SimpleIntegerProperty(Default.MARGIN_SIZE);
 
-    private int getMarginLength() {
-        return marginLength.get();
-    }
 
-    private void setMarginLength(int len) {
-        this.marginLength.set(len);
-    }
 
     private IntegerProperty marginLengthProperty() {
         return marginLength;
@@ -485,7 +422,6 @@ public class GopherMainController implements Initializable {
         } else {
             this.alignabilityDownloadPI.setProgress(0.0);
         }
-
         if (gopherService.isGenomeIndexed()) {
             this.genomeIndexPI.setProgress(1.00);
         } else {
@@ -503,6 +439,8 @@ public class GopherMainController implements Initializable {
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
+        if (this.primaryStage != null)
+            this.primaryStage.setTitle(String.format("GOPHER: %s", gopherService.getProjectName()));
     }
 
 
@@ -537,9 +475,9 @@ public class GopherMainController implements Initializable {
         this.tabpane.getTabs().removeAll(tabsToBeRemoved);
         LOGGER.info("Starting new project with name {}", newProjectName);
         gopherService.setProjectName(newProjectName);
+        initializeNewModelInGui();
         if (this.primaryStage != null)
             this.primaryStage.setTitle(String.format("GOPHER: %s", newProjectName));
-        initializeNewModelInGui();
     }
 
 
@@ -555,7 +493,7 @@ public class GopherMainController implements Initializable {
         this.minFragSizeTextField.setPromptText(String.format("%d", Default.MINIMUM_FRAGMENT_SIZE));
         this.maxKmerAlignabilityTextField.setPromptText(String.format("%d", Default.MAXIMUM_KMER_ALIGNABILITY));
         this.marginSizeTextField.setPromptText(String.valueOf(Default.MARGIN_SIZE));
-        this.baitLengthTextField.setPromptText(String.valueOf(Default.PROBE_LENGTH));
+        this.baitLengthTextField.setPromptText(String.valueOf(Default.BAIT_LENGTH));
     }
 
     /**
@@ -574,6 +512,8 @@ public class GopherMainController implements Initializable {
         this.maxKmerAlignabilityTextField.setText(null);
         this.marginSizeTextField.setText(null);
         this.baitLengthTextField.setText(null);
+        if (this.primaryStage != null)
+            this.primaryStage.setTitle(String.format("GOPHER"));
     }
 
     /**
@@ -652,9 +592,9 @@ public class GopherMainController implements Initializable {
      * been filled in by the user.
      */
     private void updateModel() {
-        this.gopherService.setSizeDown(getSizeDown() > 0 ? getSizeDown() : Default.SIZE_DOWNSTREAM);
-        this.gopherService.setSizeUp(getSizeUp() > 0 ? getSizeUp() : Default.SIZE_UPSTREAM);
-        this.gopherService.setMinFragSize(getMinFragSize() > 0 ? getMinFragSize() : Default.MINIMUM_FRAGMENT_SIZE);
+        this.gopherService.setSizeDown(sizeDown.get() > 0 ? sizeDown.get() : Default.SIZE_DOWNSTREAM);
+        this.gopherService.setSizeUp(sizeUp.get() > 0 ? sizeUp.get() : Default.SIZE_UPSTREAM);
+        this.gopherService.setMinFragSize(minFragSize.get() > 0 ? minFragSize.get() : Default.MINIMUM_FRAGMENT_SIZE);
         double repeatProportion = getMaxRepeatContent() / 100;
         this.gopherService.setMaxRepeatContent(repeatProportion > 0 ? repeatProportion : Default.MAXIMUM_KMER_ALIGNABILITY);
         double minGCproportion = percentageToProportion(this.minGCContentTextField.getText());
@@ -663,11 +603,10 @@ public class GopherMainController implements Initializable {
         this.gopherService.setMaxGCcontent(maxGCproportion > 0 ? maxGCproportion : Default.MAX_GC_CONTENT);
         int kmerAlign = getMaxMeanKmerAlignability() > 0 ? getMaxMeanKmerAlignability() : Default.MAXIMUM_KMER_ALIGNABILITY;
         this.gopherService.setMaxMeanKmerAlignability(kmerAlign);
-        int minbait = getMinimumBaitCount() > 0 ? getMinimumBaitCount() : Default.MIN_BAIT_NUMBER;
-        this.gopherService.setMinBaitCount(minbait);
-        int baitlen = getBaitLength() > 0 ? getBaitLength() : Default.PROBE_LENGTH;
+        this.gopherService.setMinBaitCount(minBaitCount.get() > 0 ? minBaitCount.get() : Default.MIN_BAIT_NUMBER);
+        int baitlen = baitLength.get() > 0 ? baitLength.get() : Default.BAIT_LENGTH;
         this.gopherService.setProbeLength(baitlen);
-        int marginsize = getMarginLength() > 0 ? getMarginLength() : Default.MARGIN_SIZE;
+        int marginsize = marginLength.get() > 0 ? marginLength.get() : Default.MARGIN_SIZE;
         this.gopherService.setMarginSize(marginsize);
 
     }
@@ -1228,6 +1167,7 @@ public class GopherMainController implements Initializable {
      */
     @FXML
     void setProxyDialog(ActionEvent e) {
+        e.consume();
         Dialog<ProxyResults> dialog = new Dialog<>();
         dialog.setTitle("Set Proxy");
         dialog.setHeaderText("Please specify…");
@@ -1482,6 +1422,7 @@ public class GopherMainController implements Initializable {
      * @param e Event triggered by close command.
      */
     public void closeWindow(ActionEvent e) {
+        e.consume();
         if (gopherService.isClean()) {
             boolean answer = PopupFactory.confirmQuitDialog("Alert", "Are you sure you want to quit?");
             if (answer) {

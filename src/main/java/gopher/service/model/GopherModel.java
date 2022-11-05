@@ -312,7 +312,7 @@ public class GopherModel implements Serializable {
     private String chromInfoPathIncludingFileNameGz = null;
 
     /** The length of a probe that will be used to enrich a restriction digest within a viewpoint. */
-    private int probeLength=Default.PROBE_LENGTH;
+    private int probeLength=Default.BAIT_LENGTH;
     public int getProbeLength() { return probeLength; }
     public void setProbeLength(Integer probeLength) {this.probeLength=probeLength; clean=false;}
 
