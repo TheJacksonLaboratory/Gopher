@@ -393,10 +393,17 @@ public class GopherServiceImpl implements GopherService, Serializable {
     @Override
     public String getProjectName(boolean removeSuffix) {
         String projectName = model.getProjectName();
+        if (projectName == null) return "";
         if (removeSuffix) {
             projectName = projectName.replace(".ser", "");
         }
         return projectName;
+    }
+
+    @Override
+    public String getProjectTitle() {
+        String projectName = getProjectName(true);
+        return "Gopher: " + projectName;
     }
 
     @Override

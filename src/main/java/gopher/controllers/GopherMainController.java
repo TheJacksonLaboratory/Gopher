@@ -1319,6 +1319,8 @@ public class GopherMainController implements Initializable {
     public void importProjectFromFileMenu(ActionEvent e) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open Gopher project file");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Gopher Files", "*.ser"));
         File file = chooser.showOpenDialog(null);
         if (file == null) { //Null pointer returned if user clicks on cancel. In this case, just do nothing.
             return;

@@ -34,6 +34,8 @@ public interface GopherService {
     String getProjectName();
     String getProjectName(boolean removeSuffix);
 
+    String getProjectTitle();
+
     void setModel(GopherModel mod);
 
     int getSizeUp();
