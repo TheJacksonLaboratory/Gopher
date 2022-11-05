@@ -15,12 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProbeFactoryTest {
 
     private static Segment testSeg = null;
-    private static IndexedFastaSequenceFile FastaReader;
-    private static AlignabilityMap alignMap;
 
     @BeforeAll
     public static void setup() throws Exception {
-
         // create AlignabilityMap object for testing
         //testMap = new AlignabilityMap(, ,50);
         String alignabilitypath="src/test/resources/testAlignabilityMap/testAlignabilityMap.bedgraph.gz";
@@ -30,7 +27,6 @@ public class ProbeFactoryTest {
         while (iterator.hasNext()) {
             AlignabilityMap c2amap=iterator.next();
             if (c2amap.getChromName().equals("chr1")) {
-                alignMap = c2amap;
                 break;
             }
         }
@@ -39,10 +35,10 @@ public class ProbeFactoryTest {
         ClassLoader classLoader = SegmentTest.class.getClassLoader();
         //String testFastaFile = classLoader.getResource("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa").getFile();
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
-        FastaReader = new IndexedFastaSequenceFile(fasta);
+        IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(fasta);
 
         testSeg = new Segment.Builder("chr1",900,2002).
-                fastaReader(FastaReader).
+                fastaReader(fastaReader).
                 marginSize(20).
                 build();
     }
