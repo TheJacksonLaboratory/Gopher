@@ -1494,6 +1494,9 @@ public class GopherMainController implements Initializable {
     }
 
 
+    public void calculateBaitQualityAllEnzymes(ActionEvent actionEvent) {
+        var bqae = new BaitQualityAllEnzymes();
+    }
 }
 
 

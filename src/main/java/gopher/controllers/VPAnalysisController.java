@@ -234,30 +234,30 @@ public class VPAnalysisController implements Initializable {
             }
         }
         LOGGER.trace("openTabs does not contain Key: {}", vp.getTargetName());
-            final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
-            tab.setId(vp.getTargetName());
-            tab.setClosable(true);
-            tab.setOnClosed(event -> {
-                if (tabpane.getTabs()
-                        .size() == 2) {
-                    event.consume();
-                }
-            });
+        final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
+        tab.setId(vp.getTargetName());
+        tab.setClosable(true);
+        tab.setOnClosed(event -> {
+            if (tabpane.getTabs()
+                    .size() == 2) {
+                event.consume();
+            }
+        });
 
-            tab.setOnCloseRequest((e) -> {
-                for (ViewPoint vpnt : this.openTabs.keySet()) {
-                    Tab t = this.openTabs.get(vpnt);
-                    if (t.equals(tab)) {
-                        this.openTabs.remove(vpnt);
-                    }
+        tab.setOnCloseRequest((e) -> {
+            for (ViewPoint vpnt : this.openTabs.keySet()) {
+                Tab t = this.openTabs.get(vpnt);
+                if (t.equals(tab)) {
+                    this.openTabs.remove(vpnt);
                 }
-            });
+            }
+        });
 
-            ViewpointScrollPane vpsp = new ViewpointScrollPane(vp, this);
-            tab.setContent(vpsp);
-            this.tabpane.getTabs().add(tab);
-            this.tabpane.getSelectionModel().select(tab);
-            openTabs.put(vp, tab);
+        ViewpointScrollPane vpsp = new ViewpointScrollPane(vp, this);
+        tab.setContent(vpsp);
+        this.tabpane.getTabs().add(tab);
+        this.tabpane.getSelectionModel().select(tab);
+        openTabs.put(vp, tab);
 
     }
 
@@ -362,8 +362,7 @@ public class VPAnalysisController implements Initializable {
                 Integer d2 = Integer.parseInt(s2);
                 return d1.compareTo(d2);
             } catch (Exception e) {
-                LOGGER.error(String.format("Error encounted while sorting integer values %s and %s", s1, s2));
-                LOGGER.error("Error: {}", e.getMessage());
+                LOGGER.error("Error encounted while sorting integer values {} and {}: {}", s1, s2, e.getMessage());
                 return 0;
             }
         }
