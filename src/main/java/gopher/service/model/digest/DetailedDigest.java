@@ -44,4 +44,30 @@ public record DetailedDigest(String chromosome,
                 nProbes5prime(),
                 nProbes3prime());
     }
+
+
+    private static final String[] headerFields = {
+            "Chromosome",
+            "Digest_Start_Position",
+            "Digest_End_Position",
+            "Digest_Number",
+            "5'_Restriction_Site",
+            "3'_Restriction_Site",
+            "Length",
+            "5'_GC_Content",
+            "3'_GC_Content",
+            "5'_Repeat_Content",
+            "3'_Repeat_Content",
+            "Enrichment_status",
+            "5'_Probes",
+            "3'_Probes"
+    };
+
+    /**
+     * @return List of fields for the output file with the detailed digest information (each line of the file corresponds to one {@link DetailedDigest} object)
+     */
+    public static String[] headerFields() {
+        return headerFields;
+    }
+
 }
