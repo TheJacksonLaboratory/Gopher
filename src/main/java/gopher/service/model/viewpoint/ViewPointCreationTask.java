@@ -58,7 +58,8 @@ public abstract class ViewPointCreationTask extends Task<Void> {
             logger.error("Unable to retrieve list of chosen restriction enzymes");
             return;
         } else {
-            logger.trace(String.format("Setting up viewpoint creation for %d enzymes", chosen.size()));
+            String enzymes = chosen.stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(";"));
+            logger.trace(String.format("Setting up viewpoint creation for %d enzymes: %s", chosen.size(), enzymes));
         }
         for (RestrictionEnzyme re : chosen) {
             String site = re.getPlainSite();

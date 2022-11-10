@@ -1,11 +1,15 @@
-package gopher.gui.factories;
+package gopher.controllers;
 
+import gopher.gui.factories.PopupFactory;
+import gopher.gui.factories.ProjectFile;
 import gopher.service.GopherService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,15 +18,22 @@ import javafx.stage.Stage;
 import gopher.io.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class DeleteFactory {
+@Component
+@Scope("prototype")
+public class DeleteFactory implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(DeleteFactory.class.getName());
+    public TableColumn projectFileColumn;
 
     /** This causes the gene upload window to be displayed with an introductory text. */
     public static void display(GopherService model) {
@@ -31,7 +42,7 @@ public class DeleteFactory {
         window = new Stage();
         window.setOnCloseRequest( event -> window.close());
         window.setTitle(windowTitle);
-        List<ProjectFile> projects = getProjectFiles(model);
+
         ClassPathResource deleteResource = new ClassPathResource("fxml/delete.fxml");
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(deleteResource.getURL());
@@ -41,10 +52,6 @@ public class DeleteFactory {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    public void deleteFilesAtUserRequest() {
         Label deleteLabel;
         Label undoneLabel;
         TableView<ProjectFile> tableView = new TableView<>();
@@ -74,7 +81,8 @@ public class DeleteFactory {
         List<String> files = getProjectFiles();
         List<ProjectFile> projectFiles = files.stream().map(ProjectFile::new).toList();
         ObservableList<ProjectFile> obsProjs = FXCollections.observableArrayList();
-        obsProjs.addAll(projectFiles);
+        List<ProjectFile> projects = getProjectFiles(model);
+        obsProjs.addAll(projects);
         tableView.getItems().clear();
         tableView.getItems().addAll(obsProjs);
         tableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -118,5 +126,15 @@ public class DeleteFactory {
             }
         }
         return files;
+    }
+
+    public void closeButtonClicked(ActionEvent e) {
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        System.setProperty("jsse.enableSNIExtension", "false");
+
+
     }
 }
