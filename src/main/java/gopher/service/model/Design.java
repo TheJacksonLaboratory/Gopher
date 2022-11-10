@@ -48,7 +48,9 @@ public class Design {
     /** NUmber of viewpoints with more than one digest (only applies to simple approach).*/
     private int n_patched_viewpoints;
 
-    private final GopherService service;
+    private final int probelen;
+
+    private final List<ViewPoint> viewPointList;
 
     private final Approach approach;
 
@@ -94,8 +96,16 @@ public class Design {
 
     @Autowired
     public Design(GopherService service) {
-        this.service = service;
+        this.viewPointList = service.getViewPointList();
+        this.probelen = service.getProbeLength();
         this.approach = service.getApproach();
+        LOGGER.info("Viewpoints: n={}, problen={}, approach={}", viewPointList.size(), probelen, approach);
+    }
+
+    public Design(List<ViewPoint> vpList, int probelen) {
+        this.viewPointList = vpList;
+        this.probelen = probelen;
+        this.approach = Approach.SIMPLE;
     }
 
 
@@ -103,11 +113,10 @@ public class Design {
     private void calculateEstimatedProbeNumber() {
         int nProbes = 0;
         n_nucleotides_in_unique_fragment_margins =0;// total length in nt of all unique probes
-        int probelen = service.getProbeLength();
         double RC=0d;
         int N=0;
         Set<String> uniqueFragmentMargins = new HashSet<>();
-        for (ViewPoint vp : service.getViewPointList()) {
+        for (ViewPoint vp : this.viewPointList) {
             if (vp.getNumOfSelectedFrags() == 0) {
                 continue;
             }
@@ -130,7 +139,7 @@ public class Design {
         }
         n_estimatedProbeCount = nProbes;
         RC /= N;
-        n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / service.getProbeLength();
+        n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / this.probelen;
     }
 
 
@@ -142,10 +151,6 @@ public class Design {
         Set<String> genesWithValidViewPoint = new HashSet<>(); // set of genes with at least one valid viewpoint
         // valid is defined as with at least one active segment
         n_resolvedViewpoints = 0;
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        //System.out.println(viewPointList.size());
-        int probeLength = service.getProbeLength();
-
         Set<Segment> uniqueRestrictionFragments = new HashSet<>();
         Set<String> uniqueGeneSymbols = new HashSet<>();
         avgVPscore = 0.0;
@@ -156,7 +161,7 @@ public class Design {
         if (viewPointList == null) {
             return;
         }
-        viewPointList.forEach(vp -> {
+        this.viewPointList.forEach(vp -> {
             uniqueRestrictionFragments.addAll(vp.getActiveSegments());
             uniqueGeneSymbols.add(vp.getTargetName());
             avgVPscore += vp.getScore();
@@ -183,7 +188,7 @@ public class Design {
         this.n_nucleotides_in_unique_fragment_margins = 0;
 
         uniqueRestrictionFragments.forEach(segment ->
-            n_nucleotides_in_unique_fragment_margins += Math.min(2 * probeLength, segment.length())
+            n_nucleotides_in_unique_fragment_margins += Math.min(2 * this.probelen, segment.length())
         );
         if (n_viewpoints > 0) {
             this.avgFragmentsPerVP = (double) n_unique_fragments / (double) n_viewpoints;
@@ -203,8 +208,7 @@ public class Design {
     public Integer getTotalNumOfUniqueBaits() {
         // get rid of redundant segments emerging from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for(ViewPoint vp : viewPointList) {
+        for(ViewPoint vp : this.viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number of baits
@@ -218,8 +222,7 @@ public class Design {
     public Integer getCaptureSize() {
         // get rid of redundant segments arising from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for(ViewPoint vp : viewPointList) {
+        for(ViewPoint vp : this.viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number of covered positions
@@ -246,8 +249,7 @@ public class Design {
     public Integer getTotalNumBalancedDigests() {
         // get rid of redundant segments emerging from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for (ViewPoint vp : viewPointList) {
+        for (ViewPoint vp : this.viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number balanced
@@ -263,8 +265,7 @@ public class Design {
     public int getTotalNumUnbalancedDigests() {
         // get rid of redundant segments emerging from overlapping viewpoints
         Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for (ViewPoint vp : viewPointList) {
+        for (ViewPoint vp : this.viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
         // count number balanced
