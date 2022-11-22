@@ -295,45 +295,7 @@ public class VPAnalysisController implements Initializable {
     private Map<String, String> createListViewContent() {
         Design design = new Design(this.gopherService);
         design.calculateDesignParameters();
-        Map<String, String> listItems = new LinkedHashMap<>();
-
-        int ngenes = design.getN_genes();
-        int resolvedGenes = design.getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
-        listItems.put("Genes", geneV);
-
-        int nviewpoints = design.getN_viewpoints();
-        int resolvedVP = design.getN_resolvedViewpoints();
-        double avVpSize = design.getAvgVPsize();
-        double avgVpScore = design.getAvgVPscore();
-        String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
-                nviewpoints, resolvedVP);
-        if (gopherService.getApproach().equals(Approach.SIMPLE)) {
-            int n_patched = design.getN_patched_viewpoints();
-            vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
-        }
-        listItems.put("Viewpoints", vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
-                avVpSize, 100 * avgVpScore);
-        listItems.put(" ", vpointV2);
-
-        int nfrags = design.getN_unique_fragments();
-        double avg_n_frag = design.getAvgFragmentsPerVP();
-        String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
-                nfrags, avg_n_frag);
-        listItems.put("Digests", fragmentV);
-
-        int n_balancedDigests = design.getTotalNumBalancedDigests();
-        int n_unbalanced = design.getTotalNumUnbalancedDigests();
-
-
-        listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
-
-        int n_baits = design.getTotalNumOfUniqueBaits();
-        Double captureSize = design.getCaptureSize() / 1000000.0;
-        String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
-        listItems.put("Probes", baitV);
-        return listItems;
+        return design.getDesignStatisticsList();
     }
 
 
