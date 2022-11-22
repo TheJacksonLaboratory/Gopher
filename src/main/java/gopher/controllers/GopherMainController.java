@@ -3,7 +3,6 @@ package gopher.controllers;
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
-import gopher.gui.factories.DeleteFactory;
 import gopher.gui.factories.EnzymeViewFactory;
 import gopher.gui.factories.HelpViewFactory;
 import gopher.gui.factories.QCCheckFactory;
@@ -1494,8 +1493,14 @@ public class GopherMainController implements Initializable {
     }
 
 
-    public void calculateBaitQualityAllEnzymes(ActionEvent actionEvent) {
-        var bqae = new BaitQualityAllEnzymes();
+    public void calculateBaitQualityAllEnzymes(ActionEvent e) {
+        e.consume();
+        String refgenepath = gopherService.getRefGenePath();
+        if (refgenepath == null) {
+            LOGGER.error("Could not retrieve refgene path");
+            return;
+        }
+        var bqae = new BaitQualityAllEnzymes(gopherService.getRefGenePath());
     }
 }
 

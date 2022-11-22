@@ -48,9 +48,6 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
             stage.setScene(new Scene(parent, 1200, 900));
             stage.setResizable(true);
             stage.setTitle(applicationProperties.getApplicationUiTitle());
-            GopherMainController mc = fxmlLoader.getController();
-            mc.setPrimaryStageReference(stage);
-           // applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
             readAppIcon().ifPresent(stage.getIcons()::add);
             stage.show();
         } catch (IOException e) {
