@@ -47,6 +47,7 @@
                  <Menu mnemonicParsing="false" text="Export">
                      <MenuItem mnemonicParsing="false" onAction="#displayReport" text="Display report" />
                      <MenuItem mnemonicParsing="false" onAction="#exportReport" text="Export report" />
+                     <MenuItem mnemonicParsing="false" onAction="#exportDesignStats" text="Export design statistics" />
                <SeparatorMenuItem mnemonicParsing="false" />
                      <MenuItem mnemonicParsing="false" onAction="#exportBEDFiles" text="Save BED files as ..." />
                      <MenuItem mnemonicParsing="false" onAction="#saveDigestFileAs" text="Save digest file as ..." />

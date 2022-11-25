@@ -138,6 +138,14 @@ public class Segment implements Serializable {
      */
     public void setStartPos(Integer startPos) { this.startPos=startPos; }
 
+    public double getGCcontentDown() {
+        return GCcontentDown;
+    }
+
+    public double getGCcontentUp() {
+        return GCcontentUp;
+    }
+
     /** @return Starting position of the Segment. */
     public Integer getStartPos() {
         return startPos;

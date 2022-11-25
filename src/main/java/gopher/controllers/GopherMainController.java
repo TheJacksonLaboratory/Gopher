@@ -50,9 +50,13 @@ import org.springframework.stereotype.Component;
 
 
 import javax.swing.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static gopher.configuration.GopherConfig.GENOME_DOWNLOAD_DIRECTORY;
 import static javafx.application.Platform.runLater;
@@ -1501,6 +1505,31 @@ public class GopherMainController implements Initializable {
             return;
         }
         var bqae = new BaitQualityAllEnzymes(gopherService.getRefGenePath());
+    }
+
+    public void exportDesignStats(ActionEvent actionEvent) {
+        Design design = new Design(this.gopherService);
+        design.calculateDesignParameters();
+        var map = design.getDesignStatisticsList();
+        String enz = this.gopherService.getChosenEnzymelist().stream()
+                .map(RestrictionEnzyme::getName)
+                .collect(Collectors.joining("-"));
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        String filename = "gopher-design-" + enz + ".tsv";
+        chooser.setInitialFileName(filename);
+        File file = chooser.showSaveDialog(this.primaryStage);
+        if (file == null) {
+            PopupFactory.displayError("Error", "Could not get filename for saving report");
+            return;
+        }
+        try (BufferedWriter w = new BufferedWriter(new FileWriter(file))) {
+            for (var e : map.entrySet()) {
+                w.write(String.format("%s\t%s\n", e.getKey(), e.getValue()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
