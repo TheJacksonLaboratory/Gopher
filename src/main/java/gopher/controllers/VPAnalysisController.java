@@ -1,6 +1,7 @@
 package gopher.controllers;
 
 import gopher.gui.factories.PopupFactory;
+import gopher.service.DesignItem;
 import gopher.service.GopherService;
 import gopher.service.model.Approach;
 import gopher.service.model.Design;
@@ -10,6 +11,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -40,16 +42,13 @@ public class VPAnalysisController implements Initializable {
      * reference to a Tab that has been opened for it.
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
+    public TableView<DesignItem> designTableView;
+    public TableColumn<DesignItem, String> designKeyTableColumn;
+    public TableColumn<DesignItem, String> designValueTableColumn;
 
-    @FXML
-    private ScrollPane VpAnalysisScrollPane;
+//    @FXML
+//    private ScrollPane VpAnalysisScrollPane;
 
-    @FXML
-    private HBox listviewHbox;
-    @FXML
-    private ListView<String> lviewKey;
-    @FXML
-    private ListView<String> lviewValue;
 
     @FXML
     private TableView<ViewPoint> viewPointTableView;
@@ -78,10 +77,8 @@ public class VPAnalysisController implements Initializable {
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
     private final ObservableList<ViewPoint> observableViewPointList = FXCollections.observableArrayList();
-    private final ObservableList<String> summaryTableKeys = FXCollections.observableArrayList();
-    private final ObservableList<String> summaryTablevalues = FXCollections.observableArrayList();
 
-
+    private final ObservableList<DesignItem> designItemList = FXCollections.observableArrayList();
     /**
      * A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
      * UCSC browser.
@@ -98,10 +95,23 @@ public class VPAnalysisController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.setProperty("jsse.enableSNIExtension", "false");
-        HBox.setHgrow(lviewValue, Priority.ALWAYS);
+        initDesignTable();
         initTable();
-        this.lviewKey.setItems(summaryTableKeys);
-        this.lviewValue.setItems(summaryTablevalues);
+    }
+
+
+    private void initDesignTable() {
+        designKeyTableColumn.setSortable(false);
+        designValueTableColumn.setSortable(false);
+        designKeyTableColumn.setCellValueFactory(cdf -> {
+            DesignItem item = cdf.getValue();
+            return new ReadOnlyStringWrapper(item.getKey());
+        });
+        designValueTableColumn.setCellValueFactory(cdf -> {
+            DesignItem item = cdf.getValue();
+            return new ReadOnlyStringWrapper(item.getValue());
+        });
+        designTableView.setItems(designItemList);
     }
 
     /**
@@ -282,9 +292,9 @@ public class VPAnalysisController implements Initializable {
 
 
     public void updateListView() {
-        Map<String, String> summaryMap = createListViewContent();
-        summaryTableKeys.setAll(summaryMap.keySet());
-        summaryTablevalues.setAll(summaryMap.values());
+        List<DesignItem> designItemList2 = createListViewContent();
+        this.designTableView.getItems().clear();
+        this.designTableView.getItems().addAll(designItemList2);
     }
 
     /**
@@ -292,10 +302,14 @@ public class VPAnalysisController implements Initializable {
      *
      * @return Map with info about the panel design
      */
-    private Map<String, String> createListViewContent() {
+    private List<DesignItem> createListViewContent() {
         Design design = new Design(this.gopherService);
         design.calculateDesignParameters();
-        return design.getDesignStatisticsList();
+        List<DesignItem> designItemList = new ArrayList<>();
+        for (var e :  design.getDesignStatisticsList().entrySet()) {
+            designItemList.add(new DesignItem(e.getKey(), e.getValue()));
+        }
+        return designItemList;
     }
 
 
