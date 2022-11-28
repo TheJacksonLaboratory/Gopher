@@ -400,13 +400,17 @@ public class GopherMainController implements Initializable {
     private void setInitializedValuesInGUI() {
         String path_to_downloaded_genome_directory = gopherService.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory != null) {
+            LOGGER.trace("Setting GUI display for genome_directory {}", path_to_downloaded_genome_directory);
             this.genomeDownloadPI.setProgress(1.00);
         } else {
+            LOGGER.trace("Setting GUI display - genome directory not initialized");
             this.genomeDownloadPI.setProgress(0);
         }
         if (gopherService.isGenomeUnpacked()) {
+            LOGGER.trace("Setting GUI display - genome is unpacked");
             this.genomeDecompressPI.setProgress(1.00);
         } else {
+            LOGGER.trace("Setting GUI display - genome is not unpacked");
             this.genomeDecompressPI.setProgress(0.0);
         }
         String refGenePath = gopherService.getRefGenePath();
@@ -632,13 +636,18 @@ public class GopherMainController implements Initializable {
      * @param build Name of genome build.
      */
     private void setGenomeBuild(String build) {
+        // if we are changing the build, then reset the GUI
+        String previousBuild = this.gopherService.getGenomeBuild();
+        if (previousBuild != null && ! previousBuild.equals(build)) {
+            LOGGER.info("Chaging genome build from {} to {}", previousBuild, build);
+            this.transcriptDownloadPI.setProgress(0.0);
+            this.alignabilityDownloadPI.setProgress(0.0);
+            this.genomeDownloadPI.setProgress(0.0);
+            this.genomeIndexPI.setProgress(0.0);
+            this.genomeDecompressPI.setProgress(0.0);
+        }
         LOGGER.info("Setting genome build to " + build);
         this.gopherService.setGenomeBuild(build);
-        this.transcriptDownloadPI.setProgress(0.0);
-        this.alignabilityDownloadPI.setProgress(0.0);
-        this.genomeDownloadPI.setProgress(0.0);
-        this.genomeIndexPI.setProgress(0.0);
-        this.genomeDecompressPI.setProgress(0.0);
     }
 
     /**
@@ -1494,17 +1503,6 @@ public class GopherMainController implements Initializable {
     private void setAllowPatching(ActionEvent e) {
         this.gopherService.setAllowPatching(patchedViewpointCheckbox.isSelected());
         e.consume();
-    }
-
-
-    public void calculateBaitQualityAllEnzymes(ActionEvent e) {
-        e.consume();
-        String refgenepath = gopherService.getRefGenePath();
-        if (refgenepath == null) {
-            LOGGER.error("Could not retrieve refgene path");
-            return;
-        }
-        var bqae = new BaitQualityAllEnzymes(gopherService.getRefGenePath());
     }
 
     public void exportDesignStats(ActionEvent actionEvent) {
