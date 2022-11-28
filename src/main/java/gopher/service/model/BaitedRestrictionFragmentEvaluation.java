@@ -66,7 +66,7 @@ public class BaitedRestrictionFragmentEvaluation {
         highGc = (n_bait_upstream > 0 && gcContentUp > 0.5) || (n_bait_downstream > 0 && gcContentDown > 0.5);
     }
 
-    public boolean isWellPlacedGcNotHigh() {
+    public boolean isWellPlacedNotShifted() {
         return wellPlacedGcNotHigh;
     }
 
@@ -85,7 +85,8 @@ public class BaitedRestrictionFragmentEvaluation {
 
     public static int getGoodQualityFragmentCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(BaitedRestrictionFragmentEvaluation::isWellPlacedGcNotHigh)
+                .filter(BaitedRestrictionFragmentEvaluation::isWellPlacedNotShifted)
+                .filter(Predicate.not(BaitedRestrictionFragmentEvaluation::isHighGc))
                 .count();
     }
 
