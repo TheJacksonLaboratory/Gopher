@@ -34,7 +34,7 @@
         <jackson.fasterxml.version>2.11.4</jackson.fasterxml.version>
         <slf4j.version>1.7.30</slf4j.version>
         <commons.io.version>2.8.0</commons.io.version>
-        <htsjdk.version>3.0.0</htsjdk.version>
+        <htsjdk.version>3.0.1</htsjdk.version>
     </properties>
 
     <dependencies>
