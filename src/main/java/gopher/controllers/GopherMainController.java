@@ -1403,11 +1403,7 @@ public class GopherMainController implements Initializable {
             popup.close();
         });
         downloadTask.setOnFailed(e -> LOGGER.error("Download of regulatory build failed"));
-        try {
-            popup.startProgress(downloadTask);
-        } catch (InterruptedException e) {
-            PopupFactory.displayException("Error", "Could not download regulatory build", e);
-        }
+        popup.startProgress(downloadTask);
         event.consume();
     }
 

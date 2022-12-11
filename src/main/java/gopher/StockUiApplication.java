@@ -22,7 +22,6 @@ package gopher;
 
 import com.sun.javafx.application.LauncherImpl;
 import gopher.gui.util.MyPreloader;
-import javafx.application.Preloader;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 

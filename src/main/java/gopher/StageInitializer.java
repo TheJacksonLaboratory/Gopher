@@ -2,7 +2,6 @@ package gopher;
 
 
 import gopher.configuration.ApplicationProperties;
-import gopher.controllers.GopherMainController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

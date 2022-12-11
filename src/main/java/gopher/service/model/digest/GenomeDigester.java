@@ -74,9 +74,8 @@ public class GenomeDigester {
     /**
      * @param scaffoldName name of chromosome or alt scaffold
      * @param sequence     DNA sequence of the chromosome
-     * @throws IOException can be thrown by the BufferedWriter.
      */
-    public List<DetailedDigest> cutOneChromosome(String scaffoldName, String sequence) throws IOException {
+    public List<DetailedDigest> cutOneChromosome(String scaffoldName, String sequence) {
         ImmutableList.Builder<Digest> builder = new ImmutableList.Builder<>();
         for (Map.Entry<RestrictionEnzyme, Integer> ent : enzyme2number.entrySet()) {
             int enzymeNumber = ent.getValue();

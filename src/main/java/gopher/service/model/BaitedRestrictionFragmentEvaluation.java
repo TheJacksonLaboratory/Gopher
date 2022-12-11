@@ -3,15 +3,20 @@ package gopher.service.model;
 import gopher.service.model.viewpoint.Segment;
 
 import java.util.List;
-import java.util.function.Predicate;
 
+/**
+ * This class evaluates each baited restriction fragment with respect to unilateral baits, shifted baits, and
+ * high GC content, and also provides a method that reports of the restriction fragment has high-quality bilateral
+ * baits that do not have a too high GC content: {@link #wellPlacedHighQuality}.
+ * @author  Peter N Robinson
+ */
 public class BaitedRestrictionFragmentEvaluation {
 
     /**
      * If true, then the baits for this restriction fragment are well placed (two baits, both not shifted)
      * and the GC content is not over 50%
      */
-    final boolean wellPlacedGcNotHigh;
+    final boolean wellPlacedHighQuality;
     /**
      * If true, one side has zero baits
      */
@@ -43,31 +48,27 @@ public class BaitedRestrictionFragmentEvaluation {
         this.n_bait_upstream = segment.getBaitNumUp();
         this.n_bait_downstream = segment.getBaitNumDown();
         // check if one or two baits is shifted
-        int shifted = 0;
         int downstreamPos = segment.getEndPos();
-        for (var bait : segment.getBaitsForDownstreamMargin()) {
-            if (bait.getEndPos() != segment.getEndPos()) {
-                shifted++;
-            }
-        }
-        n_downstream_shifted = shifted;
-        shifted = 0;
-        for (var bait : segment.getBaitsForUpstreamMargin()) {
-            if (bait.getStartPos() != segment.getStartPos()) {
-                shifted++;
-            }
-        }
-        n_upstream_shifted = shifted;
+        n_downstream_shifted = (int)  segment.getBaitsForDownstreamMargin()
+                .stream()
+                .filter(bait -> bait.getEndPos() != downstreamPos)
+                .count();
+        int upstreamPos = segment.getStartPos();
+        n_upstream_shifted = (int) segment.getBaitsForUpstreamMargin()
+                .stream()
+                .filter(bait -> bait.getStartPos() != upstreamPos)
+                .count();
         gcContentDown = segment.getGCcontentDown();
         gcContentUp = segment.getGCcontentUp();
-
-        wellPlacedGcNotHigh = n_bait_upstream > 0 && n_bait_downstream > 0 && n_downstream_shifted == 0 && n_upstream_shifted ==0;
         unilateralBait = n_bait_upstream == 0 || n_bait_downstream == 0;
         highGc = (n_bait_upstream > 0 && gcContentUp > 0.5) || (n_bait_downstream > 0 && gcContentDown > 0.5);
+        wellPlacedHighQuality = (! unilateralBait) &&
+                (n_downstream_shifted + n_upstream_shifted == 0) &&
+                (! highGc);
     }
 
-    public boolean isWellPlacedNotShifted() {
-        return wellPlacedGcNotHigh;
+    public boolean isWellPlacedHighQuality() {
+        return wellPlacedHighQuality;
     }
 
     public boolean isUnilateralBait() {
@@ -85,8 +86,7 @@ public class BaitedRestrictionFragmentEvaluation {
 
     public static int getGoodQualityFragmentCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(BaitedRestrictionFragmentEvaluation::isWellPlacedNotShifted)
-                .filter(Predicate.not(BaitedRestrictionFragmentEvaluation::isHighGc))
+                .filter(BaitedRestrictionFragmentEvaluation::isWellPlacedHighQuality)
                 .count();
     }
 
@@ -100,15 +100,12 @@ public class BaitedRestrictionFragmentEvaluation {
 
     public static int getShiftedBaitCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(Predicate.not(BaitedRestrictionFragmentEvaluation::isUnilateralBait))
                 .filter(BaitedRestrictionFragmentEvaluation::isShifted)
                 .count();
     }
 
     public static int getHighGcBaitCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(Predicate.not(BaitedRestrictionFragmentEvaluation::isUnilateralBait))
-                .filter(Predicate.not(BaitedRestrictionFragmentEvaluation::isShifted))
                 .filter(BaitedRestrictionFragmentEvaluation::isHighGc)
                 .count();
     }

@@ -80,25 +80,4 @@ public class AlignabilityMapTest {
         assertEquals(-1, scoreArray.get(1),0.001);
     }
 
-  /*  @Ignore("Test is ignored because it is only for manual checking of specified regions in real data.")
-    @Test
-    public void testGetScoreFromToRealData()  {
-        // TODO this needs to be refactored if desired!
-       // AlignabilityMap testMap2 = new AlignabilityMap("/home/peter/storage_1/VPV_data/hg19/chromInfo.txt.gz", "/home/peter/storage_1/VPV_data/hg19/hg19.100mer.alignabilityMap.bedgraph.gz", 50);
-        String chromosome = "chr3";
-        int interval_start = 856715;
-        int interval_length = 50;
-
-//        logger.trace("");
-//        logger.trace(chromosome + ":" + interval_start + "-" + (interval_start + interval_length));
-//        logger.trace("");
-//        ArrayList<Integer> scoreArray = testMap2.getScoreFromTo("chr3", interval_start,interval_start + interval_length);
-//
-//        for(int i = 0; i < scoreArray.size(); i++) {
-//            logger.trace("chr3" + "\t" + (interval_start + i -1) + "\t" + scoreArray.get(i));
-//        }
-//        logger.trace("");
-    }
-
-   */
 }

@@ -3,7 +3,6 @@ package gopher.controllers;
 import gopher.gui.factories.PopupFactory;
 import gopher.service.DesignItem;
 import gopher.service.GopherService;
-import gopher.service.model.Approach;
 import gopher.service.model.Design;
 import gopher.service.model.viewpoint.ViewPoint;
 import gopher.util.Utils;
@@ -11,12 +10,9 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +41,6 @@ public class VPAnalysisController implements Initializable {
     public TableView<DesignItem> designTableView;
     public TableColumn<DesignItem, String> designKeyTableColumn;
     public TableColumn<DesignItem, String> designValueTableColumn;
-
-//    @FXML
-//    private ScrollPane VpAnalysisScrollPane;
-
-
     @FXML
     private TableView<ViewPoint> viewPointTableView;
     @FXML

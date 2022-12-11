@@ -33,8 +33,6 @@ import java.util.ResourceBundle;
 @Scope("prototype")
 public class DeleteFactory implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(DeleteFactory.class.getName());
-    public TableColumn projectFileColumn;
-
     /** This causes the gene upload window to be displayed with an introductory text. */
     public static void display(GopherService model) {
         Stage window;

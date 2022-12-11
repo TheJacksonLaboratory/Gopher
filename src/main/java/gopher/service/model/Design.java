@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @version 0.0.2 (2017-10-17)
  */
 public class Design {
-    static Logger LOGGER = LoggerFactory.getLogger(Design.class.getName());
+    static final Logger LOGGER = LoggerFactory.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
     /** total length in nt of all unique digest margins  */
@@ -194,6 +194,7 @@ public class Design {
                 n_patched_viewpoints++;
             }
         });
+        LOGGER.trace("Obtained set of {} unique restriction fragments", uniqueRestrictionFragments.size());
 
         this.n_genes = uniqueGeneSymbols.size();
         this.n_viewpoints = viewPointList.size();

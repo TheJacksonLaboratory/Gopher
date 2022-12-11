@@ -113,14 +113,14 @@ public class Downloader extends Task<Void> {
                     threshold += block;
                 }
             }
-            LOGGER.info("Successful download from " + urlstring + ": " + (Integer.toString(totalBytesRead)) + "(" + size + ") bytes read.");
+            LOGGER.info("Successful download from " + urlstring + ": " + totalBytesRead + "(" + size + ") bytes read.");
             writer.close();
         } catch (MalformedURLException e) {
             updateProgress(0.00);
-            throw new GopherException(String.format("Malformed url: \"%s\"\n%s", urlstring, e.toString()));
+            throw new GopherException(String.format("Malformed url: \"%s\"\n%s", urlstring, e));
         } catch (IOException e) {
             updateProgress(0.00);
-            throw new GopherException(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e.toString()));
+            throw new GopherException(String.format("IO Exception reading from URL: \"%s\" to local file \"%s\"\n%s", urlstring,localFilePath, e));
         } catch (Exception e){
             updateProgress(0.00);
             throw new GopherException(e.getMessage());

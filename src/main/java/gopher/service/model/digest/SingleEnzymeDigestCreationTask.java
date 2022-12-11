@@ -1,8 +1,6 @@
 package gopher.service.model.digest;
 
-import gopher.exception.GopherException;
 import gopher.service.model.RestrictionEnzyme;
-import gopher.service.model.viewpoint.Segment;
 import gopher.service.model.viewpoint.ViewPoint;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequence;

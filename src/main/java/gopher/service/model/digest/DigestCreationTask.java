@@ -227,9 +227,8 @@ public class DigestCreationTask extends Task<Void> {
     /**
      * @param scaffoldName name of chromosome or alt scaffold
      * @param sequence     DNA sequence of the chromosome
-     * @throws IOException can be thrown by the BufferedWriter.
      */
-    private List<DetailedDigest> cutOneChromosome(String scaffoldName, String sequence) throws IOException {
+    private List<DetailedDigest> cutOneChromosome(String scaffoldName, String sequence) {
         ImmutableList.Builder<Digest> builder = new ImmutableList.Builder<>();
         for (Map.Entry<RestrictionEnzyme, Integer> ent : enzyme2number.entrySet()) {
             int enzymeNumber = ent.getValue();
@@ -286,23 +285,6 @@ public class DigestCreationTask extends Task<Void> {
                     selected,
                     baitNumUp,
                     baitNumDown));
-            /*
-            out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
-                    scaffoldName,
-                    startpos,
-                    endpos,
-                    (++n),
-                    previousCutEnzyme,
-                    number2enzyme.get(f.enzymeNumber).getName(),
-                    result.getLen(),
-                    result.getFivePrimeGcContent(),
-                    result.getThreePrimeGcContent(),
-                    result.getFivePrimeRepeatContent(),
-                    result.getThreePrimeRepeatContent(),
-                    selected ? "T" : "F",
-                    baitNumUp,
-                    baitNumDown));
-             */
             if (counter % 1000 == 0) {
                 updateMessage(String.format("Digesting %s [%d digests so far]", scaffoldName, counter));
             }
@@ -342,23 +324,6 @@ public class DigestCreationTask extends Task<Void> {
                         selected,
                         baitNumUp,
                         baitNumDown));
-        /*
-        out.write(String.format("%s\t%d\t%d\t%d\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%d\t%d\n",
-                scaffoldName,
-                (previousCutPosition + 1),
-                endpos,
-                (++n),
-                previousCutEnzyme,
-                "None",
-                result.getLen(),
-                result.getFivePrimeGcContent(),
-                result.getThreePrimeGcContent(),
-                result.getFivePrimeRepeatContent(),
-                result.getThreePrimeRepeatContent(),
-                selected ? "T" : "F",
-                baitNumUp,
-                baitNumDown));
-         */
         return detailedDigestList;
     }
 
