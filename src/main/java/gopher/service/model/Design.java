@@ -158,6 +158,11 @@ public class Design {
     }
 
 
+    private void calculateBaitedRestrictionFragmentQualityParams() {
+
+    }
+
+
     /**
      * Model has the list of ViewPoints and also the parameters for tiling, probe length etc.
      * So we do not need to pass anything to this functions.
@@ -303,6 +308,7 @@ public class Design {
 
 
     public Map<String, String> getDesignStatisticsList() {
+        calculateDesignParameters();
         Map<String, String> listItems = new LinkedHashMap<>();
         int ngenes = getN_genes();
         int resolvedGenes = getN_resolvedGenes();

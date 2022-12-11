@@ -311,19 +311,19 @@ public class DigestCreationTask extends Task<Void> {
             baitNumDown = seg.getBaitNumDown();
         }
         detailedDigestList.add(new DetailedDigest(scaffoldName,
-                        (previousCutPosition + 1),
-                        endpos,
-                        (++n),
-                        previousCutEnzyme,
-                        "None",
-                        result.getLen(),
-                        result.getFivePrimeGcContent(),
-                        result.getThreePrimeGcContent(),
-                        result.getFivePrimeRepeatContent(),
-                        result.getThreePrimeRepeatContent(),
-                        selected,
-                        baitNumUp,
-                        baitNumDown));
+                (previousCutPosition + 1),
+                endpos,
+                (++n),
+                previousCutEnzyme,
+                "None",
+                result.getLen(),
+                result.getFivePrimeGcContent(),
+                result.getThreePrimeGcContent(),
+                result.getFivePrimeRepeatContent(),
+                result.getThreePrimeRepeatContent(),
+                selected,
+                baitNumUp,
+                baitNumDown));
         return detailedDigestList;
     }
 
