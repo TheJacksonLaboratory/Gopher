@@ -398,6 +398,7 @@ public class GopherMainController implements Initializable {
     }
 
     private void setInitializedValuesInGUI() {
+        LOGGER.trace("setInitializedValuesInGUI (top): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
         String path_to_downloaded_genome_directory = gopherService.getGenomeDirectoryPath();
         if (path_to_downloaded_genome_directory != null) {
             LOGGER.trace("Setting GUI display for genome_directory {}", path_to_downloaded_genome_directory);
@@ -434,6 +435,7 @@ public class GopherMainController implements Initializable {
         } else {
             this.restrictionEnzymeLabel.setText(null);
         }
+        LOGGER.trace("setInitializedValuesInGUI (bottom 2): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
         this.unbalancedMarginCheckbox.setSelected(gopherService.getAllowUnbalancedMargins());
         this.patchedViewpointCheckbox.setSelected(gopherService.getAllowPatching());
         String gbuild = gopherService.getGenomeBuild();
@@ -441,8 +443,15 @@ public class GopherMainController implements Initializable {
         this.targetGeneLabel.setText("");
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
+        LOGGER.trace("setInitializedValuesInGUI (bottom1): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
         if (this.primaryStage != null)
             this.primaryStage.setTitle(String.format("GOPHER: %s", gopherService.getProjectName()));
+        // Something weird is causing the path to path_to_downloaded_genome_directory to be set to null
+        // reset it here -- extensive debugging could not figure out
+        if (gopherService.getGenomeDirectoryPath() == null) {
+            gopherService.setGenomeDirectoryPath(path_to_downloaded_genome_directory);
+        }
+        LOGGER.trace("setInitializedValuesInGUI (bottom): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
     }
 
 
@@ -1349,8 +1358,10 @@ public class GopherMainController implements Initializable {
             this.primaryStage.setTitle(String.format("GOPHER: %s",
                     gopherService.getProjectName()));
         setInitializedValuesInGUI();
+        LOGGER.trace("importProject: genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
         vpAnalysisController.refreshVPTable();
-        LOGGER.trace(String.format("Opened model %s from file %s", gopherService.getProjectName(), file.getAbsolutePath()));
+        LOGGER.trace("Opened model {} from file {}", gopherService.getProjectName(), file.getAbsolutePath());
+        LOGGER.trace("Path to genome dir is {}", gopherService.getGenome().getPathToGenomeDirectory());
     }
 
     @FXML

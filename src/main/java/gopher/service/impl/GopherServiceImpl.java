@@ -232,6 +232,7 @@ public class GopherServiceImpl implements GopherService, Serializable {
 
     @Override
     public void setGenomeDirectoryPath(String absolutePath) {
+        LOGGER.trace("Setting genome directory path to {}", absolutePath);
         model.setGenomeDirectoryPath(absolutePath);
     }
 
