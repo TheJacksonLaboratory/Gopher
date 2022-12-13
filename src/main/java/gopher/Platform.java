@@ -51,7 +51,7 @@ public class Platform {
                 Alert a = new Alert(AlertType.ERROR);
                 a.setTitle("Find gui config dir");
                 a.setHeaderText(null);
-                a.setContentText(String.format("Unrecognized platform. %s", platform.toString()));
+                a.setContentText(String.format("Unrecognized platform. %s", platform));
                 a.showAndWait();
                 return null;
         }

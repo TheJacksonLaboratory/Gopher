@@ -19,7 +19,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-24)
  */
 public abstract class Genome implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(Genome.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Genome.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 2L;
     /** Absolute path to the directory where ther genome file was downloaded from UCSC. */
@@ -43,7 +43,9 @@ public abstract class Genome implements Serializable {
     public String getPathToGenomeDirectory() {
         return pathToGenomeDirectory;
     }
-    public void setPathToGenomeDirectory(String absolutePath) { this.pathToGenomeDirectory=absolutePath;}
+    public void setPathToGenomeDirectory(String absolutePath) {
+        LOGGER.trace("Setting path to genome directory to {}", absolutePath);
+        this.pathToGenomeDirectory=absolutePath;}
 
 
 
@@ -73,6 +75,7 @@ public abstract class Genome implements Serializable {
      * @param pathToGenome Path to the directory where the genome file will be (or was)  downloaded.
      */
     public Genome(String pathToGenome) {
+        LOGGER.trace("Constructing genome object with pathToGenome {}", pathToGenome);
         this.pathToGenomeDirectory=pathToGenome;
     }
 
@@ -95,6 +98,7 @@ public abstract class Genome implements Serializable {
      * @return true if the genome file has been previously downloaded to the indicated path.
      */
     public boolean checkDownloadComplete(String path) {
+        LOGGER.trace("checkDownloadComplete path {}", path);
         this.pathToGenomeDirectory = path;
         return gZippedGenomeFileDownloaded();
     }
@@ -128,7 +132,7 @@ public abstract class Genome implements Serializable {
     public boolean isCanonical(String chromosomeFileBasename) {
         chromosomeFileBasename=chromosomeFileBasename.replaceAll(".fa", "");
         boolean ok = this.valid.contains(chromosomeFileBasename);
-        logger.trace(String.format("%s was %s",chromosomeFileBasename,ok));
+        LOGGER.trace(String.format("%s was %s",chromosomeFileBasename,ok));
         return ok;
     }
 

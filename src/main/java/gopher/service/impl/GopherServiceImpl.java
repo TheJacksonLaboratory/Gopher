@@ -232,6 +232,7 @@ public class GopherServiceImpl implements GopherService, Serializable {
 
     @Override
     public void setGenomeDirectoryPath(String absolutePath) {
+        LOGGER.trace("Setting genome directory path to {}", absolutePath);
         model.setGenomeDirectoryPath(absolutePath);
     }
 
@@ -393,10 +394,17 @@ public class GopherServiceImpl implements GopherService, Serializable {
     @Override
     public String getProjectName(boolean removeSuffix) {
         String projectName = model.getProjectName();
+        if (projectName == null) return "";
         if (removeSuffix) {
             projectName = projectName.replace(".ser", "");
         }
         return projectName;
+    }
+
+    @Override
+    public String getProjectTitle() {
+        String projectName = getProjectName(true);
+        return "Gopher: " + projectName;
     }
 
     @Override
@@ -407,6 +415,11 @@ public class GopherServiceImpl implements GopherService, Serializable {
     @Override
     public String getIndexedGenomeFastaIndexFile() {
         return model.getIndexedGenomeFastaIndexFile();
+    }
+
+    @Override
+    public void setGenomeIndexed(boolean indexed) {
+        if (indexed) model.setGenomeIndexed();
     }
 
     @Override
@@ -564,6 +577,7 @@ public class GopherServiceImpl implements GopherService, Serializable {
 
     @Override
     public void importProjectFromFile(File file) {
+        LOGGER.info("Importing GOPHER model from {}", file.getAbsoluteFile());
         try {
             this.model = SerializationManager.deserializeModel(file.getAbsolutePath());
         } catch (IOException | ClassNotFoundException e) {

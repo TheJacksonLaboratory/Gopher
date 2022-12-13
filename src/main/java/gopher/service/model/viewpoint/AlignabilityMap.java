@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Created by hansep on 6/12/18.
- *
+ * <p>
  * This class reads an array hash of pairs of arrays. The keys are chromosome names. The array pairs are combined
  * in a simple private sub class (AlignabilityMap) of this class and consists of an Integer and a Double array. The first
  * array has all positions at which the alignability score changes in sorted order. The second array has the
@@ -17,11 +17,11 @@ import java.util.List;
  * performs a binary search on the array for position within the array pair object of the given chromosome. The
  * determined index corresponds to the first position before the given postion at which the alignabilty score changes
  * and can be used to fetch the alignabilty score from the second array.
- *
+ * <p>
  * Input bedGraph files are assumed to be sorted like this:
  *
  * sort -k1,1 -k2,2n hg19.100mer.alignabilityMap.bedgraph
- *
+ * <p>
  * First column (chromosome) lexicographically, second column numerically start position.
  * The downloadable files are sorted like this.
  */

@@ -32,7 +32,7 @@ public class Default {
 
     public final static int MAX_BAIT_NUMBER = 3;
     /** Default length of the baits (probes) used for enrichment. */
-    public final static int PROBE_LENGTH =120;
+    public final static int BAIT_LENGTH =120;
 
     /** Default size of the kmer used to determine alignability. */
     public final static int KMER_SIZE=50;

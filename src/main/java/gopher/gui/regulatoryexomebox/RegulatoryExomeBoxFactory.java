@@ -61,11 +61,7 @@ public class RegulatoryExomeBoxFactory {
             }
             popup.close();
         });
-        try {
-            popup.startProgress(builder);
-        } catch (InterruptedException e) {
-            PopupFactory.displayException("Error", "Could not download regulatory build", e);
-        }
+        popup.startProgress(builder);
     }
 
 

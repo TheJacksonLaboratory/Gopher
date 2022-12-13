@@ -40,6 +40,8 @@ public class StageInitializer implements ApplicationListener<GopherFxApplication
             ClassPathResource gopherResource = new ClassPathResource("fxml/gophermain.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());
             fxmlLoader.setControllerFactory(applicationContext::getBean);
+
+
             Parent parent = fxmlLoader.load();
             Stage stage = event.getStage();
             stage.setScene(new Scene(parent, 1200, 900));
