@@ -1,8 +1,8 @@
 package gopher.controllers;
 
 import gopher.gui.factories.PopupFactory;
+import gopher.service.DesignItem;
 import gopher.service.GopherService;
-import gopher.service.model.Approach;
 import gopher.service.model.Design;
 import gopher.service.model.viewpoint.ViewPoint;
 import gopher.util.Utils;
@@ -13,8 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +38,9 @@ public class VPAnalysisController implements Initializable {
      * reference to a Tab that has been opened for it.
      */
     private final Map<ViewPoint, Tab> openTabs = new ConcurrentHashMap<>();
-
-    @FXML
-    private ScrollPane VpAnalysisScrollPane;
-
-    @FXML
-    private HBox listviewHbox;
-    @FXML
-    private ListView<String> lviewKey;
-    @FXML
-    private ListView<String> lviewValue;
-
+    public TableView<DesignItem> designTableView;
+    public TableColumn<DesignItem, String> designKeyTableColumn;
+    public TableColumn<DesignItem, String> designValueTableColumn;
     @FXML
     private TableView<ViewPoint> viewPointTableView;
     @FXML
@@ -78,10 +68,8 @@ public class VPAnalysisController implements Initializable {
     private TableColumn<ViewPoint, String> manuallyRevisedColumn;
 
     private final ObservableList<ViewPoint> observableViewPointList = FXCollections.observableArrayList();
-    private final ObservableList<String> summaryTableKeys = FXCollections.observableArrayList();
-    private final ObservableList<String> summaryTablevalues = FXCollections.observableArrayList();
 
-
+    private final ObservableList<DesignItem> designItemList = FXCollections.observableArrayList();
     /**
      * A reference to the main TabPane of the GUI. We will add new tabs to this that will show viewpoints in the
      * UCSC browser.
@@ -98,10 +86,23 @@ public class VPAnalysisController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.setProperty("jsse.enableSNIExtension", "false");
-        HBox.setHgrow(lviewValue, Priority.ALWAYS);
+        initDesignTable();
         initTable();
-        this.lviewKey.setItems(summaryTableKeys);
-        this.lviewValue.setItems(summaryTablevalues);
+    }
+
+
+    private void initDesignTable() {
+        designKeyTableColumn.setSortable(false);
+        designValueTableColumn.setSortable(false);
+        designKeyTableColumn.setCellValueFactory(cdf -> {
+            DesignItem item = cdf.getValue();
+            return new ReadOnlyStringWrapper(item.getKey());
+        });
+        designValueTableColumn.setCellValueFactory(cdf -> {
+            DesignItem item = cdf.getValue();
+            return new ReadOnlyStringWrapper(item.getValue());
+        });
+        designTableView.setItems(designItemList);
     }
 
     /**
@@ -234,30 +235,30 @@ public class VPAnalysisController implements Initializable {
             }
         }
         LOGGER.trace("openTabs does not contain Key: {}", vp.getTargetName());
-            final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
-            tab.setId(vp.getTargetName());
-            tab.setClosable(true);
-            tab.setOnClosed(event -> {
-                if (tabpane.getTabs()
-                        .size() == 2) {
-                    event.consume();
-                }
-            });
+        final Tab tab = new Tab("Viewpoint: " + vp.getTargetName());
+        tab.setId(vp.getTargetName());
+        tab.setClosable(true);
+        tab.setOnClosed(event -> {
+            if (tabpane.getTabs()
+                    .size() == 2) {
+                event.consume();
+            }
+        });
 
-            tab.setOnCloseRequest((e) -> {
-                for (ViewPoint vpnt : this.openTabs.keySet()) {
-                    Tab t = this.openTabs.get(vpnt);
-                    if (t.equals(tab)) {
-                        this.openTabs.remove(vpnt);
-                    }
+        tab.setOnCloseRequest((e) -> {
+            for (ViewPoint vpnt : this.openTabs.keySet()) {
+                Tab t = this.openTabs.get(vpnt);
+                if (t.equals(tab)) {
+                    this.openTabs.remove(vpnt);
                 }
-            });
+            }
+        });
 
-            ViewpointScrollPane vpsp = new ViewpointScrollPane(vp, this);
-            tab.setContent(vpsp);
-            this.tabpane.getTabs().add(tab);
-            this.tabpane.getSelectionModel().select(tab);
-            openTabs.put(vp, tab);
+        ViewpointScrollPane vpsp = new ViewpointScrollPane(vp, this);
+        tab.setContent(vpsp);
+        this.tabpane.getTabs().add(tab);
+        this.tabpane.getSelectionModel().select(tab);
+        openTabs.put(vp, tab);
 
     }
 
@@ -282,9 +283,9 @@ public class VPAnalysisController implements Initializable {
 
 
     public void updateListView() {
-        Map<String, String> summaryMap = createListViewContent();
-        summaryTableKeys.setAll(summaryMap.keySet());
-        summaryTablevalues.setAll(summaryMap.values());
+        List<DesignItem> designItemList2 = createListViewContent();
+        this.designTableView.getItems().clear();
+        this.designTableView.getItems().addAll(designItemList2);
     }
 
     /**
@@ -292,48 +293,14 @@ public class VPAnalysisController implements Initializable {
      *
      * @return Map with info about the panel design
      */
-    private Map<String, String> createListViewContent() {
+    private List<DesignItem> createListViewContent() {
         Design design = new Design(this.gopherService);
         design.calculateDesignParameters();
-        Map<String, String> listItems = new LinkedHashMap<>();
-
-        int ngenes = design.getN_genes();
-        int resolvedGenes = design.getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
-        listItems.put("Genes", geneV);
-
-        int nviewpoints = design.getN_viewpoints();
-        int resolvedVP = design.getN_resolvedViewpoints();
-        double avVpSize = design.getAvgVPsize();
-        double avgVpScore = design.getAvgVPscore();
-        String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
-                nviewpoints, resolvedVP);
-        if (gopherService.getApproach().equals(Approach.SIMPLE)) {
-            int n_patched = design.getN_patched_viewpoints();
-            vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
+        List<DesignItem> designItemList = new ArrayList<>();
+        for (var e :  design.getDesignStatisticsList().entrySet()) {
+            designItemList.add(new DesignItem(e.getKey(), e.getValue()));
         }
-        listItems.put("Viewpoints", vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
-                avVpSize, 100 * avgVpScore);
-        listItems.put(" ", vpointV2);
-
-        int nfrags = design.getN_unique_fragments();
-        double avg_n_frag = design.getAvgFragmentsPerVP();
-        String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
-                nfrags, avg_n_frag);
-        listItems.put("Digests", fragmentV);
-
-        int n_balancedDigests = design.getTotalNumBalancedDigests();
-        int n_unbalanced = design.getTotalNumUnbalancedDigests();
-
-
-        listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
-
-        int n_baits = design.getTotalNumOfUniqueBaits();
-        Double captureSize = design.getCaptureSize() / 1000000.0;
-        String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
-        listItems.put("Probes", baitV);
-        return listItems;
+        return designItemList;
     }
 
 
@@ -362,8 +329,7 @@ public class VPAnalysisController implements Initializable {
                 Integer d2 = Integer.parseInt(s2);
                 return d1.compareTo(d2);
             } catch (Exception e) {
-                LOGGER.error(String.format("Error encounted while sorting integer values %s and %s", s1, s2));
-                LOGGER.error("Error: {}", e.getMessage());
+                LOGGER.error("Error encounted while sorting integer values {} and {}: {}", s1, s2, e.getMessage());
                 return 0;
             }
         }

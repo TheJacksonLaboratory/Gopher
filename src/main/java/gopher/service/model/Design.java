@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A class that is intended to be used by the ViewPointAnalysis presenter to calculate the statistics for the
@@ -20,7 +19,7 @@ import java.util.Set;
  * @version 0.0.2 (2017-10-17)
  */
 public class Design {
-    static Logger LOGGER = LoggerFactory.getLogger(Design.class.getName());
+    static final Logger LOGGER = LoggerFactory.getLogger(Design.class.getName());
 
     private int n_unique_fragments;
     /** total length in nt of all unique digest margins  */
@@ -29,6 +28,10 @@ public class Design {
     private int n_genes;
 
     private int n_viewpoints;
+
+    int n_segments_with_no_bait = 0;
+    int n_segments_with_one_bait = 0;
+    int n_segments_with_two_bait = 0;
 
     private double avgFragmentsPerVP;
 
@@ -51,6 +54,20 @@ public class Design {
     private final GopherService service;
 
     private final Approach approach;
+
+    private int wellPlacedGoodQuality;
+    /**
+     * If true, one side has zero baits
+     */
+    private int unilateralBait;
+    /** Number of restriction fragments that are not unilateral but are shifted. */
+    private int shiftedBaits;
+    /**
+     *  that are not unilateral but are shifted but have a bait with high GC
+     */
+    private int highGc;
+
+    private int totalBaitedRestrictionFragments;
 
     public int getN_unique_fragments() {
         return n_unique_fragments;
@@ -106,12 +123,18 @@ public class Design {
         int probelen = service.getProbeLength();
         double RC=0d;
         int N=0;
+        List<BaitedRestrictionFragmentEvaluation> evalList = new ArrayList<>();
         Set<String> uniqueFragmentMargins = new HashSet<>();
+        Set<Segment> seenSegments = new HashSet<>(); // set to avoid duplicated
         for (ViewPoint vp : service.getViewPointList()) {
             if (vp.getNumOfSelectedFrags() == 0) {
                 continue;
             }
             for (Segment segment : vp.getActiveSegments()) {
+                if (!seenSegments.contains(segment)) {
+                    evalList.add(new BaitedRestrictionFragmentEvaluation(segment));
+                    seenSegments.add(segment);
+                }
                 // get unique margins of selected fragments
                 for (int l = 0; l < segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
@@ -128,9 +151,19 @@ public class Design {
                 }
             }
         }
+        this.wellPlacedGoodQuality = BaitedRestrictionFragmentEvaluation.getGoodQualityFragmentCount(evalList);
+        this.unilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
+        this.shiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
+        this.highGc = BaitedRestrictionFragmentEvaluation.getHighGcBaitCount(evalList);
+        this.totalBaitedRestrictionFragments = evalList.size();
         n_estimatedProbeCount = nProbes;
         RC /= N;
         n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / service.getProbeLength();
+    }
+
+
+    private void calculateBaitedRestrictionFragmentQualityParams() {
+
     }
 
 
@@ -143,7 +176,7 @@ public class Design {
         // valid is defined as with at least one active segment
         n_resolvedViewpoints = 0;
         List<ViewPoint> viewPointList = service.getViewPointList();
-        //System.out.println(viewPointList.size());
+        LOGGER.trace("Calculating degin parameters for {} viewpoints", viewPointList.size());
         int probeLength = service.getProbeLength();
 
         Set<Segment> uniqueRestrictionFragments = new HashSet<>();
@@ -151,11 +184,8 @@ public class Design {
         avgVPscore = 0.0;
         avgVPsize = 0.0;
         n_patched_viewpoints=0;
-        // If the user calls this function on a new project before
-        // creating viewpoints, then viewPointList is null, and we should just return.
-        if (viewPointList == null) {
-            return;
-        }
+
+
         viewPointList.forEach(vp -> {
             uniqueRestrictionFragments.addAll(vp.getActiveSegments());
             uniqueGeneSymbols.add(vp.getTargetName());
@@ -173,6 +203,7 @@ public class Design {
                 n_patched_viewpoints++;
             }
         });
+        LOGGER.trace("Obtained set of {} unique restriction fragments", uniqueRestrictionFragments.size());
 
         this.n_genes = uniqueGeneSymbols.size();
         this.n_viewpoints = viewPointList.size();
@@ -197,7 +228,7 @@ public class Design {
 
         }
         calculateEstimatedProbeNumber();
-//        logger.trace(String.format("Calculate params, n genes=%d [%s]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; "))));
+        LOGGER.trace("Calculate params, n genes={} [{}]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; ")));
     }
 
     public Integer getTotalNumOfUniqueBaits() {
@@ -278,6 +309,58 @@ public class Design {
     }
 
     public int getN_patched_viewpoints(){ return n_patched_viewpoints;}
+
+
+    public Map<String, String> getDesignStatisticsList() {
+        calculateDesignParameters();
+        Map<String, String> listItems = new LinkedHashMap<>();
+        int ngenes = getN_genes();
+        int resolvedGenes = getN_resolvedGenes();
+        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
+        listItems.put("Genes", geneV);
+        int nviewpoints = getN_viewpoints();
+        int resolvedVP = getN_resolvedViewpoints();
+        double avVpSize = getAvgVPsize();
+        double avgVpScore = getAvgVPscore();
+        String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
+                nviewpoints, resolvedVP);
+        if (service.getApproach().equals(Approach.SIMPLE)) {
+            int n_patched = getN_patched_viewpoints();
+            vpointV = String.format("%s %d viewpoints were patched", vpointV, n_patched);
+        }
+        String enzymes = service.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(";"));
+        listItems.put("Restriction enzyme(s)", enzymes);
+        listItems.put("Viewpoints", vpointV);
+        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
+                avVpSize, 100 * avgVpScore);
+        listItems.put(" ", vpointV2);
+
+        int nfrags = getN_unique_fragments();
+        double avg_n_frag = getAvgFragmentsPerVP();
+        String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
+                nfrags, avg_n_frag);
+        listItems.put("Digests", fragmentV);
+
+        int n_balancedDigests = getTotalNumBalancedDigests();
+        int n_unbalanced = getTotalNumUnbalancedDigests();
+        listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
+        int n_baits = getTotalNumOfUniqueBaits();
+        Double captureSize = getCaptureSize() / 1000000.0;
+        String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
+        listItems.put("Probes", baitV);
+        listItems.put("Active segments", String.format("%d: 0 baints, %d: 1 bait, %s: 2 baits",
+                this.n_segments_with_no_bait, n_segments_with_one_bait, n_segments_with_two_bait));
+
+        listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
+        listItems.put("Total high quality fragments", String.valueOf(wellPlacedGoodQuality));
+        listItems.put("Total unilaterally baited fragments", String.valueOf(this.unilateralBait));
+        listItems.put("Total shifted fragments", String.valueOf(this.shiftedBaits));
+       // listItems.put("Fragments with high GC", String.valueOf(this.highGc));
+        return listItems;
+    }
+
+
+
 
 
 

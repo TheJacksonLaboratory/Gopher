@@ -19,6 +19,8 @@ public interface GopherService {
     boolean serializeToLocation(String path);
     boolean isGenomeUnpacked();
     boolean isGenomeIndexed();
+
+    void setGenomeIndexed(boolean indexed);
     String getRefGenePath();
     boolean alignabilityMapPathIncludingFileNameGzExists();
 
@@ -33,6 +35,8 @@ public interface GopherService {
     void setProjectName(String projectname);
     String getProjectName();
     String getProjectName(boolean removeSuffix);
+
+    String getProjectTitle();
 
     void setModel(GopherModel mod);
 

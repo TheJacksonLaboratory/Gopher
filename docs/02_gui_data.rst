@@ -55,8 +55,8 @@ Following the steps described above, the user specifies the desired enrichment t
 
 Clicking on the ``Enter gene list`` button will open a dialog to enter a **gene list**.
 Currently, GOPHER expects a list of valid (HGNC) gene symbols.
-For promoter CHC, gene symbols can be uploaded either from a text file or from the clipboard.
-Use the ``Upload`` or ``Clipboard`` buttons.
+For promoter CHC, gene symbols can be uploaded from a text file with the ``Target Gene List`` button.
+Use the ``All protein-coding genes`` button to extract all protein-coding gene symbols from the transcript file.
 
 Next, click the ``Validate`` button.
 If gene symbols are used that do not occur in the downloaded annotation data, GOPHER will issue a warning and report a list of unmappable symbols that can be used to search for the current correct symbols.

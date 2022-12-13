@@ -14,7 +14,7 @@ import java.util.*;
  * is identical with the start position of the BED file.
  */
 public class BedFileParser {
-    private static final Logger logger = LoggerFactory.getLogger(BedFileParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BedFileParser.class);
     /** All genes in the refGene file are converted into GopherGene objects. These will be used to match
      * the gene list uploaded by the user. Key: A gene symbol (e.g., FBN1), value, the corresponding {@link GopherGene}.
      * This map should contain all symbols in the refGene file*/
@@ -63,16 +63,19 @@ public class BedFileParser {
                 try {
                     pos=Integer.parseInt(A[1])+1; // convert to one-based
                 } catch(NumberFormatException n) {
+                    LOGGER.error(String.format("Malformed BED6 line. Could not parse start pos (%s): %s",A[1],line));
                     throw new GopherException(String.format("Malformed BED6 line. Could not parse start pos (%s): %s",A[1],line));
                 }
                 String accession=A[3]; // something like rs123456 or custom name
                 String strand=A[5];
                 if (! strand.equals("+") && ! strand.equals("-")) {
+                    LOGGER.error(String.format("Malformed BED6 line. Strand was %s. Line=%s",strand,line));
                     throw new GopherException(String.format("Malformed BED6 line. Strand was %s. Line=%s",strand,line));
                 }
                 boolean isNoncoding=false; // needed for interface but not used
                 GopherGene gene= new GopherGene(accession, accession, isNoncoding, chrom, strand);
                 if (geneSymbolMap.containsKey(accession)) {
+                    LOGGER.error(String.format("Error -- attempt to enter multiple BED6 lines with same name (%s)", accession));
                     throw new GopherException(String.format("Error -- attempt to enter multiple BED6 lines with same name (%s)", accession));
                 }
                 geneSymbolMap.put(accession,gene);
@@ -83,7 +86,6 @@ public class BedFileParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
