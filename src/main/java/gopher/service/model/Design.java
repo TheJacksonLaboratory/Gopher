@@ -55,7 +55,7 @@ public class Design {
 
     private final Approach approach;
 
-    private int wellPlacedGcNotHigh;
+    private int wellPlacedGoodQuality;
     /**
      * If true, one side has zero baits
      */
@@ -125,12 +125,16 @@ public class Design {
         int N=0;
         List<BaitedRestrictionFragmentEvaluation> evalList = new ArrayList<>();
         Set<String> uniqueFragmentMargins = new HashSet<>();
+        Set<Segment> seenSegments = new HashSet<>(); // set to avoid duplicated
         for (ViewPoint vp : service.getViewPointList()) {
             if (vp.getNumOfSelectedFrags() == 0) {
                 continue;
             }
             for (Segment segment : vp.getActiveSegments()) {
-               evalList.add(new BaitedRestrictionFragmentEvaluation(segment));
+                if (!seenSegments.contains(segment)) {
+                    evalList.add(new BaitedRestrictionFragmentEvaluation(segment));
+                    seenSegments.add(segment);
+                }
                 // get unique margins of selected fragments
                 for (int l = 0; l < segment.getSegmentMargins().size(); l++) {
                     Integer fmStaPos = segment.getSegmentMargins().get(l).startPos();
@@ -147,7 +151,7 @@ public class Design {
                 }
             }
         }
-        this.wellPlacedGcNotHigh = BaitedRestrictionFragmentEvaluation.getGoodQualityFragmentCount(evalList);
+        this.wellPlacedGoodQuality = BaitedRestrictionFragmentEvaluation.getGoodQualityFragmentCount(evalList);
         this.unilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
         this.shiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
         this.highGc = BaitedRestrictionFragmentEvaluation.getHighGcBaitCount(evalList);
@@ -348,10 +352,10 @@ public class Design {
                 this.n_segments_with_no_bait, n_segments_with_one_bait, n_segments_with_two_bait));
 
         listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
-        listItems.put("Total high quality fragments", String.valueOf(wellPlacedGcNotHigh));
+        listItems.put("Total high quality fragments", String.valueOf(wellPlacedGoodQuality));
         listItems.put("Total unilaterally baited fragments", String.valueOf(this.unilateralBait));
         listItems.put("Total shifted fragments", String.valueOf(this.shiftedBaits));
-        listItems.put("Fragments with high GC", String.valueOf(this.highGc));
+       // listItems.put("Fragments with high GC", String.valueOf(this.highGc));
         return listItems;
     }
 

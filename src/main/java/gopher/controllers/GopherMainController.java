@@ -407,6 +407,7 @@ public class GopherMainController implements Initializable {
             LOGGER.trace("Setting GUI display - genome directory not initialized");
             this.genomeDownloadPI.setProgress(0);
         }
+        boolean unpacked = gopherService.isGenomeUnpacked();
         if (gopherService.isGenomeUnpacked()) {
             LOGGER.trace("Setting GUI display - genome is unpacked");
             this.genomeDecompressPI.setProgress(1.00);
@@ -425,6 +426,7 @@ public class GopherMainController implements Initializable {
         } else {
             this.alignabilityDownloadPI.setProgress(0.0);
         }
+        boolean indexed = gopherService.isGenomeIndexed();
         if (gopherService.isGenomeIndexed()) {
             this.genomeIndexPI.setProgress(1.00);
         } else {
@@ -451,6 +453,8 @@ public class GopherMainController implements Initializable {
         if (gopherService.getGenomeDirectoryPath() == null) {
             gopherService.setGenomeDirectoryPath(path_to_downloaded_genome_directory);
         }
+        if (unpacked) gopherService.setGenomeUnpacked();
+        if (indexed) gopherService.setGenomeIndexed(indexed);
         LOGGER.trace("setInitializedValuesInGUI (bottom): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
     }
 

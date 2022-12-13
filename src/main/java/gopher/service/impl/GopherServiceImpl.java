@@ -418,6 +418,11 @@ public class GopherServiceImpl implements GopherService, Serializable {
     }
 
     @Override
+    public void setGenomeIndexed(boolean indexed) {
+        if (indexed) model.setGenomeIndexed();
+    }
+
+    @Override
     public void setApproach(String approach) {
         model.setApproach(approach);
     }

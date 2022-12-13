@@ -3,6 +3,7 @@ package gopher.service.model;
 import gopher.service.model.viewpoint.Segment;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class evaluates each baited restriction fragment with respect to unilateral baits, shifted baits, and
@@ -63,8 +64,7 @@ public class BaitedRestrictionFragmentEvaluation {
         unilateralBait = n_bait_upstream == 0 || n_bait_downstream == 0;
         highGc = (n_bait_upstream > 0 && gcContentUp > 0.5) || (n_bait_downstream > 0 && gcContentDown > 0.5);
         wellPlacedHighQuality = (! unilateralBait) &&
-                (n_downstream_shifted + n_upstream_shifted == 0) &&
-                (! highGc);
+                (n_downstream_shifted + n_upstream_shifted == 0); // &&     (! highGc);
     }
 
     public boolean isWellPlacedHighQuality() {
@@ -109,5 +109,4 @@ public class BaitedRestrictionFragmentEvaluation {
                 .filter(BaitedRestrictionFragmentEvaluation::isHighGc)
                 .count();
     }
-
 }
