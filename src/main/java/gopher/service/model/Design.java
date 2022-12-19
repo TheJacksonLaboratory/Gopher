@@ -354,7 +354,7 @@ public class Design {
         listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
         listItems.put("Total unilaterally baited fragments", String.valueOf(this.totalFragmentsWithUnilateralBait));
         listItems.put("Total shifted fragments", String.valueOf(this.totalFragmentsWithShiftedBaits));
-        listItems.put("Total surviing fragments", String.valueOf(totalSurvivingBaitedFragments));
+        listItems.put("Total surviving fragments", String.valueOf(totalSurvivingBaitedFragments));
         return listItems;
     }
 
