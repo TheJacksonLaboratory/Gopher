@@ -55,13 +55,13 @@ public class Design {
 
     private final Approach approach;
 
-    private int wellPlacedGoodQuality;
+    private int totalSurvivingBaitedFragments;
     /**
      * If true, one side has zero baits
      */
-    private int unilateralBait;
+    private int totalFragmentsWithUnilateralBait;
     /** Number of restriction fragments that are not unilateral but are shifted. */
-    private int shiftedBaits;
+    private int totalFragmentsWithShiftedBaits;
     /**
      *  that are not unilateral but are shifted but have a bait with high GC
      */
@@ -151,9 +151,9 @@ public class Design {
                 }
             }
         }
-        this.wellPlacedGoodQuality = BaitedRestrictionFragmentEvaluation.getGoodQualityFragmentCount(evalList);
-        this.unilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
-        this.shiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
+        this.totalSurvivingBaitedFragments = BaitedRestrictionFragmentEvaluation.getSurvivingBaitedFragmentCount(evalList);
+        this.totalFragmentsWithUnilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
+        this.totalFragmentsWithShiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
         this.highGc = BaitedRestrictionFragmentEvaluation.getHighGcBaitCount(evalList);
         this.totalBaitedRestrictionFragments = evalList.size();
         n_estimatedProbeCount = nProbes;
@@ -228,7 +228,7 @@ public class Design {
 
         }
         calculateEstimatedProbeNumber();
-        LOGGER.trace("Calculate params, n genes={} [{}]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; ")));
+        LOGGER.trace("Calculate params, n genes={} [{}]",getN_genes(), String.join("; ", uniqueGeneSymbols));
     }
 
     public Integer getTotalNumOfUniqueBaits() {
@@ -352,10 +352,9 @@ public class Design {
                 this.n_segments_with_no_bait, n_segments_with_one_bait, n_segments_with_two_bait));
 
         listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
-        listItems.put("Total high quality fragments", String.valueOf(wellPlacedGoodQuality));
-        listItems.put("Total unilaterally baited fragments", String.valueOf(this.unilateralBait));
-        listItems.put("Total shifted fragments", String.valueOf(this.shiftedBaits));
-       // listItems.put("Fragments with high GC", String.valueOf(this.highGc));
+        listItems.put("Total unilaterally baited fragments", String.valueOf(this.totalFragmentsWithUnilateralBait));
+        listItems.put("Total shifted fragments", String.valueOf(this.totalFragmentsWithShiftedBaits));
+        listItems.put("Total surviing fragments", String.valueOf(totalSurvivingBaitedFragments));
         return listItems;
     }
 
