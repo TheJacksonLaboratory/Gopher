@@ -330,6 +330,8 @@ public class Design {
         }
         String enzymes = service.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(";"));
         listItems.put("Restriction enzyme(s)", enzymes);
+        String reSequences = service.getChosenEnzymelist().stream().map(RestrictionEnzyme::getSite).collect(Collectors.joining(";"));
+        listItems.put("Recognition site(s)", reSequences);
         listItems.put("Viewpoints", vpointV);
         String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
                 avVpSize, 100 * avgVpScore);
