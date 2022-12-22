@@ -65,7 +65,7 @@ public class BaitedRestrictionFragmentEvaluation {
                 (n_downstream_shifted + n_upstream_shifted == 0);
     }
 
-    public boolean isSurvivingBaitedFragment() {
+    public boolean isBilateralWellPlacedBaitedFragment() {
         return bilateralAndwellPlaced;
     }
 
@@ -74,7 +74,7 @@ public class BaitedRestrictionFragmentEvaluation {
     }
 
     public boolean isShifted() {
-        return ! unilateralBait && (n_upstream_shifted>0 || n_downstream_shifted>0);
+        return n_upstream_shifted>0 || n_downstream_shifted>0;
     }
 
     public boolean isHighGc() {
@@ -84,7 +84,7 @@ public class BaitedRestrictionFragmentEvaluation {
 
     public static int getSurvivingBaitedFragmentCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(BaitedRestrictionFragmentEvaluation::isSurvivingBaitedFragment)
+                .filter(BaitedRestrictionFragmentEvaluation::isBilateralWellPlacedBaitedFragment)
                 .count();
     }
 

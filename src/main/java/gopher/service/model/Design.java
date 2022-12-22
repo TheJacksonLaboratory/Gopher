@@ -316,12 +316,14 @@ public class Design {
         Map<String, String> listItems = new LinkedHashMap<>();
         int ngenes = getN_genes();
         int resolvedGenes = getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
-        listItems.put("Genes", geneV);
+        listItems.put("Genes:", String.valueOf(ngenes));
+        listItems.put("Genes with \u2265 1 viewpoint with \u2265 1 selected digest:", String.valueOf(resolvedGenes));
         int nviewpoints = getN_viewpoints();
         int resolvedVP = getN_resolvedViewpoints();
         double avVpSize = getAvgVPsize();
         double avgVpScore = getAvgVPscore();
+        listItems.put("Viewpoints:", String.valueOf(nviewpoints));
+        listItems.put("Viewpoints with \u2265 1 selected digest:", String.valueOf(resolvedVP));
         String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
                 nviewpoints, resolvedVP);
         if (service.getApproach().equals(Approach.SIMPLE)) {
@@ -356,7 +358,7 @@ public class Design {
         listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
         listItems.put("Total unilaterally baited fragments", String.valueOf(this.totalFragmentsWithUnilateralBait));
         listItems.put("Total shifted fragments", String.valueOf(this.totalFragmentsWithShiftedBaits));
-        listItems.put("Total surviving fragments", String.valueOf(totalSurvivingBaitedFragments));
+        listItems.put("Total bilateral unshifted fragments", String.valueOf(totalSurvivingBaitedFragments));
         return listItems;
     }
 
