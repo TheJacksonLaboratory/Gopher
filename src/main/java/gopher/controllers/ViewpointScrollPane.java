@@ -277,8 +277,6 @@ public class ViewpointScrollPane extends ScrollPane {
         isSelectedTableColumn = new TableColumn<>("selected?");
         isSelectedTableColumn.setCellValueFactory(cdf -> {
             // if we get here, the user has selected or deselected the checkbox
-            //this.viewpoint.setManuallyRevised();
-            //this.analysisPresenter.refreshVPTable();
             Segment segment = cdf.getValue().getSegment();
             CheckBox checkBox = cdf.getValue().getCheckBox();
             ChangeListener<Boolean> changeListener = cdf.getValue().getChangeListener();

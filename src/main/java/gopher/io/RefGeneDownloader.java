@@ -7,10 +7,11 @@ import java.io.File;
 /**
  * This class stores the URLs for the RefSeq.txt.gz file for the
  * indicated species (mm9,mm10,hg19,hg38.
+ * @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10.
  * @author Peter Robinson
  * @version 0.1.2
  */
-public class RefGeneDownloader {
+public record RefGeneDownloader(String genome) {
     final private static String hg19="http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz";
     final private static String hg38="http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz";
     final private static String mm9="http://hgdownload.soe.ucsc.edu/goldenPath/mm9/database/refGene.txt.gz";
@@ -18,12 +19,6 @@ public class RefGeneDownloader {
     final private static String xenTro9="http://hgdownload.soe.ucsc.edu/goldenPath/xenTro9/database/refGene.txt.gz";
     final private static String danRer10="http://hgdownload.soe.ucsc.edu/goldenPath/danRer10/database/refGene.txt.gz";
 
-    private final String genome;
-
-    /** @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10. */
-    public RefGeneDownloader(String genome) {
-        this.genome=genome;
-    }
     /** @return The UCSC URL from which the transcript file is to be downloaded. */
     public String getURL()throws DownloadFileNotFoundException  {
         return switch (this.genome) {

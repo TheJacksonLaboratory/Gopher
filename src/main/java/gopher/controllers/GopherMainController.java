@@ -3,11 +3,9 @@ package gopher.controllers;
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
-import gopher.gui.factories.EnzymeViewFactory;
-import gopher.gui.factories.HelpViewFactory;
-import gopher.gui.factories.QCCheckFactory;
-import gopher.gui.logviewer.LogViewerFactory;
+import gopher.gui.factories.*;
 import gopher.gui.factories.PopupFactory;
+import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.util.MyPreloader;
@@ -192,6 +190,9 @@ public class GopherMainController implements Initializable {
      */
     @Autowired
     private VPAnalysisController vpAnalysisController;
+
+    @Autowired
+    private DeleteController deleteController;
     /**
      * This is a Properties object that corresponds to the .gopher/gopher.properties file and
      * can store information about the download locations.
@@ -531,7 +532,7 @@ public class GopherMainController implements Initializable {
         this.marginSizeTextField.setText(null);
         this.baitLengthTextField.setText(null);
         if (this.primaryStage != null)
-            this.primaryStage.setTitle(String.format("GOPHER"));
+            this.primaryStage.setTitle("GOPHER");
     }
 
     /**
@@ -1317,24 +1318,21 @@ public class GopherMainController implements Initializable {
      */
     @FXML
     public void deleteProjectFiles(ActionEvent e) {
+        List<ProjectFile> pfiles = gopher.Platform.getProjectFiles();
         try {
-            URL resource = GopherMainController.class.getResource("/fxml/delete.fxml");
+            URL resource = getClass().getResource("/fxml/delete.fxml");
             LOGGER.error("Deleting project files. FXML resource is {}", resource);
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
             Parent parent = fxmlLoader.load();
-            DeleteController deleteController = fxmlLoader.<DeleteController>getController();
-            //
+            deleteController.updateTable(pfiles);
 
             Scene scene = new Scene(parent, 300, 200);
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
             stage.showAndWait();
-
-            // factory.updateTable(gopherService.getproje);
-            //(this.gopherService);
         } catch (IOException ex) {
-            PopupFactory.displayError("Error", ex.getMessage());
+            PopupFactory.displayException(ex);
         }
         e.consume();
     }
