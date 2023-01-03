@@ -34,8 +34,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.VBox;
@@ -1314,7 +1317,25 @@ public class GopherMainController implements Initializable {
      */
     @FXML
     public void deleteProjectFiles(ActionEvent e) {
-        DeleteFactory.display(this.gopherService);
+        try {
+            URL resource = GopherMainController.class.getResource("/fxml/delete.fxml");
+            LOGGER.error("Deleting project files. FXML resource is {}", resource);
+            FXMLLoader fxmlLoader = new FXMLLoader(resource);
+            Parent parent = fxmlLoader.load();
+            DeleteController deleteController = fxmlLoader.<DeleteController>getController();
+            //
+
+            Scene scene = new Scene(parent, 300, 200);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.showAndWait();
+
+            // factory.updateTable(gopherService.getproje);
+            //(this.gopherService);
+        } catch (IOException ex) {
+            PopupFactory.displayError("Error", ex.getMessage());
+        }
         e.consume();
     }
 
