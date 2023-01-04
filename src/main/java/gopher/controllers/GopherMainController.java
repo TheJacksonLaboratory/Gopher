@@ -187,9 +187,6 @@ public class GopherMainController implements Initializable {
      */
     @Autowired
     private VPAnalysisController vpAnalysisController;
-
-    @Autowired
-    private DeleteController deleteController;
     /**
      * This is a Properties object that corresponds to the .gopher/gopher.properties file and
      * can store information about the download locations.
