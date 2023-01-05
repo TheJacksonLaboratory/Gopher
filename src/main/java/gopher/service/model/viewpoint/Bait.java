@@ -57,6 +57,27 @@ public class Bait implements Serializable {
         return this.averageKmeralignabilty;
     }
     public double getRepeatContent() { return this.repeatContent; }
+    public String getContigStartPosKey() {
+        return getRefId() + ":" + getStartPos();
+    }
+
+    /**
+     *
+     * @param location "up" or "down" for baits at upstream or downstream part of restriction fragment
+     * @return TSV string intended for BED File Export
+     */
+    private String getTsvLine(String location) {
+        return getRefId() + "\t" + getStartPos() + "\t" + getEndPos() + "\t" + location + "|GC:" +
+                  String.format("%.2f", getGCContent()) + "|Ali:" + String.format("%.2f", getAlignabilityScore()) +
+                "|Rep:" + String.format("%.2f", getRepeatContent()) + "\t" + (int) Math.round(1000/getAlignabilityScore());
+    }
+
+    public String getTsvLineDownstream() {
+        return getTsvLine("down");
+    }
+    public String getTsvLineUpstream() {
+        return getTsvLine("up");
+    }
 
     public boolean isUsable(double minGCcontent, double maxGCcontent, double maxAlignabilityScore) {
         return  (minGCcontent <= this.getGCContent() &&

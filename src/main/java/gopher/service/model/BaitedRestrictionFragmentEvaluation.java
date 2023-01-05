@@ -73,6 +73,10 @@ public class BaitedRestrictionFragmentEvaluation {
         return unilateralBait;
     }
 
+    public boolean hasZeroBait() {
+        return this.n_bait_number == 0;
+    }
+
     public boolean isShifted() {
         return n_upstream_shifted>0 || n_downstream_shifted>0;
     }
@@ -105,6 +109,12 @@ public class BaitedRestrictionFragmentEvaluation {
     public static int getHighGcBaitCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
                 .filter(BaitedRestrictionFragmentEvaluation::isHighGc)
+                .count();
+    }
+
+    public static int getCountOfFragmentsWithZeroBaits(List<BaitedRestrictionFragmentEvaluation> fragments) {
+        return (int) fragments.stream()
+                .filter(BaitedRestrictionFragmentEvaluation::hasZeroBait)
                 .count();
     }
 }

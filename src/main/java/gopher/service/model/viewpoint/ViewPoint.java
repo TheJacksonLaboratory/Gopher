@@ -334,16 +334,15 @@ public class ViewPoint implements Serializable {
         this.restrictionSegmentList = new ArrayList<>();
         // if genomicPos occurs on the first digest of the chromosome, add pseudo digest with length 0.
         if(genomicPos < segmentFactory.getAllCuts().get(0)) {
-            Segment restFrag = new Segment.Builder(chromosomeID,
+            Segment restFrag = new Segment(chromosomeID,
                     0,
-                    0).
-                    fastaReader(fastaReader).marginSize(marginSize).build();
+                    0,fastaReader, marginSize); // needed?
         }
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
-            Segment restFrag = new Segment.Builder(chromosomeID,
+            Segment restFrag = new Segment(chromosomeID,
                     segmentFactory.getUpstreamCut(j),
-                    segmentFactory.getDownstreamCut(j) - 1).
-                    fastaReader(fastaReader).marginSize(marginSize).build();
+                    segmentFactory.getDownstreamCut(j) - 1,
+                    fastaReader ,marginSize);
             double maxMeanAlignabilityScore = 1.0 * gopherService.getMaxMeanKmerAlignability();
             restFrag.setUsableBaits(gopherService,c2align,maxMeanAlignabilityScore);
             restrictionSegmentList.add(restFrag);
@@ -354,8 +353,8 @@ public class ViewPoint implements Serializable {
     /** @return a 2-tuple with the number of baits: <up,down>. */
     private List<Integer> getNumberOfBaitsUpDown() {
         ImmutableList.Builder<Integer> builder = new ImmutableList.Builder<>();
-        Integer up=0;
-        Integer down=0;
+        int up=0;
+        int down=0;
         for (Segment seg : this.getActiveSegments()) {
             up +=seg.getBaitNumUp();
             down += seg.getBaitNumDown();
@@ -580,7 +579,6 @@ public class ViewPoint implements Serializable {
                             this.centerSegment.isUnbalanced() &&
                             allowSingleMargin)
                     ) {
-                LOGGER.trace("In loop set TRUE for " + this.getReferenceID() );
                 centerSegment.setSelected(true,true);
                 this.setStartPos(centerSegment.getStartPos());
                 this.setEndPos(centerSegment.getEndPos());
@@ -591,13 +589,13 @@ public class ViewPoint implements Serializable {
                 int genomicPosFragIdx = restrictionSegmentList.indexOf(centerSegment);
                 if (genomicPosFragIdx > 0) {
                     upstreamSegment = restrictionSegmentList.get(genomicPosFragIdx - 1);
-                    LOGGER.trace("SELECTED UPSTREAM " + upstreamSegment.detailedReport() );
+                    LOGGER.trace("Selected upstream {}", upstreamSegment.detailedReport());
                 } else {
                     LOGGER.trace("Warning: There is no segment in upstream direction of the center segment!");
                 }
                 if (genomicPosFragIdx < restrictionSegmentList.size() - 1) {
                     downstreamSegment = restrictionSegmentList.get(genomicPosFragIdx + 1);
-                    LOGGER.trace("SELECTED DOWNSTREAM " + downstreamSegment.detailedReport() );
+                    LOGGER.trace("Selected downstream {}", downstreamSegment.detailedReport());
 
                 } else {
                     LOGGER.trace("Warning: There is no segment in downstream direction of the center segment!");

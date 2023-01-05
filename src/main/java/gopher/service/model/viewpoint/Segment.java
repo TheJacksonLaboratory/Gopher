@@ -37,9 +37,9 @@ public class Segment implements Serializable {
     /** The id of the larger sequence where this Segment is located (usually a chromosome).*/
     private final String referenceSequenceID;
     /** The most 5' position of this Segment on the {@link #referenceSequenceID}. */
-    private Integer startPos;
+    private int startPos;
     /** The most 3' position of this Segment on the {@link #referenceSequenceID}. */
-    private final Integer endPos;
+    private final int endPos;
     /** The value of this variable is true if this Segment is selected (and will thus be used for Capture HiC probe production). */
     private boolean selected;
     private boolean unselectable;
@@ -64,9 +64,29 @@ public class Segment implements Serializable {
 
     private final transient IndexedFastaSequenceFile fastaReader;
 
+    /** Size of the margins in up and downstream direction. */
+    private final Integer marginSize;
+    /** Is this digest overlapping the TSS, i.e., it is the center digest? */
+    private boolean overlapsTSS=false;
+    /** Used to return {@link #startPos} and {@link #endPos} in String format. */
+    private static final DecimalFormat formatter = new DecimalFormat("#,###");
+
     private List<Bait> baitListUpStreamMargin;
     private List<Bait> baitListDownStreamMargin;
 
+
+    public Segment(String refSequenceID, int start, int end, IndexedFastaSequenceFile idFasta, int marginSize) {
+        this.referenceSequenceID = refSequenceID;
+        this.startPos = start;
+        this.endPos = end;
+        this.fastaReader = idFasta;
+        this.marginSize = marginSize;
+        this.selected = false; /* default */
+        this.baitListDownStreamMargin = new ArrayList<>();
+        this.baitListUpStreamMargin = new ArrayList<>();
+        calculateGCandRepeatContent(fastaReader);
+        calculateRepeatAndGcContentMargins(fastaReader);
+    }
 
     public String detailedReport() {
         return String.format("%s:%d-%d [len: %d] repeat-up:%.1f, down:%.1f  GC-up:%.1f, down:%.1f overlaps TSS: %s",
@@ -79,58 +99,6 @@ public class Segment implements Serializable {
                 GCcontentUp,
                 GCcontentDown,
                 overlapsTSS?"yes":"no");
-    }
-
-
-    /** Size of the margins in up and downstream direction. */
-    private final Integer marginSize;
-    /** Is this digest overlapping the TSS, i.e., it is the center digest? */
-    private boolean overlapsTSS=false;
-    /** Used to return {@link #startPos} and {@link #endPos} in String format. */
-    private static final DecimalFormat formatter = new DecimalFormat("#,###");
-
-    private Segment(Builder builder) {
-        this.referenceSequenceID=builder.referenceSequenceID;
-        this.startPos=builder.startPos;
-        this.endPos=builder.endPos;
-        this.marginSize=builder.marginSize;
-        this.selected=false; /* default */
-        this.fastaReader = builder.fastaReader;
-        this.baitListDownStreamMargin=new ArrayList<>();
-        this.baitListUpStreamMargin=new ArrayList<>();
-        calculateGCandRepeatContent(builder.fastaReader);
-        calculateRepeatAndGcContentMargins(builder.fastaReader);
-    }
-
-
-
-
-    public static class Builder {
-        private final String referenceSequenceID;
-        private final Integer startPos;
-        private final Integer endPos;
-        private Integer genomicPos;
-        private IndexedFastaSequenceFile fastaReader;
-        private Integer marginSize;
-
-        public Builder(String refSequenceID, Integer start, Integer end) {
-            this.referenceSequenceID=refSequenceID;
-            this.startPos=start;
-            this.endPos=end;
-        }
-        public Builder fastaReader(IndexedFastaSequenceFile val) {
-            this.fastaReader = val; return this;
-        }
-        public Builder genomicPos(Integer val) {
-            this.genomicPos = val; return this;
-        }
-        public Builder marginSize(Integer val) {
-            this.marginSize = val; return this;
-        }
-        public Segment build() {
-            return new Segment(this);
-        }
-
     }
 
     /**
@@ -346,7 +314,7 @@ public class Segment implements Serializable {
      * @return The total size of the margin(s) of this {@link Segment}.
      */
     public int getMarginSize() {
-        return Math.min(2*marginSize,length());
+        return Math.min(2*marginSize, length());
     }
 
 
@@ -372,9 +340,9 @@ public class Segment implements Serializable {
         Segment other = (Segment) obj;
         if (!referenceSequenceID.equals(other.referenceSequenceID))
             return false;
-        if (! startPos.equals(other.startPos))
+        if (! (this.startPos == other.startPos))
             return false;
-        return endPos.equals(other.endPos);
+        return (endPos == other.endPos);
     }
 
     /**
@@ -396,7 +364,7 @@ public class Segment implements Serializable {
             // we are on same chromosome -- check the position
             return getStartPos() < pos;
         } else {
-            // return true iff this chromosome lexigraphicall preceeds the other one
+            // return true iff this chromosome lexigraphically preceeds the other one
             return (getReferenceSequenceID().compareTo(chrom) < 0);
         }
     }
@@ -404,10 +372,10 @@ public class Segment implements Serializable {
 
     /** NEW VERSION */
     public void setUsableBaits(GopherService model, AlignabilityMap chromosome2AlignabilityMap, double maxAlignabilityScore) {
-        Integer bmin =model.getMinBaitCount();
-        Integer baitSize = model.getProbeLength();
-        Double minGCcontent = model.getMinGCcontent();
-        Double maxGCcontent = model.getMaxGCcontent();
+        int bmin =model.getMinBaitCount();
+        int baitSize = model.getProbeLength();
+        double minGCcontent = model.getMinGCcontent();
+        double maxGCcontent = model.getMaxGCcontent();
         if (this.length() < baitSize) {
             // do not place baits in segments shorter than the bait size
             this.unselectable = true;
@@ -453,7 +421,7 @@ public class Segment implements Serializable {
                 }
             } else {
                 // the downstream margin has less than bmin baits; try to set missing baits in upstream margin
-                Integer numOfMissingBaits = 2 * bmin - getBaitNumDown(); // determine number of missing baits
+                int numOfMissingBaits = 2 * bmin - getBaitNumDown(); // determine number of missing baits
                 this.setUsableBaitsForUpstreamMargin(numOfMissingBaits, baitSize, chromosome2AlignabilityMap, minGCcontent, maxGCcontent, maxAlignabilityScore); // try to set this number in upstream margin
                 this.removeRedundantBaits();
                 if (this.getBaitNumTotal() == 2 * bmin) {
@@ -475,37 +443,38 @@ public class Segment implements Serializable {
         return String.format("%d/%d",this.baitListUpStreamMargin.size(),this.baitListDownStreamMargin.size() );
     }
 
-    public Integer getBaitNumTotal() { return this.baitListUpStreamMargin.size() + this.baitListDownStreamMargin.size(); }
+    public int getBaitNumTotal() { return this.baitListUpStreamMargin.size() + this.baitListDownStreamMargin.size(); }
 
-    public Integer getBaitNumUp() { return this.baitListUpStreamMargin.size(); }
+    public int getBaitNumUp() { return this.baitListUpStreamMargin.size(); }
 
-    public Integer getBaitNumDown() {return this.baitListDownStreamMargin.size(); }
+    public int getBaitNumDown() {return this.baitListDownStreamMargin.size(); }
 
 
     /**
-     * NEW VERSION
+     * Create baits that satisfy the indicated constraints
+     * @param bmax maximum number of baits per viewpoint
+     * @param baitSize length in nucleotides of the baits (usually 120bp)
+     * @param alignabilityMap reference to object that encapsulates alignability data
+     * @param minGCcontent minimum G/C content of bait
+     * @param maxGCcontent maximum G/C content of bait
+     * @param maxAlignabilityScore maximum allowable alignability score
      */
-    public void setUsableBaitsForUpstreamMargin(Integer bmax, Integer baitSize, AlignabilityMap alignabilityMap, Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    public void setUsableBaitsForUpstreamMargin(int bmax, int baitSize, AlignabilityMap alignabilityMap, double minGCcontent, double maxGCcontent, double maxAlignabilityScore) {
 
-        Integer sta = this.getStartPos();
-        Integer end = this.getStartPos() + marginSize - 1;
+        int sta = this.getStartPos();
+        int end = this.getStartPos() + marginSize - 1;
 
         ArrayList<Bait> baitListUpStreamMargin = new ArrayList<>();
         for(int i = sta; i <= end - baitSize + 1; i++ ) { // from left to right because this is the upstream margin
-
-            // init bait
             Bait b = new Bait(this.referenceSequenceID, i, i + baitSize - 1, fastaReader, alignabilityMap);
-
             // check for constraints and add if appropriate
             if( b.isUsable(minGCcontent, maxGCcontent, maxAlignabilityScore) ) {
                 baitListUpStreamMargin.add(b);
             }
-
             // abort if bmax is reached
-            if(baitListUpStreamMargin.size()==bmax) { break; }
-
+            if (baitListUpStreamMargin.size()==bmax) { break; }
             // abort if end of bait reaches end of segment
-            if(i + baitSize - 1 == this.getEndPos()) { break; }
+            if (i + baitSize - 1 == this.getEndPos()) { break; }
         }
         this.baitListUpStreamMargin=baitListUpStreamMargin;
     }
