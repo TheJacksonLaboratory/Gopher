@@ -67,7 +67,7 @@ public class Bait implements Serializable {
      * @return TSV string intended for BED File Export
      */
     private String getTsvLine(String location) {
-        return getRefId() + "\t" + getStartPos() + "\t" + getEndPos() + "\t" + location + "|GC:" +
+        return getRefId() + "\t" + (getStartPos()-1) + "\t" + getEndPos() + "\t" + location + "|GC:" +
                   String.format("%.2f", getGCContent()) + "|Ali:" + String.format("%.2f", getAlignabilityScore()) +
                 "|Rep:" + String.format("%.2f", getRepeatContent()) + "\t" + (int) Math.round(1000/getAlignabilityScore());
     }
