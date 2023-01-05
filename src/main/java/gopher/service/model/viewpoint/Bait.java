@@ -8,14 +8,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * This class represents a bait or probe sequence that used for enrichment. The efficiency of a bait depends on
- * GC content, alignability and melting temperature. Upon initialization of an Bait object corresponding values are
- * calculated and set. The individual properties of the bait can accessed via getter functions.
+ * This class represents a bait (i.e., probe sequence) used for capture Hi-C enrichment.
+ * The efficiency of a bait depends on GC content, alignability and melting temperature.
  * There is also a function 'isUsable' that can be used to determine if a bait is usable given thresholds
  * for the individual properties such as GC content.
  */
 public class Bait implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(Bait.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bait.class.getName());
     /** serialization version ID */
     static final long serialVersionUID = 1L;
     /**  coordinates of the bait. */
@@ -32,15 +31,15 @@ public class Bait implements Serializable {
     /** repeat content of the bait . */
     private double repeatContent;
 
-    public Bait(String refID, Integer startPos, Integer endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
+    public Bait(String refID, int startPos, int endPos, IndexedFastaSequenceFile fastaReader, AlignabilityMap alignabilityMap) {
         this.refID = refID;
         this.startPos = startPos;
         this.endPos = endPos;
-        this.setGCContent(fastaReader);
+        String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
+        this.setGCContent(subsequence);
+        this.setRepeatContent(subsequence);
         this.setAlignabilityScore(alignabilityMap);
-        this.setRepeatContent(fastaReader);
     }
-
 
     public String getRefId() {
         return refID;
@@ -58,8 +57,29 @@ public class Bait implements Serializable {
         return this.averageKmeralignabilty;
     }
     public double getRepeatContent() { return this.repeatContent; }
+    public String getContigStartPosKey() {
+        return getRefId() + ":" + getStartPos();
+    }
 
-    public boolean isUsable(Double minGCcontent, Double maxGCcontent, Double maxAlignabilityScore) {
+    /**
+     *
+     * @param location "up" or "down" for baits at upstream or downstream part of restriction fragment
+     * @return TSV string intended for BED File Export
+     */
+    private String getTsvLine(String location) {
+        return getRefId() + "\t" + (getStartPos()-1) + "\t" + getEndPos() + "\t" + location + "|GC:" +
+                  String.format("%.2f", getGCContent()) + "|Ali:" + String.format("%.2f", getAlignabilityScore()) +
+                "|Rep:" + String.format("%.2f", getRepeatContent()) + "\t" + (int) Math.round(1000/getAlignabilityScore());
+    }
+
+    public String getTsvLineDownstream() {
+        return getTsvLine("down");
+    }
+    public String getTsvLineUpstream() {
+        return getTsvLine("up");
+    }
+
+    public boolean isUsable(double minGCcontent, double maxGCcontent, double maxAlignabilityScore) {
         return  (minGCcontent <= this.getGCContent() &&
                 this.getGCContent() <= maxGCcontent &&
                 this.getAlignabilityScore() <= maxAlignabilityScore);
@@ -68,11 +88,9 @@ public class Bait implements Serializable {
 
     /**
      * Calculate GC content of the bait.
-     * @param fastaReader FASTA Reader from HTSJDK
+     * @param subsequence DNA sequence of the bait
      */
-    private void setGCContent(IndexedFastaSequenceFile fastaReader) {
-        String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
-        // count Gs and Cs
+    private void setGCContent(String subsequence) {
         int GC = 0;
         for (int i = 0; i < subsequence.length(); i++) {
             switch (subsequence.charAt(i)) {
@@ -80,20 +98,16 @@ public class Bait implements Serializable {
             }
         }
         this.GCcontent = (double) GC / (double) subsequence.length();
-
     }
 
 
     private void setAlignabilityScore(AlignabilityMap alignabilityMap) {
-
         int kmerSize = alignabilityMap.getKmersize();
         double score = 0.0;
         ArrayList<Integer> alignabilityScoreList = alignabilityMap.getScoreFromTo(startPos, endPos - kmerSize + 1);
-
         for (Integer d : alignabilityScoreList) {
             if(d==(-1.0)) {score=-1.0; break;} // probe contains Ns, which have an alignability of -1
             score = score + d;
-
         }
         this.averageKmeralignabilty = score/alignabilityScoreList.size();
     }
@@ -103,12 +117,9 @@ public class Bait implements Serializable {
     /**
      * Calculate repeat content based on lower (repeat) and uppercase letters.
      *
-     * @param fastaReader file handle for an index FASTA file
+     * @param subsequence DNA sequence of the bait
      */
-    private void setRepeatContent(IndexedFastaSequenceFile fastaReader) {
-
-        String subsequence = fastaReader.getSubsequenceAt(this.refID, this.startPos, this.endPos).getBaseString();
-
+    private void setRepeatContent(String subsequence) {
         // count upper and lower case
         int lowerCase = 0, upperCase = 0;
         for (int i = 0; i < subsequence.length(); i++) {

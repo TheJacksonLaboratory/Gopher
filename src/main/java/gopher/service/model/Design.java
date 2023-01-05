@@ -55,17 +55,15 @@ public class Design {
 
     private final Approach approach;
 
-    private int wellPlacedGoodQuality;
+    private int totalSurvivingBaitedFragments;
+
+    private int totalFragmentsWithZeroBaits;
     /**
      * If true, one side has zero baits
      */
-    private int unilateralBait;
+    private int totalFragmentsWithUnilateralBait;
     /** Number of restriction fragments that are not unilateral but are shifted. */
-    private int shiftedBaits;
-    /**
-     *  that are not unilateral but are shifted but have a bait with high GC
-     */
-    private int highGc;
+    private int totalFragmentsWithShiftedBaits;
 
     private int totalBaitedRestrictionFragments;
 
@@ -151,21 +149,15 @@ public class Design {
                 }
             }
         }
-        this.wellPlacedGoodQuality = BaitedRestrictionFragmentEvaluation.getGoodQualityFragmentCount(evalList);
-        this.unilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
-        this.shiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
-        this.highGc = BaitedRestrictionFragmentEvaluation.getHighGcBaitCount(evalList);
+        this.totalSurvivingBaitedFragments = BaitedRestrictionFragmentEvaluation.getSurvivingBaitedFragmentCount(evalList);
+        this.totalFragmentsWithUnilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
+        this.totalFragmentsWithShiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
+        this.totalFragmentsWithZeroBaits = BaitedRestrictionFragmentEvaluation.getCountOfFragmentsWithZeroBaits(evalList);
         this.totalBaitedRestrictionFragments = evalList.size();
         n_estimatedProbeCount = nProbes;
         RC /= N;
         n_estimatedProbeCount = (int)(n_nucleotides_in_unique_fragment_margins * (1-RC) ) / service.getProbeLength();
     }
-
-
-    private void calculateBaitedRestrictionFragmentQualityParams() {
-
-    }
-
 
     /**
      * Model has the list of ViewPoints and also the parameters for tiling, probe length etc.
@@ -228,7 +220,7 @@ public class Design {
 
         }
         calculateEstimatedProbeNumber();
-        LOGGER.trace("Calculate params, n genes={} [{}]",getN_genes(),uniqueGeneSymbols.stream().collect(Collectors.joining("; ")));
+        LOGGER.trace("Calculate params, n genes={} [{}]",getN_genes(), String.join("; ", uniqueGeneSymbols));
     }
 
     public Integer getTotalNumOfUniqueBaits() {
@@ -238,8 +230,7 @@ public class Design {
         for(ViewPoint vp : viewPointList) {
             uniqueDigests.addAll(vp.getActiveSegments());
         }
-        // count number of baits
-        Integer n_baits = 0;
+        int n_baits = 0;
         for(Segment seg : uniqueDigests) {
             n_baits += seg.getBaitNumTotal();
         }
@@ -316,12 +307,15 @@ public class Design {
         Map<String, String> listItems = new LinkedHashMap<>();
         int ngenes = getN_genes();
         int resolvedGenes = getN_resolvedGenes();
-        String geneV = String.format("n=%d of which %d have \u2265 1 viewpoint with \u2265 1 selected digest", ngenes, resolvedGenes);
-        listItems.put("Genes", geneV);
+        listItems.put("assembly", service.getGenomeBuild());
+        listItems.put("Genes:", String.valueOf(ngenes));
+        listItems.put("Genes with \u2265 1 viewpoint with \u2265 1 selected digest:", String.valueOf(resolvedGenes));
         int nviewpoints = getN_viewpoints();
         int resolvedVP = getN_resolvedViewpoints();
         double avVpSize = getAvgVPsize();
         double avgVpScore = getAvgVPscore();
+        listItems.put("Viewpoints:", String.valueOf(nviewpoints));
+        listItems.put("Viewpoints with \u2265 1 selected digest:", String.valueOf(resolvedVP));
         String vpointV = String.format("n=%d of which %d have \u2265 1 selected digest",
                 nviewpoints, resolvedVP);
         if (service.getApproach().equals(Approach.SIMPLE)) {
@@ -330,32 +324,28 @@ public class Design {
         }
         String enzymes = service.getChosenEnzymelist().stream().map(RestrictionEnzyme::getName).collect(Collectors.joining(";"));
         listItems.put("Restriction enzyme(s)", enzymes);
+        String reSequences = service.getChosenEnzymelist().stream().map(RestrictionEnzyme::getSite).collect(Collectors.joining(";"));
+        listItems.put("Recognition site(s)", reSequences);
         listItems.put("Viewpoints", vpointV);
-        String vpointV2 = String.format("Mean size=%.1f bp; Mean score=%.1f%%",
-                avVpSize, 100 * avgVpScore);
-        listItems.put(" ", vpointV2);
-
+        listItems.put("Average viewpoint size", String.format("%.2f",avVpSize));
+        listItems.put("Average viewpoint score", String.format("%.2f",100 * avgVpScore));
         int nfrags = getN_unique_fragments();
         double avg_n_frag = getAvgFragmentsPerVP();
-        String fragmentV = String.format("Total number of unique digests=%d; Mean number of digests per viewpoint: %.1f",
-                nfrags, avg_n_frag);
-        listItems.put("Digests", fragmentV);
-
+        listItems.put("number of unique digests", String.valueOf(nfrags));
+        listItems.put("mean number of digests per viewpoint", String.format("%.2f", avg_n_frag));
         int n_balancedDigests = getTotalNumBalancedDigests();
         int n_unbalanced = getTotalNumUnbalancedDigests();
-        listItems.put("", String.format("Balanced: %d; Unbalanced: %d", n_balancedDigests, n_unbalanced));
+        listItems.put("Balanced restriction fragments", String.valueOf(n_balancedDigests));
+        listItems.put("Unbalanced restriction fragments", String.valueOf(n_unbalanced));
         int n_baits = getTotalNumOfUniqueBaits();
         Double captureSize = getCaptureSize() / 1000000.0;
-        String baitV = String.format("n=%d; Capture size: %.3f Mbp", n_baits, captureSize);
-        listItems.put("Probes", baitV);
-        listItems.put("Active segments", String.format("%d: 0 baints, %d: 1 bait, %s: 2 baits",
-                this.n_segments_with_no_bait, n_segments_with_one_bait, n_segments_with_two_bait));
-
+        listItems.put("Probes", String.valueOf(n_baits));
+        listItems.put("Capture size", String.format("%.3f Mbp", captureSize));
         listItems.put("Total baited fragments", String.valueOf(this.totalBaitedRestrictionFragments));
-        listItems.put("Total high quality fragments", String.valueOf(wellPlacedGoodQuality));
-        listItems.put("Total unilaterally baited fragments", String.valueOf(this.unilateralBait));
-        listItems.put("Total shifted fragments", String.valueOf(this.shiftedBaits));
-       // listItems.put("Fragments with high GC", String.valueOf(this.highGc));
+        listItems.put("Total unilaterally baited fragments", String.valueOf(this.totalFragmentsWithUnilateralBait));
+        listItems.put("Total shifted fragments", String.valueOf(this.totalFragmentsWithShiftedBaits));
+        listItems.put("Total bilateral unshifted fragments", String.valueOf(totalSurvivingBaitedFragments));
+        listItems.put("Total fragments with zero baits", String.valueOf(this.totalFragmentsWithZeroBaits));
         return listItems;
     }
 

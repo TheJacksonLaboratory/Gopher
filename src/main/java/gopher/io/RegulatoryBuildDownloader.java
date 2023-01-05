@@ -9,23 +9,14 @@ import java.io.File;
  * indicated species (mm9,mm10,hg19,hg38).
  * See <a href="http://www.ensembl.org/info/genome/funcgen/regulatory_build.html">http://www.ensembl.org/info/genome/funcgen/regulatory_build.html</a>
  * This class is intended to be used with {@link Downloader}
- *
+ * @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10.
  * @author Peter Robinson
  * @version 0.1.3 (2017-11-12)
  */
-public class RegulatoryBuildDownloader {
+public record RegulatoryBuildDownloader(String genome) {
     final private static String hg19="ftp://ftp.ensembl.org/pub/grch37/update/regulation/homo_sapiens/homo_sapiens.GRCh37.Regulatory_Build.regulatory_features.20161117.gff.gz";
     final private static String hg38 = "ftp://ftp.ensembl.org/pub/release-90/regulation/homo_sapiens/homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20161111.gff.gz";
 
-
-    private final String genome;
-
-    /**
-     * @param genome The name of the genome assembly, e.g., hg19, hg38, mm9,mm10.
-     */
-    public RegulatoryBuildDownloader(String genome) {
-        this.genome = genome;
-    }
 
     /**
      * @return The UCSC URL from which the transcript file is to be downloaded.

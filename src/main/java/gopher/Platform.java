@@ -21,12 +21,18 @@ package gopher;
  */
 
 
+import gopher.gui.factories.ProjectFile;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Platform {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Platform.class);
 
     private static final String projectDirname = "projects";
 
@@ -110,6 +116,22 @@ public class Platform {
 
         @Override
         public String toString() { return this.name; }
+    }
+
+
+    public static List<ProjectFile> getProjectFiles() {
+        List<ProjectFile> pfiles = new ArrayList<>();
+        File gopherDir = getGopherDir();
+        String[] contents = gopherDir.list();
+        for (String content : contents) {
+            LOGGER.trace("Project file: {}", content);
+            if (content.endsWith(".ser")) {
+                File f = new File(gopherDir + File.separator + content);
+                pfiles.add(new ProjectFile(f));
+            }
+        }
+
+    return pfiles;
     }
 
 

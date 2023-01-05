@@ -84,6 +84,10 @@ public class PopupFactory {
     }
 
 
+    public static void displayException(Exception e) {
+        displayException("Error", e.getMessage(), e);
+    }
+
     public static void displayException(String title, String message, Exception e) {
         TextArea textArea = new TextArea(e.toString());
         textArea.setEditable(false);

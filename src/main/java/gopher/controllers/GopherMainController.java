@@ -3,11 +3,9 @@ package gopher.controllers;
 import com.google.common.collect.ImmutableList;
 import gopher.exception.DownloadFileNotFoundException;
 import gopher.exception.GopherException;
-import gopher.gui.factories.EnzymeViewFactory;
-import gopher.gui.factories.HelpViewFactory;
-import gopher.gui.factories.QCCheckFactory;
-import gopher.gui.logviewer.LogViewerFactory;
+import gopher.gui.factories.*;
 import gopher.gui.factories.PopupFactory;
+import gopher.gui.logviewer.LogViewerFactory;
 import gopher.gui.progresspopup.ProgressPopup;
 import gopher.gui.regulatoryexomebox.RegulatoryExomeBoxFactory;
 import gopher.gui.util.MyPreloader;
@@ -528,7 +526,7 @@ public class GopherMainController implements Initializable {
         this.marginSizeTextField.setText(null);
         this.baitLengthTextField.setText(null);
         if (this.primaryStage != null)
-            this.primaryStage.setTitle(String.format("GOPHER"));
+            this.primaryStage.setTitle("GOPHER");
     }
 
     /**
@@ -1314,7 +1312,8 @@ public class GopherMainController implements Initializable {
      */
     @FXML
     public void deleteProjectFiles(ActionEvent e) {
-        DeleteFactory.display(this.gopherService);
+        List<ProjectFile> pfiles = gopher.Platform.getProjectFiles();
+        DeleteProjectFilesFactory.dispay(pfiles);
         e.consume();
     }
 

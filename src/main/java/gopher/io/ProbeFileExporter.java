@@ -56,27 +56,18 @@ public class ProbeFileExporter {
 
         PrintStream out_probe_file_bed = new PrintStream(new FileOutputStream(getFullPath(ProbeFileBedFormat)));
 
-        //PrintStream out_probe_file_agilent = new PrintStream(new FileOutputStream(getFullPath(ProbeFileAgilentFormat)));
-
-
         FileOutputStream fos = new FileOutputStream(getFullPath(ProbeFileAgilentFormatZip));
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ZipOutputStream zipOutAgillent = new ZipOutputStream(bos);
         zipOutAgillent.putNextEntry(new ZipEntry(ProbeFileAgilentFormat));
 
         zipOutAgillent.write("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates\n".getBytes());
-
-
-
-        //out_probe_file_agilent.println("TargetID\tProbeID\tSequence\tReplication\tStrand\tCoordinates");
-
         // TODO: The following code is not nice but it works. It would be better to derive first the list of unique
         // TODO: segments and then export probes from this list.
         // TODO: BUT NOTE, THE PROBES IN THE EXPORTED PROBE FILE FOR AGILENT NEED TO BE SORTED BY
         // TODO: REFERENCE ID AND STARTING COORDINATE!
 
         // use a hashMap of Integer sets to get rid of duplicated probes
-        Set<String> uniqueProbes = new HashSet<>();
         HashMap<String, ArrayList<Integer>> uniqueBaits = new HashMap<>();
         HashMap<String, String> coordsTogeneNames = new HashMap<>();
 
@@ -88,10 +79,7 @@ public class ProbeFileExporter {
                 if(0 == seg.getBaitNumTotal()) { continue; }
 
                 for(Bait b : seg.getBaitsForUpstreamMargin()) {
-                    String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
-                    uniqueProbes.add(key);
-                    String key2 = b.getRefId() + ":" + b.getStartPos();
-                    coordsTogeneNames.put(key2,vp.getTargetName());
+                    coordsTogeneNames.put(b.getContigStartPosKey(),vp.getTargetName());
                     if(!uniqueBaits.containsKey(b.getRefId())) {
                         ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
@@ -101,14 +89,11 @@ public class ProbeFileExporter {
                     }
                 }
                 for(Bait b : seg.getBaitsForDownstreamMargin()) {
-                    String key = b.getRefId() + ":" + b.getStartPos() + "-" + b.getEndPos(); // build key
-                    uniqueProbes.add(key);
-                    String key2 = b.getRefId() + ":" + b.getStartPos();
-                    coordsTogeneNames.put(key2,vp.getTargetName());
+                    coordsTogeneNames.put(b.getContigStartPosKey(), vp.getTargetName());
                     if(!uniqueBaits.containsKey(b.getRefId())) {
                         ArrayList<Integer> staPosList = new ArrayList<>();
                         staPosList.add(b.getStartPos());
-                        uniqueBaits.put(b.getRefId(),staPosList);
+                        uniqueBaits.put(b.getRefId(), staPosList);
                     } else {
                         uniqueBaits.get(b.getRefId()).add(b.getStartPos());
                     }
@@ -126,11 +111,11 @@ public class ProbeFileExporter {
             // convert ArrayList to set to get rid of duplicated baits
             Set<Integer> foo = new HashSet<>(uniqueBaits.get(refID));
             // convert back to ArrayList for sorting
-            ArrayList<Integer> sortedPositions = new ArrayList<>(foo);
+            ArrayList<Integer> sortedStartPositions = new ArrayList<>(foo);
 
-            Collections.sort(sortedPositions);
-            for (Integer sortedPosition : sortedPositions) {
-                LOGGER.error("sortedPosition {}", sortedPosition);
+            Collections.sort(sortedStartPositions);
+            for (Integer baitStartPosition : sortedStartPositions) {
+                LOGGER.error("sortedPosition {}", baitStartPosition);
                 // build ProbeID
                 String probeID = "probe_";
                 probeID += dateToStr;
@@ -139,15 +124,18 @@ public class ProbeFileExporter {
                 probeID += "_";
                 probeID += refID;
                 probeID += "_";
-                probeID += (sortedPosition - 1);
+                probeID += (baitStartPosition - 1);
                 probeID += "_";
-                String key3 = refID + ":" + sortedPosition;
+                String key3 = refID + ":" + baitStartPosition;
                 probeID += coordsTogeneNames.get(key3);
                 // get sequence
-                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, sortedPosition, sortedPosition + probe_length - 1);
-                String printToZip = refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + sortedPosition + "-" + (sortedPosition + 120 - 1) + "\n";
+                // note that in HTSJDK, the start and stop positions in the following function
+                // are both inclusive, 1-based start/stop of region.
+                // the probeID, in contrast, is using the zero-based coordinates
+                ReferenceSequence sequence = fastaReader.getSubsequenceAt(refID, baitStartPosition, baitStartPosition + probe_length - 1);
+                String printToZip = refID + "\t" + probeID + "\t" + sequence.getBaseString().toUpperCase() + "\t" + 1 + "\t" + "+" + "\t" + refID + ":" + baitStartPosition + "-" + (baitStartPosition + 120 - 1) + "\n";
                 zipOutAgillent.write(printToZip.getBytes());
-                out_probe_file_bed.println(refID + "\t" + (sortedPosition - 1) + "\t" + (sortedPosition + probe_length - 2) + "\t" + probeID); // start and end 0-based
+                out_probe_file_bed.println(refID + "\t" + (baitStartPosition - 1) + "\t" + (baitStartPosition + probe_length - 2) + "\t" + probeID); // start and end 0-based
             }
         }
         zipOutAgillent.closeEntry();

@@ -36,11 +36,7 @@ public class ProbeFactoryTest {
         //String testFastaFile = classLoader.getResource("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa").getFile();
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
         IndexedFastaSequenceFile fastaReader = new IndexedFastaSequenceFile(fasta);
-
-        testSeg = new Segment.Builder("chr1",900,2002).
-                fastaReader(fastaReader).
-                marginSize(20).
-                build();
+        testSeg = new Segment("chr1",900,2002, fastaReader, 20);
     }
 
     @Test

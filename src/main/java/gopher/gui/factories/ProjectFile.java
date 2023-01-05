@@ -14,18 +14,11 @@ import java.io.File;
 public class ProjectFile {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectFile.class.getName());
     private final StringProperty absolutePath;
-    /** Has this file been deleted? */
-    private boolean isDeleted=false;
-    /** Is this the file that is currently active on the GUI? */
-    private boolean isActiveFile=false;
 
-
-    public ProjectFile(String path) {
-        absolutePath = new SimpleStringProperty(path);
+    public ProjectFile(File path) {
+        absolutePath = new SimpleStringProperty(path.getAbsolutePath());
     }
 
-    public void setActive() { this.isActiveFile=true;}
-    public void setInActive() { this.isActiveFile=false; }
     public void deleteFile() {
         LOGGER.trace(String.format("Deleting project files %s",absolutePath.getValue()));
         (new File(absolutePath.getValue())).delete();

@@ -20,7 +20,7 @@ import java.util.Set;
  * <ol>
  *     <li>Target regions; now unique margins</li>
  *     <li>All tracks; combine genomic positions, viewpoints, fragments, etc. in one BED file</li>
- *      <li>Summary tsv; For each viewpoint collect all informations that are useful for sharing the results,
+ *     <li>Summary tsv; For each viewpoint collect all informations that are useful for sharing the results,
  * such as UCSC links, scores, number of selected fragments, etc..</li>
  * </ol>
  * The target regions file is intended to be used to generate probes, .e.g., by use of a Wizard of a probe manufacturer.
@@ -28,28 +28,25 @@ import java.util.Set;
  * @version 0.0.3 (2017-10-14)
  */
 public class BEDFileExporter {
-
-    private static final Logger logger = LoggerFactory.getLogger(BEDFileExporter.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(BEDFileExporter.class.getName());
     private final String allTracksBEDfile;
     private final String targetRegionBEDfile;
-    private final String vpvSummaryTSVfile;
-    //private final String vpvSummaryRfile;
+    private final String gopherSummaryTSVfile;
     private final String vpvUniqueTargetFragmentsFile;
     /** Path to directory where the BED files will be stored. The path is guaranteed to have no trailing slash. */
     private final String directoryPath;
 
     /**
      *
-     * @param dirpath The directory where we will write the BED and TSV files to
+     * @param dirpath The directory into which we will write the BED and TSV files
      * @param outPrefix The prefix (name) of the files.
      */
     public BEDFileExporter(String dirpath, String outPrefix){
         // initialize the file  names
-        this.allTracksBEDfile =String.format("%s_allTracks.bed",outPrefix);
-        this.targetRegionBEDfile =String.format("%s_uniqueTargetDigestMargins.txt",outPrefix);
-        this.vpvSummaryTSVfile=String.format("%s_viewPoints.tsv",outPrefix);
-        //this.vpvSummaryRfile=String.format("%s_vpvSummary.r",outPrefix);
-        this.vpvUniqueTargetFragmentsFile=String.format("%s_uniqueTargetDigests.bed",outPrefix);
+        this.allTracksBEDfile = String.format("%s_allTracks.bed",outPrefix);
+        this.targetRegionBEDfile = String.format("%s_uniqueTargetDigestMargins.txt",outPrefix);
+        this.gopherSummaryTSVfile = String.format("%s_viewPoints.tsv",outPrefix);
+        this.vpvUniqueTargetFragmentsFile = String.format("%s_uniqueTargetDigests.bed",outPrefix);
         /* remove trailing slash if necessary. */
         if (dirpath.endsWith(File.separator)) {
             dirpath=dirpath.substring(0,dirpath.length()-1);
@@ -75,30 +72,17 @@ public class BEDFileExporter {
         PrintStream out_targetRegions = new PrintStream(new FileOutputStream(getFullPath(targetRegionBEDfile)));
         out_targetRegions.println("track name='" + targetRegionBEDfile + "' description='" + targetRegionBEDfile + "'");
 
-        // print tsv file that can be used to share the results of VPV
-        // -----------------------------------------------------------
-        PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryTSVfile)));
+        // print tsv file with summary of GOPHER results
+        PrintStream out_ucscURL = new PrintStream(new FileOutputStream(getFullPath(gopherSummaryTSVfile)));
         out_ucscURL.println("Gene\tGENOMIC_POS\tURL\tNO_SELECTED_FRAGMENTS\tSCORE\tVP_LENGTH\tACT_SEG_LENGTH\tTSS_FRAGMENT_SELECTED");
         for (ViewPoint vp : viewpointlist) {
             if(vp.getNumOfSelectedFrags()==0) {continue;}
             String url= getDefaultURL(vp,genomeBuild);
-            int NO_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
+            int Nr_SELECTED_FRAGMENTS = vp.getActiveSegments().size();
             String SCORE = String.format("%.2f", vp.getScore());
-            out_ucscURL.printf("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b%n",vp.getTargetName(),vp.getGenomicLocationString(),url,NO_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen());
+            out_ucscURL.printf("%s\t%s\t%s\t%d\t%s\t%d\t%d\t%b%n",vp.getTargetName(),vp.getGenomicLocationString(),url,Nr_SELECTED_FRAGMENTS,SCORE,vp.getTotalLengthOfViewpoint(),vp.getTotalLengthOfActiveSegments(),vp.isTSSfragmentChosen());
         }
         out_ucscURL.close();
-
-        //PrintStream vpvSummaryR = new PrintStream(new FileOutputStream(getFullPath(vpvSummaryRfile)));
-
-        //String[] helpSplit=vpvSummaryRfile.split("_gopherSummary.r");
-        //String prefix=helpSplit[0];
-        //String script=getRscript(prefix);
-        //vpvSummaryR.println(script);
-
-        // print file for all tracks that can be uploaded to the UCSC genome browser
-        // print file for target regions that can be used as input for the SureDesign wizard
-        // ---------------------------------------------------------------------------------
-
         PrintStream out_allTracks = new PrintStream(new FileOutputStream(getFullPath(allTracksBEDfile)));
 
         // print genomic positions
@@ -157,11 +141,10 @@ public class BEDFileExporter {
                     uniqueFragmentMargins.add(vp.getReferenceID() + "\t" + (fmStaPos-1) + "\t" + fmEndPos + "\t" + vp.getTargetName() + "_margin_" + l);
                     uniqueFragments.add(vp.getReferenceID() + "\t" + (segment.getStartPos()-1) + "\t" + segment.getEndPos() + "\t" + vp.getTargetName());
                     for(Bait bait : segment.getBaitsForUpstreamMargin()) {
-                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tup|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
+                        uniqueProbes.add(bait.getTsvLineUpstream());
                     }
-
                     for(Bait bait : segment.getBaitsForDownstreamMargin()) {
-                        uniqueProbes.add(bait.getRefId() + "\t" + bait.getStartPos() + "\t" + bait.getEndPos() + "\tdown|GC:" + String.format("%.2f",bait.getGCContent()) + "|Ali:" + String.format("%.2f",bait.getAlignabilityScore()) + "|Rep:" + String.format("%.2f",bait.getRepeatContent()) + "\t" + (int) Math.round(1000/bait.getAlignabilityScore()));
+                        uniqueProbes.add(bait.getTsvLineDownstream());
                     }
                 }
             }
@@ -201,7 +184,7 @@ public class BEDFileExporter {
         out_allTracks.close();
         out_targetRegions.close();
 
-        logger.trace("Done output of BED files. Total Length of Margins: " + totalLengthOfMargins);
+        LOGGER.trace("Done output of BED files. Total Length of Margins: {}", totalLengthOfMargins);
 
         // print out unique set of target fragments to a separate file that can be used as input for diachromatic
         // ------------------------------------------------------------------------------------------------------

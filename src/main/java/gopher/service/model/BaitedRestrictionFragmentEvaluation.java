@@ -3,21 +3,19 @@ package gopher.service.model;
 import gopher.service.model.viewpoint.Segment;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This class evaluates each baited restriction fragment with respect to unilateral baits, shifted baits, and
  * high GC content, and also provides a method that reports of the restriction fragment has high-quality bilateral
- * baits that do not have a too high GC content: {@link #wellPlacedHighQuality}.
+ * baits that do not have a too high GC content: {@link #bilateralAndwellPlaced}.
  * @author  Peter N Robinson
  */
 public class BaitedRestrictionFragmentEvaluation {
 
     /**
      * If true, then the baits for this restriction fragment are well placed (two baits, both not shifted)
-     * and the GC content is not over 50%
      */
-    final boolean wellPlacedHighQuality;
+    final boolean bilateralAndwellPlaced;
     /**
      * If true, one side has zero baits
      */
@@ -63,20 +61,24 @@ public class BaitedRestrictionFragmentEvaluation {
         gcContentUp = segment.getGCcontentUp();
         unilateralBait = n_bait_upstream == 0 || n_bait_downstream == 0;
         highGc = (n_bait_upstream > 0 && gcContentUp > 0.5) || (n_bait_downstream > 0 && gcContentDown > 0.5);
-        wellPlacedHighQuality = (! unilateralBait) &&
-                (n_downstream_shifted + n_upstream_shifted == 0); // &&     (! highGc);
+        bilateralAndwellPlaced = (! unilateralBait) &&
+                (n_downstream_shifted + n_upstream_shifted == 0);
     }
 
-    public boolean isWellPlacedHighQuality() {
-        return wellPlacedHighQuality;
+    public boolean isBilateralWellPlacedBaitedFragment() {
+        return bilateralAndwellPlaced;
     }
 
     public boolean isUnilateralBait() {
         return unilateralBait;
     }
 
+    public boolean hasZeroBait() {
+        return this.n_bait_number == 0;
+    }
+
     public boolean isShifted() {
-        return ! unilateralBait && (n_upstream_shifted>0 || n_downstream_shifted>0);
+        return n_upstream_shifted>0 || n_downstream_shifted>0;
     }
 
     public boolean isHighGc() {
@@ -84,9 +86,9 @@ public class BaitedRestrictionFragmentEvaluation {
     }
 
 
-    public static int getGoodQualityFragmentCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
+    public static int getSurvivingBaitedFragmentCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
-                .filter(BaitedRestrictionFragmentEvaluation::isWellPlacedHighQuality)
+                .filter(BaitedRestrictionFragmentEvaluation::isBilateralWellPlacedBaitedFragment)
                 .count();
     }
 
@@ -107,6 +109,12 @@ public class BaitedRestrictionFragmentEvaluation {
     public static int getHighGcBaitCount(List<BaitedRestrictionFragmentEvaluation> fragments) {
         return (int) fragments.stream()
                 .filter(BaitedRestrictionFragmentEvaluation::isHighGc)
+                .count();
+    }
+
+    public static int getCountOfFragmentsWithZeroBaits(List<BaitedRestrictionFragmentEvaluation> fragments) {
+        return (int) fragments.stream()
+                .filter(BaitedRestrictionFragmentEvaluation::hasZeroBait)
                 .count();
     }
 }

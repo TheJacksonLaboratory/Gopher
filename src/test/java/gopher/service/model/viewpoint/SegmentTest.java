@@ -49,10 +49,9 @@ public class SegmentTest {
      * @return A Segment with no repeat bases
      */
     private static Segment buildSegmentA(IndexedFastaSequenceFile reader) {
-        return new Segment.Builder(referenceSequenceID,21,44).
-                fastaReader(reader).
-                marginSize(Default.MARGIN_SIZE).
-                build();
+        return new Segment(referenceSequenceID,21,44,
+                reader,
+                Default.MARGIN_SIZE);
     }
 
     /**
@@ -65,10 +64,9 @@ public class SegmentTest {
      * @return A Segment with 10/24 repeat bases
      */
     private static Segment buildSegmentB(IndexedFastaSequenceFile reader) {
-        return new Segment.Builder(referenceSequenceID,69,92).
-                fastaReader(reader).
-                marginSize(Default.MARGIN_SIZE).
-                build();
+        return new Segment(referenceSequenceID,69,92,
+                reader,
+                Default.MARGIN_SIZE);
     }
 
     /**
@@ -81,9 +79,9 @@ public class SegmentTest {
      * @return A Segment with 100% repeat bases
      */
     private static Segment buildSegmentC(IndexedFastaSequenceFile reader) {
-        return new Segment.Builder(referenceSequenceID,93,112).
-                fastaReader(reader).
-                marginSize(Default.MARGIN_SIZE).build();
+        return new Segment(referenceSequenceID,93,112,
+                reader,
+                Default.MARGIN_SIZE);
     }
 
 
@@ -94,8 +92,8 @@ public class SegmentTest {
      */
     @Test
     public void testGetSegmentMargins() {
-        int marg=5; /* margin size for testing */
-        Segment  segment = new Segment.Builder(referenceSequenceID,69,92).fastaReader(FastaReader).marginSize(marg).build();
+        int marginSize=5; /* margin size for testing */
+        Segment  segment = new Segment(referenceSequenceID,69,92,FastaReader,marginSize);
         double expected = 1.0;
         double epsilon=0.0001;
         assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
@@ -110,8 +108,8 @@ public class SegmentTest {
      */
     @Test
     public void testGetSegmentMargins2() {
-        int marg=5; /* margin size for testing */
-        Segment  segment = new Segment.Builder(referenceSequenceID,75,92).fastaReader(FastaReader).marginSize(marg).build();
+        int marginSize = 5; /* margin size for testing */
+        Segment  segment = new Segment(referenceSequenceID,75,92,FastaReader,marginSize);
         double expected = 0.8;
         double epsilon=0.0001;
         assertEquals(expected,segment.getRepeatContentMarginUp(),epsilon);
@@ -127,8 +125,8 @@ public class SegmentTest {
      */
     @Test
     public void testGetSegmentMargins3() {
-        int marg=5; /* margin size for testing */
-        Segment  segment = new Segment.Builder(referenceSequenceID,75,95).fastaReader(FastaReader).marginSize(marg).build();
+        int marginSize = 5; /* margin size for testing */
+        Segment  segment = new Segment(referenceSequenceID,75,95,FastaReader, marginSize);
         //System.out.println("D="+FastaReader.getSubsequenceAt(referenceSequenceID, 75, 95).getBaseString());
         double expected = 0.8;
         double epsilon=0.0001;
@@ -263,11 +261,7 @@ public class SegmentTest {
     @Test
     public void testRepetitiveContentAlteredSegmentB() {
         // change end position
-        //Segment seg = new Segment(referenceSequenceID,72,92,false, FastaReader);
-        Segment seg=new Segment.Builder(referenceSequenceID,72,92).
-                fastaReader(FastaReader).
-                marginSize(Default.MARGIN_SIZE).
-                build();
+        Segment seg=new Segment(referenceSequenceID,72,92, FastaReader, Default.MARGIN_SIZE);
         double expected = 7.0/21;
         double epsilon=0.0001;
 
@@ -337,10 +331,7 @@ public class SegmentTest {
         // create segment for testing
         File fasta = new File("src/test/resources/testAlignabilityMap/testAlignabilityMap.fa");
         FastaReader = new IndexedFastaSequenceFile(fasta);
-        Segment testSeg = new Segment.Builder("chr1",900,2002).
-                fastaReader(FastaReader).
-                marginSize(250).
-                build();
+        Segment testSeg = new Segment("chr1",900,2002, FastaReader, 250);
         List<IntPair> ip = testSeg.getSegmentMargins();
         Integer upStreamStaPos = ip.get(0).startPos();
         Integer upStreamEndPos = ip.get(0).endPos();
