@@ -149,7 +149,7 @@ public class Design {
                 }
             }
         }
-        this.totalSurvivingBaitedFragments = BaitedRestrictionFragmentEvaluation.getSurvivingBaitedFragmentCount(evalList);
+        this.totalSurvivingBaitedFragments = BaitedRestrictionFragmentEvaluation.getWellPlacedBaitedFragmentCount(evalList);
         this.totalFragmentsWithUnilateralBait = BaitedRestrictionFragmentEvaluation.getUnilateralBaitCount(evalList);
         this.totalFragmentsWithShiftedBaits = BaitedRestrictionFragmentEvaluation.getShiftedBaitCount(evalList);
         this.totalFragmentsWithZeroBaits = BaitedRestrictionFragmentEvaluation.getCountOfFragmentsWithZeroBaits(evalList);
@@ -264,41 +264,6 @@ public class Design {
         return cSize;
     }
 
-
-    public Integer getTotalNumBalancedDigests() {
-        // get rid of redundant segments emerging from overlapping viewpoints
-        Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for (ViewPoint vp : viewPointList) {
-            uniqueDigests.addAll(vp.getActiveSegments());
-        }
-        // count number balanced
-        Integer n_balanced_digests = 0;
-        for (Segment seg : uniqueDigests) {
-            if(seg.isBalanced()) {
-                n_balanced_digests++;
-            }
-        }
-        return n_balanced_digests;
-    }
-
-    public int getTotalNumUnbalancedDigests() {
-        // get rid of redundant segments emerging from overlapping viewpoints
-        Set<Segment> uniqueDigests = new HashSet<>();
-        List<ViewPoint> viewPointList = service.getViewPointList();
-        for (ViewPoint vp : viewPointList) {
-            uniqueDigests.addAll(vp.getActiveSegments());
-        }
-        // count number balanced
-        int n_unbalanced_digests = 0;
-        for (Segment seg : uniqueDigests) {
-            if(seg.isUnbalanced()) {
-                n_unbalanced_digests++;
-            }
-        }
-        return n_unbalanced_digests;
-    }
-
     public int getN_patched_viewpoints(){ return n_patched_viewpoints;}
 
 
@@ -333,10 +298,6 @@ public class Design {
         double avg_n_frag = getAvgFragmentsPerVP();
         listItems.put("number of unique digests", String.valueOf(nfrags));
         listItems.put("mean number of digests per viewpoint", String.format("%.2f", avg_n_frag));
-        int n_balancedDigests = getTotalNumBalancedDigests();
-        int n_unbalanced = getTotalNumUnbalancedDigests();
-        listItems.put("Balanced restriction fragments", String.valueOf(n_balancedDigests));
-        listItems.put("Unbalanced restriction fragments", String.valueOf(n_unbalanced));
         int n_baits = getTotalNumOfUniqueBaits();
         Double captureSize = getCaptureSize() / 1000000.0;
         listItems.put("Probes", String.valueOf(n_baits));

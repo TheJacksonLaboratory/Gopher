@@ -9,7 +9,8 @@ users to revise them using an interactive visualization.
 Please download the app from the [Releases page](https://github.com/TheJacksonLaboratory/Gopher/releases) 
 (currently GOPHER-0.8.18.jar).
 You will require Java 17 or higher to run Gopher.  On most computers you should be able to start the app with 
-a double click. If desired, you can
+a double click. (Note to M1/M2 MacIntosh users - we have noted that problems occur with JavaFX applications such as GOPHER
+on M1 Macs with Java 17; we recommend using the Java 19 JDK from [Azul](https://www.azul.com/) Zulu). If desired, you can
 also start Gopher from the command line as follows.
 
 ```aidl

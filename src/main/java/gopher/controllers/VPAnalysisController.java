@@ -316,6 +316,7 @@ public class VPAnalysisController implements Initializable {
         observableViewPointList.clear();
         observableViewPointList.setAll(this.gopherService.getViewPointList());
         LOGGER.trace("Size of observableViewPointList after adding viewpoints {}", observableViewPointList.size());
+        updateListView() ;
     }
 
     /**

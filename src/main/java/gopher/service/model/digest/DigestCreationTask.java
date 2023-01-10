@@ -78,10 +78,6 @@ public class DigestCreationTask extends Task<Void> {
      */
     private final String genomeFastaFilePath;
     /**
-     * File handle for the output of the restriction fragments.
-     */
-    private BufferedWriter out = null;
-    /**
      * size of margin of fragments used for calculating GC and fivePrimeRepeatContent content.
      */
     private final int marginSize;
@@ -172,7 +168,10 @@ public class DigestCreationTask extends Task<Void> {
             }
         }
         try {
-            out = new BufferedWriter(new FileWriter(outfilename));
+            /**
+             * File handle for the output of the restriction fragments.
+             */
+            BufferedWriter out = new BufferedWriter(new FileWriter(outfilename));
             out.write(HEADER + "\n");
             List<DetailedDigest>  detailedDigestList = cutChromosomes(this.genomeFastaFilePath);
             out.close();
@@ -261,9 +260,10 @@ public class DigestCreationTask extends Task<Void> {
             String subsequence = sequence.substring(startpos - 1, endpos);
             Result result = getGcAndRepeat(subsequence, this.marginSize);
 
+
             boolean selected = false;
-            Integer baitNumUp = 0;
-            Integer baitNumDown = 0;
+            int baitNumUp = 0;
+            int baitNumDown = 0;
             if (btree.containsNode(scaffoldName, startpos)) {
                 selected = true;
                 Segment seg = btree.getNode(scaffoldName, startpos).segment;
@@ -301,8 +301,8 @@ public class DigestCreationTask extends Task<Void> {
         String subsequence = sequence.substring(startpos - 1, endpos);
         Result result = getGcAndRepeat(subsequence, marginSize);
         boolean selected = false;
-        Integer baitNumUp = 0;
-        Integer baitNumDown = 0;
+        int baitNumUp = 0;
+        int baitNumDown = 0;
         if (btree.containsNode(scaffoldName, startpos)) {
             selected = true;
             Segment seg = btree.getNode(scaffoldName, startpos).segment;

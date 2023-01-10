@@ -31,8 +31,6 @@ public class Faidx extends Task<Void> {
     private final String genomeFastaBaseName;
     /** Basename of the genome fasta index file, e.g., hg19.fa.fai */
     private final String genomeFastaIndexBaseName;
-    /** Number of canonical chromosomes, e.g., chr1 and not chr3random123. */
-    private final int n_canonical_chromosomes;
     /** Key: Name of a chromosome (or in general, of a contig). Value: length in nucleotides. */
     private final Map<String, Integer> contigLengths;
     /** The progress indicator on the GUI that will show progress of indexing. */
@@ -44,7 +42,6 @@ public class Faidx extends Task<Void> {
         this.genomeFastaIndexBaseName =genomeFastaBaseName + ".fai"; // fai suffix
         logger.trace("Initializing fasta indexing at directory " + this.genomeDirectoryPath);
         this.progress = pi;
-        this.n_canonical_chromosomes = model.getGenome().getNumberOfCanonicalChromosomes();
         this.contigLengths = new HashMap<>();
     }
 
