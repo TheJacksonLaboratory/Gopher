@@ -261,9 +261,10 @@ public class DigestCreationTask extends Task<Void> {
             String subsequence = sequence.substring(startpos - 1, endpos);
             Result result = getGcAndRepeat(subsequence, this.marginSize);
 
+
             boolean selected = false;
-            Integer baitNumUp = 0;
-            Integer baitNumDown = 0;
+            int baitNumUp = 0;
+            int baitNumDown = 0;
             if (btree.containsNode(scaffoldName, startpos)) {
                 selected = true;
                 Segment seg = btree.getNode(scaffoldName, startpos).segment;
@@ -301,8 +302,8 @@ public class DigestCreationTask extends Task<Void> {
         String subsequence = sequence.substring(startpos - 1, endpos);
         Result result = getGcAndRepeat(subsequence, marginSize);
         boolean selected = false;
-        Integer baitNumUp = 0;
-        Integer baitNumDown = 0;
+        int baitNumUp = 0;
+        int baitNumDown = 0;
         if (btree.containsNode(scaffoldName, startpos)) {
             selected = true;
             Segment seg = btree.getNode(scaffoldName, startpos).segment;
