@@ -23,10 +23,7 @@ import gopher.service.model.viewpoint.ViewPointCreationTask;
 import gopher.service.GopherService;
 import gopher.util.Utils;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,6 +31,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.VBox;
@@ -69,6 +67,9 @@ import static javafx.application.Platform.runLater;
 @Component
 public class GopherMainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(GopherMainController.class.getName());
+    @FXML
+    public Label projectNameLabel;
+    private final StringProperty projectNameProperty = new SimpleStringProperty();
 
 
     /**
@@ -193,11 +194,6 @@ public class GopherMainController implements Initializable {
      */
     @Autowired
     private Properties pgProperties;
-
-    /**
-     * Reference to the primary stage. We use this to set the title when we switch models (new from File menu).
-     */
-    private Stage primaryStage = null;
 
     @Autowired
     GopherService gopherService;
@@ -330,6 +326,8 @@ public class GopherMainController implements Initializable {
         setGUItoSimple();
         initializePromptTexts();
         setBindings();
+        String cssValue = " -fx-font-size: 18; -fx-text-fill: blue;";
+        this.projectNameLabel.setStyle(cssValue);
         this.approachChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
             String selectedItem = approachChoiceBox.getItems().get((Integer) number2);
             switch (selectedItem) {
@@ -355,6 +353,17 @@ public class GopherMainController implements Initializable {
         gopherService.setProjectName(projectName);
         LOGGER.trace("Project name " + projectName);
         this.vpAnalysisController.setTabPaneRef(tabpane);
+    }
+
+
+   Stage getPrimaryStageReference() {
+        Scene scene = this.genomeChoiceBox.getScene();
+        if (scene ==null) {
+            LOGGER.error("Could not retrieve scene from genomeChoiceBox");
+            return null;
+        } else {
+            return  (Stage) scene.getWindow();
+        }
     }
 
 
@@ -444,8 +453,7 @@ public class GopherMainController implements Initializable {
         this.allGenesLabel.setText("");
         this.bedTargetsLabel.setText("");
         LOGGER.trace("setInitializedValuesInGUI (bottom1): genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
-        if (this.primaryStage != null)
-            this.primaryStage.setTitle(String.format("GOPHER: %s", gopherService.getProjectName()));
+        this.projectNameProperty.set(String.format("GOPHER: %s", gopherService.getProjectName()));
         // Something weird is causing the path to path_to_downloaded_genome_directory to be set to null
         // reset it here -- extensive debugging could not figure out
         if (gopherService.getGenomeDirectoryPath() == null) {
@@ -489,8 +497,7 @@ public class GopherMainController implements Initializable {
         LOGGER.info("Starting new project with name {}", newProjectName);
         gopherService.setProjectName(newProjectName);
         initializeNewModelInGui();
-        if (this.primaryStage != null)
-            this.primaryStage.setTitle(String.format("GOPHER: %s", newProjectName));
+        this.projectNameProperty.set(String.format("GOPHER: %s", newProjectName));
     }
 
 
@@ -525,8 +532,6 @@ public class GopherMainController implements Initializable {
         this.maxKmerAlignabilityTextField.setText(null);
         this.marginSizeTextField.setText(null);
         this.baitLengthTextField.setText(null);
-        if (this.primaryStage != null)
-            this.primaryStage.setTitle("GOPHER");
     }
 
     /**
@@ -586,6 +591,7 @@ public class GopherMainController implements Initializable {
         Bindings.bindBidirectional(this.minBaitCountTextField.textProperty(), minimumBaitCountProperty(), integerConverter);
         Bindings.bindBidirectional(this.baitLengthTextField.textProperty(), baitLengthProperty(), integerConverter);
         Bindings.bindBidirectional(this.marginSizeTextField.textProperty(), marginLengthProperty(), integerConverter);
+        Bindings.bindBidirectional(this.projectNameLabel.textProperty(), projectNameProperty);
         sizeDownTextField.clear();
         sizeUpTextField.clear();
         minFragSizeTextField.clear();
@@ -878,7 +884,8 @@ public class GopherMainController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose file with list of gene symbols or Entrez Gene IDs");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File file = fileChooser.showOpenDialog(primaryStage);
+
+        File file = fileChooser.showOpenDialog(getPrimaryStageReference());
         if (file == null) {
             LOGGER.error("Could not get name of BED file");
             return;
@@ -887,6 +894,7 @@ public class GopherMainController implements Initializable {
             this.gopherService.setTargetGenesPath(file.getAbsolutePath());
         }
         enterEntrezGeneListFromFile(file);
+
         e.consume();
     }
 
@@ -903,7 +911,7 @@ public class GopherMainController implements Initializable {
         e.consume();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File file = fileChooser.showOpenDialog(primaryStage);
+        File file = fileChooser.showOpenDialog(getPrimaryStageReference());
         if (file == null) {
             LOGGER.error("Could not get name of BED file");
             return;
@@ -1357,9 +1365,6 @@ public class GopherMainController implements Initializable {
         LOGGER.trace("Importing project: {}", file.getAbsolutePath());
         removePreviousValuesFromTextFields();
         gopherService.importProjectFromFile(file);
-        if (this.primaryStage != null)
-            this.primaryStage.setTitle(String.format("GOPHER: %s",
-                    gopherService.getProjectName()));
         setInitializedValuesInGUI();
         LOGGER.trace("importProject: genome dir{}", gopherService.getGenome().getPathToGenomeDirectory());
         vpAnalysisController.refreshVPTable();
@@ -1474,10 +1479,6 @@ public class GopherMainController implements Initializable {
         closeWindow(new ActionEvent(event.getSource(), event.getTarget()));
     };
 
-    public void setPrimaryStageReference(Stage stage) {
-        this.primaryStage = stage;
-        this.primaryStage.setOnCloseRequest(confirmCloseEventHandler);
-    }
 
     @FXML
     public void displayReport(ActionEvent e) {
@@ -1493,7 +1494,7 @@ public class GopherMainController implements Initializable {
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         chooser.setInitialFileName(filename);
-        File file = chooser.showSaveDialog(this.primaryStage);
+        File file = chooser.showSaveDialog(getPrimaryStageReference());
         if (file == null) {
             PopupFactory.displayError("Error", "Could not get filename for saving report");
             return;
@@ -1526,7 +1527,7 @@ public class GopherMainController implements Initializable {
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         String filename = "gopher-design-" + enz + ".tsv";
         chooser.setInitialFileName(filename);
-        File file = chooser.showSaveDialog(this.primaryStage);
+        File file = chooser.showSaveDialog( getPrimaryStageReference());
         if (file == null) {
             PopupFactory.displayError("Error", "Could not get filename for saving report");
             return;
