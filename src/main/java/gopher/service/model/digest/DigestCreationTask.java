@@ -78,10 +78,6 @@ public class DigestCreationTask extends Task<Void> {
      */
     private final String genomeFastaFilePath;
     /**
-     * File handle for the output of the restriction fragments.
-     */
-    private BufferedWriter out = null;
-    /**
      * size of margin of fragments used for calculating GC and fivePrimeRepeatContent content.
      */
     private final int marginSize;
@@ -172,7 +168,10 @@ public class DigestCreationTask extends Task<Void> {
             }
         }
         try {
-            out = new BufferedWriter(new FileWriter(outfilename));
+            /**
+             * File handle for the output of the restriction fragments.
+             */
+            BufferedWriter out = new BufferedWriter(new FileWriter(outfilename));
             out.write(HEADER + "\n");
             List<DetailedDigest>  detailedDigestList = cutChromosomes(this.genomeFastaFilePath);
             out.close();

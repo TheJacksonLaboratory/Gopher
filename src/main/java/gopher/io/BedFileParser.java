@@ -23,17 +23,6 @@ public class BedFileParser {
      * This map should contain all symbols in the refGene file.
      *  */
     private final Map<String, GopherGene> gene2chromosomePosMap;
-    /** The set of gene symbols that we could not find in the {@code refGene.txt.gz} file--and ergo,that we regard as being invalid because
-     * they are using nonstandard gene symbols.*/
-    private Set<String> invalidGeneSymbols;
-    /** The set of gene symbols that we could find in  the {@code refGene.txt.gz} file--and ergo,that we regard as being valid.
-     * These are the genes chosen by the user. */
-    private Set<String> validGeneSymbols;
-    /** Total number of genes in the refGene.txt.gz file (number of unique gene symbols). */
-    private int n_totalGenes;
-    private int n_chosenGenes;
-    private int n_totalTSS;
-    private int n_chosenTSS;
 
     private final static int MINIMUM_NUMBER_OF_BED_FIELDS=6;
 
@@ -95,11 +84,12 @@ public class BedFileParser {
      */
     public List<GopherGene> getGopherGeneList() {
         List<GopherGene> genelist=new ArrayList<>();
-        this.n_chosenTSS=0;
+        int n_chosenTSS=0;
         for (GopherGene g: gene2chromosomePosMap.values()) {
             genelist.add(g);
-            this.n_chosenTSS += g.n_viewpointstarts();
+            n_chosenTSS += g.n_viewpointstarts();
         }
+        LOGGER.info("Added {} genes to chosen gene list", n_chosenTSS);
         return genelist;
     }
 
