@@ -48,12 +48,12 @@ public class ViewPoint implements Serializable {
     private final String accession;
     /** Name of the target of the viewpoint (often a gene).*/
     private final String targetName;
-    /** central genomic coordinate of the viewpoint, usually a transcription start site. One-based fully closed numbering */
+    /** Genomic coordinate of the viewpoint, usually a transcription start site. 1-based fully closed numbering */
     private final int genomicPos;
-    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).
+    /** The range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).
      * Note that this is defined with respect to the strand -- it is "reversed" for genes on the - strand. */
     private int upstreamNucleotideLength;
-    /** refers to the  the range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
+    /** The range around 'genomicPos' in which VPV searches initially for cutting positions (CuttingPositionMap).*/
     private int downstreamNucleotideLength;
     /** start position of the viewpoint */
     private int startPos;
@@ -70,7 +70,7 @@ public class ViewPoint implements Serializable {
     private final boolean isPositiveStrand;
     /** Data structure for storing cutting site position relative to 'genomicPos' */
     private SegmentFactory segmentFactory;
-    /** List of active and inactive restriction {@link gopher.service.model.viewpoint.Segment} objects that are contained within the viewpoint. */
+    /** Active and inactive restriction {@link gopher.service.model.viewpoint.Segment} objects contained within the viewpoint. */
     private List<Segment> restrictionSegmentList;
     /** List of restriction enzymes chosen by the User (package scope visibility). */
     static List<RestrictionEnzyme> chosenEnzymes=null;
@@ -229,7 +229,8 @@ public class ViewPoint implements Serializable {
                     changed=true;
                 }
 
-                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) &&
+                        (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
                     LOGGER.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
@@ -279,15 +280,16 @@ public class ViewPoint implements Serializable {
                     changed=true;
                 }
 
-                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) && (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
+                if((0 < segmentFactory.getNumOfCutsUpstreamPos(genomicPos)) &&
+                        (0 < segmentFactory.getNumOfCutsDownstreamPos(genomicPos))) {
                     LOGGER.trace("0<x and 0<y");
                     initRestrictionFragments(fastaReader, c2align);
                 }
             }
             while (changed && (segmentFactory.getNumOfCutsUpstreamPos(genomicPos-upstreamNucleotideLength) < 2 ||
                     segmentFactory.getNumOfCutsDownstreamPos(genomicPos+downstreamNucleotideLength) < 2) &&
-                    !(genomicPos-upstreamLength < 0) &&//!segmentFactory.maxDistUpOutOfChromosome() &&
-                    !(chromosomeLength < genomicPos + downstreamLength));//!segmentFactory.maxDistDownOutOfChromosome());
+                    !(genomicPos - upstreamLength < 0) &&
+                    !(chromosomeLength < genomicPos + downstreamLength));
         }
         /* The iterative approach can result in more than one adjacent digest in up- or downstream direction.
            Such digests need to be removed from the list.
@@ -295,13 +297,15 @@ public class ViewPoint implements Serializable {
         int LEN = restrictionSegmentList.size();
         LOGGER.trace("restrictionSegmentList.size(): " + restrictionSegmentList.size());
         int firstSelectedIndex = IntStream.range(0,LEN)
-                .filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//isSelected())
+                .filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos - this.upstreamNucleotideLength,
+                        genomicPos + this.downstreamNucleotideLength))
                 .findFirst().orElse(0);
 
         // The map reverses the order.
         int lastSelectedIndex = IntStream.range(0,LEN-1).
                 map(i -> LEN - i - 1).
-                filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos-this.upstreamNucleotideLength,genomicPos+this.downstreamNucleotideLength))//.isSelected())
+                filter(i->restrictionSegmentList.get(i).overlapsRange(genomicPos - this.upstreamNucleotideLength,
+                        genomicPos + this.downstreamNucleotideLength))
                 .findFirst().orElse(0);
 
 
@@ -332,12 +336,6 @@ public class ViewPoint implements Serializable {
      */
     private void initRestrictionFragments(IndexedFastaSequenceFile fastaReader, AlignabilityMap c2align) {
         this.restrictionSegmentList = new ArrayList<>();
-        // if genomicPos occurs on the first digest of the chromosome, add pseudo digest with length 0.
-        if(genomicPos < segmentFactory.getAllCuts().get(0)) {
-            Segment restFrag = new Segment(chromosomeID,
-                    0,
-                    0,fastaReader, marginSize); // needed?
-        }
         for (int j = 0; j < segmentFactory.getAllCuts().size() - 1; j++) {
             Segment restFrag = new Segment(chromosomeID,
                     segmentFactory.getUpstreamCut(j),
@@ -381,7 +379,9 @@ public class ViewPoint implements Serializable {
         return genomicPos;
     }
     /** @return a string like chr4:29,232,796 */
-    public String getGenomicLocationString() { return String.format("%s:%s", chromosomeID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));}
+    public String getGenomicLocationString() {
+        return String.format("%s:%s", chromosomeID, NumberFormat.getNumberInstance(Locale.US).format(genomicPos));
+    }
 
     /** @return overall score of this ViewPoint */
     public final double getScore() {
@@ -495,10 +495,10 @@ public class ViewPoint implements Serializable {
 
 
     /**
-     * This function can be used to reshape the viewpoint according to rules that were developed in consultation with bench scientists.
-     * In this approach, the viewpoint is seen as a set of selected fragments within a given range around {@link #genomicPos}.
-     * Fragments can be discarded because they shorter, or because their margins a higher repetitive content than a given thresholds.
-     *
+     * This function can be used to reshape the viewpoint according to rules that were developed in consultation
+     * with bench scientists. In this approach, the viewpoint is seen as a set of selected fragments within a given
+     * range around {@link #genomicPos}. Fragments can be discarded because they shorter, or because their margins
+     * a higher repetitive content than a given thresholds.
      * @param maxSizeUp    upper limit for the distance between {@link #startPos} and {@link #genomicPos} (e.g. 5000).
      * @param maxSizeDown  upper limit for the distance between {@link #genomicPos} and {@link #endPos} (e.g. 5000).
      */
@@ -564,12 +564,13 @@ public class ViewPoint implements Serializable {
                 orElse(null);
 
         if (this.centerSegment == null) {
-            LOGGER.error(String.format("%s At least one digest must contain 'genomicPos' (%s:%d)", getTargetName(), chromosomeID, genomicPos));
-            //restrictionSegmentList.clear(); /* no fragments */
+            LOGGER.error("{} At least one digest must contain 'genomicPos' ({}:{}})",
+                    getTargetName(), chromosomeID, genomicPos);
         } else {
             this.centerSegment.setOverlapsTSS(true);
             LOGGER.trace("Setting center segment, overlaps TSS for " + this.getReferenceID() + ": " );
-            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject digest-wise in UPSTREAM direction ???
+            // originating from the centralized digest containing 'genomicPos' (included) openExistingProject
+            // digest-wise in UPSTREAM direction
             int length = centerSegment.length();
             LOGGER.trace("length of center segment=" + length +" balanced=" + (centerSegment.isBalanced()?"yes":"no"));
             if ((length >= this.minFragSize &&
@@ -600,7 +601,7 @@ public class ViewPoint implements Serializable {
                 } else {
                     LOGGER.trace("Warning: There is no segment in downstream direction of the center segment!");
                 }
-                Double score = calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
+                double score = calculateViewpointScoreSimple(centerSegment.getStartPos(), genomicPos, centerSegment.getEndPos());
                 if(allowPatchedViewpoints && score < 0.6) {
                     // add adjacent segment
                     if(centerSegment.getEndPos() - genomicPos < genomicPos - centerSegment.getStartPos() && downstreamSegment != null) {
