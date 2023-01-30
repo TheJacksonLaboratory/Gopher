@@ -1,4 +1,4 @@
-# GOPHER: Generator Of Probes for capture Hi-C Expriments at high Resolution
+# GOPHER: Generator Of Probes for capture Hi-C Experiments at high Resolution
 
 GOPHER is a Java App designed to help design probes for Capture Hi-C experiments. 
 GOPHER allows users to download, uncompress, and index genome FASTA files, which are 
