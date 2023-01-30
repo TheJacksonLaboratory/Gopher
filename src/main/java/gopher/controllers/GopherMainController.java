@@ -983,16 +983,18 @@ public class GopherMainController implements Initializable {
         this.bedTargetsLabel.setText("");
         this.allGenesLabel.setText("");
         switch (ttype) {
-            case NONE:
+            case NONE -> {
                 return;
-            case TARGET_GENES:
+            }
+            case TARGET_GENES -> {
                 this.targetGeneLabel.setText(String.format("%d genes", count));
                 return;
-            case ALL_GENES:
+            }
+            case ALL_GENES -> {
                 this.allGenesLabel.setText(String.format("%d genes", count));
                 return;
-            case BED_TARGETS:
-                this.bedTargetsLabel.setText(String.format("%d targets", count));
+            }
+            case BED_TARGETS -> this.bedTargetsLabel.setText(String.format("%d targets", count));
         }
     }
 

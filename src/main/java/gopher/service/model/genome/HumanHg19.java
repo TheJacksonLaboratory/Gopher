@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class HumanHg19 extends Genome implements Serializable {
-    static Logger logger = LoggerFactory.getLogger(HumanHg19.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(HumanHg19.class);
     /** serialization version ID */
     static final long serialVersionUID = 4L;
     private static final String[] chromosomes = {"chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9",
@@ -46,7 +46,9 @@ public class HumanHg19 extends Genome implements Serializable {
 
     @Override  public boolean isCanonicalChromosome(String filename) {
         int i = filename.lastIndexOf("/");
-        if (i>0 && filename.length()>i) { filename = filename.substring(i+1); }
+        if (i>0) { // i.e., filename was a path with slashes
+            filename = filename.substring(i+1);
+        }
         return chromosomeFileNames.contains(filename);
     }
 }

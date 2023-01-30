@@ -140,9 +140,11 @@ public abstract class Genome implements Serializable {
 
     public boolean isCanonicalChromosome(String filename) {
         int i = filename.lastIndexOf("/");
-        if (i>0 && filename.length()>i) { filename = filename.substring(i+1); }
+        if (i>0) { // i.e., filename was a path including slashes
+            filename = filename.substring(i+1);
+        }
         if (filename.startsWith("chroms/")) {
-            filename=filename.substring(7);
+            filename = filename.substring(7);
         }
         return chromosomeFileNames.contains(filename);
     }
