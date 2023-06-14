@@ -7,6 +7,9 @@ on:
   # Runs on pushes targeting the main branch
   push:
     branches: [ master ]
+  # TODO - remove once the setup is OK
+  pull_request:
+      branches: [ develop ]
 
 jobs:
   build-docs:
