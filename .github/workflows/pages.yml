@@ -32,7 +32,7 @@ jobs:
       run: |
         pip3 install sphinx sphinx-rtd-theme
 
-    - name: Generate examples and build documentation
+    - name: Build the documentation
       run: |
         ## Init the target folder. 
         # We will put all site documentation there.
@@ -47,7 +47,7 @@ jobs:
         cd ..
         mv docs/_build/html/* gh-pages
 
-    - name: Deploy documentation.
+    - name: Deploy documentation
       if: ${{ github.event_name == 'push' }}
       uses: JamesIves/github-pages-deploy-action@v4.4.1
       with:
