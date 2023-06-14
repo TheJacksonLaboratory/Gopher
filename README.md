@@ -25,7 +25,7 @@ java -Xms2g -Xmx6g -jar GOPHER-0.9.0.jar
 GOPHER will run without problems on 2GB for small panels (-Xmx2g), but 6GB is preferable for probe design
 for all protein-coding genes or other very larger panels.
 
-The manual for GOPHER can be found here: https://thejacksonlaboratory.gihub.io/Gopher
+The manual for GOPHER can be found here: https://thejacksonlaboratory.github.io/Gopher
 
 See [Hansen P, et al., 2019, GOPHER: Generator Of Probes for capture Hi-C Experiments at high Resolution. 
 BMC Genomics 20:40](https://pubmed.ncbi.nlm.nih.gov/30642251/) for more information.
