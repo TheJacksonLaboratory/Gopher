@@ -7,9 +7,6 @@ on:
   # Runs on pushes targeting the main branch
   push:
     branches: [ master ]
-  # TODO - remove once the setup is OK
-  pull_request:
-      branches: [ develop ]
 
 jobs:
   build-docs:
@@ -20,8 +17,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
-        # TODO - remove once the setup is OK
-        ref: update_docs
+        ref: master
     
     - name: Set up Python 3.
       uses: actions/setup-python@v4
@@ -48,8 +44,7 @@ jobs:
         mv docs/_build/html/* gh-pages
 
     - name: Deploy documentation
-      # TODO - remove once the setup is OK
-      #if: ${{ github.event_name == 'push' }}
+      if: ${{ github.event_name == 'push' }}
       uses: JamesIves/github-pages-deploy-action@v4.4.1
       with:
         branch: gh-pages
