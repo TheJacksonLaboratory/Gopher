@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GUI – Viewpoint window &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Exporting results" href="05_output.html" />
+    <link rel="prev" title="GUI – Design setup" href="03_gui_design.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_installation.html">Installing and running GOPHER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_gui_data.html">GUI – Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GUI – Viewpoint window</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#analysis-window">Analysis window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#editing-viewpoints">Editing viewpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zooming-out-and-in">Zooming out and in</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ucsc-genome-browser-link">UCSC genome browser link</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="05_output.html">Exporting results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_concepts.html">Concepts and terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GUI – Viewpoint window</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/04_gui_viewpoint.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gui-viewpoint-window">
+<h1>GUI – Viewpoint window<a class="headerlink" href="#gui-viewpoint-window" title="Permalink to this heading"></a></h1>
+<section id="analysis-window">
+<h2>Analysis window<a class="headerlink" href="#analysis-window" title="Permalink to this heading"></a></h2>
+<p>In this tab a summary of the viewpoint creation is shown.
+At the top global summary statistics regarding the entire design are listed, such as the number of genes and viewpoints.
+Note that there are usually more viewpoints than genes, because one viewpoint for each TSS is created.
+GOPHER shows viewpoints for which no fragments could be found to allow the user to manually review them and add Fragments by hand if desired.</p>
+<p>The table below contains detailed information about each individual viewpoint.
+A score is calculated for each viewpoint as described in the main manuscript.
+Furthermore, there is a button for each viewpoint that opens the viewpoint tab.</p>
+<figure class="align-default">
+<img alt="_images/gui3_overview2.png" src="_images/gui3_overview2.png" />
+</figure>
+</section>
+<section id="editing-viewpoints">
+<h2>Editing viewpoints<a class="headerlink" href="#editing-viewpoints" title="Permalink to this heading"></a></h2>
+<p>Each viewpoint can be inspected in a separate tab and fragments can be added or removed as desired.
+GOPHER fetches information about the genomic location of the viewpoint from the UCSC Genome browser and displays this in a window.
+Selected fragments are highlighted with different colors.</p>
+<p>For the <strong>simple approach</strong>, viewpoints will have a single fragment if the fragment overlapping the TSS passes the selection criteria explained above.
+The example below shows the promoter 2 of the RALGDS gene.</p>
+<figure class="align-default">
+<img alt="_images/gui3_simple.png" src="_images/gui3_simple.png" />
+</figure>
+<p>For the <strong>extended approach</strong>, promoters can have multiple fragments.
+In the following example, GOPHER has selected 7 fragments for the 5th (most 3’) of five promoters of hte ZBTB16 gene.
+Several of the candidate fragments were rejected because they were too small (89 nt, 77 nt, 20 nt, and 0 nt).
+One 715 nt fragment was rejected because it GC content was above threshold (71.33%), and one 320 nt fragment was rejected because of a repeat content of 73.75%.
+None of the reject fragments would be expected to perform well in a capture Hi-C experiment.</p>
+<figure class="align-default">
+<img alt="_images/gui3_extended.png" src="_images/gui3_extended.png" />
+</figure>
+</section>
+<section id="zooming-out-and-in">
+<h2>Zooming out and in<a class="headerlink" href="#zooming-out-and-in" title="Permalink to this heading"></a></h2>
+<p>Clicking the <code class="docutils literal notranslate"><span class="pre">zoom</span> <span class="pre">out</span></code> or <code class="docutils literal notranslate"><span class="pre">zoom</span> <span class="pre">in</span></code> buttons will expand or contract the region of the genome that is shown.
+Zooming can affect the number of fragments chosen – zooming out will cause any new fragments in the new win dow that satisty the filter criteria to be chosen.
+On the other hand, zooming in will cause fragments that are no longer visible to be deselected.</p>
+</section>
+<section id="ucsc-genome-browser-link">
+<h2>UCSC genome browser link<a class="headerlink" href="#ucsc-genome-browser-link" title="Permalink to this heading"></a></h2>
+<p>Clicking on the <code class="docutils literal notranslate"><span class="pre">Copy</span> <span class="pre">URL</span></code> button will generate a link to continue the analysis in the UCSC genome browser.</p>
+<figure class="align-default">
+<img alt="_images/gui3_url.png" src="_images/gui3_url.png" />
+</figure>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="03_gui_design.html" class="btn btn-neutral float-left" title="GUI – Design setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="05_output.html" class="btn btn-neutral float-right" title="Exporting results" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

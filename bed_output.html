@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exporting BED file &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Building the regulatory exome" href="reg_exome_output.html" />
+    <link rel="prev" title="Exporting results" href="05_output.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_installation.html">Installing and running GOPHER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_gui_data.html">GUI – Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_gui_viewpoint.html">GUI – Viewpoint window</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="05_output.html">Exporting results</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Exporting BED file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#examing-gopher-s-output-in-the-ucsc-genome-browser">Examing GOPHER’s output in the UCSC genome browser</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reg_exome_output.html">Building the regulatory exome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="digest_output.html">Digest file export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="project_export.html">Exporting the project file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="06_concepts.html">Concepts and terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="05_output.html">Exporting results</a></li>
+      <li class="breadcrumb-item active">Exporting BED file</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/bed_output.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="exporting-bed-file">
+<h1>Exporting BED file<a class="headerlink" href="#exporting-bed-file" title="Permalink to this heading"></a></h1>
+<section id="examing-gopher-s-output-in-the-ucsc-genome-browser">
+<h2>Examing GOPHER’s output in the UCSC genome browser<a class="headerlink" href="#examing-gopher-s-output-in-the-ucsc-genome-browser" title="Permalink to this heading"></a></h2>
+<p>By clicking on <code class="docutils literal notranslate"><span class="pre">Export</span> <span class="pre">&gt;</span> <span class="pre">Save</span> <span class="pre">BED</span> <span class="pre">filed</span> <span class="pre">as</span> <span class="pre">...</span></code>, GOPHER outputs a series of BED files.
+Here are the first three lines of a typical file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chr11</span>  <span class="mi">3814753</span>    <span class="mi">3815000</span>    <span class="n">NUP98</span>
+<span class="n">chr11</span>  <span class="mi">113929420</span>  <span class="mi">113929670</span>  <span class="n">ZBTB16</span>
+<span class="n">chr17</span>  <span class="mi">66507972</span>   <span class="mi">66508222</span>   <span class="n">PRKAR1A</span>
+</pre></div>
+</div>
+<p>Each line represents one region for which we would like to generate a probe.
+The regions are located on the edges of the restriction fragments chosen by the user with GOPHER.</p>
+<p>One way to validate the results of this analysis are to compare the chosen fragments with the locations of restriction enzyme cutting sites in the genome.
+Users can generate a BED file for any enzyme and load both BED files as custom tracks to UCSC.
+Following this,the user can copy URLs from the GOPHER browser itself and visualize the viewpoints and the fragments they contain together with the information from the BED files.</p>
+<p>There are many ways to generate BED files representing restriction sites.
+We will show one method that uses several Bioconductor libraries (see <a class="reference external" href="http://bioconductor.org/">http://bioconductor.org/</a> for information on how to install Bioconductor and the required packages).
+The following code extracts all <em>Dpn</em>II sites in the GRCh37 (also known as hg19) build of the human genome.
+This sites have a zero overhang.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">HiTC</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">rtracklayer</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">BSgenome</span><span class="o">.</span><span class="n">Hsapiens</span><span class="o">.</span><span class="n">UCSC</span><span class="o">.</span><span class="n">hg19</span><span class="p">)</span>
+
+<span class="n">human_chr</span> <span class="o">&lt;-</span> <span class="n">seqlevels</span><span class="p">(</span><span class="n">BSgenome</span><span class="o">.</span><span class="n">Hsapiens</span><span class="o">.</span><span class="n">UCSC</span><span class="o">.</span><span class="n">hg19</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span>
+<span class="n">resFrag</span> <span class="o">&lt;-</span> <span class="n">getRestrictionFragmentsPerChromosome</span><span class="p">(</span><span class="n">resSite</span><span class="o">=</span><span class="s2">&quot;GATC&quot;</span><span class="p">,</span> <span class="n">chromosomes</span><span class="o">=</span><span class="n">human_chr</span><span class="p">,</span> <span class="n">overhangs5</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>    <span class="n">genomePack</span><span class="o">=</span><span class="s2">&quot;BSgenome.Hsapiens.UCSC.hg19&quot;</span><span class="p">)</span>
+<span class="n">allRF</span> <span class="o">&lt;-</span> <span class="n">do</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span><span class="n">resFrag</span><span class="p">)</span>
+<span class="n">names</span><span class="p">(</span><span class="n">allRF</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">unlist</span><span class="p">(</span><span class="n">sapply</span><span class="p">(</span><span class="n">resFrag</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">){</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;HIC_&quot;</span><span class="p">,</span> <span class="n">seqlevels</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">))}))</span>
+<span class="n">export</span><span class="p">(</span><span class="n">allRF</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;bed&quot;</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="s2">&quot;DpnII_resfrag_hg19.bed&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The BED file generated by this script will contain lines that represent restriction fragments located between individual cutting sites.
+Note that the BED format is zero-based and half closed (see
+<a class="reference external" href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1">https://genome.ucsc.edu/FAQ/FAQformat.html#format1</a>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ head DpnII_resfrag_hg19.bed
+chr1    0       11159   HIC_chr1_1      0       +
+chr1    11159   12410   HIC_chr1_2      0       +
+chr1    12410   12460   HIC_chr1_3      0       +
+chr1    12460   12685   HIC_chr1_4      0       +
+chr1    12685   12828   HIC_chr1_5      0       +
+chr1    12828   13314   HIC_chr1_6      0       +
+chr1    13314   13419   HIC_chr1_7      0       +
+chr1    13419   13565   HIC_chr1_8      0       +
+chr1    13565   13697   HIC_chr1_9      0       +
+chr1    13697   13914   HIC_chr1_10     0       +
+</pre></div>
+</div>
+<p>We will add the following line to the top of this file in order to display the fragments in blue for better visibility.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">track</span> <span class="n">name</span><span class="o">=</span><span class="n">spacer</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;DpnII sites&quot;</span> <span class="n">color</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>This can be done with <code class="docutils literal notranslate"><span class="pre">sed</span></code> as follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sed</span>  <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;1i track name=spacer description=&quot;DpnII sites&quot; color=0,0,255,&#39;</span> <span class="n">DpnII_resfrag_hg19</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>We remove all mitochondrial fragments, which are not relevant for CHC (one of the entries also seems to cause an import error at the UCSC site).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;/^chrM/d&#39;</span> <span class="n">DpnII_resfrag_hg19</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>Note that the fragments above tile the entire genome.
+We would like to extract a list of fragments that are near to transcription start sites and then to extract the borders of these fragments, since these are the regions that are enriched for capture Hi-C.
+To do so, we will first extract a list of transcription start sites from gencode (<a class="reference external" href="https://www.gencodegenes.org/">https://www.gencodegenes.org/</a>).</p>
+<p>We will use standard unix tools as well as BEDtools (<a class="reference external" href="http://bedtools.readthedocs.io/en/latest/">http://bedtools.readthedocs.io/en/latest/</a>).</p>
+<p>Our gene data file will be taken from gencode release 19 (GRCh37/hg19), the comprehensive gene annotation file (GTF): <code class="docutils literal notranslate"><span class="pre">gencode.v19.annotation.gtf_withproteinids</span></code>.
+We first filter for functional, non-mitochondrial transcripts.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="s1">&#39;^#&#39;</span> <span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">gtf</span> <span class="o">|</span>
+  <span class="n">awk</span> <span class="s1">&#39;/</span><span class="se">\t</span><span class="s1">(HAVANA|ENSEMBL)</span><span class="se">\t</span><span class="s1">(transcript)</span><span class="se">\t</span><span class="s1">/ </span><span class="si">{print}</span><span class="s1">&#39;</span><span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">w</span> <span class="s2">&quot;gene_status </span><span class="se">\&quot;</span><span class="s2">KNOWN</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">w</span> <span class="s2">&quot;transcript_status </span><span class="se">\&quot;</span><span class="s2">KNOWN</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">pseudogene</span> <span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">nonsense_mediated_decay</span> <span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">retained_intron</span>  <span class="o">|</span>
+  <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">chrM</span> <span class="o">&gt;</span>
+  <span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">filtered_transcript</span><span class="o">.</span><span class="n">gtf</span>
+</pre></div>
+</div>
+<p>Now, we extract the 50 nucleotides upstream of each TSS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">filtered_transcript</span><span class="o">.</span><span class="n">gtf</span> <span class="o">|</span>
+<span class="n">awk</span> <span class="s1">&#39;{if ($7 ==&quot;-&quot;) {print $1&quot;</span><span class="se">\t</span><span class="s1">&quot;$5&quot;</span><span class="se">\t</span><span class="s1">&quot;$5+50&quot;</span><span class="se">\t</span><span class="s1">&quot;$10&quot;|&quot;$12&quot;</span><span class="se">\t</span><span class="s1">0</span><span class="se">\t</span><span class="s1">&quot;$7} </span><span class="se">\</span>
+<span class="s1">  else {print $1&quot;</span><span class="se">\t</span><span class="s1">&quot;$4-50&quot;</span><span class="se">\t</span><span class="s1">&quot;$4&quot;</span><span class="se">\t</span><span class="s1">&quot;$10&quot;|&quot;$12&quot;</span><span class="se">\t</span><span class="s1">0</span><span class="se">\t</span><span class="s1">&quot;$7}}&#39;</span> <span class="o">|</span>
+<span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;s/&quot;//g&#39;</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;s/;//g&#39;</span> <span class="o">|</span>
+<span class="n">grep</span> <span class="nb">chr</span> <span class="o">|</span>
+<span class="n">bedtools</span> <span class="n">sort</span> <span class="o">-</span><span class="n">i</span> <span class="n">stdin</span> <span class="o">&gt;</span> <span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">filtered_tss_50bp_upstream</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>This produces a file with the 50 nucleotide segments that have an overlap with the TSS.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ head gencode.v19.annotation.filtered_tss_50bp_upstream.bed
+chr1        36073   36123   ENSG00000237613.2|ENST00000461467.1     0       -
+chr1        36081   36131   ENSG00000237613.2|ENST00000417324.1     0       -
+chr1        69041   69091   ENSG00000186092.4|ENST00000335137.3     0       +
+</pre></div>
+</div>
+<p>For instance, the first entry is derived from ENSG00000237613.2 on the negative strand of chromosome 1 at positions 34554-36081, and overlaps that entry between 36073 and 36081.</p>
+<p>We now intersect the <em>Dpn</em>II fragments with the 50 nucleotide TSS fragments, and  filter for sizes between 146 and 20kb.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">intersectBed</span> <span class="o">-</span><span class="n">wa</span> <span class="o">-</span><span class="n">wb</span> <span class="o">-</span><span class="n">a</span> <span class="n">DpnII_resfrag_hg19</span><span class="o">.</span><span class="n">bed</span> \
+  <span class="o">-</span><span class="n">b</span> <span class="o">../</span><span class="n">annotation</span><span class="o">/</span><span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">filtered_tss_50bp_upstream</span><span class="o">.</span><span class="n">bed</span> <span class="o">|</span>
+  <span class="n">awk</span> <span class="s1">&#39;{if ($3-$2 &gt; 146 &amp;&amp; $3-$2 &lt; 20000)  print $0}&#39;</span><span class="o">|</span>
+  <span class="n">bedtools</span> <span class="n">merge</span> <span class="o">-</span><span class="n">d</span> <span class="mi">1</span> <span class="o">-</span><span class="n">i</span> <span class="n">stdin</span> <span class="o">|</span>
+  <span class="n">intersectBed</span> <span class="o">-</span><span class="n">wa</span> <span class="o">-</span><span class="n">wb</span> <span class="o">-</span><span class="n">a</span> <span class="n">stdin</span> \
+  <span class="o">-</span><span class="n">b</span> <span class="o">../</span><span class="n">annotation</span><span class="o">/</span><span class="n">gencode</span><span class="o">.</span><span class="n">v19</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">filtered_tss_50bp_upstream</span><span class="o">.</span><span class="n">bed</span> <span class="o">|</span>
+  <span class="n">awk</span> <span class="s1">&#39;{ if ($9==&quot;-&quot;) {print $1&quot;</span><span class="se">\t</span><span class="s1">&quot;$3-240&quot;</span><span class="se">\t</span><span class="s1">&quot;$3&quot;</span><span class="se">\t</span><span class="s1">&quot;$7&quot;</span><span class="se">\t</span><span class="s1">&quot;$8&quot;</span><span class="se">\t</span><span class="s1">&quot;$9} </span><span class="se">\</span>
+<span class="s1">    else {print $1&quot;</span><span class="se">\t</span><span class="s1">&quot;$2&quot;</span><span class="se">\t</span><span class="s1">&quot;$2+240&quot;</span><span class="se">\t</span><span class="s1">&quot;$7&quot;</span><span class="se">\t</span><span class="s1">&quot;$8&quot;</span><span class="se">\t</span><span class="s1">&quot;$9}}&#39;</span><span class="o">|</span>
+  <span class="n">sed</span> <span class="s1">&#39;s/|/</span><span class="se">\t</span><span class="s1">/g&#39;</span> <span class="o">|</span>
+  <span class="n">cut</span> <span class="o">-</span><span class="n">f1</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="o">-</span><span class="mi">7</span><span class="o">|</span>
+  <span class="n">sort</span> <span class="o">-</span><span class="n">k1</span><span class="p">,</span><span class="mi">1</span> <span class="o">-</span><span class="n">k2</span><span class="p">,</span><span class="mi">2</span><span class="n">n</span> <span class="o">|</span>
+  <span class="n">uniq</span> <span class="o">-&gt;</span> <span class="n">all_known_promoters_test_probe_design</span><span class="o">.</span><span class="n">bed</span>
+
+  <span class="n">This</span> <span class="n">produces</span> <span class="n">a</span> <span class="n">BED</span> <span class="n">file</span>
+
+  <span class="n">chr1</span>        <span class="mi">36431</span>   <span class="mi">36671</span>   <span class="n">ENSG00000237613</span><span class="mf">.2</span>       <span class="mi">0</span>       <span class="o">-</span>
+  <span class="n">chr1</span>        <span class="mi">68902</span>   <span class="mi">69142</span>   <span class="n">ENSG00000186092</span><span class="mf">.4</span>       <span class="mi">0</span>       <span class="o">+</span>
+  <span class="n">chr1</span>        <span class="mi">139632</span>  <span class="mi">139872</span>  <span class="n">ENSG00000237683</span><span class="mf">.5</span>       <span class="mi">0</span>       <span class="o">-</span>
+  <span class="n">chr1</span>        <span class="mi">158665</span>  <span class="mi">158905</span>  <span class="n">ENSG00000222623</span><span class="mf">.1</span>       <span class="mi">0</span>       <span class="o">-</span>
+</pre></div>
+</div>
+<p>One now uses bedtools to make windows around the initial fragments of 120 bp.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bedtools</span> <span class="n">makewindows</span> \
+<span class="o">-</span><span class="n">b</span> <span class="n">all_known_promoters_test_probe_design</span><span class="o">.</span><span class="n">bed</span> <span class="o">-</span><span class="n">w</span> <span class="mi">120</span> <span class="o">-</span><span class="n">i</span> <span class="n">src</span> <span class="o">|</span>
+<span class="n">bedtools</span> <span class="n">sort</span> <span class="o">-</span><span class="n">i</span> <span class="n">stdin</span> <span class="o">&gt;</span> <span class="n">all_known_promoters_windows</span><span class="o">.</span><span class="n">sorted</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>This produces a file of overlapping, 120 nt windows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chr1</span>  <span class="mi">36431</span>   <span class="mi">36551</span>   <span class="n">ENSG00000237613</span><span class="mf">.2</span>
+<span class="n">chr1</span>  <span class="mi">36551</span>   <span class="mi">36671</span>   <span class="n">ENSG00000237613</span><span class="mf">.2</span>
+<span class="n">chr1</span>  <span class="mi">68902</span>   <span class="mi">69022</span>   <span class="n">ENSG00000186092</span><span class="mf">.4</span>
+<span class="n">chr1</span>  <span class="mi">69022</span>   <span class="mi">69142</span>   <span class="n">ENSG00000186092</span><span class="mf">.4</span>
+<span class="n">chr1</span>  <span class="mi">139632</span>  <span class="mi">139752</span>  <span class="n">ENSG00000237683</span><span class="mf">.5</span>
+</pre></div>
+</div>
+<p>Optionally, one can also use the bedtools nuc tool to remove initial fragments that contain repeats and also filter for GC content between 25% and 65%.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bedtools</span> <span class="n">makewindows</span> \
+<span class="o">-</span><span class="n">b</span> <span class="n">all_known_promoters_test_probe_design</span><span class="o">.</span><span class="n">bed</span> <span class="o">-</span><span class="n">w</span> <span class="mi">120</span>  <span class="o">-</span><span class="n">i</span> <span class="n">src</span> <span class="o">|</span>
+<span class="n">bedtools</span> <span class="n">nuc</span> <span class="o">-</span><span class="n">fi</span> <span class="n">hg19_nh</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">masked</span> <span class="o">-</span><span class="n">bed</span> <span class="n">stdin</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span><span class="n">seq</span> <span class="o">|</span>
+<span class="n">awk</span> <span class="s1">&#39;{if ($6 &gt;= 0.25 &amp;&amp; $6 &lt;= 0.65 &amp;&amp; $13 ==120 ) print $0}&#39;</span> <span class="o">|</span>
+<span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="s2">&quot;NNN&quot;</span> <span class="o">|</span>
+<span class="n">bedtools</span> <span class="n">sort</span> <span class="o">-</span><span class="n">i</span> <span class="n">stdin</span> <span class="o">&gt;</span> <span class="n">all_known_promoters_windows_filtered</span><span class="o">.</span><span class="n">sorted</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>Finally, we grab windows passing above criteria closest to the edge of DpnII fragment end.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">intersectBed</span> <span class="o">-</span><span class="n">wa</span> <span class="o">-</span><span class="n">u</span> <span class="o">-</span><span class="n">a</span> <span class="n">DpnII_resfrag_hg19</span><span class="o">.</span><span class="n">bed</span> \
+<span class="o">-</span><span class="n">b</span> <span class="n">all_known_promoters_windows</span><span class="o">.</span><span class="n">sorted</span><span class="o">.</span><span class="n">bed</span>  <span class="o">|</span>
+<span class="n">bedtools</span> <span class="n">sort</span> <span class="o">-</span><span class="n">i</span> <span class="n">stdin</span> <span class="o">|</span>
+<span class="n">closestBed</span> <span class="o">-</span><span class="n">t</span> <span class="n">first</span> <span class="o">-</span><span class="n">a</span> <span class="n">stdin</span> \
+<span class="o">-</span><span class="n">b</span> <span class="n">all_known_promoters_windows</span><span class="o">.</span><span class="n">sorted</span><span class="o">.</span><span class="n">bed</span> <span class="o">|</span>
+<span class="n">cut</span> <span class="o">-</span><span class="n">f1</span><span class="o">-</span><span class="mi">6</span> <span class="o">&gt;</span> <span class="n">Promoter_Capture_HiC_Gencode_V19_DpnII</span><span class="o">.</span><span class="n">bed</span>
+</pre></div>
+</div>
+<p>This produces the BED file that we can view in UCSC.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chr1</span>  <span class="mi">35641</span>   <span class="mi">36671</span>   <span class="n">HIC_chr1_56</span>     <span class="mi">0</span>       <span class="o">+</span>
+<span class="n">chr1</span>  <span class="mi">68902</span>   <span class="mi">69276</span>   <span class="n">HIC_chr1_144</span>    <span class="mi">0</span>       <span class="o">+</span>
+<span class="n">chr1</span>  <span class="mi">136170</span>  <span class="mi">139872</span>  <span class="n">HIC_chr1_306</span>    <span class="mi">0</span>       <span class="o">+</span>
+<span class="n">chr1</span>  <span class="mi">157269</span>  <span class="mi">158905</span>  <span class="n">HIC_chr1_367</span>    <span class="mi">0</span>       <span class="o">+</span>
+</pre></div>
+</div>
+<p>Now go to the My <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">&gt;</span> <span class="pre">Custom</span> <span class="pre">Tracks</span></code> page at the UCSC Genome Browser, click on the Custom Tracks button, and upload the targeted <em>Dpn</em>II BED file.
+Now you can view the <em>Dpn</em>II sites, the chosen fragments,and the highlighted viewpoint regions (use the copy URL to clipboard to obtain a URL for a region of interest).
+An analogous script can be used to check results for other restriction enzymes.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="05_output.html" class="btn btn-neutral float-left" title="Exporting results" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reg_exome_output.html" class="btn btn-neutral float-right" title="Building the regulatory exome" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

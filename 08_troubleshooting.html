@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Troubleshooting &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Probe upload" href="07_probe_upload.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_installation.html">Installing and running GOPHER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_gui_data.html">GUI – Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_gui_viewpoint.html">GUI – Viewpoint window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_output.html">Exporting results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_concepts.html">Concepts and terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#connection-issues">Connection issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#proxy">Proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#java-version">Java version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-errors">Memory errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logging">Logging</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/08_troubleshooting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h1>
+<section id="connection-issues">
+<h2>Connection issues<a class="headerlink" href="#connection-issues" title="Permalink to this heading"></a></h2>
+<p>Many Gopher functions depend on an active internet connection including (obviously) the downloads.
+The visualization of viewpoints is implemented with a call to the UCSC genome browser. Therefore,
+you must be onlne for Gopher to work correctly, and if you receive an error message or if a blank
+page is shown for the visualization of viewpoints, you should check your internet connection.</p>
+</section>
+<section id="proxy">
+<h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>If you are behind a proxy server, then you will need to enter the HTTP proxy and port with</dt><dd><p>the Edit|Set proxy menu item.</p>
+</dd>
+</dl>
+</section>
+<section id="java-version">
+<h2>Java version<a class="headerlink" href="#java-version" title="Permalink to this heading"></a></h2>
+<p>GOPHER requires a Java runtime environment (JRE) of 1.8 or higher to run. If one attempts to start Java with an
+older JRE, an error message such as the following may appear:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Unsupported</span> <span class="n">major</span><span class="o">.</span><span class="n">minor</span> <span class="n">version</span> <span class="mf">52.0</span>
+</pre></div>
+</div>
+<p>Please consult the <cite>Java download page &lt;https://java.com/en/&gt;_</cite> for more information. To determine the Java version
+on your computer, open a terminal window and enter</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -version
+</pre></div>
+</div>
+<p>You should then seen a response such as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="n">version</span> <span class="s2">&quot;1.8.0_181&quot;</span>
+<span class="n">Java</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span> <span class="n">SE</span> <span class="n">Runtime</span> <span class="n">Environment</span> <span class="p">(</span><span class="n">build</span> <span class="mf">1.8.0_181</span><span class="o">-</span><span class="n">b13</span><span class="p">)</span>
+<span class="n">Java</span> <span class="n">HotSpot</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span> <span class="mi">64</span><span class="o">-</span><span class="n">Bit</span> <span class="n">Server</span> <span class="n">VM</span> <span class="p">(</span><span class="n">build</span> <span class="mf">25.181</span><span class="o">-</span><span class="n">b13</span><span class="p">,</span> <span class="n">mixed</span> <span class="n">mode</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The version in this example is thus 1.8.0_181.</p>
+</section>
+<section id="memory-errors">
+<h2>Memory errors<a class="headerlink" href="#memory-errors" title="Permalink to this heading"></a></h2>
+<p>We recommend starting GOPHER with at least 2 GB memory. The amount of memory required by GOPHER will depend on the
+size of the panel and GOPHER may require more memory with very large panels. GOPHER will display an error dialog
+stating <code class="docutils literal notranslate"><span class="pre">Out</span> <span class="pre">of</span> <span class="pre">Memory</span> <span class="pre">Error</span></code> if it runs out of memory. In this case, you will need to close the program,
+adjust the memry settings, and restart GOPHER.</p>
+<p>There are several ways to adjust the amount of memory that the Java Virtual Machine provides to Java apps. When starting
+an app such as GOPHER from the command line, you can determine the amount of Minimum and Maximum memory provided to the
+app as follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -Xms2g -Xmx6g -jar GOPHER.jar
+</pre></div>
+</div>
+<p>This command will start GOPHER with at least 2 gigabytes of RAM (-Xms2g) and allow GOPHER to use up to 6 gigabytes of
+RAM (-Xmx6g).</p>
+</section>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this heading"></a></h2>
+<p>By default, GOPHER will only write messages to its log file if an error occurs. If you
+run into difficulties using GOPHER, you can set the logging level
+to TRACE (in the Help menu). This will cause GOPHER to write detailed messages to its log file
+that you can see with the Show log entry in the Help menu. You can contact us and if you like can send
+us the log file (which will be stored in your GOPHER user directory (.gopher in linux and Mac, and gopher in
+Windows).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="07_probe_upload.html" class="btn btn-neutral float-left" title="Probe upload" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

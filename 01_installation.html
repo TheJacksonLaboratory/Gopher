@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installing and running GOPHER &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GUI – Data preparation" href="02_gui_data.html" />
+    <link rel="prev" title="Welcome to GOPHER’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing and running GOPHER</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-pre-built-gopher-app">Using the pre-built GOPHER app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-gopher-from-source">Building GOPHER from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-gopher">Running GOPHER</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="02_gui_data.html">GUI – Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_gui_viewpoint.html">GUI – Viewpoint window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_output.html">Exporting results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_concepts.html">Concepts and terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installing and running GOPHER</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/01_installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installing-and-running-gopher">
+<h1>Installing and running GOPHER<a class="headerlink" href="#installing-and-running-gopher" title="Permalink to this heading"></a></h1>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>GOPHER needs Java 17 or newer to build from source.
+You can determine what version of Java you have on your computer by entering the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -version
+  java version &quot;17.0.1&quot; 2021-10-19 LTS
+  Java(TM) SE Runtime Environment (build 17.0.1+12-LTS-39)
+  Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+12-LTS-39, mixed mode, sharing)
+</pre></div>
+</div>
+</section>
+<section id="using-the-pre-built-gopher-app">
+<h2>Using the pre-built GOPHER app<a class="headerlink" href="#using-the-pre-built-gopher-app" title="Permalink to this heading"></a></h2>
+<p>Most users should install the prebuilt application called <code class="docutils literal notranslate"><span class="pre">GOPHER.jar</span></code> that is available in the <em>Releases</em> section of
+the GOPHER GitHub repository: <a class="reference external" href="https://github.com/TheJacksonLaboratory/GOPHER/releases/">https://github.com/TheJacksonLaboratory/GOPHER/releases/</a>.</p>
+<p>Versions are available for different operating systems and can be installed as usual.</p>
+<p>We additionally supply an executable jar file that can be run on systems with Java 17 or newer. You should be able to
+start GOPHER by double clicking on the <code class="docutils literal notranslate"><span class="pre">GOPHER.jar</span></code>.
+Alternatively, you can start <code class="docutils literal notranslate"><span class="pre">GOPHER.jar</span></code> from the shell with the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar GOPHER.jar
+</pre></div>
+</div>
+<p><strong>Note:</strong> if you receive an <code class="docutils literal notranslate"><span class="pre">OutOfMemoryError</span></code> allow more memory to be allocated for Java heap using <code class="docutils literal notranslate"><span class="pre">-Xmx</span></code> option, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">Xmx8g</span> <span class="o">-</span><span class="n">jar</span> <span class="n">GOPHER</span><span class="o">.</span><span class="n">jar</span>
+</pre></div>
+</div>
+</section>
+<section id="building-gopher-from-source">
+<h2>Building GOPHER from source<a class="headerlink" href="#building-gopher-from-source" title="Permalink to this heading"></a></h2>
+<p>It is also possible to build the GOPHER application from source.
+The source code for GOPHER is available from the GOPHER GitHub page.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/TheJacksonLaboratory/Gopher
+</pre></div>
+</div>
+<p>GOPHER used the maven build system. To build the App simply enter the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mvn package
+</pre></div>
+</div>
+<p>This will create the  GOPHER.jar app in the <em>target</em> subdirectory.</p>
+</section>
+<section id="running-gopher">
+<h2>Running GOPHER<a class="headerlink" href="#running-gopher" title="Permalink to this heading"></a></h2>
+<p>Assuming you have built or downloaded the <cite>GOPHER.jar</cite> file, it is simple to start the program. Enter</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ java -jar GOPHER.jar
+</pre></div>
+</div>
+<p>or double-click on the file.
+You will see the following dialog.
+This dialog allows users to open a previously created project or to start a new one.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/install_welcome.png"><img alt="splash screen" src="_images/install_welcome.png" style="width: 372.0px; height: 322.40000000000003px;" /></a>
+</figure>
+<p>If you click on the <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">project</span></code> button, you can enter the desired name of the project and begin work.
+Note that GOPHER stores projects files in a directory in the home directory: <code class="docutils literal notranslate"><span class="pre">gopher</span></code></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to GOPHER’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="02_gui_data.html" class="btn btn-neutral float-right" title="GUI – Data preparation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

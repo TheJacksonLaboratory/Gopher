@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GUI – Data preparation &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GUI – Design setup" href="03_gui_design.html" />
+    <link rel="prev" title="Installing and running GOPHER" href="01_installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_installation.html">Installing and running GOPHER</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GUI – Data preparation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#choosing-a-genome-build">Choosing a genome build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#choosing-enrichment-targets">Choosing enrichment targets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_gui_viewpoint.html">GUI – Viewpoint window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_output.html">Exporting results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_concepts.html">Concepts and terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GUI – Data preparation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/02_gui_data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gui-data-preparation">
+<h1>GUI – Data preparation<a class="headerlink" href="#gui-data-preparation" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>Sequence and annotation data for various genome builds for mouse and human can be downloaded and preprocessed via mouse clicks.
+Lists of target gene symbols can be uploaded from a text file or from the clipboard.
+Alternatively, a shortcut allows to select all protein-coding genes as capture targets.
+GOPHER’s functionality is not restricted to transcription start sites.
+Arbitrary genomic position can be uploaded in BED6 format, for instance GWAS hits.</p>
+<figure class="align-default">
+<img alt="_images/gui1_overview.png" src="_images/gui1_overview.png" />
+</figure>
+</section>
+<section id="choosing-a-genome-build">
+<h2>Choosing a genome build<a class="headerlink" href="#choosing-a-genome-build" title="Permalink to this heading"></a></h2>
+<p>GOPHER currently supports hg19 (i.e., GRCh37), GRCh38, mm9 and mm10.
+Choose the appropriate genome build from the pulldown menu.</p>
+<figure class="align-default">
+<img alt="_images/gui1_genome3.png" src="_images/gui1_genome3.png" />
+</figure>
+<p>Click on the <code class="docutils literal notranslate"><span class="pre">Download</span></code> button and choose a directory for the <strong>genome</strong>.
+GOPHER will download the corresponding genome file from the UCSC Genome Browser unless it finds the correspding files in the directory, in which case it will merely show the <em>Done</em> mark.
+Note that the full download may take many minutes or longer depending on your network bandwidth.</p>
+<p>The UCSC Genome files are provided as compressed (gzip) tar archives.
+Clicking on the <code class="docutils literal notranslate"><span class="pre">Start</span></code> button after <strong>Decompress genome</strong> will decompress the files if necessary.
+If GOPHER finds the unpacked files in the genome directory, it will show the <em>Done</em> mark immediately.</p>
+<p>The genome FASTA files (one for each chromosome) need to be <strong>indexed</strong>.
+GOPHER indexes the files to produce <code class="docutils literal notranslate"><span class="pre">.fai</span></code> index files that are equivalent to those produced by samtools.
+If desired you can use samtools yourself.
+If GOPHER finds the <code class="docutils literal notranslate"><span class="pre">.fai</span></code> files in the directory, it will show the <em>Done</em> mark immediately.</p>
+<p>GOPHER additionally requires a transcript definition file.
+It will automatically download the correct file from UCSC if the user clicks on the <code class="docutils literal notranslate"><span class="pre">Download</span></code> button after <strong>Transcripts</strong>.
+It is recommended to store the file in the same directory as the genome file.
+If GOPHER finds the file in the direcotry (<code class="docutils literal notranslate"><span class="pre">refGene.txt.gz</span></code>) it will show the <em>Done</em> mark immediately.</p>
+<p>Finally, GOPHER needs to download the alignabilty map from UCSC.
+For a given kmer size <span class="math notranslate nohighlight">\(k\)</span>, the alignabilty map <span class="math notranslate nohighlight">\(p \mapsto a_k(p)\)</span> indicates how often the kmer starting at position <span class="math notranslate nohighlight">\(p\)</span> occurs within in the entire genome.
+GOPHER will automatically download the it correct file from UCSC if the user clicks on the <code class="docutils literal notranslate"><span class="pre">Download</span></code> button after <strong>Alignabilty map</strong>.</p>
+</section>
+<section id="choosing-enrichment-targets">
+<h2>Choosing enrichment targets<a class="headerlink" href="#choosing-enrichment-targets" title="Permalink to this heading"></a></h2>
+<p>Following the steps described above, the user specifies the desired enrichment targets.</p>
+<figure class="align-default">
+<img alt="_images/gui1_enrichment2.png" src="_images/gui1_enrichment2.png" />
+</figure>
+<p>Clicking on the <code class="docutils literal notranslate"><span class="pre">Enter</span> <span class="pre">gene</span> <span class="pre">list</span></code> button will open a dialog to enter a <strong>gene list</strong>.
+Currently, GOPHER expects a list of valid (HGNC) gene symbols.
+For promoter CHC, gene symbols can be uploaded from a text file with the <code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">Gene</span> <span class="pre">List</span></code> button.
+Use the <code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">protein-coding</span> <span class="pre">genes</span></code> button to extract all protein-coding gene symbols from the transcript file.</p>
+<p>Next, click the <code class="docutils literal notranslate"><span class="pre">Validate</span></code> button.
+If gene symbols are used that do not occur in the downloaded annotation data, GOPHER will issue a warning and report a list of unmappable symbols that can be used to search for the current correct symbols.
+Finally, click the <code class="docutils literal notranslate"><span class="pre">Accept</span></code> button.</p>
+<p>Alternatively, the <code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">protein-coding</span> <span class="pre">genes</span></code> button allows promoters of <strong>all-protein coding genes</strong> to be selected as targets.</p>
+<p>GOPHER also accepts a <strong>BED file</strong> with genomic positions.
+For instance, the coordinates of GWAS hits can be uploaded in BED6 format.
+Click the <code class="docutils literal notranslate"><span class="pre">Enter</span> <span class="pre">BED</span> <span class="pre">file</span></code> button and select the file.</p>
+<p>GOPHER also has two <strong>sample gene lists</strong> for human and mouse genomes that can be used as enrichment targets.
+To access the lists, click on <code class="docutils literal notranslate"><span class="pre">Help</span> <span class="pre">&gt;</span> <span class="pre">Example</span> <span class="pre">gene</span> <span class="pre">sets</span></code>.
+Select <code class="docutils literal notranslate"><span class="pre">human</span></code> or <code class="docutils literal notranslate"><span class="pre">mouse</span></code> and click <code class="docutils literal notranslate"><span class="pre">Validate</span></code> and <code class="docutils literal notranslate"><span class="pre">Accept</span></code>.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="_images/gui1_enrichment3.png"><img alt="_images/gui1_enrichment3.png" src="_images/gui1_enrichment3.png" style="width: 441.6px; height: 505.6px;" /></a>
+</figure>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="01_installation.html" class="btn btn-neutral float-left" title="Installing and running GOPHER" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="03_gui_design.html" class="btn btn-neutral float-right" title="GUI – Design setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

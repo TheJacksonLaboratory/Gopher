@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concepts and terminology &mdash; GOPHER 0.9.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Probe upload" href="07_probe_upload.html" />
+    <link rel="prev" title="Exporting the project file" href="project_export.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GOPHER
+          </a>
+              <div class="version">
+                0.9
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_installation.html">Installing and running GOPHER</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_gui_data.html">GUI – Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_gui_design.html">GUI – Design setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_gui_viewpoint.html">GUI – Viewpoint window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_output.html">Exporting results</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts and terminology</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-capture-hi-c">Introduction to Capture Hi-C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#approaches-to-viewpoint-design">Approaches to viewpoint design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simple">Simple</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-patched">Simple patched</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extended">Extended</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparison-of-approaches">Comparison of approaches</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usable-baits">Usable baits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#balanced-and-unbalanced-margins">Balanced and unbalanced margins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="07_probe_upload.html">Probe upload</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GOPHER</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Concepts and terminology</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/06_concepts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="concepts-and-terminology">
+<h1>Concepts and terminology<a class="headerlink" href="#concepts-and-terminology" title="Permalink to this heading"></a></h1>
+<section id="introduction-to-capture-hi-c">
+<h2>Introduction to Capture Hi-C<a class="headerlink" href="#introduction-to-capture-hi-c" title="Permalink to this heading"></a></h2>
+<p>Chromosome conformation capture (3C) is used to analyze the spatial structure of chromatin which plays an important role in regulation of gene expression.
+The next-generation sequencing application Hi-C allows the detection of all pairwise DNA interactions within the genome.
+In order to derive valid interactions, Hi-C requires a large amounts of input DNA and deep sequencing.
+Similar to exome sequencing, capture Hi-C (CHC) implements a compromise by limiting the view to preselected regions of interest using hybridization capture technology.
+For instance, capture Hi-C can be used to restrict the analysis to interactions that involve promoter regions.</p>
+<p>For Hi-C <strong>restriction enzymes</strong> are employed that cut the genome at specific nucleotide patterns. For instance, the enzyme
+DpnII cuts at all occurrences of the pattern GATC. The resulting DNA fragments are referred to as <strong>digests</strong>.
+The resolution of Hi-C is at the digest level, i.e. detected interactions are between digests,
+which is why the target regions for capture Hi-C consists of digests.
+Due to the Hi-C protocol the <strong>probes</strong> (aka <strong>baits</strong>) used for enrichment should be placed within the <strong>margins</strong> of digests only.</p>
+<p>Additional information can be found in a number of papers including the following:</p>
+<p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25938943">Mifsud B et al (2015) Mapping long-range promoter contacts in human cells with high-resolution capture Hi-C. Nat Genet. 2015 Jun;47(6):598-606</a></p>
+<p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/28964259">Mishra A, Hawkins RD (2017) Three-dimensional genome architecture and emerging technologies: looping in disease. Genome Med. 2017 Sep 30;9(1):87</a></p>
+<p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/30010637">Schoenfelder S et al (2018) Promoter Capture Hi-C: High-resolution, Genome-wide Profiling of Promoter Interactions. J Vis Exp. doi: 10.3791/57320.</a></p>
+<p><a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/29979818">Orlando G et al (2018). Capture Hi-C Library Generation and Analysis to Detect Chromatin Interactions. Curr Protoc Hum Genet. 2018 Jul 6:e63.</a></p>
+</section>
+<section id="approaches-to-viewpoint-design">
+<span id="approaches"></span><h2>Approaches to viewpoint design<a class="headerlink" href="#approaches-to-viewpoint-design" title="Permalink to this heading"></a></h2>
+<p>GOPHER implements three main strategies for probe design.
+To choose one of the approaches, select <code class="docutils literal notranslate"><span class="pre">Simple</span></code> or <code class="docutils literal notranslate"><span class="pre">Extended</span></code> from the pulldown menu at the top of the setup pane.
+The Simple approach can be combined with the <code class="docutils literal notranslate"><span class="pre">Patched</span> <span class="pre">viewpoints?</span></code> option.</p>
+<figure class="align-default">
+<img alt="_images/gui2_approaches3.png" src="_images/gui2_approaches3.png" />
+</figure>
+<section id="simple">
+<h3>Simple<a class="headerlink" href="#simple" title="Permalink to this heading"></a></h3>
+<p>Simple viewpoints consist of only <strong>one digest</strong> that most typically contains the trancription start site (TSS).
+The simple approach is intended for designs with large numbers of target regions such as studies of all promoters for protein coding genes.
+In the first run of viewpoint creation, only the digests that contain the TSS are selected.
+This typically results in inhomogeneous sets of viewpoints, i.e. numbers of covered bases vary due to different sizes of digests.
+Furthermore, for some viewpoints the selected digest covers the region upstream but for others the region downstream of the TSS.</p>
+<p>GOPHER tries to select the fragment that overlaps the transcriptional start site (TSS) and additionally satisfies the following requirements:</p>
+<ul class="simple">
+<li><p>GC content of the fragment is within the minimum and maximum limits defined on the setup tab</p></li>
+<li><p>The repeat content of the margins of a fragment is not higher than the defined limit (see below for a definition of fragment margin)</p></li>
+<li><p>The length of the fragment is not less than the lower boundary defined in the setup tab, and not more than 20,000 nucleotides</p></li>
+</ul>
+<p>If the restriction fragment that overlaps the TSS does not satisfy all of these criteria, then no restriction fragment is selected.</p>
+<figure class="align-default">
+<img alt="_images/concepts_simple.png" src="_images/concepts_simple.png" />
+</figure>
+</section>
+<section id="simple-patched">
+<h3>Simple patched<a class="headerlink" href="#simple-patched" title="Permalink to this heading"></a></h3>
+<p>Due to the uneven distribution of restriction enzyme cutting sites across the genome, it is often the case that digests are not well centered at the TSS positions.
+If the <strong>patching</strong> of simple viewpoints is allowed, GOPHER tries to compensate for this by adding one of the adjacent digests.
+The resulting viewpoints are referred to as <strong>simple patched viewpoints</strong> and consist of <strong>two digests</strong>.</p>
+<p>For this purpose, a score for simple viewpoints was defined that corresponds to the area under the curve of a normal distribution centered at the TSS but only for those section that are covered by the selected digest.
+For digests that are not well centered at the TSS this score will be close to 0.5.
+By default, GOPHER performs patching for scores below 0.6.</p>
+<figure class="align-default">
+<img alt="_images/concepts_simple_patched.png" src="_images/concepts_simple_patched.png" />
+</figure>
+</section>
+<section id="extended">
+<h3>Extended<a class="headerlink" href="#extended" title="Permalink to this heading"></a></h3>
+<p>For <strong>extended viewpoints</strong>, a range around genomic positions (most typically a TSSs) can be specified.
+GOPHER tries to select all digests that overlap the specified range.
+The number of digests depends on the restriction enzyme.</p>
+<p>The extended approach is intended for in depth analyses of a few hundred predefined genes that are of interest within a given context, e.g. all genes associated with Mendelian immune diseases.
+All digests that overlap the specified range and satisfy the design parameters are selected.
+The score for extended viewpoints is similar to that for simple viewpoints.
+The individual positions surrounding the TSS are weighted by their distance to the TSS, and only positions that are covered by selected digests contribute to the score.
+This has the effect that viewpoints with a large proportion of covered positions near to the TSS will be assigned a good score, which is useful for the identification of poorly resolved viewpoints that require manual inspection.</p>
+<p>For instance, if upstream size is set to 5000 and downstream size is set to 2000, then GOPHER will select all restriction fragments that are at least partially located within the 5000 nucleotides 5’ (upstream) of the TSS and within 2000 nucleotides 3’ (downstream) of the TSS.
+Note that if a fragment overlaps the upstream or downstream limit by at least one nucleotide it will be chosen if the criteria are fulfiled.
+The criteria for GC and repeat content are identical to those of the simple approach.</p>
+<figure class="align-default">
+<img alt="_images/concepts_extended.png" src="_images/concepts_extended.png" />
+</figure>
+</section>
+<section id="comparison-of-approaches">
+<h3>Comparison of approaches<a class="headerlink" href="#comparison-of-approaches" title="Permalink to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Advantages</p></th>
+<th class="head"><p>Disadvantages</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Simple</p></td>
+<td><ul class="simple">
+<li><p>Only two probes required for each viewpoint.</p></li>
+<li><p>Applicable to a large number of target genes.</p></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li><p>Size of target regions determined by the choice of restriction fragment.</p></li>
+<li><p>Many target genes have to be discarded, because TSS containing fragment cannot be enriched.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Patched
+simple</p></td>
+<td><ul class="simple">
+<li><p>Potentially more efficient enrichment of fragments
+as compared to the <em>Simple</em> approach.</p></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li><p>Size of target regions determined by the choice of restriction fragment.</p></li>
+<li><p>Many target genes have to be discarded, because TSS containing fragment cannot be enriched.</p></li>
+<li><p>Applicable to a smaller number of genes, because more probes required as compared to the <em>Simple</em> approach.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>Extended</p></td>
+<td><ul class="simple">
+<li><p>Size of the target regions defined by the user.</p></li>
+<li><p>Many target genes that would have been discarded can
+be <em>rescued</em> by enriching fragments next to the TSS
+containing fragment.</p></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li><p>Applicable to a smaller number of genes, because more probes required as compared to the <em>Simple+</em> approach.</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="usable-baits">
+<h2>Usable baits<a class="headerlink" href="#usable-baits" title="Permalink to this heading"></a></h2>
+<p>Within the framework of GOPHER, a digest can only be selected if sufficient usable baits can be placed within margins.
+A bait is <strong>usable</strong> if it satisfy constraint regarding repeat and GC content.
+The uniquness of any given bait is measured as its mean <strong>alignabilty</strong>,
+and the the <strong>GC content</strong> is the proportion of Gs and Cs within the bait sequence.
+The user can specify thresholds for alignability and GC content.</p>
+</section>
+<section id="balanced-and-unbalanced-margins">
+<h2>Balanced and unbalanced margins<a class="headerlink" href="#balanced-and-unbalanced-margins" title="Permalink to this heading"></a></h2>
+<p>A <strong>minimum number of baits</strong> can be specified by the user.
+By default, GOPHER tries to place b<sub>min</sub> in each margin of a given digest.
+If this is successful the digests is referred to as <strong>balanced</strong>.
+The constraint of balanced margins can be relaxed.
+If <strong>unbalanced</strong> margins are allowed, GOPHER tries to place 2 times b<sub>min</sub> in both margins.
+Alternatively, <strong>unbalanced</strong> digests can be added manually for individual viewpoints.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="project_export.html" class="btn btn-neutral float-left" title="Exporting the project file" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="07_probe_upload.html" class="btn btn-neutral float-right" title="Probe upload" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Peter Hansen, Peter Robinson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
